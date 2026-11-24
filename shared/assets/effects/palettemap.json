@@ -27,7 +27,8 @@
     "source": [
      0
     ]
-   }
+   },
+   "section": "palette"
   },
   {
    "id": "color1",
@@ -38,7 +39,8 @@
     "source": [
      0
     ]
-   }
+   },
+   "section": "palette"
   },
   {
    "id": "color2",
@@ -49,7 +51,8 @@
     "source": [
      0
     ]
-   }
+   },
+   "section": "palette"
   },
   {
    "id": "color3",
@@ -60,7 +63,8 @@
     "source": [
      0
     ]
-   }
+   },
+   "section": "palette"
   },
   {
    "id": "color4",
@@ -71,7 +75,8 @@
     "source": [
      0
     ]
-   }
+   },
+   "section": "palette"
   },
   {
    "id": "color5",
@@ -82,7 +87,8 @@
     "source": [
      0
     ]
-   }
+   },
+   "section": "palette"
   },
   {
    "id": "color6",
@@ -93,7 +99,8 @@
     "source": [
      0
     ]
-   }
+   },
+   "section": "palette"
   },
   {
    "id": "color7",
@@ -104,7 +111,8 @@
     "source": [
      0
     ]
-   }
+   },
+   "section": "palette"
   },
   {
    "id": "color8",
@@ -115,7 +123,8 @@
     "source": [
      0
     ]
-   }
+   },
+   "section": "palette"
   },
   {
    "id": "palette",
@@ -209,5 +218,5 @@
    "percent": true
   }
  ],
- "sksl": "uniform shader image;\nuniform shader palette;\nuniform shader thresholds;\nuniform float2 size;\nuniform float time;\nuniform float source;\nuniform float colors;\nlayout(color) uniform half4 color1;\nlayout(color) uniform half4 color2;\nlayout(color) uniform half4 color3;\nlayout(color) uniform half4 color4;\nlayout(color) uniform half4 color5;\nlayout(color) uniform half4 color6;\nlayout(color) uniform half4 color7;\nlayout(color) uniform half4 color8;\nuniform float pattern;\nuniform float dither;\nuniform float alpha;\nuniform float paletteSize;\nuniform float paletteSpread;\nuniform half4 swatches[16];\nfloat hash12(float2 p) {\n    float3 q = fract(float3(p.xyx) * 0.1031);\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.x + q.y) * q.z);\n}\nfloat3 lookup(float3 c) {\n    c = clamp(c, 0.0, 1.0);\n    if (paletteSize < 16.5) {\n        float3 best = float3(0.0);\n        float bestD = 100.0;\n        for (int i = 0; i < 16; i++) {\n            if (float(i) >= paletteSize) break;\n            float3 s = float3(swatches[i].rgb);\n            float d = dot(c - s, c - s);\n            if (d < bestD) { bestD = d; best = s; }\n        }\n        return best;\n    }\n    float3 q = floor(c * 31.0 + 0.5);\n    return float3(palette.eval(float2(mod(q.b, 8.0) * 32.0 + q.r + 0.5, floor(q.b / 8.0) * 32.0 + q.g + 0.5)).rgb);\n}\nfloat3 nearest(float3 rgb) {\n    float3 best = float3(color1.rgb);\n    float bestD = distance(rgb, best);\n    float d = distance(rgb, float3(color2.rgb));\n    if (d < bestD) { bestD = d; best = float3(color2.rgb); }\n    if (colors > 2.5) { d = distance(rgb, float3(color3.rgb)); if (d < bestD) { bestD = d; best = float3(color3.rgb); } }\n    if (colors > 3.5) { d = distance(rgb, float3(color4.rgb)); if (d < bestD) { bestD = d; best = float3(color4.rgb); } }\n    if (colors > 4.5) { d = distance(rgb, float3(color5.rgb)); if (d < bestD) { bestD = d; best = float3(color5.rgb); } }\n    if (colors > 5.5) { d = distance(rgb, float3(color6.rgb)); if (d < bestD) { bestD = d; best = float3(color6.rgb); } }\n    if (colors > 6.5) { d = distance(rgb, float3(color7.rgb)); if (d < bestD) { bestD = d; best = float3(color7.rgb); } }\n    if (colors > 7.5) { d = distance(rgb, float3(color8.rgb)); if (d < bestD) { bestD = d; best = float3(color8.rgb); } }\n    return best;\n}\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float3 base = float3(src.rgb) / float(src.a);\n    float3 rgb = base;\n    if (pattern > 0.5 && pattern < 1.5) rgb += (hash12(floor(coord)) - 0.5) * dither * 0.3;\n    else if (pattern > 1.5) rgb += (float(thresholds.eval(floor(coord) + 0.5).r) - 0.5) * dither * paletteSpread;\n    float3 best = source > 0.5 ? lookup(rgb) : nearest(rgb);\n    return half4(half3(mix(base, best, clamp(alpha, 0.0, 1.0))) * src.a, src.a);\n}\n"
+ "sksl": "uniform shader image;\nuniform shader palette;\nuniform shader thresholds;\nuniform float2 size;\nuniform float time;\nuniform float source;\nuniform float colors;\nlayout(color) uniform half4 color1;\nlayout(color) uniform half4 color2;\nlayout(color) uniform half4 color3;\nlayout(color) uniform half4 color4;\nlayout(color) uniform half4 color5;\nlayout(color) uniform half4 color6;\nlayout(color) uniform half4 color7;\nlayout(color) uniform half4 color8;\nuniform float pattern;\nuniform float dither;\nuniform float alpha;\nuniform float paletteSize;\nuniform float paletteSpread;\nuniform half4 swatches[16];\nfloat hash12(float2 p) {\n    float3 q = fract(float3(p.xyx) * 0.1031);\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.x + q.y) * q.z);\n}\nfloat3 lookup(float3 c) {\n    c = clamp(c, 0.0, 1.0);\n    if (paletteSize < 16.5) {\n        float3 best = float3(0.0);\n        float bestD = 100.0;\n        for (int i = 0; i < 16; i++) {\n            if (float(i) >= paletteSize) break;\n            float3 s = float3(swatches[i].rgb);\n            float d = dot(c - s, c - s);\n            if (d < bestD) { bestD = d; best = s; }\n        }\n        return best;\n    }\n    float3 q = floor(c * 31.0 + 0.5);\n    return float3(palette.eval(float2(mod(q.b, 8.0) * 32.0 + q.r + 0.5, floor(q.b / 8.0) * 32.0 + q.g + 0.5)).rgb);\n}\nfloat3 nearest(float3 rgb) {\n    float3 best = float3(color1.rgb);\n    float bestD = distance(rgb, best);\n    float d = distance(rgb, float3(color2.rgb));\n    if (d < bestD) { bestD = d; best = float3(color2.rgb); }\n    if (colors > 2.5) { d = distance(rgb, float3(color3.rgb)); if (d < bestD) { bestD = d; best = float3(color3.rgb); } }\n    if (colors > 3.5) { d = distance(rgb, float3(color4.rgb)); if (d < bestD) { bestD = d; best = float3(color4.rgb); } }\n    if (colors > 4.5) { d = distance(rgb, float3(color5.rgb)); if (d < bestD) { bestD = d; best = float3(color5.rgb); } }\n    if (colors > 5.5) { d = distance(rgb, float3(color6.rgb)); if (d < bestD) { bestD = d; best = float3(color6.rgb); } }\n    if (colors > 6.5) { d = distance(rgb, float3(color7.rgb)); if (d < bestD) { bestD = d; best = float3(color7.rgb); } }\n    if (colors > 7.5) { d = distance(rgb, float3(color8.rgb)); if (d < bestD) { bestD = d; best = float3(color8.rgb); } }\n    return best;\n}\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float3 base = float3(src.rgb) / float(src.a);\n    float3 rgb = base;\n    if (pattern > 0.5 && pattern < 1.5) rgb += (hash12(floor(coord)) - 0.5) * dither * 0.3;\n    else if (pattern > 1.5) rgb += (float(thresholds.eval(floor(coord) + 0.5).r) - 0.5) * dither * paletteSpread;\n    float3 best = source > 0.5 ? lookup(rgb) : nearest(rgb);\n    return half4(half3(clamp(mix(base, best, max(alpha, 0.0)), 0.0, 1.0)) * src.a, src.a);\n}\n"
 }

@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
@@ -30,7 +31,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.TextAutoSize
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -57,15 +57,21 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -77,7 +83,8 @@ import app.absentmotion.engine.EngineThread
 import app.absentmotion.export.formatBytes
 import app.absentmotion.library.CommunityClient
 import app.absentmotion.library.CommunityDamagedException
-import app.absentmotion.library.CommunityFeed
+import app.absentmotion.library.COMMUNITY_COUNTS_TTL_MS
+import app.absentmotion.library.communityDownloadSource
 import app.absentmotion.library.CommunityIndex
 import app.absentmotion.library.CommunityItem
 import app.absentmotion.library.CommunityItemUnavailable
@@ -103,10 +110,12 @@ import app.absentmotion.ui.editor.SearchField
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.ThemeFade
 import java.io.File
+import java.text.NumberFormat
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.coroutineContext
 import kotlin.math.abs
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.job
@@ -270,7 +279,7 @@ fun CommunityTab(modifier: Modifier, engine: (() -> EngineThread)? = null, onImp
     val scope = rememberCoroutineScope()
     val effectImport = remember(context, engine != null) { engine?.let { AddedEffectImport(context, it) } }
     val pager = rememberPagerState { CommunityCategory.entries.size }
-    val client = remember(context) { CommunityClient(context.cacheDir) { TrustedHttp(CommunityFeed.source) } }
+    val client = remember(context) { CommunityClient(context.cacheDir) }
     var index by remember { mutableStateOf(sessionIndex) }
     var loading by remember { mutableStateOf(sessionIndex == null) }
     var failed by remember { mutableStateOf(false) }
@@ -315,13 +324,39 @@ fun CommunityTab(modifier: Modifier, engine: (() -> EngineThread)? = null, onImp
     }
 
     val current = index
+    val pad = if (isDesktop) 24.dp else 16.dp
+    val header: @Composable (List<CommunityItem>) -> Unit = { items ->
+        Spacer(Modifier.height(if (isDesktop) 16.dp else 8.dp))
+        CommunityShareCard(Modifier.padding(horizontal = pad).fillMaxWidth())
+        Spacer(Modifier.height(8.dp))
+        CommunityBrowseControls(browse, items, Modifier.padding(horizontal = pad).fillMaxWidth())
+        Spacer(Modifier.height(8.dp))
+        CommunityCategoryBar(
+            categories = CommunityCategory.entries,
+            currentPage = pager.currentPage,
+            pageOffset = { pager.currentPage + pager.currentPageOffsetFraction },
+            onSelect = { category -> scope.launch { pager.animateScrollToPage(category.ordinal) } },
+            modifier = Modifier.padding(horizontal = pad).widthIn(max = 420.dp).fillMaxWidth()
+        )
+        Spacer(Modifier.height(4.dp))
+    }
+    var counts by remember(client) { mutableStateOf(emptyMap<String, Long>()) }
+    val loadCounts = allowed && current?.tooNew == false && current.items.any { it.asset != null }
+    LaunchedEffect(client, loadCounts) {
+        if (!loadCounts) return@LaunchedEffect
+        while (true) {
+            counts = runInterruptible(Dispatchers.IO) { client.downloadCounts() }
+            delay(COMMUNITY_COUNTS_TTL_MS)
+        }
+    }
     when {
         !allowed -> CommunityErrorState(modifier, R.string.community_ask_title, R.string.community_ask_note, R.string.community_ask_button) {
             sessionAllowed = true
         }
 
-        loading -> Box(modifier.fillMaxSize(), Alignment.Center) {
-            CircularProgressIndicator(color = Am.Navy)
+        loading -> Column(modifier.fillMaxSize()) {
+            header(emptyList())
+            CommunitySkeletonGrid(pad)
         }
 
         failed && refused -> CommunityErrorState(modifier, R.string.community_ask_title, R.string.mobile_data_refused, R.string.community_ask_button) {
@@ -343,25 +378,9 @@ fun CommunityTab(modifier: Modifier, engine: (() -> EngineThread)? = null, onImp
         )
 
         else -> {
-            val pad = if (isDesktop) 24.dp else 16.dp
             val itemsByKind = remember(current.items) { current.items.groupBy { it.kind } }
             Column(modifier.fillMaxSize()) {
-                Spacer(Modifier.height(if (isDesktop) 16.dp else 8.dp))
-                CommunityShareCard(Modifier.padding(horizontal = pad).fillMaxWidth())
-                Spacer(Modifier.height(8.dp))
-                CommunityBrowseControls(
-                    browse, itemsByKind[CommunityCategory.entries[pager.currentPage].kind].orEmpty(),
-                    Modifier.padding(horizontal = pad).fillMaxWidth()
-                )
-                Spacer(Modifier.height(8.dp))
-                CommunityCategoryBar(
-                    categories = CommunityCategory.entries,
-                    currentPage = pager.currentPage,
-                    pageOffset = { pager.currentPage + pager.currentPageOffsetFraction },
-                    onSelect = { category -> scope.launch { pager.animateScrollToPage(category.ordinal) } },
-                    modifier = Modifier.padding(horizontal = pad).widthIn(max = 420.dp).fillMaxWidth()
-                )
-                Spacer(Modifier.height(4.dp))
+                header(itemsByKind[CommunityCategory.entries[pager.currentPage].kind].orEmpty())
                 HorizontalPager(
                     state = pager,
                     modifier = Modifier.weight(1f).fillMaxWidth(),
@@ -384,6 +403,7 @@ fun CommunityTab(modifier: Modifier, engine: (() -> EngineThread)? = null, onImp
                             client = client,
                             engine = engine,
                             thumbs = thumbs,
+                            counts = counts,
                             onSelect = { selected = it }
                         )
                     }
@@ -396,6 +416,7 @@ fun CommunityTab(modifier: Modifier, engine: (() -> EngineThread)? = null, onImp
         CommunityItemSheet(
             item = item,
             thumb = thumbs[item.thumbKey],
+            count = item.asset?.let(counts::get),
             onDismiss = { selected = null },
             onImport = onImport,
             onEffect = effectImport?.let { importer ->
@@ -575,6 +596,7 @@ private fun CommunityItemsPage(
     client: CommunityClient,
     engine: (() -> EngineThread)?,
     thumbs: MutableMap<String, ImageBitmap?>,
+    counts: Map<String, Long>,
     onSelect: (CommunityItem) -> Unit
 ) {
     val context = LocalContext.current
@@ -596,7 +618,7 @@ private fun CommunityItemsPage(
         }
     } else {
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(160.dp),
+            columns = communityCells(),
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(start = pad, end = pad, top = 12.dp, bottom = 28.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -626,6 +648,8 @@ private fun CommunityItemsPage(
                 CommunityGridCard(
                     item = item,
                     thumb = thumbs[key],
+                    loading = !thumbs.containsKey(key),
+                    count = item.asset?.let(counts::get),
                     onClick = { onSelect(item) }
                 )
             }
@@ -640,6 +664,8 @@ private fun CommunityItemsPage(
 private fun CommunityGridCard(
     item: CommunityItem,
     thumb: ImageBitmap?,
+    loading: Boolean,
+    count: Long?,
     onClick: () -> Unit
 ) {
     val shape = RoundedCornerShape(12.dp)
@@ -658,14 +684,21 @@ private fun CommunityGridCard(
                 .fillMaxWidth()
                 .aspectRatio(1f)
                 .clip(RoundedCornerShape(10.dp))
-                .then(if (thumb != null && item.kind != CommunityKind.Bundle) Modifier.checkerboard(5.dp) else Modifier.background(Am.HomePanel)),
+                .then(when {
+                    thumb != null && item.kind != CommunityKind.Bundle -> Modifier.checkerboard(5.dp)
+                    thumb == null && loading -> Modifier.shimmer(RoundedCornerShape(10.dp))
+                    else -> Modifier.background(Am.HomePanel)
+                }),
             Alignment.Center
         ) {
-            if (thumb != null) {
-                Image(thumb, null, Modifier.fillMaxSize(), contentScale = if (item.kind == CommunityKind.Bundle) ContentScale.Crop else ContentScale.Fit)
-            } else {
-                Icon(HomeIcons.CommunityTab, null, Modifier.size(36.dp), tint = Am.HomeMid)
+            androidx.compose.animation.Crossfade(thumb, animationSpec = androidx.compose.animation.core.tween(180), label = "thumb") { shown ->
+                if (shown != null) {
+                    Image(shown, null, Modifier.fillMaxSize(), contentScale = if (item.kind == CommunityKind.Bundle) ContentScale.Crop else ContentScale.Fit)
+                } else if (!loading) {
+                    Box(Modifier.fillMaxSize(), Alignment.Center) { Icon(HomeIcons.CommunityTab, null, Modifier.size(36.dp), tint = Am.HomeMid) }
+                }
             }
+            count?.let { CommunityDownloadBadge(it, Modifier.align(Alignment.BottomEnd).padding(4.dp)) }
         }
         Spacer(Modifier.height(8.dp))
         Text(
@@ -693,6 +726,7 @@ private fun CommunityGridCard(
 private fun CommunityItemSheet(
     item: CommunityItem,
     thumb: ImageBitmap?,
+    count: Long?,
     onDismiss: () -> Unit,
     onImport: (File) -> Unit,
     onEffect: ((File) -> Unit)?,
@@ -723,7 +757,7 @@ private fun CommunityItemSheet(
 
     fun startDownload() {
         if (activeDownload != null || (item.kind == CommunityKind.Effect && onEffect == null)) return
-        val http = TrustedHttp(CommunityFeed.source)
+        val http = TrustedHttp(communityDownloadSource(item))
         val cancelled = AtomicBoolean(false)
         val job = scope.launch {
             val me = coroutineContext.job
@@ -847,7 +881,8 @@ private fun CommunityItemSheet(
                     }
                 }
             }
-        }
+        },
+        side = { CommunityItemDetails(item, count) }
     ) {
         Spacer(Modifier.height(16.dp))
         val thumbRatio = if (thumb != null && thumb.width > 0 && thumb.height > 0) {
@@ -858,7 +893,7 @@ private fun CommunityItemSheet(
         Box(
             Modifier
                 .fillMaxWidth()
-                .aspectRatio(thumbRatio)
+                .aspectRatio(thumbRatio.coerceAtLeast(1f))
                 .clip(RoundedCornerShape(12.dp))
                 .then(if (thumb != null && item.kind != CommunityKind.Bundle) Modifier.checkerboard(8.dp) else Modifier.background(Am.Scrim)),
             Alignment.Center
@@ -875,6 +910,13 @@ private fun CommunityItemSheet(
             }
         }
         Spacer(Modifier.height(14.dp))
+    }
+}
+
+@Composable
+private fun CommunityItemDetails(item: CommunityItem, count: Long?) {
+    Column(Modifier.fillMaxWidth()) {
+        Spacer(Modifier.height(16.dp))
         if (item.creator.isNotEmpty()) {
             Text(
                 text = stringResource(R.string.community_by, item.creator),
@@ -932,7 +974,42 @@ private fun CommunityItemSheet(
                 lineHeight = 19.sp
             )
         }
+        if (item.kind == CommunityKind.Effect && item.contents.isNotEmpty()) {
+            Spacer(Modifier.height(14.dp))
+            Text(stringResource(R.string.community_effects_included), color = Am.Navy, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+            for (effect in item.contents) {
+                val label = if (effect.version == 1L) effect.name
+                    else stringResource(R.string.community_effect_version, effect.name, effect.version)
+                Text(label, Modifier.padding(top = 2.dp), color = Am.HomeMid, fontSize = 13.sp)
+            }
+        }
+        count?.let {
+            Text(communityDownloadLabel(it), Modifier.padding(top = 14.dp), color = Am.HomeMid, fontSize = 13.sp)
+        }
         Spacer(Modifier.height(24.dp))
+    }
+}
+
+@Composable
+private fun communityDownloadLabel(count: Long): String {
+    val locale = LocalConfiguration.current.locales[0]
+    val number = remember(count, locale) { NumberFormat.getIntegerInstance(locale).format(count) }
+    return pluralStringResource(R.plurals.community_download_count, count.coerceAtMost(Int.MAX_VALUE.toLong()).toInt(), number)
+}
+
+@Composable
+private fun CommunityDownloadBadge(count: Long, modifier: Modifier) {
+    val label = communityDownloadLabel(count)
+    val style = TextStyle(fontSize = 10.sp)
+    val measure = rememberTextMeasurer()
+    BoxWithConstraints(modifier) {
+        val available = with(LocalDensity.current) { (maxWidth - 12.dp).toPx() }
+        if (measure.measure(label, style, maxLines = 1).size.width <= available) {
+            Text(
+                label, Modifier.background(Am.Card, RoundedCornerShape(6.dp)).padding(horizontal = 6.dp, vertical = 2.dp),
+                color = Am.HomeMid, style = style, maxLines = 1,
+            )
+        }
     }
 }
 
@@ -951,4 +1028,32 @@ internal fun decodeCommunityThumb(bytes: ByteArray?): ImageBitmap? {
     } catch (_: Throwable) {
         null
     }
+}
+
+@Composable
+private fun CommunitySkeletonGrid(pad: Dp) {
+    LazyVerticalGrid(
+        columns = communityCells(),
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(start = pad, end = pad, top = 12.dp, bottom = 28.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        userScrollEnabled = false
+    ) {
+        items(6) {
+            val shape = RoundedCornerShape(12.dp)
+            Column(Modifier.fillMaxWidth().clip(shape).background(Am.Card).border(1.dp, Am.HomeLine, shape).padding(8.dp)) {
+                Box(Modifier.fillMaxWidth().aspectRatio(1f).shimmer(RoundedCornerShape(10.dp)))
+                Spacer(Modifier.height(8.dp))
+                Box(Modifier.height(20.dp), Alignment.CenterStart) { Box(Modifier.fillMaxWidth(0.62f).height(12.dp).shimmer(RoundedCornerShape(6.dp))) }
+                Box(Modifier.padding(top = 2.dp).height(16.dp), Alignment.CenterStart) { Box(Modifier.fillMaxWidth(0.4f).height(10.dp).shimmer(RoundedCornerShape(5.dp))) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun communityCells(): GridCells {
+    val width = with(LocalDensity.current) { LocalWindowInfo.current.containerSize.width.toDp() }
+    return GridCells.Adaptive(if (width >= 900.dp) 220.dp else 160.dp)
 }

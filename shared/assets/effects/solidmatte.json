@@ -34,5 +34,5 @@
    "default": false
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nlayout(color) uniform half4 color;\nuniform float alpha;\nuniform float punch;\nuniform float screenSpace;\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    bool inside = coord.x >= 0.0 && coord.y >= 0.0 && coord.x < size.x && coord.y < size.y;\n    half m = screenSpace > 0.5 || inside ? color.a * half(clamp(alpha, 0.0, 1.0)) : 0.0;\n    half4 matte = half4(color.rgb * m, m);\n    if (punch > 0.5) return matte * (1.0 - c.a);\n    return c + matte * (1.0 - c.a);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nlayout(color) uniform half4 color;\nuniform float alpha;\nuniform float punch;\nuniform float screenSpace;\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    bool inside = coord.x >= 0.0 && coord.y >= 0.0 && coord.x < size.x && coord.y < size.y;\n    half m = screenSpace > 0.5 || inside ? color.a * half(max(alpha, 0.0)) : 0.0;\n    half4 matte = half4(min(color.rgb * m, half3(1.0)), min(m, 1.0));\n    if (punch > 0.5) return matte * (1.0 - c.a);\n    return c + matte * (1.0 - c.a);\n}\n"
 }

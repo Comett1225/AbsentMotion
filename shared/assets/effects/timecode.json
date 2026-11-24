@@ -17,7 +17,8 @@
     "MM:SS",
     "MM:SS.hh",
     "SS.hh",
-    "Frames"
+    "Frames",
+    "MM:SS:FF"
    ]
   },
   {

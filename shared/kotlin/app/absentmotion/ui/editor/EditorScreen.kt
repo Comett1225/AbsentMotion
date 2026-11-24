@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -67,6 +66,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalContext
+import app.absentmotion.ui.home.DialogPill
 
 internal val LocalEditorScope = staticCompositionLocalOf<CoroutineScope> { error("outside the editor") }
 
@@ -128,22 +128,22 @@ private fun EditorBody(state: EditorState, onExit: () -> Unit) {
     if (state.easingHint) AlertDialog(
         onDismissRequest = { state.easingHint = false }, title = { Text(stringResource(if (state.easingBetween) R.string.easing_between_title else R.string.add_keyframes_first)) },
         text = { Text(stringResource(if (state.easingBetween) R.string.easing_between_text else R.string.easing_needs_at_least_two_keyframes)) },
-        confirmButton = { TextButton({ state.easingHint = false }) { Text(stringResource(R.string.ok), color = Am.Accent) } },
+        confirmButton = { DialogPill(stringResource(R.string.ok)) { state.easingHint = false } },
         containerColor = Am.Field, titleContentColor = Am.OnDark, textContentColor = Am.OnDark,
     )
     if (state.ungroupAsk) androidx.compose.material3.AlertDialog(
         onDismissRequest = { state.ungroupAsk = false },
         text = { Text(stringResource(R.string.ungroup_loses_style), color = Am.OnDark) },
-        confirmButton = { androidx.compose.material3.TextButton({ state.ungroupAsk = false; state.ungroupSelected() }) { Text(stringResource(R.string.layer_tool_ungroup), color = Am.Accent) } },
-        dismissButton = { androidx.compose.material3.TextButton({ state.ungroupAsk = false }) { Text(stringResource(R.string.cancel), color = Am.Accent) } },
+        confirmButton = { DialogPill(stringResource(R.string.layer_tool_ungroup)) { state.ungroupAsk = false; state.ungroupSelected() } },
+        dismissButton = { DialogPill(stringResource(R.string.cancel), primary = false, editor = true) { state.ungroupAsk = false } },
         containerColor = Am.Field,
     )
     state.pointsAsk?.let { go ->
         androidx.compose.material3.AlertDialog(
             onDismissRequest = { state.pointsAsk = null },
             text = { Text(stringResource(R.string.shape_points_lose_animation), color = Am.OnDark) },
-            confirmButton = { androidx.compose.material3.TextButton({ state.pointsAsk = null; go() }) { Text(stringResource(R.string.action_continue), color = Am.Accent) } },
-            dismissButton = { androidx.compose.material3.TextButton({ state.pointsAsk = null }) { Text(stringResource(R.string.cancel), color = Am.Accent) } },
+            confirmButton = { DialogPill(stringResource(R.string.action_continue)) { state.pointsAsk = null; go() } },
+            dismissButton = { DialogPill(stringResource(R.string.cancel), primary = false, editor = true) { state.pointsAsk = null } },
             containerColor = Am.Field,
         )
     }
@@ -186,6 +186,8 @@ internal fun EditorTools(state: EditorState, scope: kotlinx.coroutines.Coroutine
                 3 -> app.absentmotion.ui.home.TrimScreen { close() }
                 4 -> app.absentmotion.ui.home.ExtractAudioScreen { close() }
                 5 -> app.absentmotion.ui.home.GifScreen { close() }
+                6 -> app.absentmotion.ui.home.EnhanceImageScreen { close() }
+                7 -> app.absentmotion.ui.home.SendScreen(state.store, state.projectId) { close() }
             }
         }
     }

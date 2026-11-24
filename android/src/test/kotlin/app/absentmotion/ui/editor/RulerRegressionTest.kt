@@ -1,6 +1,7 @@
 package app.absentmotion.ui.editor
 
 import app.absentmotion.ui.editor.panels.rulerAccessibleTick
+import app.absentmotion.ui.editor.panels.rulerScrollsPanel
 import app.absentmotion.ui.editor.panels.rulerSnap
 import org.junit.Assert.*
 import org.junit.Test
@@ -33,5 +34,13 @@ class RulerRegressionTest {
             assertEquals("$p at $spacing is on a tick", 0f, snapped % spacing, 0.001f)
             assertTrue("$p at $spacing moved ${abs(snapped - p)}", abs(snapped - p) <= spacing / 2f + 0.001f)
         }
+    }
+
+    @Test fun aMostlyVerticalSwipeOnTheRulerIsLeftToThePanel() {
+        assertTrue(rulerScrollsPanel(2f, 12f, 6f))
+        assertTrue(rulerScrollsPanel(-5f, -9f, 6f))
+        assertFalse(rulerScrollsPanel(12f, 2f, 6f))
+        assertFalse(rulerScrollsPanel(1f, 5f, 6f))
+        assertFalse(rulerScrollsPanel(9f, 9f, 6f))
     }
 }

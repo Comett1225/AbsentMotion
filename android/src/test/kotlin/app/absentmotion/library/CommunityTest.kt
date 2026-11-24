@@ -18,6 +18,80 @@ class CommunityTest {
     private val shaA = "a".repeat(64)
     private val shaB = "0123456789abcdef".repeat(4)
 
+    @Test fun releaseAssetsAreOptionalPlainFileNames() {
+        fun item(field: String) = parseCommunityIndex("""
+            {"format":"absentmotion-community","version":2,"items":[
+            {"kind":"effect","name":"fun-pack","file":"effects/fun-pack/fun-pack.abmfx","bytes":42,"sha256":"$shaA"$field}
+            ]}
+        """.trimIndent(), 52).items.single()
+
+        fun withAsset(value: String) = item(",\"asset\":" + org.json.JSONObject.quote(value))
+        val release = withAsset("effect-fun-pack.abmfx")
+        assertEquals("effect-fun-pack.abmfx", release.asset)
+        assertEquals("https://github.com/Comett1225/AbsentMotion-Community/releases/download/items/effect-fun-pack.abmfx", communityDownloadUrl(release))
+        assertNotNull(withAsset("x".repeat(120)).asset)
+        val invalid = listOf("", "../asset", "a b", "a%2Fb", "..", "x".repeat(121)).map(::withAsset)
+        for (raw in invalid + listOf(item(""), item(",\"asset\":42"), item(",\"asset\":null"))) {
+            assertNull(raw.asset)
+            assertEquals(COMMUNITY_RAW + raw.file, communityDownloadUrl(raw))
+        }
+    }
+
+    @Test fun releaseDownloadsTrustOnlyTheUpdatersAssetHostsAfterRedirect() {
+        for (host in listOf("objects.githubusercontent.com", "release-assets.githubusercontent.com")) {
+            val target = URI("https://$host/asset?ticket=123")
+            assertTrue(CommunityReleaseSource.allows(target, first = false))
+            assertFalse(CommunityReleaseSource.allows(target, first = true))
+        }
+        assertFalse(CommunityReleaseSource.allows(URI("https://raw.githubusercontent.com/asset"), first = false))
+        assertFalse(CommunityReleaseSource.allows(URI("http://release-assets.githubusercontent.com/asset"), first = false))
+    }
+
+    @Test fun releaseCountsReadOnlyValidAssetNamesAndNonnegativeIntegers() {
+        val counts = parseCommunityDownloadCounts("""
+            {"assets":[
+              {"name":"effect-fun-pack.abmfx","download_count":1234},
+              {"name":"preset-zero.xml","download_count":0},
+              {"name":"bundle-large.absproj","download_count":2147483648},
+              {"name":"bundle-missing.absproj"},
+              {"name":"preset-negative.xml","download_count":-1},
+              {"name":"preset-decimal.xml","download_count":1.5},
+              {"name":"preset-string.xml","download_count":"50"},
+              {"name":"../item","download_count":1}
+            ]}
+        """.trimIndent())
+        assertEquals(mapOf("effect-fun-pack.abmfx" to 1234L, "preset-zero.xml" to 0L, "bundle-large.absproj" to 2147483648L), counts)
+    }
+
+    @Test fun releaseCountsCacheLastsAnHourInMemoryAndOnDisk() {
+        var now = 1000L
+        val file = File(tmp.root, "community/counts.json")
+        val cache = CommunityCountsCache(file) { now }
+        val fresh = mapOf("bundle-clip.absproj" to 5L)
+        assertEquals(fresh, cache.counts { fresh })
+        now += COMMUNITY_COUNTS_TTL_MS - 1
+        assertEquals(fresh, cache.counts { throw AssertionError("memory cache missed") })
+        assertEquals(fresh, CommunityCountsCache(file) { now }.counts { throw AssertionError("disk cache missed") })
+        now += 1
+        assertTrue(cache.counts { throw java.io.IOException() }.isEmpty())
+        assertTrue(CommunityCountsCache(file) { now }.counts { throw AssertionError("failure was not cached") }.isEmpty())
+        now += COMMUNITY_COUNTS_TTL_MS
+        val updated = mapOf("bundle-clip.absproj" to 8L)
+        assertEquals(updated, cache.counts { updated })
+    }
+
+    @Test fun aCountsFetchStoppedByLeavingTheTabIsNotCached() {
+        val file = File(tmp.root, "community/counts.json")
+        val cache = CommunityCountsCache(file) { 1000L }
+        assertTrue(cache.counts { throw java.io.InterruptedIOException("thread interrupted") }.isEmpty())
+        assertFalse(file.exists())
+        val fresh = mapOf("bundle-clip.absproj" to 5L)
+        assertEquals(fresh, cache.counts { fresh })
+        assertEquals(fresh, CommunityCountsCache(file) { 1000L }.counts { throw AssertionError("disk cache missed") })
+        assertTrue(CommunityCountsCache(File(tmp.root, "other.json")) { 1000L }.counts { throw java.net.SocketTimeoutException() }.isEmpty())
+        assertTrue(File(tmp.root, "other.json").exists())
+    }
+
     @Test fun parseCommunityIndexReadsValidItemsAndIgnoresUnknownKind() {
         val json = """
             {

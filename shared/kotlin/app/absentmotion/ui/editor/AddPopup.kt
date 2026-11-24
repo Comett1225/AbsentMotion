@@ -235,24 +235,28 @@ private fun ShapePages(state: EditorState, modifier: Modifier) = androidx.compos
 
 @Composable
 private fun ToolsPage(state: EditorState, modifier: Modifier) {
-    val tools = listOfNotNull(
-        Triple(1, app.absentmotion.ui.home.HomeIcons.Compress, R.string.tools_compress),
-        Triple(3, app.absentmotion.ui.home.HomeIcons.Trim, R.string.tools_trim),
-        Triple(4, app.absentmotion.ui.home.HomeIcons.Audio, R.string.tools_extract),
-        Triple(5, app.absentmotion.ui.home.HomeIcons.Gif, R.string.tools_gif),
-        Triple(2, app.absentmotion.ui.home.HomeIcons.Download, R.string.tools_downloader).takeIf { app.absentmotion.platform.videoDownloader().available },
-    )
+    val importLink = app.absentmotion.ui.home.LocalImportLink.current
+    val tools = app.absentmotion.ui.home.projectTools(state.settings, importLink != null)
     LazyHorizontalGrid(AtLeastTwo(96.dp), modifier.clipToBounds()) {
-        items(tools, key = { it.first }) { (id, icon, label) ->
+        items(tools, key = { it }) { id ->
+            val tool = app.absentmotion.ui.home.toolInfo(id)
             val press = remember { MutableInteractionSource() }
             Column(
-                Modifier.size(80.dp, 96.dp).tutorialGuard().pressScale(press, TilePress).clickable(press, LocalIndication.current) { state.toolOpen = id },
+                Modifier.size(80.dp, 96.dp).tutorialGuard().pressScale(press, TilePress).clickable(press, LocalIndication.current) { state.openTool(id, importLink) },
                 horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center,
             ) {
-                Icon(icon, null, Modifier.size(28.dp), tint = Am.OnDark)
-                Text(stringResource(label), Modifier.padding(top = 6.dp, start = 4.dp, end = 4.dp), color = Am.OnDark, fontSize = 12.sp, lineHeight = 14.sp, textAlign = TextAlign.Center, maxLines = 2)
+                Icon(tool.icon, null, Modifier.size(28.dp), tint = Am.OnDark)
+                Text(stringResource(tool.title), Modifier.padding(top = 6.dp, start = 4.dp, end = 4.dp), color = Am.OnDark, fontSize = 12.sp, lineHeight = 14.sp, textAlign = TextAlign.Center, maxLines = 3)
             }
         }
+    }
+}
+
+internal fun EditorState.openTool(id: String, importLink: (() -> Unit)?) {
+    when (id) {
+        "importer" -> importLink?.invoke()
+        "send" -> { commitTyping(); endGesture(); toolOpen = 7 }
+        else -> toolOpen = app.absentmotion.ui.home.toolInfo(id).open
     }
 }
 

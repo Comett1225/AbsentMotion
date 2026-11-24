@@ -38,7 +38,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -394,7 +393,7 @@ fun TemplateEditor(templateId: String, engine: EngineThread, settings: AppSettin
     if (frozen) AlertDialog(
         onDismissRequest = { frozen = false }, title = { Text(stringResource(R.string.video_frozen)) },
         text = { Text(stringResource(R.string.your_video_ended_early_so_its)) },
-        confirmButton = { TextButton({ frozen = false }) { Text(stringResource(R.string.ok), color = Am.Accent) } },
+        confirmButton = { DialogPill(stringResource(R.string.ok)) { frozen = false } },
         containerColor = Am.Field, titleContentColor = Am.OnDark, textContentColor = Am.OnDark,
     )
 }
@@ -416,7 +415,7 @@ private fun TopBar(title: String, icon: ImageVector, description: String, action
 private fun Hint(text: String, modifier: Modifier, onOk: () -> Unit) {
     Row(modifier.padding(12.dp).clip(Rounded).background(Am.Field).padding(start = 16.dp), verticalAlignment = Alignment.CenterVertically) {
         Text(text, Modifier.weight(1f, fill = false), color = Am.OnDark, fontSize = 15.sp)
-        TextButton(onOk) { Text(stringResource(R.string.ok), color = Am.Accent) }
+        DialogPill(stringResource(R.string.ok), Modifier.padding(6.dp), onClick = onOk)
     }
 }
 
@@ -466,8 +465,8 @@ private fun SlotCell(picture: ImageBitmap?, selected: Boolean, mode: MediaFillMo
 private fun Ask(title: String, body: String, stay: String, onStay: () -> Unit, go: String, onGo: () -> Unit) {
     AlertDialog(
         onDismissRequest = onStay, title = { Text(title) }, text = { Text(body) },
-        confirmButton = { TextButton(onGo) { Text(go, color = Am.Accent) } },
-        dismissButton = { TextButton(onStay) { Text(stay, color = Am.Accent) } },
+        confirmButton = { DialogPill(go, onClick = onGo) },
+        dismissButton = { DialogPill(stay, primary = false, editor = true, onClick = onStay) },
         containerColor = Am.Field, titleContentColor = Am.OnDark, textContentColor = Am.OnDark,
     )
 }

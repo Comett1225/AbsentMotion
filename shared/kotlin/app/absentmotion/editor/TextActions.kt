@@ -9,7 +9,7 @@ fun EditorState.addText() {
     val layer = Layer(XmlNode("text", linkedMapOf("id" to "$id",
         "startTime" to "${scene.frameStart(frame)}", "endTime" to "${scene.endTimeFor(frame, settings.defaultLayerDuration * 1000)}",
         "fillType" to "color", "mediaFillMode" to "fill", "size" to "18.000000",
-        "font" to "googlefonts?name=Roboto&weight=400", "wrapWidth" to "512", "align" to "left")))
+        "font" to "googlefonts?name=Roboto&weight=400", "wrapWidth" to "512", "align" to "left", "textMetrics" to "pixel")))
         .withTransform("location", scene.width / 2f, scene.height / 2f, 0f)
         .withFill("color", 0xFF7F7F7F.toInt()).withContent("")
     edit { it.add(layer) }

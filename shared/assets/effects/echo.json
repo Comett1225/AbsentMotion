@@ -42,6 +42,22 @@
     "Behind",
     "Atop"
    ]
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 1,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "legacyDefault": 0,
+   "when": {
+    "style": [
+     0
+    ]
+   }
   }
  ]
 }

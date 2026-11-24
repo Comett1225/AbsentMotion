@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -180,7 +179,7 @@ internal fun ReportDialog(summary: String, onDismiss: () -> Unit) {
                             ReportLinkButton(stringResource(R.string.report_form)) { runCatching { opener.openUri(found.form) } }
                         }
                     }
-                    TextButton(onDismiss, Modifier.align(Alignment.End)) { Text(stringResource(R.string.action_close), color = Am.Navy) }
+                    DialogPill(stringResource(R.string.action_close), Modifier.align(Alignment.End), onClick = onDismiss)
                 }
             }
         }
@@ -197,7 +196,7 @@ internal fun ReportDialog(summary: String, onDismiss: () -> Unit) {
                 ReportLinkButton(stringResource(R.string.report_form)) { runCatching { opener.openUri(found.form) } }
             }
         },
-        confirmButton = { TextButton(onDismiss) { Text(stringResource(R.string.action_close), color = Am.Navy) } },
+        confirmButton = { DialogPill(stringResource(R.string.action_close), onClick = onDismiss) },
         containerColor = Am.Card,
     )
 }

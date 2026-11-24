@@ -106,6 +106,13 @@ private fun Layer.integral(effect: XmlNode, name: String, seconds: Double, fallb
     return sum
 }
 
+private fun Layer.swingCycles(effect: XmlNode, seconds: Double): Double {
+    val p = effect.effectProperty("freq")
+    val span = Math.round((endTime - startTime) * 0.12) / 120.0
+    if (p == null || p.keyframes.isEmpty() || span <= 0) return integral(effect, "freq", seconds, 2f)
+    return (0..Math.round(seconds * 120)).sumOf { k -> floats(p.valueAt((k / 120.0 / span).toFloat()), floatArrayOf(2f))[0].toDouble() } / 120
+}
+
 private fun Layer.tOf(ms: Double) = ((ms - startTime) / (endTime - startTime).coerceAtLeast(1)).toFloat()
 
 private fun Layer.msOf(t: Float) = startTime + t.toDouble() * (endTime - startTime)
@@ -135,7 +142,8 @@ private fun Layer.motion(ms: Double): Pair<Double, Double> {
             "absent.swing" -> {
                 val a1 = param("angle1", -30f)
                 val a2 = param("angle2", 30f)
-                rotation += (a1 + a2) / 2 + (a2 - a1) / 2 * cycle()
+                val swings = (swingCycles(e, seconds) + param("phase", 0f)) / 2
+                rotation += (a1 + a2) / 2 + (a2 - a1) / 2 * wave(swings, param("wave", 0f).toFloat())
             }
             "absent.spin" -> rotation += (6 * integral(e, "rpm", seconds, 60f)) % 360.0
             "absent.pulsesize" -> {

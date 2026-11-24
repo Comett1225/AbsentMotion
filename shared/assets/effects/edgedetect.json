@@ -2,7 +2,7 @@
  "id": "edgedetect",
  "name": "Edge Detect",
  "category": "stylize",
- "description": "Bright lines where the picture changes, dark elsewhere.",
+ "description": "Bright lines where the picture changes, dark elsewhere. Ink draws dark lines on white; Color keeps the picture's own colors on the edges.",
  "params": [
   {
    "id": "strength",
@@ -20,7 +20,8 @@
    "default": 0,
    "options": [
     "Classic",
-    "Ink"
+    "Ink",
+    "Color"
    ]
   },
   {
@@ -33,7 +34,8 @@
    "step": 0.01,
    "when": {
     "style": [
-     1
+     1,
+     2
     ]
    }
   },
@@ -47,7 +49,8 @@
    "step": 0.001,
    "when": {
     "style": [
-     1
+     1,
+     2
     ]
    }
   },
@@ -58,10 +61,11 @@
    "default": false,
    "when": {
     "style": [
-     1
+     1,
+     2
     ]
    }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float strength;\nuniform float style;\nuniform float spacing;\nuniform float threshold;\nuniform float invert;\nhalf luma(half3 c) { return dot(c, half3(0.2126, 0.7152, 0.0722)); }\nhalf l(float2 p) { return luma(image.eval(p).rgb); }\nhalf4 main(float2 coord) {\n    float s = style > 0.5 ? max(spacing, 0.0) : 1.0;\n    half gx = l(coord + float2(s, -s)) + 2 * l(coord + float2(s, 0)) + l(coord + float2(s, s))\n            - l(coord + float2(-s, -s)) - 2 * l(coord + float2(-s, 0)) - l(coord + float2(-s, s));\n    half gy = l(coord + float2(-s, s)) + 2 * l(coord + float2(0, s)) + l(coord + float2(s, s))\n            - l(coord + float2(-s, -s)) - 2 * l(coord + float2(0, -s)) - l(coord + float2(s, -s));\n    half4 c = image.eval(coord);\n    half a = c.a;\n    if (style < 0.5) return half4(half3(saturate(length(half2(gx, gy)) * half(strength))) * a, a);\n    float e = clamp(float(length(half2(gx, gy))) * strength - threshold, 0.0, 1.0);\n    return invert > 0.5 ? half4(c.rgb * half(e), a) : half4(half3(1.0 - e) * a, a);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float strength;\nuniform float style;\nuniform float spacing;\nuniform float threshold;\nuniform float invert;\nhalf luma(half3 c) { return dot(c, half3(0.2126, 0.7152, 0.0722)); }\nhalf l(float2 p) { return luma(image.eval(p).rgb); }\nhalf4 main(float2 coord) {\n    float s = style > 0.5 ? max(spacing, 0.0) : 1.0;\n    half gx = l(coord + float2(s, -s)) + 2 * l(coord + float2(s, 0)) + l(coord + float2(s, s))\n            - l(coord + float2(-s, -s)) - 2 * l(coord + float2(-s, 0)) - l(coord + float2(-s, s));\n    half gy = l(coord + float2(-s, s)) + 2 * l(coord + float2(0, s)) + l(coord + float2(s, s))\n            - l(coord + float2(-s, -s)) - 2 * l(coord + float2(0, -s)) - l(coord + float2(s, -s));\n    half4 c = image.eval(coord);\n    half a = c.a;\n    if (style < 0.5) return half4(half3(saturate(length(half2(gx, gy)) * half(strength))) * a, a);\n    if (style > 1.5) {\n        float w = clamp(float(length(half2(gx, gy))) * strength * 1.75 / (0.5 + clamp(threshold, 0.0, 0.5)), 0.0, 1.0);\n        return invert > 0.5 ? half4(half3(half(1.0 - w)) * a, a) : half4(c.rgb * half(w), a);\n    }\n    float e = clamp(float(length(half2(gx, gy))) * strength - threshold, 0.0, 1.0);\n    return invert > 0.5 ? half4(c.rgb * half(e), a) : half4(half3(1.0 - e) * a, a);\n}\n"
 }

@@ -93,7 +93,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -107,6 +106,7 @@ import app.absentmotion.export.measureGif
 import app.absentmotion.export.measureSequenceFrame
 import app.absentmotion.export.measureVideoDraw
 import app.absentmotion.export.withMissing
+import app.absentmotion.export.fixedFormat
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.Composable
@@ -270,6 +270,8 @@ import app.absentmotion.effects.AddedEffectStore
 import app.absentmotion.effects.addedEffectUses
 import app.absentmotion.ui.home.SwitchRow
 import app.absentmotion.ui.HoldName
+import app.absentmotion.ui.home.DialogPill
+import app.absentmotion.ui.home.AccentPill
 
 private val Navy get() = Am.Navy
 private val NoteGrey get() = Am.HomeDim
@@ -290,7 +292,7 @@ private sealed interface Phase {
     class Running(val kind: ExportKind, val job: Job, val clock: ExportClock, @StringRes val title: Int = runningTitle(kind), @StringRes val reserve: Int? = null) : Phase {
         var progress by mutableFloatStateOf(0f)
     }
-    class Done(val kind: ExportKind, val result: ExportResult) : Phase
+    class Done(val kind: ExportKind, val result: ExportResult, val staged: app.absentmotion.export.StagedExport? = null, val saved: Boolean = false) : Phase
 }
 
 internal object SavedTemplates { var revision by androidx.compose.runtime.mutableIntStateOf(0) }
@@ -580,6 +582,20 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
                     }
                     if (chosen != ExportKind.Package) exported = scene.withMissing(missing.toSet())
                 }
+                val stageKey = if (chosen in StagedKinds && !DESK) app.absentmotion.export.StagedExports.key(exported.toXml(), s, chosen, frame) else null
+                val (stageExt, stageMime) = when (chosen) {
+                    ExportKind.Gif -> "gif" to "image/gif"
+                    ExportKind.Frame -> ImageKind.Png.ext to ImageKind.Png.mime
+                    ExportKind.FrameAs -> s.image.ext to s.image.mime
+                    else -> s.fixedFormat().let { it.container.ext to it.container.mime }
+                }
+                fun staged() = stageKey?.let { app.absentmotion.export.StagedExports.find(context, it, name, stageExt, stageMime) }
+                staged()?.let { ready ->
+                    outcome = true
+                    phase = Phase.Done(chosen, ExportResult(listOf(ready.uri), ready.mime, ""), ready)
+                    return@launch
+                }
+                val stage = stageKey?.let { app.absentmotion.export.StagedExports.store(context, it) }
                 if (fetching != null) {
                     try {
                         AiSmooth.download(context, fetching, report)
@@ -611,11 +627,12 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
                 val began = System.nanoTime()
                 unlock.spend()
                 val result = Tier.unlocking(risks.mapNotNull { it.key as? Feature }) {
-                    (if (background) Exporter(context.applicationContext, app.absentmotion.platform.exportEngine(engine), MediaStoreExport(context.applicationContext), bundles = bundles) else exporter).export(chosen, exported, s, frame, name, { note = it }, community.takeIf { chosen == ExportKind.Package }, includeAddedEffects, report)
+                    (if (background) Exporter(context.applicationContext, app.absentmotion.platform.exportEngine(engine), MediaStoreExport(context.applicationContext), bundles = bundles, stage = stage)
+                        else if (stage != null) Exporter(context, engine, MediaStoreExport(context), bundles = bundles, stage = stage) else exporter).export(chosen, exported, s, frame, name, { note = it }, community.takeIf { chosen == ExportKind.Package }, includeAddedEffects, report)
                 }
                 outcome = true
                 if (background) app.absentmotion.platform.exportDone(result)
-                phase = Phase.Done(chosen, result)
+                phase = Phase.Done(chosen, result, staged())
                 if (preset != null) {
                     withContext(NonCancellable + Dispatchers.IO) {
                         runCatching { app.absentmotion.library.PresetStore(context).setPlaceholder(preset.preset.id, preset.choice) }
@@ -672,6 +689,29 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
 
     val framing = page == ExportKind.FrameAs
     val closeFrame = { if (phase is Phase.Done) phase = Phase.Idle; closePage() }
+    var saving by remember { mutableStateOf(false) }
+    fun saveStaged(done: Phase.Done) {
+        val staged = done.staged ?: return
+        if (saving) return
+        saving = true
+        app.absentmotion.platform.exportScope(scope).launch {
+            try {
+                val target = MediaStoreExport(context.applicationContext)
+                val uri = withContext(Dispatchers.IO) { app.absentmotion.export.StagedExports.save(context, staged, target) }
+                val folder = if (done.kind == ExportKind.Video) "Movies" else "Pictures"
+                val where = target.location("$folder/${app.absentmotion.export.AppFolder}")
+                if (phase === done) phase = Phase.Done(done.kind, ExportResult(listOf(uri), staged.mime, where, done.result.verification), staged, saved = true)
+                app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.compress_saved_to, where), app.absentmotion.platform.Toast.LENGTH_SHORT).show()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.w("AMExport", "saving the export failed", e)
+                failure = Failure(R.string.export_failed_title, txt(R.string.library_text_value, e.message ?: e.toString()), hint = true)
+            } finally {
+                saving = false
+            }
+        }
+    }
 
     androidx.compose.runtime.CompositionLocalProvider(LocalRiskAsk provides askRisk) {
     if (DESK) DeskExport(
@@ -752,19 +792,19 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
             val background = animatedColor(if (shown is Phase.Done) Am.DoneBg else Scrim)
             Box(Modifier.fillMaxSize().presenceScrim(background).pointerInput(Unit) {}, contentAlignment = Alignment.Center) {
                 if (shown is Phase.Running) RunningPanel(shown, heat.level, note) { shown.job.cancel() }
-                else if (shown is Phase.Done) DoneScreen(shown.kind, shown.result, { phase = Phase.Idle }) { share(context, shown) }
+                else if (shown is Phase.Done) DoneScreen(shown.kind, shown.result, { phase = Phase.Idle }, staged = shown.staged != null, saving = saving, saved = shown.saved, onSave = { saveStaged(shown) }) { share(context, shown) }
             }
         }
     }
 
     }
-    RiskDialog(risk, Navy, Navy, Alert, Am.Card) { risk = null; it?.proceed?.invoke() }
+    RiskDialog(risk, Navy, Alert, Am.Card) { risk = null; it?.proceed?.invoke() }
     if (templateInfo) {
         AlertDialog(
             onDismissRequest = { templateInfo = false },
             title = { Text(stringResource(R.string.template), color = Navy) },
             text = { Text(stringResource(R.string.also_keeps_the_project_with_its), color = Navy) },
-            confirmButton = { TextButton({ templateInfo = false }) { Text(stringResource(R.string.ok), color = Navy) } },
+            confirmButton = { DialogPill(stringResource(R.string.ok)) { templateInfo = false } },
             containerColor = Am.Card,
         )
     }
@@ -773,7 +813,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
             onDismissRequest = { help = false },
             title = { Text(stringResource(R.string.export_interpolation), color = Navy) },
             text = { SmoothingHelp(Navy, Modifier.heightIn(max = 420.dp)) },
-            confirmButton = { TextButton({ help = false }) { Text(stringResource(R.string.ok), color = Navy) } },
+            confirmButton = { DialogPill(stringResource(R.string.ok)) { help = false } },
             containerColor = Am.Card,
         )
     }
@@ -787,11 +827,11 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
                 Column(Modifier.verticalScroll(rememberScrollState())) {
                     Text(f.text.text(), color = Navy)
                     if (f.hint) OutdatedHint(outdated, Modifier.padding(top = 8.dp))
-                    if (f.hint) TextButton({ reporting = true }) { Text(stringResource(R.string.report_button), color = Navy) }
+                    if (f.hint) DialogPill(stringResource(R.string.report_button), Modifier.padding(top = 12.dp), primary = false) { reporting = true }
                 }
             },
-            confirmButton = { TextButton({ failure = null; f.proceed?.invoke() }) { Text(f.action?.text() ?: stringResource(R.string.ok), color = Navy) } },
-            dismissButton = f.proceed?.let { { TextButton({ failure = null }) { Text(stringResource(R.string.cancel), color = Navy) } } },
+            confirmButton = { DialogPill(f.action?.text() ?: stringResource(R.string.ok)) { failure = null; f.proceed?.invoke() } },
+            dismissButton = f.proceed?.let { { DialogPill(stringResource(R.string.cancel), primary = false) { failure = null } } },
             containerColor = Am.Card,
         )
     }
@@ -1124,9 +1164,9 @@ private fun WarningCard(title: String, text: String, use: String?, onUse: () -> 
         Column(Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp, top = 10.dp)) {
             Text(title, color = Alert, fontSize = 15.sp, fontWeight = FontWeight.Bold, maxLines = 1)
             Text(text, Modifier.padding(top = 2.dp), color = Navy, fontSize = 14.sp, lineHeight = 19.sp)
-            Row(Modifier.fillMaxWidth().height(44.dp), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
-                if (onContinue != null) TextButton(onContinue) { Text(stringResource(R.string.export_continue_anyway), color = ValueGrey, fontSize = 15.sp, maxLines = 1) }
-                if (use != null) TextButton(onUse) { Text(use, color = Alert, fontSize = 15.sp, fontWeight = FontWeight.Bold, maxLines = 1) }
+            FlowRow(Modifier.fillMaxWidth().padding(vertical = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (onContinue != null) DialogPill(stringResource(R.string.export_continue_anyway), primary = false, onClick = onContinue)
+                if (use != null) DialogPill(use, onClick = onUse)
             }
         }
     }
@@ -1378,7 +1418,7 @@ private fun BoxScope.RunningPanel(p: Phase.Running, heat: ThermalLevel, note: Ui
             exportHeatText(heat)?.let { Text(it.text(), color = Am.OnScrimAccent, fontSize = 21.sp, lineHeight = 27.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, maxLines = 3) }
                 ?: note?.let { Text(it.text(), color = Am.OnScrim, fontSize = 15.sp, lineHeight = 20.sp, textAlign = TextAlign.Center, maxLines = 4) }
         }
-        TextButton(onCancel) { Text(stringResource(R.string.cancel), color = Am.OnScrimAccent, fontSize = 17.sp) }
+        AccentPill(stringResource(R.string.cancel), primary = false, onClick = onCancel)
     }
     Text(
         stringResource(if (p.kind in BackgroundKinds) R.string.export_running_leave else R.string.keep_absentmotion_open_and_your_screen),
@@ -1401,6 +1441,8 @@ private fun runningTitle(kind: ExportKind): Int = when (kind) {
     ExportKind.Sequence -> R.string.export_running_sequence
     else -> R.string.export_running
 }
+
+private val StagedKinds = setOf(ExportKind.Video, ExportKind.Gif, ExportKind.Frame, ExportKind.FrameAs)
 
 private val BackgroundKinds = setOf(ExportKind.Video, ExportKind.Audio, ExportKind.Gif, ExportKind.Sequence, ExportKind.Package)
 private val SizedKinds = setOf(ExportKind.Video, ExportKind.Gif, ExportKind.Sequence)

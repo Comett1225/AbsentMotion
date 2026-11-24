@@ -243,7 +243,10 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
         val outside = stringResource(R.string.screenshot_outside)
         val saved = stringResource(R.string.screenshot_saved)
         val failed = stringResource(R.string.screenshot_failed)
+        val modelFacts = if (kind == "model") app.absentmotion.ui.editor.panels.rememberModelFacts(still) else null
         val more = listOfNotNull(
+            if (kind == "model") Tile(TexturesTool) { state.panel = EditorPanel.Textures } else null,
+            if (kind == "model" && modelFacts?.bones?.isNotEmpty() == true) Tile(PoseTool) { state.panel = EditorPanel.Pose } else null,
             if (kind == "shape" && still.isShapeTemplate == true) Tile(EditPoints) { state.requestPoints(enter = true) } else null,
             if (kind == "shape" && drawn && still.let(ShapeCatalog::paramsFor).orEmpty().isNotEmpty()) Tile(EditShape) { state.panel = EditorPanel.EditShape } else null,
             if (state.scene.depthOrder && kind in setOf("shape", "text", "drawing", "embedScene")) Tile(ThreeDLayer, active = still?.node?.get("threeD") == "true") {
@@ -401,6 +404,8 @@ private val FramePick = Tool(R.string.layer_tool_frame, app.absentmotion.ui.home
 private val CutoutEdge = Tool(R.string.cutout_edge, PanelIcons.TabBorder, 18.1f)
 private val ReverseTool = Tool(R.string.speed_reverse, PanelIcons.Reverse, 19.4f)
 private val ScreenshotTool = Tool(R.string.layer_tool_screenshot, PanelIcons.Screenshot, 19.4f)
+private val TexturesTool = Tool(R.string.model_textures, PanelIcons.Textures, 19.4f)
+private val PoseTool = Tool(R.string.model_pose, PanelIcons.Bone, 19.4f)
 
 @Composable
 private fun SmallTool(icon: ImageVector, description: String, modifier: Modifier, shape: RoundedCornerShape, enabled: Boolean = true, iconSize: Dp = 24.dp, onClick: () -> Unit = {}) {
@@ -474,7 +479,7 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
     val threeD = !desk && shown == ROTATE_TAB && (state.settings.rotate3d || layer.hasTilt()) && (selected.kind != "camera" || state.scene.depthOrder)
     val turn = if (move) turnFor(selected, catalog, shown, threeD) else null
     var menuOpen by remember { mutableStateOf(false) }
-    val named = panel != EditorPanel.EditShape && panel != EditorPanel.Camera && panel != EditorPanel.Model && panel != EditorPanel.Light && !(move && shown == ROTATE_TAB && turn != null)
+    val named = panel != EditorPanel.EditShape && panel != EditorPanel.Camera && panel != EditorPanel.Model && panel != EditorPanel.Light && panel != EditorPanel.Pose && !(move && shown == ROTATE_TAB && turn != null)
     val known = if (!named) null else when {
         move -> if (selected.kind == "camera" && shown == SIZE_TAB) KeyTarget(app.absentmotion.model.CameraFov, "60.000000") else TransformTargets[shown]
         panel == EditorPanel.ColorFill && layer.fillType == "color" -> KeyTarget(PropRef.FillColor, formatColor(layer.fillColor))
@@ -536,6 +541,8 @@ fun LayerPanel(state: EditorState, modifier: Modifier = Modifier) {
             EditorPanel.Light -> LightPanel(state, layer, Modifier.fillMaxSize())
             EditorPanel.Edge -> app.absentmotion.ui.editor.panels.EdgePanel(state, layer, Modifier.fillMaxSize())
             EditorPanel.Frame -> app.absentmotion.ui.editor.panels.FramePanel(state, layer, Modifier.fillMaxSize())
+            EditorPanel.Textures -> app.absentmotion.ui.editor.panels.TexturesPanel(state, layer, Modifier.fillMaxSize())
+            EditorPanel.Pose -> app.absentmotion.ui.editor.panels.PosePanel(state, layer, Modifier.fillMaxSize())
             EditorPanel.Tools, EditorPanel.EditText, EditorPanel.Effects, EditorPanel.Crop -> {}
         }
         Box(Modifier.width(2.px).fillMaxHeight().background(PanelDark))
@@ -643,6 +650,9 @@ fun ValueKeypad(request: KeypadRequest, onClose: () -> Unit, modifier: Modifier 
     var active by remember(request) { mutableIntStateOf(request.active.coerceIn(0, fields.lastIndex)) }
     val texts = remember(request) { mutableStateListOf<String>().apply { fields.forEach { add(formatPlain(it.value)) } } }
     var selected by remember(request) { mutableStateOf(true) }
+    var ready by remember(request) { mutableStateOf(false) }
+    val settle = androidx.compose.ui.platform.LocalViewConfiguration.current.doubleTapTimeoutMillis
+    androidx.compose.runtime.LaunchedEffect(request) { kotlinx.coroutines.delay(settle); ready = true }
 
     fun type(c: Char) {
         val t = texts[active]
@@ -688,7 +698,7 @@ fun ValueKeypad(request: KeypadRequest, onClose: () -> Unit, modifier: Modifier 
         }
         true
     }) {
-        Box(Modifier.weight(1f).fillMaxWidth().background(Color.Black.copy(alpha = 0.8f)).clickable(silent, null, onClick = onClose))
+        Box(Modifier.weight(1f).fillMaxWidth().background(Color.Black.copy(alpha = 0.8f)).clickable(silent, null) { if (ready) onClose() })
         Column(Modifier.fillMaxWidth().height(247.dp).background(Am.TimelineBg).clickable(silent, null) {}.padding(horizontal = 6.dp)) {
             Spacer(Modifier.height(7.5.dp))
             Row(Modifier.height(40.dp), Arrangement.spacedBy(5.dp)) {
@@ -704,7 +714,7 @@ fun ValueKeypad(request: KeypadRequest, onClose: () -> Unit, modifier: Modifier 
                 }
             }
             Spacer(Modifier.height(12.8.dp))
-            KeyGrid(::type, ::backspace, ::flipSign, ::done)
+            KeyGrid({ if (ready) type(it) }, { if (ready) backspace() }, { if (ready) flipSign() }, { if (ready) done() })
         }
     }
 }

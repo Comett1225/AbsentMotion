@@ -3,11 +3,15 @@ package app.absentmotion.ui.home
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import app.absentmotion.ui.theme.Am
@@ -30,13 +34,26 @@ import app.absentmotion.ui.theme.Motion
 internal val WideCard = Modifier.widthIn(max = 420.dp)
 
 @Composable
-internal fun AccentPill(text: String, modifier: Modifier = Modifier, enabled: Boolean = true, onClick: () -> Unit) {
+internal fun AccentPill(
+    text: String, modifier: Modifier = Modifier, enabled: Boolean = true, primary: Boolean = true,
+    fill: Color = if (primary) Am.Accent else Am.Field, ink: Color = if (primary) Am.OnAccent else Am.OnDark, onClick: () -> Unit,
+) {
     Box(
-        modifier.height(48.dp).clip(CircleShape).background(if (enabled) Am.Accent else Am.Accent.copy(alpha = 0.4f)).clickable(enabled = enabled, onClick = onClick).padding(horizontal = 24.dp),
+        modifier.heightIn(min = 48.dp).clip(CircleShape).background(if (enabled) fill else fill.copy(alpha = 0.4f))
+            .clickable(enabled = enabled, role = Role.Button, onClick = onClick).padding(horizontal = 24.dp),
         contentAlignment = Alignment.Center,
     ) {
-        Text(text, color = Am.OnAccent, fontSize = 15.sp, fontWeight = FontWeight.Medium, maxLines = 1)
+        Text(text, color = ink, fontSize = 15.sp, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center, maxLines = 2, overflow = TextOverflow.Ellipsis)
     }
+}
+
+@Composable
+internal fun DialogPill(text: String, modifier: Modifier = Modifier, primary: Boolean = true, enabled: Boolean = true, editor: Boolean = false, onClick: () -> Unit) {
+    val ink = when { primary -> Am.OnAccent; editor -> Am.OnDark; else -> Am.Navy }
+    AccentPill(
+        text, modifier, enabled, primary, fill = when { primary -> Am.Accent; editor -> Am.FieldHi; else -> Am.HomeLine },
+        ink = if (enabled) ink else ink.copy(alpha = 0.5f), onClick = onClick,
+    )
 }
 
 @Composable

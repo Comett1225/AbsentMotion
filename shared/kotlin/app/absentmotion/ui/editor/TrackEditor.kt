@@ -162,7 +162,7 @@ internal fun TrackPanel(state: EditorState, mode: TrackMode) {
 }
 
 @Composable
-private fun <T> Choices(label: String, options: List<Pair<String, T>>, chosen: T, enabled: Boolean, onPick: (T) -> Unit) {
+internal fun <T> Choices(label: String, options: List<Pair<String, T>>, chosen: T, enabled: Boolean, onPick: (T) -> Unit) {
     Row(Modifier.fillMaxWidth().height(34.dp).alpha(if (enabled) 1f else DimAlpha), verticalAlignment = Alignment.CenterVertically) {
         Text(label, Modifier.width(72.dp).padding(end = 4.dp), color = Am.Caption, maxLines = 1, autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(8.sp, 12.sp, 0.5.sp))
         Row(Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(6.dp)).background(Am.PanelInset)) {

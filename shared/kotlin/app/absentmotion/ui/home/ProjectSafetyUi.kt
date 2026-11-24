@@ -36,7 +36,6 @@ import app.absentmotion.library.CrashEntry
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -101,7 +100,7 @@ fun OpeningOverlay(onCancel: () -> Unit) {
             CircularProgressIndicator(Modifier.size(44.dp), color = Am.Accent)
             if (slow) {
                 Text(stringResource(R.string.still_working), Modifier.padding(top = 16.dp), color = Color.White, fontSize = 15.sp)
-                TextButton(onCancel) { Text(stringResource(R.string.cancel), color = Color.White, fontSize = 15.sp) }
+                AccentPill(stringResource(R.string.cancel), Modifier.padding(top = 8.dp), primary = false, onClick = onCancel)
             }
         }
     }
@@ -372,11 +371,11 @@ internal fun ClosedDialog(
                 stringResource(R.string.safety_recovery_body, recoveryTitle.ifBlank { stringResource(R.string.recovery_your_project) }),
                 Modifier.padding(top = if (crash != null) 12.dp else 0.dp), color = Am.Navy,
             )
-            if (crash != null) TextButton({ reporting = true }) { Text(stringResource(R.string.report_button), color = Am.Navy) }
+            if (crash != null) DialogPill(stringResource(R.string.report_button), Modifier.padding(top = 12.dp), primary = false) { reporting = true }
         }, actions = {
-            if (recovering) TextButton(onDiscard) { Text(stringResource(R.string.discard), color = Am.Navy) }
-            if (recovering) TextButton(onRestore) { Text(stringResource(R.string.restore), color = Am.Navy) }
-            else TextButton(onClose) { Text(stringResource(R.string.ok), color = Am.Navy) }
+            if (recovering) DialogPill(stringResource(R.string.discard), primary = false, onClick = onDiscard)
+            if (recovering) DialogPill(stringResource(R.string.restore), onClick = onRestore)
+            else DialogPill(stringResource(R.string.ok), onClick = onClose)
         })
         return
     }
@@ -391,15 +390,15 @@ internal fun ClosedDialog(
                     stringResource(R.string.safety_recovery_body, recoveryTitle.ifBlank { stringResource(R.string.recovery_your_project) }),
                     Modifier.padding(top = if (crash != null) 12.dp else 0.dp), color = Am.Navy,
                 )
-                if (crash != null) TextButton({ reporting = true }) { Text(stringResource(R.string.report_button), color = Am.Navy) }
+                if (crash != null) DialogPill(stringResource(R.string.report_button), Modifier.padding(top = 12.dp), primary = false) { reporting = true }
             }
         },
         dismissButton = if (!recovering) null else {
-            { TextButton(onDiscard) { Text(stringResource(R.string.discard), color = Am.Navy) } }
+            { DialogPill(stringResource(R.string.discard), primary = false, onClick = onDiscard) }
         },
         confirmButton = {
-            if (recovering) TextButton(onRestore) { Text(stringResource(R.string.restore), color = Am.Navy) }
-            else TextButton(onClose) { Text(stringResource(R.string.ok), color = Am.Navy) }
+            if (recovering) DialogPill(stringResource(R.string.restore), onClick = onRestore)
+            else DialogPill(stringResource(R.string.ok), onClick = onClose)
         },
         containerColor = Am.Card,
     )
@@ -416,10 +415,10 @@ internal fun OpenFailedDialog(onHistory: (() -> Unit)?, outdated: Outdated?, onD
         SafetyNotice(stringResource(R.string.could_not_open_this_project), onDismiss, body = {
             Text(stringResource(if (onHistory != null) R.string.safety_open_failed_with_history else R.string.the_project_file_is_missing_or), color = Am.Navy)
             OutdatedHint(outdated, Modifier.padding(top = 8.dp))
-            TextButton({ reporting = true }) { Text(stringResource(R.string.report_button), color = Am.Navy) }
+            DialogPill(stringResource(R.string.report_button), Modifier.padding(top = 12.dp), primary = false) { reporting = true }
         }, actions = {
-            if (onHistory != null) TextButton(onHistory) { Text(stringResource(R.string.version_history), color = Am.Navy) }
-            TextButton(onDismiss) { Text(stringResource(R.string.ok), color = Am.Navy) }
+            if (onHistory != null) DialogPill(stringResource(R.string.version_history), primary = false, onClick = onHistory)
+            DialogPill(stringResource(R.string.ok), onClick = onDismiss)
         })
         return
     }
@@ -430,11 +429,11 @@ internal fun OpenFailedDialog(onHistory: (() -> Unit)?, outdated: Outdated?, onD
             Column {
                 Text(stringResource(if (onHistory != null) R.string.safety_open_failed_with_history else R.string.the_project_file_is_missing_or), color = Am.Navy)
                 OutdatedHint(outdated, Modifier.padding(top = 8.dp))
-                TextButton({ reporting = true }) { Text(stringResource(R.string.report_button), color = Am.Navy) }
+                DialogPill(stringResource(R.string.report_button), Modifier.padding(top = 12.dp), primary = false) { reporting = true }
             }
         },
-        dismissButton = onHistory?.let { { TextButton(it) { Text(stringResource(R.string.version_history), color = Am.Navy) } } },
-        confirmButton = { TextButton(onDismiss) { Text(stringResource(R.string.ok), color = Am.Navy) } },
+        dismissButton = onHistory?.let { { DialogPill(stringResource(R.string.version_history), primary = false, onClick = it) } },
+        confirmButton = { DialogPill(stringResource(R.string.ok), onClick = onDismiss) },
         containerColor = Am.Card,
     )
 }
@@ -448,7 +447,7 @@ private fun SafetyNotice(title: String, onDismiss: () -> Unit, body: @Composable
                     Text(title, Modifier.weight(1f).verticalScroll(rememberScrollState()).semantics { heading() }, color = Am.Navy, fontSize = 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.Bold)
                     Column(Modifier.weight(1f).verticalScroll(rememberScrollState()), content = body)
                 }
-                Row(Modifier.align(Alignment.End)) { actions() }
+                Row(Modifier.align(Alignment.End).padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) { actions() }
             }
         }
     }

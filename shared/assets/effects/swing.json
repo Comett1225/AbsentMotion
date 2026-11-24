@@ -7,7 +7,7 @@
  "description": "Turns the layer back and forth between two angles.",
  "params": [
   {
-   "id": "frequency",
+   "id": "freq",
    "label": "Frequency",
    "type": "float",
    "default": 2,
@@ -52,6 +52,21 @@
     "Sine",
     "Triangle"
    ]
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "when": {
+    "style": [
+     1
+    ]
+   }
   }
  ]
 }

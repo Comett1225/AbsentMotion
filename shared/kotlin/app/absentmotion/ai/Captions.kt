@@ -117,7 +117,7 @@ internal fun Scene.captionLayers(
         val layer = Layer(XmlNode("text", linkedMapOf("id" to "${Layer.newId()}", "label" to name(first + i),
             "startTime" to "${frameStart(starts[i])}", "endTime" to "${frameEnd(lastFrame)}",
             "fillType" to "color", "mediaFillMode" to "fill", "size" to formatFloats(floatArrayOf(size)),
-            "font" to style.font, "wrapWidth" to "$wrap", "align" to "center")))
+            "font" to style.font, "wrapWidth" to "$wrap", "align" to "center", "textMetrics" to "pixel")))
             .withTransform("location", width / 2f, captionY(width, height, style.position, tall), 0f)
             .withFill("color", style.color).withContent(chunk.text)
         if (!style.outline) layer else layer.withBorderAdded().let {

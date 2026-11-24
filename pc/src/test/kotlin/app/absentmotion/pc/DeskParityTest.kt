@@ -53,6 +53,7 @@ import app.absentmotion.editor.extractAudio
 import app.absentmotion.editor.markBeats
 import app.absentmotion.editor.savePreset
 import app.absentmotion.editor.screenshotFrame
+import app.absentmotion.editor.startVectorDrawing
 import app.absentmotion.library.PresetStore
 import app.absentmotion.ui.editor.importSvgFile
 import kotlinx.coroutines.CoroutineScope
@@ -219,6 +220,34 @@ class DeskParityTest {
             mainClock.advanceTimeBy(300)
             onRoot().performMouseInput { moveTo(centre); press(MouseButton.Primary); moveTo(centre + Offset(60f, 30f), 200); release(MouseButton.Primary) }
             runOnIdle { assertNotEquals("dragging empty canvas pans", Offset.Zero, editor.canvasPan) }
+            runBlocking { app.closeEditor() }
+        }
+    }
+
+    @Test fun penToolZoomsAndPansWithTheMouse() {
+        data("pen-zoom")
+        runSkikoComposeUiTest(size = Size(1280f, 800f)) {
+            val app = DeskAppState()
+            setContent { DeskApp(app) }
+            open(app, "styles")
+            val editor = app.editor!!
+            runOnIdle { editor.startVectorDrawing() }
+            mainClock.advanceTimeBy(300)
+            val centre = DeskPreviewBounds.bounds.center
+            onRoot().performMultiModalInput {
+                mouse { moveTo(centre) }
+                key { keyDown(commandKey) }
+                mouse { scroll(-2f) }
+                key { keyUp(commandKey) }
+            }
+            runOnIdle { assertTrue("zoomed in with the pen tool", editor.canvasZoom > 1f) }
+            val pan = editor.canvasPan
+            val scene = editor.scene
+            onRoot().performMouseInput { moveTo(centre); press(MouseButton.Tertiary); moveTo(centre + Offset(60f, 30f), 200); release(MouseButton.Tertiary) }
+            runOnIdle {
+                assertNotEquals("middle-drag pans", pan, editor.canvasPan)
+                assertTrue("middle click places no point", editor.scene.node === scene.node)
+            }
             runBlocking { app.closeEditor() }
         }
     }

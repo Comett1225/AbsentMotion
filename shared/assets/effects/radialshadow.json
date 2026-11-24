@@ -64,7 +64,22 @@
    "max": 1,
    "step": 0.001,
    "percent": true
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "when": {
+    "style": [
+     1
+    ]
+   }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 light;\nuniform float reach;\nlayout(color) uniform half4 color;\nuniform float alpha;\nuniform float fade;\nuniform float fill;\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    float2 l = light * size;\n    float shade = 0.0;\n    for (int i = 1; i <= 64; i++) {\n        float t = float(i) / 64.0;\n        float k = 1.0 / (1.0 + max(reach, 0.0) * t);\n        float hit = float(image.eval(l + (coord - l) * k).a) * (1.0 - fade * t);\n        shade = max(shade, hit);\n    }\n    float sa = shade * clamp(alpha, 0.0, 1.0) * float(color.a);\n    half4 s = half4(half3(color.rgb) * half(sa), half(sa));\n    half4 body = src * half(clamp(fill, 0.0, 1.0));\n    return body + s * (1.0 - body.a);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 light;\nuniform float reach;\nlayout(color) uniform half4 color;\nuniform float alpha;\nuniform float fade;\nuniform float fill;\nuniform float style;\nuniform float4 screen;\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    float2 l = light * size;\n    float shade = 0.0;\n    for (int i = 1; i <= 64; i++) {\n        float t = float(i) / 64.0;\n        float2 at = style > 0.5 ? coord - normalize(coord - l + float2(0.0001, 0.0)) * max(reach, 0.0) * min(screen.z, screen.w) * t : l + (coord - l) / (1.0 + max(reach, 0.0) * t);\n        float hit = float(image.eval(at).a) * (1.0 - fade * t);\n        shade = max(shade, hit);\n    }\n    float sa = shade * clamp(alpha, 0.0, 1.0) * float(color.a);\n    half4 s = half4(half3(color.rgb) * half(sa), half(sa));\n    half4 body = src * half(clamp(fill, 0.0, 1.0));\n    return body + s * (1.0 - body.a);\n}\n"
 }

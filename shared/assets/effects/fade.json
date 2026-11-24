@@ -22,7 +22,23 @@
    "min": 0,
    "max": 10,
    "step": 0.01
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 1,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "legacyDefault": 0,
+   "when": {
+    "style": [
+     0
+    ]
+   }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float fadeIn;\nuniform float fadeOut;\nuniform float duration;\nhalf4 main(float2 coord) {\n    float a = 1.0;\n    if (fadeIn > 0.0) a *= clamp(time / fadeIn, 0.0, 1.0);\n    if (fadeOut > 0.0) a *= clamp((duration - time) / fadeOut, 0.0, 1.0);\n    return image.eval(coord) * half(a);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float fadeIn;\nuniform float fadeOut;\nuniform float duration;\nuniform float style;\nfloat ramp(float x) {\n    float u = clamp(x, 0.0, 1.0);\n    if (style < 0.5) return u;\n    return u < 0.5 ? 2.0 * u * u : 1.0 - 2.0 * (1.0 - u) * (1.0 - u);\n}\nhalf4 main(float2 coord) {\n    float a = 1.0;\n    if (fadeIn > 0.0) a *= ramp(time / fadeIn);\n    if (fadeOut > 0.0) a *= ramp((duration - time) / fadeOut);\n    return image.eval(coord) * half(a);\n}\n"
 }

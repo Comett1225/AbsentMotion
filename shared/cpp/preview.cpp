@@ -193,7 +193,7 @@ void RenderPreview(SkCanvas* canvas, int width, int height, const Scene& scene, 
 
         canvas->clear(background);
         const float px = view.refPx > 0 ? view.refPx : width / 1080.0f;
-        const bool world = ActiveCamera(scene.layers, timeMs) != nullptr;
+        const bool world = !camera && ActiveCamera(scene.layers, timeMs) != nullptr;
         auto drawScene = [&](SkCanvas* target, const LayerEffects* fx) {
             if (world) DrawWorld(target, *shown, timeMs, pictures, fx);
             else DrawScene(target, *shown, timeMs, pictures, fx);

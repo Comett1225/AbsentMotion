@@ -607,6 +607,19 @@ internal fun Scene.withBlockAt(ids: List<Long>, frame: Int, end: Boolean): Scene
     return chosen.fold(this) { acc, layer -> acc.update(layer.id) { movedClip(layer, layer.startTime + shift, keepEnd = end) } }
 }
 
+internal fun Scene.withEndsAt(ids: List<Long>, frame: Int, sampleMs: Int): Scene =
+    (withTrims(ids, frame, sampleMs, false) ?: this).withClipEdgesAt(ids, frame, end = true, extend = true)
+
+internal fun Scene.endShifts(ids: List<Long>, frame: Int, sampleMs: Int): List<Int> {
+    val ended = withEndsAt(ids, frame, sampleMs)
+    return ids.mapNotNull { id -> layer(id)?.let { (ended.layer(id)?.endTime ?: it.endTime) - it.endTime } }
+}
+
+fun EditorState.endChosenAtPlayhead() {
+    val ids = chosenLayers.map { it.id }
+    edit { it.withEndsAt(ids, frame, sampleMs) }
+}
+
 internal fun Scene.withClipEdgesAt(ids: List<Long>, frame: Int, end: Boolean, extend: Boolean): Scene {
     val target = if (end && extend) frameEnd(frame) else frameStart(frame)
     return ids.fold(this) { acc, id ->

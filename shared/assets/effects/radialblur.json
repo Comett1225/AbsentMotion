@@ -2,7 +2,7 @@
  "id": "radialblur",
  "name": "Zoom Blur",
  "category": "blur",
- "description": "Applies a radial zoom blur by averaging samples along rays from a center point with adjustable strength. Length Even gives every streak the same length instead of growing with the distance from the center.",
+ "description": "Applies a radial zoom blur by averaging samples along rays from a center point with adjustable strength. Adaptive makes the streaks grow with the distance from the center; turned off, every streak has the same length.",
  "params": [
   {
    "id": "center",
@@ -14,24 +14,36 @@
    ]
   },
   {
-   "id": "amount",
+   "id": "zoom",
    "label": "Strength",
    "type": "float",
    "default": 0.15,
    "min": 0.0,
-   "max": 1.9,
+   "max": 1.0,
    "step": 0.01
   },
   {
-   "id": "streak",
-   "label": "Length",
+   "id": "adaptive",
+   "label": "Adaptive",
+   "type": "switch",
+   "default": true
+  },
+  {
+   "id": "style",
+   "label": "Style",
    "type": "choice",
-   "default": 0,
+   "default": 1,
    "options": [
-    "By Distance",
-    "Even"
-   ]
+    "Classic",
+    "Standard"
+   ],
+   "legacyDefault": 0,
+   "when": {
+    "style": [
+     0
+    ]
+   }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float amount;\nuniform float2 center;\nuniform float streak;\n\nhalf4 main(float2 coord) {\n    float2 c = center * size;\n    float2 d = coord - c;\n    float s = clamp(amount, 0.0, 1.9);\n    float n = streak > 0.5 ? 128.0 : 48.0;\n    float4 sum = float4(0.0);\n    float2 e = d * (sqrt(size.x * size.y) / max(length(d), 0.001));\n    for (int i = 0; i < 128; ++i) {\n        if (float(i) >= n) break;\n        float t = s * (float(i) / (n - 1.0) - 0.5);\n        sum += float4(image.eval(streak > 0.5 ? coord + e * t : c + d * (1.0 + t)));\n    }\n    return half4(sum / n);\n}"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float4 screen;\nuniform float time;\nuniform float zoom;\nuniform float2 center;\nuniform float adaptive;\nuniform float style;\n\nhalf4 main(float2 coord) {\n    float2 c = center * size;\n    float2 d = coord - c;\n    float s = clamp(zoom, 0.0, 2.5);\n    float2 lo = screen.xy + 0.5;\n    float2 hi = screen.xy + screen.zw - 0.5;\n    float4 sum = float4(0.0);\n    if (style > 0.5) {\n        float r = length(d);\n        float2 u = r > 0.001 ? d / r : float2(0.0);\n        float span = 0.68 * s * max(size.x, size.y);\n        if (adaptive > 0.5) {\n            float2 e = u * span * length(d / size);\n            for (int i = 0; i < 64; ++i) {\n                sum += float4(image.eval(clamp(coord + e * (float(i) / 63.0 - 0.5), lo, hi)));\n            }\n            return half4(sum / 64.0);\n        }\n        for (int i = 0; i < 128; ++i) {\n            sum += float4(image.eval(clamp(coord + u * span * (float(i) / 127.0 - 0.5), lo, hi)));\n        }\n        return half4(sum / 128.0);\n    }\n    if (adaptive > 0.5) {\n        for (int i = 0; i < 64; ++i) {\n            float t = 0.8 * s * (float(i) / 63.0 - 0.5);\n            sum += float4(image.eval(clamp(c + d * (1.0 + t), lo, hi)));\n        }\n        return half4(sum / 64.0);\n    }\n    float2 e = d * (4.0 * sqrt(size.x * size.y) / max(length(d), 0.001));\n    for (int i = 0; i < 128; ++i) {\n        float t = s * (float(i) / 127.0 - 0.5);\n        sum += float4(image.eval(clamp(coord + e * t, lo, hi)));\n    }\n    return half4(sum / 128.0);\n}"
 }

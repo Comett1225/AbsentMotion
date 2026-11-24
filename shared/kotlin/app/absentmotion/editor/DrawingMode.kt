@@ -27,6 +27,7 @@ import app.absentmotion.model.strokes
 import app.absentmotion.model.withContours
 import app.absentmotion.model.withHoles
 import kotlin.math.cos
+import kotlin.math.roundToInt
 import kotlin.math.sin
 import kotlin.math.tan
 import kotlin.random.Random
@@ -40,23 +41,57 @@ sealed class DrawingMode(val layerId: Long, val created: Boolean) {
 internal fun DrawingMode.screenMatrix(scene: Scene, timeMs: Int): Matrix? =
     seen?.let { Matrix().apply { setValues(it.copyOf(9)) } } ?: scene.worldMatrix(layerId, timeMs)
 
+enum class Pressure { Off, Stylus, Speed }
+
+class BrushSettings(width: Float) {
+    var width by mutableFloatStateOf(width)
+    var hardness by mutableFloatStateOf(1f)
+    var smoothing by mutableFloatStateOf(0f)
+}
+
+internal val BrushWidths = intArrayOf(1, 2, 3, 4, 5, 6, 8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 48, 56, 64, 72, 80, 96, 112, 128, 160, 192, 224, 256, 300)
+
 private object DrawingDefaults {
     var tool = DrawTool.Pen
-    var width = 10f
     var color = 0xFFE53935.toInt()
+    val brush = BrushSettings(10f)
+    val eraser = BrushSettings(10f)
+    var penPressure by mutableStateOf(Pressure.Off)
+    var brushPressure by mutableStateOf(Pressure.Stylus)
+    var wholeStrokes by mutableStateOf(false)
 }
 
 class FreehandMode(layerId: Long, created: Boolean) : DrawingMode(layerId, created) {
     var tool by mutableStateOf(DrawingDefaults.tool)
         private set
-    var width by mutableFloatStateOf(DrawingDefaults.width)
-        private set
     var color by mutableIntStateOf(DrawingDefaults.color)
         private set
+    var settingsOpen by mutableStateOf(false)
+
+    val settings: BrushSettings get() = if (tool == DrawTool.Eraser) DrawingDefaults.eraser else DrawingDefaults.brush
+    val width: Float get() = settings.width
+
+    var pressure: Pressure
+        get() = when (tool) { DrawTool.Pen -> DrawingDefaults.penPressure; DrawTool.Brush -> DrawingDefaults.brushPressure; else -> Pressure.Off }
+        set(value) { if (tool == DrawTool.Pen) DrawingDefaults.penPressure = value else if (tool == DrawTool.Brush) DrawingDefaults.brushPressure = value }
+
+    var wholeStrokes: Boolean
+        get() = DrawingDefaults.wholeStrokes
+        set(value) { DrawingDefaults.wholeStrokes = value }
+
+    val savedTool: DrawTool get() = if (tool == DrawTool.Pen && pressure != Pressure.Off) DrawTool.Brush else tool
 
     fun pick(tool: DrawTool) { this.tool = tool; DrawingDefaults.tool = tool }
-    fun resize(width: Float) { this.width = width; DrawingDefaults.width = width }
+    fun resize(width: Float) { settings.width = width }
     fun recolour(color: Int) { this.color = color; DrawingDefaults.color = color }
+    fun opacity(alpha: Float) = recolour((color and 0xFFFFFF) or ((alpha.coerceIn(0f, 1f) * 255).roundToInt() shl 24))
+
+    fun stepSize(up: Boolean) {
+        val index = BrushWidths.indexOfLast { it <= width }.coerceAtLeast(0)
+        resize(BrushWidths[(index + if (up) 1 else -1).coerceIn(0, BrushWidths.lastIndex)].toFloat())
+    }
+
+    fun stepHardness(up: Boolean) { settings.hardness = ((settings.hardness * 10).roundToInt() + if (up) 1 else -1).coerceIn(0, 10) / 10f }
 
     override val handlesCode: Int get() = -11
 }

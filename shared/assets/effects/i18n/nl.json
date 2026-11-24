@@ -1,0 +1,8892 @@
+{
+ "categories": {
+  "3d": "3D",
+  "ai": "AI",
+  "beat": "Beat",
+  "blur": "Vervaging",
+  "color": "Kleur",
+  "distort": "Vervormen",
+  "key": "Keying",
+  "move": "Beweging",
+  "new": "Nieuw",
+  "noise": "Ruis",
+  "other": "Overig",
+  "repeat": "Herhaling",
+  "stylize": "Stileren",
+  "text": "Tekst"
+ },
+ "effects": {
+  "ascii": {
+   "description": "Maakt van de laag tekstkunst van letters en symbolen: lichtere delen krijgen vollere tekens. Grootte bepaalt hoe breed elk teken op de laag is, zodat de tekens meebewegen, -draaien en -schalen. Kleur behoudt de eigen kleuren van het beeld of gebruikt één kleur, en Randlijnen tekent contouren met de tekens | - / en \\.",
+   "name": "ASCII",
+   "params": {
+    "background": {
+     "label": "Achtergrondkleur"
+    },
+    "backgroundMode": {
+     "label": "Achtergrond",
+     "options": [
+      "Geen",
+      "Kleur"
+     ]
+    },
+    "brightness": {
+     "label": "Helderheid"
+    },
+    "cell": {
+     "label": "Grootte"
+    },
+    "characters": {
+     "label": "Eigen tekens"
+    },
+    "charset": {
+     "label": "Tekens",
+     "options": [
+      "Gedetailleerd",
+      "Eenvoudig",
+      "Blokken",
+      "Binair",
+      "Aangepast"
+     ]
+    },
+    "colorMode": {
+     "label": "Kleur",
+     "options": [
+      "Origineel",
+      "Eén kleur"
+     ]
+    },
+    "contrast": {
+     "label": "Contrast"
+    },
+    "edges": {
+     "label": "Randlijnen"
+    },
+    "invert": {
+     "label": "Omkeren"
+    },
+    "textColor": {
+     "label": "Tekstkleur"
+    }
+   },
+   "presets": {
+    "amber-monitor": "Amber monitor",
+    "binary-rain": "Binaire regen",
+    "blocks": "Blokken",
+    "line-art": "Lijntekening",
+    "newspaper": "Krant",
+    "terminal": "Terminal"
+   }
+  },
+  "autoshake": {
+   "description": "Beweegt de laag in de loop van de tijd willekeurig binnen de ingestelde grenzen.",
+   "name": "Automatisch schudden",
+   "params": {
+    "angle": {
+     "label": "Hoek"
+    },
+    "evolution": {
+     "label": "Evolutie"
+    },
+    "frequency": {
+     "label": "Frequentie"
+    },
+    "magnitude": {
+     "label": "Uitslag"
+    },
+    "pattern": {
+     "label": "Patroon",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "slack": {
+     "label": "Speling"
+    },
+    "zshake": {
+     "label": "Z-schudden"
+    }
+   }
+  },
+  "backdrop": {
+   "description": "Heette vroeger Aanpassingslaag. Kopieert wat onder de laag is getekend, zodat de effecten erna die kopie bewerken. Maskeren op laag beperkt de kopie tot de ondoorzichtige delen van de laag. Mix brengt de vulling van de laag terug. Met Effecten buiten laag kunnen latere effecten, zoals Uitrekken, de kopie voorbij de randen van de laag brengen.",
+   "name": "Achtergrond kopiëren",
+   "params": {
+    "mask": {
+     "label": "Maskeren op laag"
+    },
+    "mix": {
+     "label": "Mix"
+    },
+    "spill": {
+     "label": "Effecten buiten laag"
+    }
+   }
+  },
+  "beatblur": {
+   "description": "Geeft elke beat een zoomvervaging die wegtrekt terwijl de beat wegsterft. Selecteer eerst je muziekclip, open het menu en tik op Beats markeren; zonder beatmarkeringen volgt het de BPM-instelling.",
+   "name": "Beat-vervaging",
+   "params": {
+    "beats": {
+     "label": "Beats",
+     "options": [
+      "Elke beat",
+      "Elke 2e beat",
+      "Elke 4e beat"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Uitdoven"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "strength": {
+     "label": "Sterkte"
+    }
+   }
+  },
+  "beatflash": {
+   "description": "Laat de laag bij elke beat oplichten in een kleur. Selecteer eerst je muziekclip, open het menu en tik op Beats markeren; zonder beatmarkeringen volgt het de BPM-instelling.",
+   "name": "Beat-flits",
+   "params": {
+    "beats": {
+     "label": "Beats",
+     "options": [
+      "Elke beat",
+      "Elke 2e beat",
+      "Elke 4e beat"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "Kleur"
+    },
+    "decay": {
+     "label": "Uitdoven"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "strength": {
+     "label": "Sterkte"
+    }
+   }
+  },
+  "beatglitch": {
+   "description": "Breekt de laag bij elke beat op in verschoven stroken met gesplitste kleuren. Selecteer eerst je muziekclip, open het menu en tik op Beats markeren; zonder beatmarkeringen volgt het de BPM-instelling.",
+   "name": "Beat-glitch",
+   "params": {
+    "beats": {
+     "label": "Beats",
+     "options": [
+      "Elke beat",
+      "Elke 2e beat",
+      "Elke 4e beat"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Uitdoven"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "slices": {
+     "label": "Stroken"
+    },
+    "strength": {
+     "label": "Sterkte"
+    }
+   }
+  },
+  "beatglow": {
+   "description": "Laat de lichte delen van de laag bij elke beat gloeien. Selecteer eerst je muziekclip, open het menu en tik op Beats markeren; zonder beatmarkeringen volgt het de BPM-instelling.",
+   "name": "Beat-gloed",
+   "params": {
+    "beats": {
+     "label": "Beats",
+     "options": [
+      "Elke beat",
+      "Elke 2e beat",
+      "Elke 4e beat"
+     ]
+    },
+    "blur": {
+     "label": "Straal"
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "Kleur"
+    },
+    "decay": {
+     "label": "Uitdoven"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "strength": {
+     "label": "Sterkte"
+    },
+    "threshold": {
+     "label": "Drempel"
+    }
+   }
+  },
+  "beatpulse": {
+   "description": "Maakt de laag bij elke beat lichter, als een flits van belichting; een negatieve sterkte maakt hem donkerder. Selecteer eerst je muziekclip, open het menu en tik op Beats markeren; zonder beatmarkeringen volgt het de BPM-instelling.",
+   "name": "Beat-puls",
+   "params": {
+    "beats": {
+     "label": "Beats",
+     "options": [
+      "Elke beat",
+      "Elke 2e beat",
+      "Elke 4e beat"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Uitdoven"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "strength": {
+     "label": "Sterkte"
+    }
+   }
+  },
+  "beatrgbsplit": {
+   "description": "Trekt bij elke beat het rode en blauwe kanaal uit elkaar. Selecteer eerst je muziekclip, open het menu en tik op Beats markeren; zonder beatmarkeringen volgt het de BPM-instelling.",
+   "name": "Beat-RGB-splitsing",
+   "params": {
+    "angle": {
+     "label": "Hoek"
+    },
+    "beats": {
+     "label": "Beats",
+     "options": [
+      "Elke beat",
+      "Elke 2e beat",
+      "Elke 4e beat"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Uitdoven"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "strength": {
+     "label": "Sterkte"
+    }
+   }
+  },
+  "beatrotate": {
+   "description": "Kantelt de laag bij elke beat, afwisselend naar links en rechts, en zwaait terug. Selecteer eerst je muziekclip, open het menu en tik op Beats markeren; zonder beatmarkeringen volgt het de BPM-instelling.",
+   "name": "Beat-rotatie",
+   "params": {
+    "alternate": {
+     "label": "Afwisselen"
+    },
+    "beats": {
+     "label": "Beats",
+     "options": [
+      "Elke beat",
+      "Elke 2e beat",
+      "Elke 4e beat"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "cover": {
+     "label": "Beeld vullen"
+    },
+    "decay": {
+     "label": "Uitdoven"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "strength": {
+     "label": "Sterkte"
+    }
+   }
+  },
+  "beatshake": {
+   "description": "Schudt de laag bij elke beat, steeds in een andere richting, en komt tot rust vóór de volgende. Selecteer eerst je muziekclip, open het menu en tik op Beats markeren; zonder beatmarkeringen volgt het de BPM-instelling.",
+   "name": "Beat-schudden",
+   "params": {
+    "beats": {
+     "label": "Beats",
+     "options": [
+      "Elke beat",
+      "Elke 2e beat",
+      "Elke 4e beat"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Uitdoven"
+    },
+    "frequency": {
+     "label": "Frequentie"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "strength": {
+     "label": "Sterkte"
+    }
+   }
+  },
+  "beatzoom": {
+   "description": "Zoomt bij elke beat in en zoomt soepel weer uit. Selecteer eerst je muziekclip, open het menu en tik op Beats markeren; zonder beatmarkeringen volgt het de BPM-instelling.",
+   "name": "Beat-zoom",
+   "params": {
+    "beats": {
+     "label": "Beats",
+     "options": [
+      "Elke beat",
+      "Elke 2e beat",
+      "Elke 4e beat"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "decay": {
+     "label": "Uitdoven"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "strength": {
+     "label": "Sterkte"
+    }
+   }
+  },
+  "bend": {
+   "description": "Buigt de laag langs een cirkelboog; de kant van Oorsprong blijft staan en de andere kant draait naar de ingestelde hoek, een positieve hoek naar links. Werkt het best op lange, smalle lagen.",
+   "name": "Buigen",
+   "params": {
+    "amount": {
+     "label": "Hoek"
+    },
+    "before": {
+     "label": "Voor begin",
+     "options": [
+      "Bevriezen",
+      "Naar dezelfde kant buigen",
+      "Naar andere kant buigen"
+     ]
+    },
+    "origin": {
+     "label": "Oorsprong",
+     "options": [
+      "Links",
+      "Rechts",
+      "Boven",
+      "Onder"
+     ]
+    },
+    "start": {
+     "label": "Begin"
+    },
+    "tuneHead": {
+     "label": "Kop afstemmen"
+    },
+    "tuneTail": {
+     "label": "Staart afstemmen"
+    }
+   }
+  },
+  "blink": {
+   "description": "Zet de laag een aantal keer per seconde aan en uit.",
+   "name": "Knipperen",
+   "params": {
+    "frequency": {
+     "label": "Frequentie"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    }
+   }
+  },
+  "blockdissolve": {
+   "description": "Verwijdert willekeurige blokken op een raster uit de laag. Animeer Sterkte om steeds meer blokken weg te halen.",
+   "name": "Blokken oplossen",
+   "params": {
+    "blockSize": {
+     "label": "Grootte"
+    },
+    "fade": {
+     "label": "Uitfaden"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "strength": {
+     "label": "Sterkte"
+    },
+    "stretch": {
+     "label": "Uitrekken"
+    }
+   }
+  },
+  "blocknoise": {
+   "description": "Laat willekeurige ruisblokken over de laag flikkeren. Vermenigvuldigen moduleert de bestaande kleuren; Optellen voegt er ruis aan toe. Bevriezen houdt het patroon stil.",
+   "name": "Blokruis",
+   "params": {
+    "blending": {
+     "label": "Overvloeimodus",
+     "options": [
+      "Optellen",
+      "Vermenigvuldigen"
+     ]
+    },
+    "blockSize": {
+     "label": "Grootte"
+    },
+    "extremes": {
+     "label": "Uitersten"
+    },
+    "freeze": {
+     "label": "Bevriezen"
+    },
+    "mono": {
+     "label": "Monochroom"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "overshoot": {
+     "label": "Doorschieten"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "strength": {
+     "label": "Sterkte"
+    },
+    "stretch": {
+     "label": "Uitrekken"
+    }
+   }
+  },
+  "blur": {
+   "description": "Een vloeiende, gelijkmatige vervaging. Met de vorm Vierkant wordt in plaats daarvan een gelijkmatig vierkant rond elk punt gemiddeld.",
+   "name": "Vervaging",
+   "params": {
+    "iterations": {
+     "label": "Iteraties"
+    },
+    "shape": {
+     "label": "Vorm",
+     "options": [
+      "Vloeiend",
+      "Vierkant",
+      "Snel vierkant"
+     ]
+    },
+    "strength": {
+     "label": "Sterkte"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    }
+   }
+  },
+  "box": {
+   "description": "Plakt de laag op een doos waarvan je de breedte, hoogte en diepte kiest.",
+   "name": "Doos",
+   "params": {
+    "ambient": {
+     "label": "Omgevingslicht"
+    },
+    "depth": {
+     "label": "Diepte"
+    },
+    "glossiness": {
+     "label": "Glansgraad"
+    },
+    "height": {
+     "label": "Hoogte"
+    },
+    "light": {
+     "label": "Lichthoek"
+    },
+    "lightColor": {
+     "label": "Lichtkleur"
+    },
+    "lightHeight": {
+     "label": "Lichthoogte"
+    },
+    "lighting": {
+     "label": "Verlichting",
+     "options": [
+      "Klassiek",
+      "Zacht",
+      "Direct"
+     ]
+    },
+    "perspective": {
+     "label": "Perspectief"
+    },
+    "position": {
+     "label": "Positie"
+    },
+    "rotX": {
+     "label": "Rotatie X"
+    },
+    "rotY": {
+     "label": "Rotatie Y"
+    },
+    "rotZ": {
+     "label": "Rotatie Z"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "shading": {
+     "label": "Schaduwwerking"
+    },
+    "shine": {
+     "label": "Glans"
+    },
+    "smoothing": {
+     "label": "Afronding"
+    },
+    "texAnchor": {
+     "label": "Textuuranker",
+     "options": [
+      "Midden",
+      "Hoek"
+     ]
+    },
+    "texAngle": {
+     "label": "Textuurhoek"
+    },
+    "texCrop": {
+     "label": "Textuur uitsnijden"
+    },
+    "texMirror": {
+     "label": "Spiegelen"
+    },
+    "texMode": {
+     "label": "Textuur",
+     "options": [
+      "Passend",
+      "Tegels",
+      "Uitrekken"
+     ]
+    },
+    "texOffset": {
+     "label": "Textuurverschuiving"
+    },
+    "texRepeatX": {
+     "label": "Herhaling X"
+    },
+    "texRepeatY": {
+     "label": "Herhaling Y"
+    },
+    "width": {
+     "label": "Breedte"
+    }
+   }
+  },
+  "brightnesscontrast": {
+   "description": "Past de helderheid en het contrast van het beeld aan.",
+   "name": "Helderheid en contrast",
+   "params": {
+    "brightness": {
+     "label": "Helderheid"
+    },
+    "contrast": {
+     "label": "Contrast"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Per kanaal",
+      "Kleur behouden"
+     ]
+    }
+   }
+  },
+  "bulge": {
+   "description": "Laat de laag opbollen als een lens (positieve Sterkte) of knijpt hem in naar Midden (negatief), binnen een cirkel met Straal als deel van de laaggrootte. Met Meten op Scherm is Straal een deel van het scherm. Afname Vloeiend laat de lens zachter overlopen in de rest van de laag.",
+   "name": "Knijpen/opbollen",
+   "params": {
+    "amount": {
+     "label": "Sterkte"
+    },
+    "center": {
+     "label": "Midden"
+    },
+    "curve": {
+     "label": "Afname",
+     "options": [
+      "Klassiek",
+      "Vloeiend"
+     ]
+    },
+    "radius": {
+     "label": "Straal"
+    },
+    "reach": {
+     "label": "Meten op",
+     "options": [
+      "Laag",
+      "Scherm"
+     ]
+    }
+   }
+  },
+  "bumpmap": {
+   "description": "Belicht de laag alsof de helderheid een verhoogd oppervlak is, voor een reliëf- en textuurlook die de kleuren behoudt.",
+   "name": "Bumpmap",
+   "params": {
+    "ambient": {
+     "label": "Omgevingslicht"
+    },
+    "angle": {
+     "label": "Lichthoek"
+    },
+    "height": {
+     "label": "Hoogte"
+    },
+    "light": {
+     "label": "Lichtkleur"
+    },
+    "shine": {
+     "label": "Glans"
+    }
+   }
+  },
+  "cartoon": {
+   "description": "Brengt de kleuren terug tot een paar banden en tekent contouren waar het beeld scherp verandert. Sterkte bepaalt hoeveel randen een contour krijgen.",
+   "name": "Cartoon",
+   "params": {
+    "color": {
+     "label": "Contourkleur"
+    },
+    "strength": {
+     "label": "Sterkte"
+    }
+   }
+  },
+  "channelmixer": {
+   "description": "Bouwt het beeld opnieuw op uit het rode, groene en blauwe kanaal: elk kanaal voegt zijn eigen kleur toe, daarna buigt Gamma elk kanaal en tilt Verschuiving ze allemaal op of verlaagt ze.",
+   "name": "Kanaalmixer",
+   "params": {
+    "blue": {
+     "label": "Blauw"
+    },
+    "gammaBlue": {
+     "label": "Gamma blauw"
+    },
+    "gammaGreen": {
+     "label": "Gamma groen"
+    },
+    "gammaRed": {
+     "label": "Gamma rood"
+    },
+    "green": {
+     "label": "Groen"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "red": {
+     "label": "Rood"
+    }
+   }
+  },
+  "channelremap": {
+   "description": "Bouwt elk kleurkanaal opnieuw op uit een ander kanaal van de laag, voor valse kleuren of om luminantie naar alfa te verplaatsen.",
+   "name": "Kanaaltoewijzing (RGB)",
+   "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Rood",
+      "Groen",
+      "Blauw",
+      "Alfa",
+      "Luminantie",
+      "Nul",
+      "Vol"
+     ]
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "Rood",
+      "Groen",
+      "Blauw",
+      "Alfa",
+      "Luminantie",
+      "Nul",
+      "Vol"
+     ]
+    },
+    "g": {
+     "label": "G",
+     "options": [
+      "Rood",
+      "Groen",
+      "Blauw",
+      "Alfa",
+      "Luminantie",
+      "Nul",
+      "Vol"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "Rood",
+      "Groen",
+      "Blauw",
+      "Alfa",
+      "Luminantie",
+      "Nul",
+      "Vol"
+     ]
+    }
+   }
+  },
+  "channelremaphsv": {
+   "description": "Bouwt kleurtoon, verzadiging, waarde en alfa opnieuw op uit andere kanalen van de laag.",
+   "name": "Kanaaltoewijzing (HSV)",
+   "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Kleurtoon",
+      "Verzadiging",
+      "Waarde",
+      "Alfa",
+      "Luminantie",
+      "Nul",
+      "Vol"
+     ]
+    },
+    "h": {
+     "label": "H",
+     "options": [
+      "Kleurtoon",
+      "Verzadiging",
+      "Waarde",
+      "Alfa",
+      "Luminantie",
+      "Nul",
+      "Vol"
+     ]
+    },
+    "s": {
+     "label": "S",
+     "options": [
+      "Kleurtoon",
+      "Verzadiging",
+      "Waarde",
+      "Alfa",
+      "Luminantie",
+      "Nul",
+      "Vol"
+     ]
+    },
+    "v": {
+     "label": "V",
+     "options": [
+      "Kleurtoon",
+      "Verzadiging",
+      "Waarde",
+      "Alfa",
+      "Luminantie",
+      "Nul",
+      "Vol"
+     ]
+    }
+   }
+  },
+  "checker": {
+   "description": "Tekent een dambordpatroon over de ondoorzichtige delen van de laag, of ponst de vakjes eruit.",
+   "name": "Dambord",
+   "params": {
+    "angle": {
+     "label": "Hoek"
+    },
+    "color": {
+     "label": "Kleur"
+    },
+    "count": {
+     "label": "Aantal"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "punch": {
+     "label": "Uitsparen"
+    },
+    "screenSpace": {
+     "label": "Schermruimte"
+    },
+    "stretch": {
+     "label": "Uitrekken"
+    }
+   }
+  },
+  "chromakey": {
+   "description": "Verwijdert één kleur, zoals een green screen.",
+   "name": "Chroma key",
+   "params": {
+    "defringe": {
+     "label": "Randen opschonen"
+    },
+    "invert": {
+     "label": "Omkeren"
+    },
+    "key": {
+     "label": "Keykleur"
+    },
+    "luma": {
+     "label": "Luma-gewicht"
+    },
+    "softness": {
+     "label": "Zachtheid"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    },
+    "tolerance": {
+     "label": "Tolerantie"
+    }
+   }
+  },
+  "chromaticzoomblur": {
+   "description": "Een zoomvervaging vanuit een middelpunt die blauw naar binnen en rood naar buiten trekt, zodat randen uitwaaieren in regenboogranden.",
+   "name": "Chromatische zoomvervaging",
+   "params": {
+    "amount": {
+     "label": "Sterkte"
+    },
+    "center": {
+     "label": "Midden"
+    },
+    "sampling": {
+     "label": "Bemonstering",
+     "options": [
+      "Lineair",
+      "Stralen"
+     ]
+    }
+   }
+  },
+  "circularripple": {
+   "description": "Laat cirkelvormige rimpelingen uitdijen vanuit een punt, als een druppel die in water valt. Met Meten op Scherm worden Frequentie, Sterkte en Straal op het scherm gemeten in plaats van op de laag.",
+   "name": "Cirkelvormige rimpeling",
+   "params": {
+    "center": {
+     "label": "Midden"
+    },
+    "feather": {
+     "label": "Zachte rand"
+    },
+    "frequency": {
+     "label": "Frequentie"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "radius": {
+     "label": "Straal"
+    },
+    "reach": {
+     "label": "Meten op",
+     "options": [
+      "Laag",
+      "Scherm"
+     ]
+    },
+    "strength": {
+     "label": "Sterkte"
+    }
+   }
+  },
+  "clouds": {
+   "description": "Bedekt de ondoorzichtige delen van de laag met een zacht wolkenpatroon, ook handig als ruisbron.",
+   "name": "Wolken",
+   "params": {
+    "color1": {
+     "label": "Kleur 1"
+    },
+    "color2": {
+     "label": "Kleur 2"
+    },
+    "contrast": {
+     "label": "Contrast"
+    },
+    "intensity": {
+     "label": "Intensiteit"
+    },
+    "octaves": {
+     "label": "Octaven"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "parallax": {
+     "label": "Parallax"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "stretch": {
+     "label": "Uitrekken"
+    }
+   }
+  },
+  "cmykhalftone": {
+   "description": "Tekent de laag opnieuw als tijdschriftdruk: cyaan, magenta, gele en zwarte punten op vier gedraaide rasters.",
+   "name": "CMYK-rasterpunten",
+   "params": {
+    "amount": {
+     "label": "Hoeveelheid"
+    },
+    "angle": {
+     "label": "Hoek"
+    },
+    "black": {
+     "label": "Zwart"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "strength": {
+     "label": "Sterkte"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Hard"
+     ]
+    }
+   }
+  },
+  "coloradjust": {
+   "description": "Past helderheid, contrast, verzadiging en levendigheid in één keer aan; levendigheid versterkt vooral de doffere kleuren.",
+   "name": "Kleur aanpassen",
+   "params": {
+    "brightness": {
+     "label": "Helderheid"
+    },
+    "contrast": {
+     "label": "Contrast"
+    },
+    "saturation": {
+     "label": "Verzadiging"
+    },
+    "vibrance": {
+     "label": "Levendigheid"
+    }
+   }
+  },
+  "colorbalance": {
+   "description": "Duwt de schaduwen, middentonen en hooglichten elk naar een eigen kleur (grijs laat een bereik ongewijzigd). Helderheid behouden houdt de helderheid van elke pixel vast terwijl de kleuren veranderen.",
+   "name": "Kleurbalans",
+   "params": {
+    "amount": {
+     "label": "Hoeveelheid"
+    },
+    "highlights": {
+     "label": "Hooglichten"
+    },
+    "midtones": {
+     "label": "Middentonen"
+    },
+    "preserve": {
+     "label": "Helderheid behouden"
+    },
+    "shadows": {
+     "label": "Schaduwen"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    }
+   }
+  },
+  "colorize": {
+   "description": "Kleurt de hele laag in één kleurtoon. Licht en schaduw zet de helderheid van de laag om naar de kleurtoon; Helderheid behouden houdt de helderheid van elke pixel en wisselt de kleur voor die van de kleurtoon.",
+   "name": "Inkleuren",
+   "params": {
+    "amount": {
+     "label": "Hoeveelheid"
+    },
+    "hue": {
+     "label": "Kleurtoon"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Licht en schaduw",
+      "Helderheid behouden"
+     ]
+    }
+   }
+  },
+  "colorwheels": {
+   "description": "Kleurwielen voor de schaduwen (lift), middentonen (gamma) en hooglichten (gain): een kleurtoon, hoe sterk die wordt doorgevoerd, en een niveau. Offset verschuift alle tonen. De stijl Op helderheid weegt elk wiel naar de helderheid van de pixel.",
+   "name": "Lift Gamma Gain",
+   "params": {
+    "gainAmount": {
+     "label": "Gain-hoeveelheid"
+    },
+    "gainHue": {
+     "label": "Gain-kleurtoon"
+    },
+    "gainLevel": {
+     "label": "Gain-niveau"
+    },
+    "gammaAmount": {
+     "label": "Gamma-hoeveelheid"
+    },
+    "gammaHue": {
+     "label": "Gamma-kleurtoon"
+    },
+    "gammaLevel": {
+     "label": "Gamma-niveau"
+    },
+    "liftAmount": {
+     "label": "Lift-hoeveelheid"
+    },
+    "liftHue": {
+     "label": "Lift-kleurtoon"
+    },
+    "liftLevel": {
+     "label": "Lift-niveau"
+    },
+    "offsetAmount": {
+     "label": "Offset-hoeveelheid"
+    },
+    "offsetHue": {
+     "label": "Offset-kleurtoon"
+    },
+    "offsetLevel": {
+     "label": "Offset-niveau"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Op helderheid",
+      "Standaard"
+     ]
+    }
+   }
+  },
+  "contourgradient": {
+   "description": "Schildert een verloop van twee kleuren naar buiten vanaf de randen van de ondoorzichtige delen van de laag, als een zachte gekleurde halo.",
+   "name": "Contourverloop",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blur": {
+     "label": "Breedte"
+    },
+    "color1": {
+     "label": "Kleur 1"
+    },
+    "color2": {
+     "label": "Kleur 2"
+    },
+    "fade": {
+     "label": "Uitfaden"
+    },
+    "fill": {
+     "label": "Vulling"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "spread": {
+     "label": "Spreiding",
+     "options": [
+      "Vervaging",
+      "Afstand"
+     ]
+    }
+   }
+  },
+  "contourlines": {
+   "description": "Tekent contourringen rond de ondoorzichtige delen van de laag, voor gestapelde sticker- of neoncontouren.",
+   "name": "Contourlijnen",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blur": {
+     "label": "Naar buiten"
+    },
+    "color": {
+     "label": "Kleur"
+    },
+    "count": {
+     "label": "Aantal"
+    },
+    "fill": {
+     "label": "Vulling"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "spread": {
+     "label": "Spreiding",
+     "options": [
+      "Vervaging",
+      "Afstand"
+     ]
+    },
+    "width": {
+     "label": "Breedte"
+    }
+   }
+  },
+  "contourstrips": {
+   "description": "Tekent gestapelde papierstroken waarvan de hoogte de helderheid of dekking van de laag volgt, als een landschap van bergkammen.",
+   "name": "Contourstroken",
+   "params": {
+    "angle": {
+     "label": "Hoek"
+    },
+    "color1": {
+     "label": "Kleur 1"
+    },
+    "color2": {
+     "label": "Kleur 2"
+    },
+    "count": {
+     "label": "Aantal"
+    },
+    "edgeColor": {
+     "label": "Randkleur"
+    },
+    "height": {
+     "label": "Hoogte"
+    },
+    "invert": {
+     "label": "Omkeren"
+    },
+    "light": {
+     "label": "Lichtkleur"
+    },
+    "lightAngle": {
+     "label": "Lichthoek"
+    },
+    "map": {
+     "label": "Hoogtekaart",
+     "options": [
+      "Alfa",
+      "Luminantie"
+     ]
+    },
+    "mask": {
+     "label": "Maskeren op laag"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Gestapeld"
+     ]
+    },
+    "thickness": {
+     "label": "Dikte"
+    }
+   }
+  },
+  "countupdown": {
+   "description": "Wijzigt elk getal in een tekstlaag: vermenigvuldigt het en telt er iets bij op, dus met keyframes op Vermenigvuldigen van 0% tot 100% tel je op tot het getal dat je hebt getypt. Woorden rond de getallen blijven zoals ze zijn.",
+   "name": "Op-/aftellen",
+   "params": {
+    "add": {
+     "label": "Optellen"
+    },
+    "decimals": {
+     "label": "Decimalen",
+     "options": [
+      "Zoals getypt",
+      "0",
+      "1",
+      "2",
+      "3"
+     ]
+    },
+    "multiply": {
+     "label": "Vermenigvuldigen"
+    },
+    "separator": {
+     "label": "Duizendtallen",
+     "options": [
+      "1000.5",
+      "1,000.5",
+      "1.000,5",
+      "1 000.5"
+     ]
+    }
+   },
+   "presets": {
+    "count-up": "Optellen"
+   }
+  },
+  "crop": {
+   "description": "Snijdt de randen van de laag af: Links, Boven, Rechts en Onder bepalen hoeveel van de eigen breedte of hoogte van de laag aan elke kant verdwijnt, Ronding rondt de hoeken af en Zachte rand maakt de randen zachter. De laag blijft op zijn plek.",
+   "name": "Uitsnijden",
+   "params": {
+    "bottom": {
+     "label": "Onder"
+    },
+    "feather": {
+     "label": "Zachte rand"
+    },
+    "left": {
+     "label": "Links"
+    },
+    "radius": {
+     "label": "Ronding"
+    },
+    "right": {
+     "label": "Rechts"
+    },
+    "top": {
+     "label": "Boven"
+    }
+   }
+  },
+  "cross": {
+   "description": "Plaatst de laag op drie balken die elkaar in het midden kruisen.",
+   "name": "Drieassig kruis",
+   "params": {
+    "ambient": {
+     "label": "Omgevingslicht"
+    },
+    "glossiness": {
+     "label": "Glansgraad"
+    },
+    "keep": {
+     "label": "Laag behouden"
+    },
+    "light": {
+     "label": "Lichthoek"
+    },
+    "lightColor": {
+     "label": "Lichtkleur"
+    },
+    "lightHeight": {
+     "label": "Lichthoogte"
+    },
+    "lighting": {
+     "label": "Verlichting",
+     "options": [
+      "Klassiek",
+      "Zacht",
+      "Direct"
+     ]
+    },
+    "perspective": {
+     "label": "Perspectief"
+    },
+    "position": {
+     "label": "Positie"
+    },
+    "reach": {
+     "label": "Lengte"
+    },
+    "rotX": {
+     "label": "Rotatie X"
+    },
+    "rotY": {
+     "label": "Rotatie Y"
+    },
+    "rotZ": {
+     "label": "Rotatie Z"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "shading": {
+     "label": "Schaduwwerking"
+    },
+    "shine": {
+     "label": "Glans"
+    },
+    "smoothing": {
+     "label": "Afronding"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    },
+    "texAnchor": {
+     "label": "Textuuranker",
+     "options": [
+      "Midden",
+      "Hoek"
+     ]
+    },
+    "texAngle": {
+     "label": "Textuurhoek"
+    },
+    "texCrop": {
+     "label": "Textuur uitsnijden"
+    },
+    "texMirror": {
+     "label": "Spiegelen"
+    },
+    "texMode": {
+     "label": "Textuur",
+     "options": [
+      "Passend",
+      "Tegels",
+      "Uitrekken"
+     ]
+    },
+    "texOffset": {
+     "label": "Textuurverschuiving"
+    },
+    "texRepeatX": {
+     "label": "Herhaling X"
+    },
+    "texRepeatY": {
+     "label": "Herhaling Y"
+    },
+    "thickness": {
+     "label": "Dikte"
+    }
+   }
+  },
+  "cube": {
+   "description": "Plakt de laag op elk vlak van een draaiende kubus met afgeronde randen en verlichting.",
+   "name": "Kubus",
+   "params": {
+    "ambient": {
+     "label": "Omgevingslicht"
+    },
+    "edge": {
+     "label": "Grootte"
+    },
+    "glossiness": {
+     "label": "Glansgraad"
+    },
+    "light": {
+     "label": "Lichthoek"
+    },
+    "lightColor": {
+     "label": "Lichtkleur"
+    },
+    "lightHeight": {
+     "label": "Lichthoogte"
+    },
+    "lighting": {
+     "label": "Verlichting",
+     "options": [
+      "Klassiek",
+      "Zacht",
+      "Direct"
+     ]
+    },
+    "perspective": {
+     "label": "Perspectief"
+    },
+    "position": {
+     "label": "Positie"
+    },
+    "rotX": {
+     "label": "Rotatie X"
+    },
+    "rotY": {
+     "label": "Rotatie Y"
+    },
+    "rotZ": {
+     "label": "Rotatie Z"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "shading": {
+     "label": "Schaduwwerking"
+    },
+    "shine": {
+     "label": "Glans"
+    },
+    "smoothing": {
+     "label": "Afronding"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    },
+    "texAnchor": {
+     "label": "Textuuranker",
+     "options": [
+      "Midden",
+      "Hoek"
+     ]
+    },
+    "texAngle": {
+     "label": "Textuurhoek"
+    },
+    "texCrop": {
+     "label": "Textuur uitsnijden"
+    },
+    "texMirror": {
+     "label": "Spiegelen"
+    },
+    "texMode": {
+     "label": "Textuur",
+     "options": [
+      "Passend",
+      "Tegels",
+      "Uitrekken"
+     ]
+    },
+    "texOffset": {
+     "label": "Textuurverschuiving"
+    },
+    "texRepeatX": {
+     "label": "Herhaling X"
+    },
+    "texRepeatY": {
+     "label": "Herhaling Y"
+    }
+   }
+  },
+  "curl": {
+   "description": "Rolt het ene uiteinde van de laag om een cirkel terwijl het andere plat blijft; animeer Verschuiving om hem op of af te rollen. Werkt het best op brede, dunne lagen.",
+   "name": "Krullen",
+   "params": {
+    "curlFrom": {
+     "label": "Krullen vanaf",
+     "options": [
+      "Links",
+      "Rechts"
+     ]
+    },
+    "direction": {
+     "label": "Richting",
+     "options": [
+      "Omhoog",
+      "Omlaag"
+     ]
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "radius": {
+     "label": "Straal"
+    },
+    "stretch": {
+     "label": "Uitrekken"
+    }
+   }
+  },
+  "cylinder": {
+   "description": "Wikkelt de laag om een cilinder en op de ronde uiteinden.",
+   "name": "Cilinder",
+   "params": {
+    "ambient": {
+     "label": "Omgevingslicht"
+    },
+    "glossiness": {
+     "label": "Glansgraad"
+    },
+    "height": {
+     "label": "Hoogte"
+    },
+    "light": {
+     "label": "Lichthoek"
+    },
+    "lightColor": {
+     "label": "Lichtkleur"
+    },
+    "lightHeight": {
+     "label": "Lichthoogte"
+    },
+    "lighting": {
+     "label": "Verlichting",
+     "options": [
+      "Klassiek",
+      "Zacht",
+      "Direct"
+     ]
+    },
+    "perspective": {
+     "label": "Perspectief"
+    },
+    "position": {
+     "label": "Positie"
+    },
+    "radius": {
+     "label": "Straal"
+    },
+    "rotX": {
+     "label": "Rotatie X"
+    },
+    "rotY": {
+     "label": "Rotatie Y"
+    },
+    "rotZ": {
+     "label": "Rotatie Z"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "shading": {
+     "label": "Schaduwwerking"
+    },
+    "shine": {
+     "label": "Glans"
+    },
+    "smoothing": {
+     "label": "Afronding"
+    },
+    "texAnchor": {
+     "label": "Textuuranker",
+     "options": [
+      "Midden",
+      "Hoek"
+     ]
+    },
+    "texAngle": {
+     "label": "Textuurhoek"
+    },
+    "texCrop": {
+     "label": "Textuur uitsnijden"
+    },
+    "texMirror": {
+     "label": "Spiegelen"
+    },
+    "texMode": {
+     "label": "Textuur",
+     "options": [
+      "Passend",
+      "Tegels",
+      "Uitrekken"
+     ]
+    },
+    "texOffset": {
+     "label": "Textuurverschuiving"
+    },
+    "texRepeatX": {
+     "label": "Herhaling X"
+    },
+    "texRepeatY": {
+     "label": "Herhaling Y"
+    }
+   }
+  },
+  "darkglow": {
+   "description": "Spreidt de donkere delen van de laag uit over de lichte, als een gloed van schaduw.",
+   "name": "Donkere gloed",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blend": {
+     "label": "Mengen"
+    },
+    "blur": {
+     "label": "Diffusie"
+    },
+    "color": {
+     "label": "Kleur"
+    },
+    "threshold": {
+     "label": "Drempel"
+    }
+   }
+  },
+  "datamosh": {
+   "description": "Tussen de begin- en eindtijd, in seconden vanaf het begin van de laag, ververst het beeld niet meer en wordt het meegesleept door de beweging die volgt, alsof er een keyframe ontbreekt. Videolagen worden uitgesmeerd door hun echte beweging, andere lagen door bewegende blokken.",
+   "name": "Datamosh",
+   "params": {
+    "block": {
+     "label": "Blokgrootte"
+    },
+    "bloom": {
+     "label": "Bloom"
+    },
+    "decay": {
+     "label": "Uitdoven"
+    },
+    "end": {
+     "label": "Einde"
+    },
+    "glitch": {
+     "label": "Glitch"
+    },
+    "intensity": {
+     "label": "Intensiteit"
+    },
+    "start": {
+     "label": "Begin"
+    }
+   }
+  },
+  "deepglow": {
+   "description": "Een rijke, heldere gloed die zich ver verspreidt: een felle kern bij de laag die vloeiend overgaat in een brede, zachte nevel.",
+   "name": "Deep Glow",
+   "params": {
+    "blur": {
+     "label": "Straal"
+    },
+    "falloff": {
+     "label": "Afname"
+    },
+    "high": {
+     "label": "Drempel hoog"
+    },
+    "hue": {
+     "label": "Kleurtoonverschuiving"
+    },
+    "intensity": {
+     "label": "Intensiteit"
+    },
+    "limit": {
+     "label": "Drempel"
+    },
+    "low": {
+     "label": "Drempel laag"
+    },
+    "opacity": {
+     "label": "Dekking gloed"
+    },
+    "original": {
+     "label": "Dekking origineel"
+    },
+    "outside": {
+     "label": "Gloed buiten"
+    },
+    "saturation": {
+     "label": "Verzadiging"
+    },
+    "softness": {
+     "label": "Zachtheid drempel"
+    },
+    "tint": {
+     "label": "Tintkleur"
+    },
+    "tintAmount": {
+     "label": "Tint"
+    },
+    "vibrance": {
+     "label": "Levendigheid"
+    }
+   }
+  },
+  "denoise": {
+   "description": "Verwijdert beeldruis met een randbehoudend bilateraal filter dat naburige pixels alleen middelt als hun kleuren op elkaar lijken.",
+   "name": "Ruisreductie",
+   "params": {
+    "detail": {
+     "label": "Detail"
+    },
+    "radius": {
+     "label": "Straal"
+    },
+    "strength": {
+     "label": "Sterkte"
+    }
+   }
+  },
+  "difference": {
+   "description": "Toont hoe de laag verschilt van wat erachter ligt, zoals de overvloeimodus Verschil, maar op deze plek in de effectenlijst.",
+   "name": "Verschil",
+   "params": {
+    "amount": {
+     "label": "Hoeveelheid"
+    }
+   }
+  },
+  "differencematte": {
+   "description": "Verbergt de delen van de laag die op de lagen erachter lijken, zodat alleen wat verschilt overblijft. Drempel bepaalt hoe anders een plek moet zijn om te blijven en Zachte rand verzacht de rand.",
+   "name": "Verschilmatte",
+   "params": {
+    "feather": {
+     "label": "Zachte rand"
+    },
+    "threshold": {
+     "label": "Drempel"
+    }
+   }
+  },
+  "directionalblur": {
+   "description": "Bewegingsonscherpte door samples langs een hoek te middelen. Met Spreiding op Beide kanten vervaagt het gelijkmatig naar voren en naar achteren.",
+   "name": "Richtingsvervaging",
+   "params": {
+    "angle": {
+     "label": "Hoek"
+    },
+    "blurLength": {
+     "label": "Lengte"
+    },
+    "spread": {
+     "label": "Spreiding",
+     "options": [
+      "Eén kant",
+      "Beide kanten"
+     ]
+    }
+   }
+  },
+  "displacementmap": {
+   "description": "Verschuift met de kleuren van de laag de lagen erachter en verbergt zichzelf daarna; of verschuift, met Kaart op Laag eronder, deze laag met de laag eronder.",
+   "name": "Verplaatsingskaart",
+   "params": {
+    "edges": {
+     "label": "Randen",
+     "options": [
+      "Herhalen",
+      "Spiegelen",
+      "Transparant",
+      "Tegels"
+     ]
+    },
+    "fromCenter": {
+     "label": "Vanuit midden"
+    },
+    "invert": {
+     "label": "Omkeren"
+    },
+    "map": {
+     "label": "Kaart",
+     "options": [
+      "Deze laag",
+      "Laag eronder"
+     ]
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    },
+    "xchannel": {
+     "label": "X",
+     "options": [
+      "R",
+      "G",
+      "B",
+      "Luminantie"
+     ]
+    },
+    "ychannel": {
+     "label": "Y",
+     "options": [
+      "R",
+      "G",
+      "B",
+      "Luminantie"
+     ]
+    }
+   }
+  },
+  "dissolve": {
+   "description": "Haalt willekeurige pixels of blokken uit de laag. Animeer Sterkte voor een oplosovergang; Seed kiest het patroon en Grootte bepaalt hoe groot elk spikkeltje is.",
+   "name": "Oplossen",
+   "params": {
+    "grain": {
+     "label": "Grootte"
+    },
+    "progress": {
+     "label": "Sterkte"
+    },
+    "seed": {
+     "label": "Seed"
+    }
+   }
+  },
+  "dots": {
+   "description": "Tekent een willekeurig maar gelijkmatig patroon van zachte stippen over de laag, of gebruikt de laag alleen als masker voor de stippen.",
+   "name": "Stippen",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blend": {
+     "label": "Overvloeimodus",
+     "options": [
+      "Normaal",
+      "Vermenigvuldigen",
+      "Bleken"
+     ]
+    },
+    "color1": {
+     "label": "Kleur 1"
+    },
+    "color2": {
+     "label": "Kleur 2"
+    },
+    "density": {
+     "label": "Dichtheid"
+    },
+    "feather": {
+     "label": "Zachte rand"
+    },
+    "fill": {
+     "label": "Vulling"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "radius": {
+     "label": "Straal"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "slack": {
+     "label": "Speling"
+    }
+   }
+  },
+  "drawingprogress": {
+   "description": "Tekent een vrije tekening lijn voor lijn, of de omtrek van een vorm, van Begin tot Einde. Zet keyframes op Einde van 0% tot 100% om de tekening te zien ontstaan. Werkt het best bij vormen met Vulling uit en een lijn.",
+   "name": "Tekenvoortgang",
+   "params": {
+    "end": {
+     "label": "Einde"
+    },
+    "start": {
+     "label": "Begin"
+    }
+   }
+  },
+  "dropshadow": {
+   "description": "Tekent een zachte schaduw van de vorm van de laag erachter, verschoven met Verschuiving X en Verschuiving Y. Spreiding vergroot de schaduw voordat die vervaagt.",
+   "name": "Slagschaduw",
+   "params": {
+    "blur": {
+     "label": "Zachtheid"
+    },
+    "color": {
+     "label": "Kleur"
+    },
+    "opacity": {
+     "label": "Dekking"
+    },
+    "spread": {
+     "label": "Spreiding"
+    },
+    "x": {
+     "label": "Verschuiving X"
+    },
+    "y": {
+     "label": "Verschuiving Y"
+    }
+   }
+  },
+  "duotone": {
+   "description": "Past een tweekleurige verloopkaart toe op basis van luminantie, met regelaars voor contrast en hoeveelheid.",
+   "name": "Duotoon",
+   "params": {
+    "amount": {
+     "label": "Hoeveelheid"
+    },
+    "color1": {
+     "label": "Schaduwkleur"
+    },
+    "color2": {
+     "label": "Hooglichtkleur"
+    },
+    "contrast": {
+     "label": "Contrast"
+    }
+   }
+  },
+  "echo": {
+   "description": "Tekent kopieën van de laag zoals die een moment geleden was, en volgt de animatie.",
+   "name": "Echo-keyframes",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "composite": {
+     "label": "Plaatsing",
+     "options": [
+      "Erachter",
+      "Erbovenop"
+     ]
+    },
+    "count": {
+     "label": "Aantal"
+    },
+    "seconds": {
+     "label": "Seconden"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    }
+   }
+  },
+  "edgedetect": {
+   "description": "Lichte lijnen waar het beeld verandert, elders donker. Inkt tekent donkere lijnen op wit; Kleur houdt de eigen kleuren van het beeld op de randen.",
+   "name": "Randdetectie",
+   "params": {
+    "invert": {
+     "label": "Omkeren"
+    },
+    "spacing": {
+     "label": "Afvlakking"
+    },
+    "strength": {
+     "label": "Sterkte"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Inkt",
+      "Kleur"
+     ]
+    },
+    "threshold": {
+     "label": "Drempel"
+    }
+   }
+  },
+  "edgeglow": {
+   "description": "Zoekt de randen in de laag en laat ze als neon gloeien boven een donkerder gemaakt beeld.",
+   "name": "Randgloed",
+   "params": {
+    "blend": {
+     "label": "Mengen"
+    },
+    "blur": {
+     "label": "Vervaging"
+    },
+    "brightness": {
+     "label": "Helderheid"
+    },
+    "color": {
+     "label": "Kleur"
+    },
+    "edges": {
+     "label": "Randsterkte"
+    },
+    "gamma": {
+     "label": "Gamma"
+    },
+    "invert": {
+     "label": "Omkeren"
+    },
+    "mask": {
+     "label": "Maskeren op laag"
+    },
+    "own": {
+     "label": "Beeldkleur"
+    },
+    "smoothing": {
+     "label": "Afvlakking"
+    },
+    "spread": {
+     "label": "Spreiding"
+    },
+    "strength": {
+     "label": "Sterkte"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    },
+    "threshold": {
+     "label": "Drempel"
+    },
+    "tint": {
+     "label": "Tint"
+    },
+    "tintColor": {
+     "label": "Tintkleur"
+    }
+   }
+  },
+  "electricedges": {
+   "description": "Tekent een knetterende, gloeiende omtrek rond de laag. Dikte verbreedt die tot een gloeiende band, elke Seed-waarde geeft een ander patroon, zodat een geanimeerde Seed elk frame knettert, en Evolutie laat het stromen. Optioneel met contourlijnen binnenin.",
+   "name": "Elektrische randen",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blur": {
+     "label": "Afstand"
+    },
+    "color": {
+     "label": "Kleur"
+    },
+    "contourAngle": {
+     "label": "Contourhoek"
+    },
+    "contourStyle": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Dunne lijnen"
+     ]
+    },
+    "contours": {
+     "label": "Contouren renderen"
+    },
+    "count": {
+     "label": "Aantal contouren"
+    },
+    "detail": {
+     "label": "Detail"
+    },
+    "distortion": {
+     "label": "Vervorming"
+    },
+    "evolution": {
+     "label": "Evolutie"
+    },
+    "fill": {
+     "label": "Vulling"
+    },
+    "glow": {
+     "label": "Gloed"
+    },
+    "glowColor": {
+     "label": "Gloedkleur"
+    },
+    "maskColor": {
+     "label": "Maskerkleur"
+    },
+    "maskEvolution": {
+     "label": "Maskerevolutie"
+    },
+    "maskScale": {
+     "label": "Maskerschaal"
+    },
+    "maskSeed": {
+     "label": "Masker-seed"
+    },
+    "maskStrength": {
+     "label": "Maskersterkte"
+    },
+    "phase": {
+     "label": "Contourfase"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "strength": {
+     "label": "Sterkte"
+    },
+    "thickness": {
+     "label": "Dikte"
+    }
+   }
+  },
+  "ellipsoid": {
+   "description": "Wikkelt de laag om een bol die je kunt samendrukken en afplatten.",
+   "name": "Ellipsoïde",
+   "params": {
+    "ambient": {
+     "label": "Omgevingslicht"
+    },
+    "flattenRatio": {
+     "label": "Afplatten"
+    },
+    "glossiness": {
+     "label": "Glansgraad"
+    },
+    "light": {
+     "label": "Lichthoek"
+    },
+    "lightColor": {
+     "label": "Lichtkleur"
+    },
+    "lightHeight": {
+     "label": "Lichthoogte"
+    },
+    "lighting": {
+     "label": "Verlichting",
+     "options": [
+      "Klassiek",
+      "Zacht",
+      "Direct"
+     ]
+    },
+    "perspective": {
+     "label": "Perspectief"
+    },
+    "position": {
+     "label": "Positie"
+    },
+    "radius": {
+     "label": "Straal"
+    },
+    "rotX": {
+     "label": "Rotatie X"
+    },
+    "rotY": {
+     "label": "Rotatie Y"
+    },
+    "rotZ": {
+     "label": "Rotatie Z"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "shading": {
+     "label": "Schaduwwerking"
+    },
+    "shine": {
+     "label": "Glans"
+    },
+    "squeezeRatio": {
+     "label": "Samendrukken"
+    },
+    "texAnchor": {
+     "label": "Textuuranker",
+     "options": [
+      "Midden",
+      "Hoek"
+     ]
+    },
+    "texAngle": {
+     "label": "Textuurhoek"
+    },
+    "texCrop": {
+     "label": "Textuur uitsnijden"
+    },
+    "texMirror": {
+     "label": "Spiegelen"
+    },
+    "texMode": {
+     "label": "Textuur",
+     "options": [
+      "Passend",
+      "Tegels",
+      "Uitrekken"
+     ]
+    },
+    "texOffset": {
+     "label": "Textuurverschuiving"
+    },
+    "texRepeatX": {
+     "label": "Herhaling X"
+    },
+    "texRepeatY": {
+     "label": "Herhaling Y"
+    }
+   }
+  },
+  "emboss": {
+   "description": "Past een reliëfeffect toe met luminantieverlopen langs een opgegeven lichthoek.",
+   "name": "Reliëf",
+   "params": {
+    "angle": {
+     "label": "Lichthoek"
+    },
+    "strength": {
+     "label": "Sterkte"
+    }
+   }
+  },
+  "energybeam": {
+   "description": "Tekent een gloeiende lichtstraal met een felle kern en een zachte halo tussen twee punten, die kan wiebelen en over zijn lengte kan groeien.",
+   "name": "Energiestraal",
+   "params": {
+    "blend": {
+     "label": "Mengen",
+     "options": [
+      "Optellen",
+      "Bleken",
+      "Normaal"
+     ]
+    },
+    "color": {
+     "label": "Gloedkleur"
+    },
+    "dim": {
+     "label": "Achtergrond dimmen"
+    },
+    "evolution": {
+     "label": "Evolutie"
+    },
+    "frequency": {
+     "label": "Frequentie"
+    },
+    "from": {
+     "label": "Begin"
+    },
+    "glow": {
+     "label": "Gloed"
+    },
+    "halo": {
+     "label": "Halo"
+    },
+    "haloColor": {
+     "label": "Halokleur"
+    },
+    "haloWidth": {
+     "label": "Halobreedte"
+    },
+    "opacity": {
+     "label": "Dekking"
+    },
+    "progress": {
+     "label": "Voortgang"
+    },
+    "span": {
+     "label": "Lengte"
+    },
+    "to": {
+     "label": "Einde"
+    },
+    "width": {
+     "label": "Breedte"
+    },
+    "wiggle": {
+     "label": "Wiebelen"
+    }
+   }
+  },
+  "exposure": {
+   "description": "Bootst fotografische belichting na met stops, verschuiving en gammacorrectie. Doorzichtige delen oplichten laat deels transparante pixels, zoals een vervaagde rand, feller worden dan wit.",
+   "name": "Belichting",
+   "params": {
+    "gamma": {
+     "label": "Gamma"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "soft": {
+     "label": "Doorzichtige delen oplichten"
+    },
+    "stops": {
+     "label": "Stops"
+    }
+   }
+  },
+  "fade": {
+   "description": "Laat de laag aan het begin infaden en aan het einde weer uitfaden, over de tijden die je instelt.",
+   "name": "In-/uitfaden",
+   "params": {
+    "fadeIn": {
+     "label": "In"
+    },
+    "fadeOut": {
+     "label": "Uit"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    }
+   }
+  },
+  "feather": {
+   "description": "Verzacht de alfaranden van de laag en laat ze vanaf de omtrek infaden. Meer iteraties geven een vloeiendere, diepere overgang. Stijl Klassiek: Naar binnen vervaagt binnen de bestaande omtrek; Alfa vervagen spreidt de verzachte rand ook naar buiten.",
+   "name": "Zachte rand",
+   "params": {
+    "blur": {
+     "label": "Sterkte"
+    },
+    "iter": {
+     "label": "Iteraties"
+    },
+    "mode": {
+     "label": "Randen",
+     "options": [
+      "Naar binnen",
+      "Alfa vervagen"
+     ]
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    }
+   }
+  },
+  "fillbehind": {
+   "description": "Vult het beeld achter de laag met een vervaagde, ingezoomde kopie van zichzelf, de gebruikelijke oplossing voor een staande video in een liggend project.",
+   "name": "Achtergrondvulling",
+   "params": {
+    "bgAlpha": {
+     "label": "Alfa achtergrond"
+    },
+    "bgOffset": {
+     "label": "Verschuiving achtergrond"
+    },
+    "bgScale": {
+     "label": "Schaal achtergrond"
+    },
+    "blur": {
+     "label": "Sterkte"
+    },
+    "brightness": {
+     "label": "Helderheid"
+    },
+    "edgeColor": {
+     "label": "Randkleur"
+    },
+    "edgeStrength": {
+     "label": "Randsterkte"
+    },
+    "feather": {
+     "label": "Zachte rand"
+    },
+    "fgAlpha": {
+     "label": "Alfa voorgrond"
+    },
+    "fgOffset": {
+     "label": "Verschuiving voorgrond"
+    },
+    "fgScale": {
+     "label": "Schaal voorgrond"
+    },
+    "gamma": {
+     "label": "Gamma"
+    },
+    "saturation": {
+     "label": "Verzadiging"
+    },
+    "scanCount": {
+     "label": "Aantal scanlijnen"
+    },
+    "scanStrength": {
+     "label": "Sterkte scanlijnen"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    },
+    "tint": {
+     "label": "Tint"
+    },
+    "tintColor": {
+     "label": "Tintkleur"
+    }
+   }
+  },
+  "filmgrain": {
+   "description": "Geanimeerde monochrome filmkorrel met instelbare hoeveelheid, korrelgrootte en animatiesnelheid.",
+   "name": "Filmkorrel",
+   "params": {
+    "amount": {
+     "label": "Hoeveelheid"
+    },
+    "grainSize": {
+     "label": "Korrelgrootte"
+    },
+    "speed": {
+     "label": "Snelheid"
+    }
+   }
+  },
+  "flicker": {
+   "description": "Laat de dekking van de laag willekeurig flikkeren.",
+   "name": "Flikkeren",
+   "params": {
+    "intensity": {
+     "label": "Sterkte"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "speed": {
+     "label": "Frequentie"
+    },
+    "style": {
+     "label": "Modus",
+     "options": [
+      "Knipperen",
+      "Gelijkmatig"
+     ]
+    }
+   }
+  },
+  "flip": {
+   "description": "Draait de laag in 3D om als een kaart; de achterkant is doorzichtig, een beeld of een kleur.",
+   "name": "Laag omdraaien",
+   "params": {
+    "ambient": {
+     "label": "Omgevingslicht"
+    },
+    "axis": {
+     "label": "As"
+    },
+    "back": {
+     "label": "Achterkant",
+     "options": [
+      "Doorzichtig",
+      "Beeld",
+      "Kleur"
+     ]
+    },
+    "backColor": {
+     "label": "Kleur achterkant"
+    },
+    "glossiness": {
+     "label": "Glansgraad"
+    },
+    "light": {
+     "label": "Lichthoek"
+    },
+    "lightColor": {
+     "label": "Lichtkleur"
+    },
+    "lightHeight": {
+     "label": "Lichthoogte"
+    },
+    "lighting": {
+     "label": "Verlichting",
+     "options": [
+      "Klassiek",
+      "Zacht",
+      "Direct"
+     ]
+    },
+    "perspective": {
+     "label": "Perspectief"
+    },
+    "pivot": {
+     "label": "Draaipunt"
+    },
+    "pivotDepth": {
+     "label": "Diepte draaipunt"
+    },
+    "position": {
+     "label": "Positie"
+    },
+    "rotX": {
+     "label": "Rotatie X"
+    },
+    "rotY": {
+     "label": "Rotatie Y"
+    },
+    "rotZ": {
+     "label": "Rotatie Z"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "shading": {
+     "label": "Schaduwwerking"
+    },
+    "shine": {
+     "label": "Glans"
+    },
+    "texAnchor": {
+     "label": "Textuuranker",
+     "options": [
+      "Midden",
+      "Hoek"
+     ]
+    },
+    "texAngle": {
+     "label": "Textuurhoek"
+    },
+    "texCrop": {
+     "label": "Textuur uitsnijden"
+    },
+    "texMirror": {
+     "label": "Spiegelen"
+    },
+    "texMode": {
+     "label": "Textuur",
+     "options": [
+      "Passend",
+      "Tegels",
+      "Uitrekken"
+     ]
+    },
+    "texOffset": {
+     "label": "Textuurverschuiving"
+    },
+    "texRepeatX": {
+     "label": "Herhaling X"
+    },
+    "texRepeatY": {
+     "label": "Herhaling Y"
+    }
+   }
+  },
+  "fontweight": {
+   "description": "Bepaalt hoe dik de letters zijn, van dun tot zwaar, en is te animeren met keyframes. Werkt met variabele lettertypen, die elk gewicht in één bestand bevatten: Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display en Dancing Script in de lettertypelijst, of een variabel lettertype dat je importeert. Lettertypen met vaste gewichten behouden hun eigen uiterlijk.",
+   "name": "Letterdikte",
+   "params": {
+    "weight": {
+     "label": "Gewicht"
+    }
+   }
+  },
+  "fourcolor": {
+   "description": "Mengt vier kleuren op vier punten (in pixels vanaf het midden van de laag) over de laag.",
+   "name": "Vierkleurenverloop",
+   "params": {
+    "blend": {
+     "label": "Mengen",
+     "options": [
+      "Normaal",
+      "Vermenigvuldigen",
+      "Bleken",
+      "Bedekken",
+      "Zacht licht",
+      "Fel licht",
+      "Optellen",
+      "Donkerder",
+      "Lichter",
+      "Verschil",
+      "Kleur tegenhouden",
+      "Kleur doordrukken"
+     ]
+    },
+    "color1": {
+     "label": "Kleur 1"
+    },
+    "color2": {
+     "label": "Kleur 2"
+    },
+    "color3": {
+     "label": "Kleur 3"
+    },
+    "color4": {
+     "label": "Kleur 4"
+    },
+    "corner": {
+     "label": "Hoekverschuivingen"
+    },
+    "falloff": {
+     "label": "Afname",
+     "options": [
+      "Afstand",
+      "Vloeiend"
+     ]
+    },
+    "opacity": {
+     "label": "Dekking"
+    },
+    "point1": {
+     "label": "Punt 1"
+    },
+    "point2": {
+     "label": "Punt 2"
+    },
+    "point3": {
+     "label": "Punt 3"
+    },
+    "point4": {
+     "label": "Punt 4"
+    },
+    "softness": {
+     "label": "Zachtheid"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    }
+   }
+  },
+  "fractalridges": {
+   "description": "Vult de dekkende delen van de laag met scherpe, turbulente ribbels van fractale ruis.",
+   "name": "Fractale ribbels",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "color1": {
+     "label": "Kleur 1"
+    },
+    "color2": {
+     "label": "Kleur 2"
+    },
+    "evolution": {
+     "label": "Evolutie"
+    },
+    "intensity": {
+     "label": "Intensiteit"
+    },
+    "octaves": {
+     "label": "Octaven"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "parallax": {
+     "label": "Parallax"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "stretch": {
+     "label": "Uitrekken"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    }
+   }
+  },
+  "fractalwarp": {
+   "description": "Vervormt de laag met gevouwen fractale ruis, voor vuur, water en hittetrillingen.",
+   "name": "Fractale vervorming",
+   "params": {
+    "complexity": {
+     "label": "Complexiteit"
+    },
+    "evolution": {
+     "label": "Evolutie"
+    },
+    "intensity": {
+     "label": "Intensiteit"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "parallax": {
+     "label": "Parallax"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "screenSize": {
+     "label": "Grootte van",
+     "options": [
+      "Laag",
+      "Scherm"
+     ]
+    },
+    "screenSpace": {
+     "label": "Schermruimte"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "strength": {
+     "label": "Sterkte"
+    }
+   }
+  },
+  "fracture3d": {
+   "description": "Breekt de laag in bewegende 3D-scherven.",
+   "name": "3D-versplintering",
+   "params": {
+    "depthPush": {
+     "label": "Diepteduw"
+    },
+    "direction": {
+     "label": "Richting"
+    },
+    "fade": {
+     "label": "Uitfaden"
+    },
+    "force": {
+     "label": "Kracht"
+    },
+    "gravity": {
+     "label": "Zwaartekracht"
+    },
+    "impact": {
+     "label": "Inslagpunt"
+    },
+    "intensity": {
+     "label": "Lichtintensiteit"
+    },
+    "light": {
+     "label": "Lichtrichting"
+    },
+    "pieces": {
+     "label": "Stukken"
+    },
+    "progress": {
+     "label": "Voortgang"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "spin": {
+     "label": "Draaiing"
+    },
+    "spread": {
+     "label": "Spreiding richting"
+    },
+    "thickness": {
+     "label": "Dikte"
+    }
+   }
+  },
+  "fringeclean": {
+   "description": "Haalt de kleur uit de pixels langs de rand van de matte van de laag, zodat gekleurde randjes van een key grijs worden, terwijl tot drie beschermde kleuren blijven zoals ze zijn.",
+   "name": "Matterand",
+   "params": {
+    "blur": {
+     "label": "Dikte"
+    },
+    "color1": {
+     "label": "Kleur 1 behouden"
+    },
+    "color2": {
+     "label": "Kleur 2 behouden"
+    },
+    "color3": {
+     "label": "Kleur 3 behouden"
+    },
+    "feather": {
+     "label": "Zachte rand"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    },
+    "threshold1": {
+     "label": "Bereik 1"
+    },
+    "threshold2": {
+     "label": "Bereik 2"
+    },
+    "threshold3": {
+     "label": "Bereik 3"
+    }
+   }
+  },
+  "glass": {
+   "description": "Maakt van de vorm van de laag geslepen glas dat de lagen erachter breekt, met een glanslicht langs de rand. Licht Zacht toont de laag met Vulling en belicht het glas met Kleur, het felst langs de binnenrand van de schuine kant die naar het licht wijst.",
+   "name": "Glas",
+   "params": {
+    "angle": {
+     "label": "Lichthoek"
+    },
+    "blur": {
+     "label": "Schuine kant"
+    },
+    "color": {
+     "label": "Kleur"
+    },
+    "fill": {
+     "label": "Vulling"
+    },
+    "highlight": {
+     "label": "Hooglicht"
+    },
+    "light": {
+     "label": "Licht",
+     "options": [
+      "Rand",
+      "Zacht"
+     ]
+    },
+    "refraction": {
+     "label": "Breking"
+    },
+    "tint": {
+     "label": "Tint"
+    }
+   }
+  },
+  "glitch": {
+   "description": "Willekeurig verschoven horizontale blokken en kleurkanalen, die een paar keer per seconde veranderen.",
+   "name": "Glitch",
+   "params": {
+    "blockHeight": {
+     "label": "Blokhoogte"
+    },
+    "intensity": {
+     "label": "Intensiteit"
+    },
+    "seed": {
+     "label": "Seed"
+    }
+   }
+  },
+  "glow": {
+   "description": "Een halo in één kleur rond de buitenkant van de vorm van de laag. Hardheid maakt van een zachte overgang een harde omtrek.",
+   "name": "Gloed",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blendMode": {
+     "label": "Overvloeimodus",
+     "options": [
+      "Normaal",
+      "Vermenigvuldigen",
+      "Bleken"
+     ]
+    },
+    "color": {
+     "label": "Kleur"
+    },
+    "hardness": {
+     "label": "Hardheid"
+    },
+    "radius": {
+     "label": "Straal"
+    },
+    "spread": {
+     "label": "Spreiding",
+     "options": [
+      "Standaard",
+      "Volledig"
+     ]
+    }
+   }
+  },
+  "glowscan": {
+   "description": "Vervaagt en verlicht alleen de delen van de laag waarvan de helderheid binnen een band valt; animeer Positie om de gloed van schaduwen naar hooglichten te laten lopen.",
+   "name": "Gloedscan",
+   "params": {
+    "blur": {
+     "label": "Vervaging"
+    },
+    "color": {
+     "label": "Gloedkleur"
+    },
+    "intensity": {
+     "label": "Intensiteit"
+    },
+    "position": {
+     "label": "Positie"
+    },
+    "show": {
+     "label": "Alleen band tonen"
+    },
+    "softness": {
+     "label": "Zachtheid"
+    },
+    "width": {
+     "label": "Breedte"
+    }
+   }
+  },
+  "gradientmap": {
+   "description": "Kleurt het beeld op helderheid opnieuw in met drie kleuren, met herhalingen en een fase. Helderheid schalen vermenigvuldigt het resultaat met de eigen helderheid van het beeld.",
+   "name": "Verloopkaart",
+   "params": {
+    "color1": {
+     "label": "Schaduwen"
+    },
+    "color2": {
+     "label": "Middentonen"
+    },
+    "color3": {
+     "label": "Hooglichten"
+    },
+    "opacity": {
+     "label": "Dekking"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "repeat": {
+     "label": "Herhaling"
+    },
+    "reverse": {
+     "label": "Omkeren"
+    },
+    "saturation": {
+     "label": "Verzadiging"
+    },
+    "scaleBrightness": {
+     "label": "Helderheid schalen"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Verloop",
+      "Spectrum"
+     ]
+    }
+   }
+  },
+  "gradientoverlay": {
+   "description": "Legt een tweekleurig verloop over de laag, met keuze uit vormen en overvloeimodi.",
+   "name": "Verloopbedekking",
+   "params": {
+    "angle": {
+     "label": "Hoek"
+    },
+    "blend": {
+     "label": "Mengen",
+     "options": [
+      "Normaal",
+      "Vermenigvuldigen",
+      "Bleken",
+      "Bedekken",
+      "Zacht licht",
+      "Fel licht",
+      "Optellen",
+      "Donkerder",
+      "Lichter",
+      "Verschil",
+      "Kleur tegenhouden",
+      "Kleur doordrukken"
+     ]
+    },
+    "color1": {
+     "label": "Kleur 1"
+    },
+    "color2": {
+     "label": "Kleur 2"
+    },
+    "look": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "opacity": {
+     "label": "Dekking"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "shape": {
+     "label": "Vorm",
+     "options": [
+      "Lineair",
+      "Radiaal",
+      "Gespiegeld",
+      "Hoek"
+     ]
+    },
+    "style": {
+     "label": "Lengte",
+     "options": [
+      "Rechthoek",
+      "Ovaal"
+     ]
+    }
+   }
+  },
+  "grid": {
+   "description": "Tekent rasterlijnen over de dekkende delen van de laag, of snijdt ze eruit.",
+   "name": "Raster",
+   "params": {
+    "angle": {
+     "label": "Hoek"
+    },
+    "color": {
+     "label": "Kleur"
+    },
+    "count": {
+     "label": "Aantal"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "origin": {
+     "label": "Oorsprong",
+     "options": [
+      "Midden",
+      "Laaghoek",
+      "Schermhoek"
+     ]
+    },
+    "punch": {
+     "label": "Uitsparen"
+    },
+    "smoothing": {
+     "label": "Afvlakking"
+    },
+    "spacing": {
+     "label": "Tussenruimte"
+    },
+    "stretch": {
+     "label": "Uitrekken"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    },
+    "width": {
+     "label": "Breedte"
+    }
+   }
+  },
+  "gridrepeat": {
+   "description": "Maakt dynamisch meerdere kopieën van de laag, gerangschikt in een raster.",
+   "name": "Rasterherhaling",
+   "params": {
+    "copyDelay": {
+     "label": "Vertraging per kopie"
+    },
+    "count": {
+     "label": "Aantal"
+    },
+    "easing": {
+     "label": "Easing",
+     "options": [
+      "Lineair",
+      "Ease-in",
+      "Ease-out",
+      "Ease-in-out"
+     ]
+    },
+    "fillAmount": {
+     "label": "Hoeveelheid vulling"
+    },
+    "fillColor": {
+     "label": "Vulkleur"
+    },
+    "position": {
+     "label": "Positie"
+    },
+    "randomOpacity": {
+     "label": "Willekeurige dekking"
+    },
+    "randomOrder": {
+     "label": "Willekeurige volgorde"
+    },
+    "randomPosition": {
+     "label": "Willekeurige positie"
+    },
+    "randomRotation": {
+     "label": "Willekeurige rotatie"
+    },
+    "randomScale": {
+     "label": "Willekeurige schaal"
+    },
+    "rangeEnd": {
+     "label": "Bereikeinde"
+    },
+    "rangeOffset": {
+     "label": "Bereikverschuiving"
+    },
+    "rangeOpacity": {
+     "label": "Bereikdekking"
+    },
+    "rangePosition": {
+     "label": "Bereikpositie"
+    },
+    "rangeRotation": {
+     "label": "Bereikrotatie"
+    },
+    "rangeScale": {
+     "label": "Bereikschaal"
+    },
+    "rangeStart": {
+     "label": "Bereikbegin"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "stagger": {
+     "label": "Verspringen"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    }
+   }
+  },
+  "grunge": {
+   "description": "Geeft de laag een versleten look met korrel, vuilvlekken, verbrande randen en een stoffige kleurtint.",
+   "name": "Grunge",
+   "params": {
+    "blotches": {
+     "label": "Vuil"
+    },
+    "burn": {
+     "label": "Verbrande randen"
+    },
+    "color": {
+     "label": "Tintkleur"
+    },
+    "grain": {
+     "label": "Korrel"
+    },
+    "scale": {
+     "label": "Grootte vuil"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "strength": {
+     "label": "Sterkte"
+    },
+    "tint": {
+     "label": "Tint"
+    }
+   }
+  },
+  "halftone": {
+   "description": "Gedrukte stippen die groter worden waar het beeld donker is.",
+   "name": "Halftoon",
+   "params": {
+    "angle": {
+     "label": "Hoek"
+    },
+    "cell": {
+     "label": "Grootte"
+    },
+    "colored": {
+     "label": "Gekleurde stippen"
+    },
+    "ink": {
+     "label": "Stipkleur"
+    },
+    "paper": {
+     "label": "Papierkleur"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "strength": {
+     "label": "Sterkte"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Tweekleurig",
+      "Standaard"
+     ]
+    }
+   }
+  },
+  "halftonelines": {
+   "description": "Tekent de laag opnieuw als gedrukte lijnen die dikker worden in donkere delen en dunner in lichte.",
+   "name": "Halftoonlijnen",
+   "params": {
+    "amount": {
+     "label": "Hoeveelheid"
+    },
+    "angle": {
+     "label": "Hoek"
+    },
+    "color1": {
+     "label": "Kleur 1"
+    },
+    "color2": {
+     "label": "Kleur 2"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "strength": {
+     "label": "Sterkte"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    }
+   }
+  },
+  "heart": {
+   "description": "Snijdt de laag uit als een bol, opgeblazen hart.",
+   "name": "Hart",
+   "params": {
+    "ambient": {
+     "label": "Omgevingslicht"
+    },
+    "depth": {
+     "label": "Diepte"
+    },
+    "glossiness": {
+     "label": "Glansgraad"
+    },
+    "heartSize": {
+     "label": "Grootte"
+    },
+    "light": {
+     "label": "Lichthoek"
+    },
+    "lightColor": {
+     "label": "Lichtkleur"
+    },
+    "lightHeight": {
+     "label": "Lichthoogte"
+    },
+    "lighting": {
+     "label": "Verlichting",
+     "options": [
+      "Klassiek",
+      "Zacht",
+      "Direct"
+     ]
+    },
+    "perspective": {
+     "label": "Perspectief"
+    },
+    "position": {
+     "label": "Positie"
+    },
+    "rotX": {
+     "label": "Rotatie X"
+    },
+    "rotY": {
+     "label": "Rotatie Y"
+    },
+    "rotZ": {
+     "label": "Rotatie Z"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "shading": {
+     "label": "Schaduwwerking"
+    },
+    "shine": {
+     "label": "Glans"
+    },
+    "smoothing": {
+     "label": "Afronding"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    },
+    "texAnchor": {
+     "label": "Textuuranker",
+     "options": [
+      "Midden",
+      "Hoek"
+     ]
+    },
+    "texAngle": {
+     "label": "Textuurhoek"
+    },
+    "texCrop": {
+     "label": "Textuur uitsnijden"
+    },
+    "texMirror": {
+     "label": "Spiegelen"
+    },
+    "texMode": {
+     "label": "Textuur",
+     "options": [
+      "Passend",
+      "Tegels",
+      "Uitrekken"
+     ]
+    },
+    "texOffset": {
+     "label": "Textuurverschuiving"
+    },
+    "texRepeatX": {
+     "label": "Herhaling X"
+    },
+    "texRepeatY": {
+     "label": "Herhaling Y"
+    }
+   }
+  },
+  "hexagontilerotate": {
+   "description": "Verdeelt de laag in zeshoekige tegels en draait het beeld in elke tegel apart.",
+   "name": "Zeshoektegels draaien",
+   "params": {
+    "angle": {
+     "label": "Hoek"
+    },
+    "count": {
+     "label": "Aantal"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "random": {
+     "label": "Willekeurig"
+    },
+    "rotation": {
+     "label": "Rotatie"
+    },
+    "seed": {
+     "label": "Seed"
+    }
+   }
+  },
+  "hexagontileshift": {
+   "description": "Verdeelt de laag in zeshoekige tegels en schuift het beeld in elke tegel in een willekeurige richting.",
+   "name": "Zeshoektegels verschuiven",
+   "params": {
+    "angle": {
+     "label": "Hoek"
+    },
+    "count": {
+     "label": "Aantal"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "strength": {
+     "label": "Sterkte"
+    }
+   }
+  },
+  "hexagontiling": {
+   "description": "Herhaalt het midden van de laag in zeshoekige tegels die het scherm vullen.",
+   "name": "Zeshoektegels",
+   "params": {
+    "angle": {
+     "label": "Hoek"
+    },
+    "crop": {
+     "label": "Uitsnijden"
+    },
+    "fit": {
+     "label": "Beeld",
+     "options": [
+      "Volledige grootte",
+      "In elke tegel"
+     ]
+    },
+    "mask": {
+     "label": "Maskeren op laag"
+    },
+    "mirror": {
+     "label": "Spiegelen"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "screenSpace": {
+     "label": "Schermruimte"
+    },
+    "stretch": {
+     "label": "Uitrekken"
+    }
+   }
+  },
+  "hexgrid": {
+   "description": "Bedekt de laag met een raster van zeshoeken in één tot drie kleuren, met zachte randen en ruimte ertussen.",
+   "name": "Zeshoekraster",
+   "params": {
+    "angle": {
+     "label": "Hoek"
+    },
+    "blend": {
+     "label": "Mengen",
+     "options": [
+      "Normaal",
+      "Vermenigvuldigen",
+      "Bleken",
+      "Bedekken",
+      "Zacht licht",
+      "Fel licht",
+      "Optellen",
+      "Donkerder",
+      "Lichter",
+      "Verschil",
+      "Kleur tegenhouden",
+      "Kleur doordrukken"
+     ]
+    },
+    "cell": {
+     "label": "Grootte"
+    },
+    "color1": {
+     "label": "Kleur 1"
+    },
+    "color2": {
+     "label": "Kleur 2"
+    },
+    "color3": {
+     "label": "Kleur 3"
+    },
+    "colors": {
+     "label": "Kleuren",
+     "options": [
+      "Eén",
+      "Twee",
+      "Drie"
+     ]
+    },
+    "feather": {
+     "label": "Zachte rand"
+    },
+    "gap": {
+     "label": "Tussenruimte"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "opacity": {
+     "label": "Dekking"
+    },
+    "stretch": {
+     "label": "Uitrekken"
+    }
+   }
+  },
+  "hexprism": {
+   "description": "Plaatst de laag op de voor- en achterkant van een zeszijdig prisma.",
+   "name": "Zeshoekig prisma",
+   "params": {
+    "ambient": {
+     "label": "Omgevingslicht"
+    },
+    "depth": {
+     "label": "Diepte"
+    },
+    "glossiness": {
+     "label": "Glansgraad"
+    },
+    "light": {
+     "label": "Lichthoek"
+    },
+    "lightColor": {
+     "label": "Lichtkleur"
+    },
+    "lightHeight": {
+     "label": "Lichthoogte"
+    },
+    "lighting": {
+     "label": "Verlichting",
+     "options": [
+      "Klassiek",
+      "Zacht",
+      "Direct"
+     ]
+    },
+    "perspective": {
+     "label": "Perspectief"
+    },
+    "position": {
+     "label": "Positie"
+    },
+    "radius": {
+     "label": "Straal"
+    },
+    "rotX": {
+     "label": "Rotatie X"
+    },
+    "rotY": {
+     "label": "Rotatie Y"
+    },
+    "rotZ": {
+     "label": "Rotatie Z"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "shading": {
+     "label": "Schaduwwerking"
+    },
+    "shine": {
+     "label": "Glans"
+    },
+    "smoothing": {
+     "label": "Afronding"
+    },
+    "texAnchor": {
+     "label": "Textuuranker",
+     "options": [
+      "Midden",
+      "Hoek"
+     ]
+    },
+    "texAngle": {
+     "label": "Textuurhoek"
+    },
+    "texCrop": {
+     "label": "Textuur uitsnijden"
+    },
+    "texMirror": {
+     "label": "Spiegelen"
+    },
+    "texMode": {
+     "label": "Textuur",
+     "options": [
+      "Passend",
+      "Tegels",
+      "Uitrekken"
+     ]
+    },
+    "texOffset": {
+     "label": "Textuurverschuiving"
+    },
+    "texRepeatX": {
+     "label": "Herhaling X"
+    },
+    "texRepeatY": {
+     "label": "Herhaling Y"
+    }
+   }
+  },
+  "highlightshadow": {
+   "description": "Herstelt of versterkt heldere hooglichten en maakt donkere schaduwen lichter of dieper, op basis van de helderheid van elke pixel.",
+   "name": "Hooglichten & schaduwen",
+   "params": {
+    "highlights": {
+     "label": "Hooglichten"
+    },
+    "shadows": {
+     "label": "Schaduwen"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Kleur behouden"
+     ]
+    }
+   }
+  },
+  "hollowbox": {
+   "description": "Een doos met open boven- en onderkant: de laag bedekt de buitenkant en de binnenkant krijgt de binnenkleur.",
+   "name": "Holle doos",
+   "params": {
+    "ambient": {
+     "label": "Omgevingslicht"
+    },
+    "depth": {
+     "label": "Diepte"
+    },
+    "glossiness": {
+     "label": "Glansgraad"
+    },
+    "height": {
+     "label": "Hoogte"
+    },
+    "interior": {
+     "label": "Binnenkleur"
+    },
+    "light": {
+     "label": "Lichthoek"
+    },
+    "lightColor": {
+     "label": "Lichtkleur"
+    },
+    "lightHeight": {
+     "label": "Lichthoogte"
+    },
+    "lighting": {
+     "label": "Verlichting",
+     "options": [
+      "Klassiek",
+      "Zacht",
+      "Direct"
+     ]
+    },
+    "perspective": {
+     "label": "Perspectief"
+    },
+    "position": {
+     "label": "Positie"
+    },
+    "rotX": {
+     "label": "Rotatie X"
+    },
+    "rotY": {
+     "label": "Rotatie Y"
+    },
+    "rotZ": {
+     "label": "Rotatie Z"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "shading": {
+     "label": "Schaduwwerking"
+    },
+    "shine": {
+     "label": "Glans"
+    },
+    "smoothing": {
+     "label": "Afronding"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    },
+    "texAnchor": {
+     "label": "Textuuranker",
+     "options": [
+      "Midden",
+      "Hoek"
+     ]
+    },
+    "texAngle": {
+     "label": "Textuurhoek"
+    },
+    "texCrop": {
+     "label": "Textuur uitsnijden"
+    },
+    "texMirror": {
+     "label": "Spiegelen"
+    },
+    "texMode": {
+     "label": "Textuur",
+     "options": [
+      "Passend",
+      "Tegels",
+      "Uitrekken"
+     ]
+    },
+    "texOffset": {
+     "label": "Textuurverschuiving"
+    },
+    "texRepeatX": {
+     "label": "Herhaling X"
+    },
+    "texRepeatY": {
+     "label": "Herhaling Y"
+    },
+    "thickness": {
+     "label": "Dikte"
+    },
+    "width": {
+     "label": "Breedte"
+    }
+   }
+  },
+  "hsl": {
+   "description": "Wijzigt kleurtoon, verzadiging en lichtheid van één kleurbereik tegelijk (rood, oranje, groen enzovoort) en laat de andere kleuren met rust.",
+   "name": "HSL",
+   "params": {
+    "blend": {
+     "label": "Mengen",
+     "options": [
+      "Normaal",
+      "Vermenigvuldigen",
+      "Bleken"
+     ]
+    },
+    "blueHue": {
+     "label": "Kleurtoon"
+    },
+    "blueLightness": {
+     "label": "Lichtheid"
+    },
+    "blueSaturation": {
+     "label": "Verzadiging"
+    },
+    "brightness": {
+     "label": "Helderheid"
+    },
+    "cyanHue": {
+     "label": "Kleurtoon"
+    },
+    "cyanLightness": {
+     "label": "Lichtheid"
+    },
+    "cyanSaturation": {
+     "label": "Verzadiging"
+    },
+    "greenHue": {
+     "label": "Kleurtoon"
+    },
+    "greenLightness": {
+     "label": "Lichtheid"
+    },
+    "greenSaturation": {
+     "label": "Verzadiging"
+    },
+    "magentaHue": {
+     "label": "Kleurtoon"
+    },
+    "magentaLightness": {
+     "label": "Lichtheid"
+    },
+    "magentaSaturation": {
+     "label": "Verzadiging"
+    },
+    "opacity": {
+     "label": "Dekking"
+    },
+    "orangeHue": {
+     "label": "Kleurtoon"
+    },
+    "orangeLightness": {
+     "label": "Lichtheid"
+    },
+    "orangeSaturation": {
+     "label": "Verzadiging"
+    },
+    "purpleHue": {
+     "label": "Kleurtoon"
+    },
+    "purpleLightness": {
+     "label": "Lichtheid"
+    },
+    "purpleSaturation": {
+     "label": "Verzadiging"
+    },
+    "range": {
+     "label": "Kleur",
+     "options": [
+      "Rood",
+      "Oranje",
+      "Geel",
+      "Groen",
+      "Cyaan",
+      "Blauw",
+      "Paars",
+      "Magenta"
+     ]
+    },
+    "redHue": {
+     "label": "Kleurtoon"
+    },
+    "redLightness": {
+     "label": "Lichtheid"
+    },
+    "redSaturation": {
+     "label": "Verzadiging"
+    },
+    "yellowHue": {
+     "label": "Kleurtoon"
+    },
+    "yellowLightness": {
+     "label": "Lichtheid"
+    },
+    "yellowSaturation": {
+     "label": "Verzadiging"
+    }
+   }
+  },
+  "huesaturation": {
+   "description": "Draait kleuren rond de kleurencirkel en maakt ze sterker of zwakker; levendigheid versterkt vooral de doffere kleuren.",
+   "name": "Kleurtoon & verzadiging",
+   "params": {
+    "hue": {
+     "label": "Kleurtoon"
+    },
+    "lightness": {
+     "label": "Lichtheid"
+    },
+    "saturation": {
+     "label": "Verzadiging"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Helderheid behouden",
+      "Video"
+     ]
+    },
+    "vibrance": {
+     "label": "Levendigheid"
+    }
+   }
+  },
+  "innerblur": {
+   "description": "Vervaagt het beeld binnen de laag en houdt de omtrek scherp.",
+   "name": "Vervaging binnen",
+   "params": {
+    "blur": {
+     "label": "Sterkte"
+    }
+   }
+  },
+  "innerbulge": {
+   "description": "Laat de laag uitbollen of knijpt hem in binnen een cirkel met Straal rond Midden, terwijl de randen van de laag op hun plek blijven. Zachte rand bepaalt hoe ver vanaf de randen de laag begint te bewegen; Gaussiaans houdt het midden gelijkmatig vergroot met een kortere afname.",
+   "name": "Knijpen/opbollen binnen",
+   "params": {
+    "center": {
+     "label": "Midden"
+    },
+    "feather": {
+     "label": "Zachte rand"
+    },
+    "gaussian": {
+     "label": "Gaussiaans"
+    },
+    "radius": {
+     "label": "Straal"
+    },
+    "strength": {
+     "label": "Sterkte"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    }
+   }
+  },
+  "innerglow": {
+   "description": "Voegt een gloed toe langs de binnenranden van de dekkende delen van de laag.",
+   "name": "Gloed binnen",
+   "params": {
+    "blend": {
+     "label": "Mengen",
+     "options": [
+      "Bleken",
+      "Normaal"
+     ]
+    },
+    "blur": {
+     "label": "Grootte"
+    },
+    "color": {
+     "label": "Kleur"
+    },
+    "corners": {
+     "label": "Hoeken",
+     "options": [
+      "Rond",
+      "Vierkant"
+     ]
+    },
+    "intensity": {
+     "label": "Intensiteit"
+    },
+    "opacity": {
+     "label": "Dekking"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    }
+   }
+  },
+  "invert": {
+   "description": "Keert de kleurkanalen van het beeld om, met een menghoeveelheid en optioneel omgekeerde alfa.",
+   "name": "Omkeren",
+   "params": {
+    "amount": {
+     "label": "Hoeveelheid"
+    },
+    "invert_alpha": {
+     "label": "Alfa omkeren"
+    }
+   }
+  },
+  "iridescence": {
+   "description": "Bedekt de dekkende delen van de laag met een vloeiende regenboogglans, zoals olie op water of een zeepbel.",
+   "name": "Regenboogglans",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blend": {
+     "label": "Overvloeimodus",
+     "options": [
+      "Normaal",
+      "Vermenigvuldigen",
+      "Bleken",
+      "Bedekken",
+      "Zacht licht",
+      "Fel licht",
+      "Optellen",
+      "Donkerder",
+      "Lichter",
+      "Verschil",
+      "Kleur tegenhouden",
+      "Kleur doordrukken"
+     ]
+    },
+    "evolution": {
+     "label": "Evolutie"
+    },
+    "saturation": {
+     "label": "Verzadiging"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "shift": {
+     "label": "Kleurtoonverschuiving"
+    }
+   }
+  },
+  "kaleidoscope": {
+   "description": "Gespiegelde segmenten rond een punt.",
+   "name": "Caleidoscoop",
+   "params": {
+    "angle": {
+     "label": "Hoek"
+    },
+    "center": {
+     "label": "Midden"
+    },
+    "direction": {
+     "label": "Richting",
+     "options": [
+      "Met de klok mee",
+      "Tegen de klok in"
+     ]
+    },
+    "mirror": {
+     "label": "Spiegelen"
+    },
+    "segments": {
+     "label": "Segmenten"
+    }
+   }
+  },
+  "lensblur": {
+   "description": "Een draaiende vervaging die een scherp gebied rond het midden laat en naar de randen toe sterker wordt. Vervaging Zoomen smeert in plaats daarvan vanuit het midden naar buiten, tot voorbij de randen van de laag.",
+   "name": "Lensvervaging",
+   "params": {
+    "blur": {
+     "label": "Vervaging",
+     "options": [
+      "Draaien",
+      "Zoomen"
+     ]
+    },
+    "center": {
+     "label": "Midden"
+    },
+    "feather": {
+     "label": "Zachte rand"
+    },
+    "radius": {
+     "label": "Straal"
+    },
+    "sweep": {
+     "label": "Hoek"
+    }
+   }
+  },
+  "lensflare": {
+   "description": "Een fel licht met een halo, over het beeld gelegd.",
+   "name": "Lichtschittering",
+   "params": {
+    "brightness": {
+     "label": "Helderheid"
+    },
+    "center": {
+     "label": "Midden"
+    },
+    "color": {
+     "label": "Kleur"
+    },
+    "radius": {
+     "label": "Straal"
+    }
+   }
+  },
+  "levels": {
+   "description": "Past de niveaus van het beeld aan met zwart- en witpunt voor invoer, gamma en zwart- en witpunt voor uitvoer.",
+   "name": "Niveaus",
+   "params": {
+    "gamma": {
+     "label": "Gamma"
+    },
+    "inBlack": {
+     "label": "Invoer zwart"
+    },
+    "inWhite": {
+     "label": "Invoer wit"
+    },
+    "outBlack": {
+     "label": "Uitvoer zwart"
+    },
+    "outWhite": {
+     "label": "Uitvoer wit"
+    }
+   }
+  },
+  "lightglow": {
+   "description": "Voegt een gekleurde gloed toe rond de delen van het beeld die feller zijn dan een drempel.",
+   "name": "Lichtgloed",
+   "params": {
+    "blend": {
+     "label": "Mengen"
+    },
+    "blur": {
+     "label": "Grootte"
+    },
+    "color": {
+     "label": "Kleur"
+    },
+    "intensity": {
+     "label": "Intensiteit"
+    },
+    "mask": {
+     "label": "Maskeren op laag"
+    },
+    "opacity": {
+     "label": "Dekking"
+    },
+    "soften": {
+     "label": "Verzachten"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    },
+    "threshold": {
+     "label": "Drempel"
+    }
+   }
+  },
+  "lightning": {
+   "description": "Tekent een vertakte bliksemschicht tussen twee punten op de laag.",
+   "name": "Bliksem",
+   "params": {
+    "color": {
+     "label": "Kleur"
+    },
+    "evolution": {
+     "label": "Evolutie"
+    },
+    "from": {
+     "label": "Begin"
+    },
+    "glow": {
+     "label": "Gloed"
+    },
+    "jag": {
+     "label": "Detail"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "to": {
+     "label": "Einde"
+    },
+    "width": {
+     "label": "Breedte"
+    }
+   }
+  },
+  "linearrepeat": {
+   "description": "Maakt dynamisch meerdere kopieën van de laag, gerangschikt langs een lijn.",
+   "name": "Lineaire herhaling",
+   "params": {
+    "copyDelay": {
+     "label": "Vertraging per kopie"
+    },
+    "count": {
+     "label": "Aantal"
+    },
+    "easing": {
+     "label": "Easing",
+     "options": [
+      "Lineair",
+      "Ease-in",
+      "Ease-out",
+      "Ease-in-out"
+     ]
+    },
+    "fillAmount": {
+     "label": "Hoeveelheid vulling"
+    },
+    "fillColor": {
+     "label": "Vulkleur"
+    },
+    "position": {
+     "label": "Positie"
+    },
+    "randomOpacity": {
+     "label": "Willekeurige dekking"
+    },
+    "randomOrder": {
+     "label": "Willekeurige volgorde"
+    },
+    "randomPosition": {
+     "label": "Willekeurige positie"
+    },
+    "randomRotation": {
+     "label": "Willekeurige rotatie"
+    },
+    "randomScale": {
+     "label": "Willekeurige schaal"
+    },
+    "rangeEnd": {
+     "label": "Bereikeinde"
+    },
+    "rangeOffset": {
+     "label": "Bereikverschuiving"
+    },
+    "rangeOpacity": {
+     "label": "Bereikdekking"
+    },
+    "rangePosition": {
+     "label": "Bereikpositie"
+    },
+    "rangeRotation": {
+     "label": "Bereikrotatie"
+    },
+    "rangeScale": {
+     "label": "Bereikschaal"
+    },
+    "rangeStart": {
+     "label": "Bereikbegin"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    }
+   }
+  },
+  "linearstreaks": {
+   "description": "Maakt rechte strepen door kopieën van de laag langs een hoek te schuiven en te mengen waar ze overlappen. Overvloeien Uit laat de laag zoals hij is. Kopieën Elke pixel legt één kopie op elke pixel van Lengte, in plaats van 48 erlangs verdeeld.",
+   "name": "Lineaire strepen",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "angle": {
+     "label": "Hoek"
+    },
+    "bias": {
+     "label": "Bias"
+    },
+    "copies": {
+     "label": "Kopieën",
+     "options": [
+      "Verspreid",
+      "Elke pixel"
+     ]
+    },
+    "mode": {
+     "label": "Overvloeien",
+     "options": [
+      "Lichter",
+      "Gemiddelde",
+      "Donkerder",
+      "Uit"
+     ]
+    },
+    "reach": {
+     "label": "Lengte"
+    }
+   }
+  },
+  "liquidglass": {
+   "description": "Maakt van de vorm van de laag helder, afgerond glas, zoals een telefoonknop: de lagen erachter buigen het sterkst bij de rand, met een felle rand aan de verlichte kant en een zachtere aan de andere kant. Mat vervaagt wat erachter ligt en Regenboogrand splitst de kleuren bij de rand.",
+   "name": "Liquid Glass",
+   "params": {
+    "angle": {
+     "label": "Lichthoek"
+    },
+    "blur": {
+     "label": "Rand"
+    },
+    "color": {
+     "label": "Kleur"
+    },
+    "dispersion": {
+     "label": "Regenboogrand"
+    },
+    "frost": {
+     "label": "Mat"
+    },
+    "highlight": {
+     "label": "Hooglicht"
+    },
+    "refraction": {
+     "label": "Buiging"
+    },
+    "tint": {
+     "label": "Tint"
+    }
+   }
+  },
+  "longshadow": {
+   "description": "Werpt lange, evenwijdige schaduwen vanuit de dekkende delen van de laag.",
+   "name": "Lange schaduw",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "angle": {
+     "label": "Hoek"
+    },
+    "color": {
+     "label": "Kleur"
+    },
+    "fade": {
+     "label": "Uitfaden"
+    },
+    "fill": {
+     "label": "Vulling"
+    },
+    "reach": {
+     "label": "Lengte"
+    },
+    "samples": {
+     "label": "Samples"
+    },
+    "solidity": {
+     "label": "Stevigheid"
+    }
+   }
+  },
+  "lumakey": {
+   "description": "Verwijdert de donkere delen van de laag (of de lichte).",
+   "name": "Luma key",
+   "params": {
+    "high": {
+     "label": "Hoge drempel"
+    },
+    "invert": {
+     "label": "Omkeren"
+    },
+    "softness": {
+     "label": "Zachtheid"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    },
+    "threshold": {
+     "label": "Drempel"
+    }
+   }
+  },
+  "lumastamp": {
+   "description": "Maakt van de laag een egale kleur waarvan de dekking volgt hoe helder elke pixel is, zoals een stempel of stencil.",
+   "name": "Luma-stempel",
+   "params": {
+    "color": {
+     "label": "Kleur"
+    },
+    "compositing": {
+     "label": "Samenstelling",
+     "options": [
+      "Stempel",
+      "Tint"
+     ]
+    },
+    "gamma": {
+     "label": "Gamma"
+    },
+    "high": {
+     "label": "Witpunt"
+    },
+    "invert": {
+     "label": "Omkeren"
+    },
+    "low": {
+     "label": "Zwartpunt"
+    }
+   }
+  },
+  "magnifybackground": {
+   "description": "Maakt van de laag een vergrootglas: de vorm toont de lagen erachter vergroot rond het midden.",
+   "name": "Achtergrond vergroten",
+   "params": {
+    "magnify": {
+     "label": "Laag vergroten"
+    },
+    "sampling": {
+     "label": "Bemonstering",
+     "options": [
+      "Dichtstbijzijnde",
+      "Lineair"
+     ]
+    },
+    "scale": {
+     "label": "Schaal"
+    }
+   }
+  },
+  "maskblur": {
+   "description": "Vervaagt de lagen achter deze laag binnen de vorm; lichtere delen van de laag vervagen meer, dus een verloop geeft een tilt-shift.",
+   "name": "Maskervervaging",
+   "params": {
+    "invert": {
+     "label": "Omkeren"
+    },
+    "strength": {
+     "label": "Sterkte"
+    }
+   }
+  },
+  "mattechoker": {
+   "description": "Maakt de dekkende delen van de laag kleiner door hun randen weg te eten.",
+   "name": "Matte inkrimpen",
+   "params": {
+    "amount": {
+     "label": "Inkrimpen"
+    },
+    "blur": {
+     "label": "Grootte"
+    },
+    "invert": {
+     "label": "Omkeren"
+    },
+    "method": {
+     "label": "Methode",
+     "options": [
+      "Drempel",
+      "Eroderen"
+     ]
+    },
+    "softness": {
+     "label": "Zachtheid"
+    }
+   }
+  },
+  "mirror": {
+   "description": "Spiegelt de ene helft van het beeld over een spiegellijn, bepaald door een hoek en een middelpunt.",
+   "name": "Spiegelen",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "angle": {
+     "label": "Hoek"
+    },
+    "blend": {
+     "label": "Mengen",
+     "options": [
+      "Normaal",
+      "Vermenigvuldigen",
+      "Bleken"
+     ]
+    },
+    "center": {
+     "label": "Midden"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Vouwen",
+      "Omdraaien"
+     ]
+    }
+   }
+  },
+  "mosaic": {
+   "description": "Verdeelt de laag in vierkanten en vult elk vierkant met de gemiddelde kleur ervan.",
+   "name": "Mozaïek",
+   "params": {
+    "average": {
+     "label": "Gemiddelde",
+     "options": [
+      "Cel",
+      "Hoek"
+     ]
+    },
+    "count": {
+     "label": "Aantal"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "stretch": {
+     "label": "Uitrekken"
+    }
+   }
+  },
+  "motionblur": {
+   "description": "Vervaagt de laag in de richting waarin hij beweegt, draait en groeit, op basis van keyframes en bewegingseffecten zoals Automatisch schudden en Oscilleren. Afstemming schaalt de vervaging. Het voorbeeld toont een snellere vervaging, tenzij Volledige onscherpte aan staat.",
+   "name": "Bewegingsonscherpte",
+   "params": {
+    "position": {
+     "label": "Positie"
+    },
+    "rotation": {
+     "label": "Hoek"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "tune": {
+     "label": "Afstemming"
+    }
+   }
+  },
+  "movealongpath": {
+   "description": "Plaatst de laag ergens langs de omtrek van de laag direct eronder.",
+   "name": "Langs pad bewegen",
+   "params": {
+    "inset": {
+     "label": "Binnen/buiten"
+    },
+    "legacyCoordinates": {
+     "label": "Oude coördinaten"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "orientation": {
+     "label": "Oriëntatie"
+    },
+    "progress": {
+     "label": "Voortgang"
+    },
+    "rotate": {
+     "label": "Automatisch draaien"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    }
+   }
+  },
+  "noise": {
+   "description": "Bedekt de laag met fijne korrel, één korrel per pixel, die elk frame verandert. Monochroom maakt de korrel grijs, Uitersten maakt elke korrel helemaal licht of donker en Bevriezen zet het patroon stil.",
+   "name": "Ruis",
+   "params": {
+    "amount": {
+     "label": "Sterkte"
+    },
+    "extremes": {
+     "label": "Uitersten"
+    },
+    "freeze": {
+     "label": "Bevriezen"
+    },
+    "mono": {
+     "label": "Monochroom"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "overshoot": {
+     "label": "Doorschieten"
+    }
+   }
+  },
+  "noisedisplace": {
+   "description": "Verschuift pixels met vloeiende waarderuis die in de tijd beweegt.",
+   "name": "Ruisverplaatsing",
+   "params": {
+    "amount": {
+     "label": "Hoeveelheid"
+    },
+    "scale": {
+     "label": "Ruisschaal"
+    },
+    "speed": {
+     "label": "Animatiesnelheid"
+    }
+   }
+  },
+  "octahedron": {
+   "description": "Plaatst de laag op de acht vlakken van een octaëder.",
+   "name": "Octaëder",
+   "params": {
+    "ambient": {
+     "label": "Omgevingslicht"
+    },
+    "glossiness": {
+     "label": "Glansgraad"
+    },
+    "light": {
+     "label": "Lichthoek"
+    },
+    "lightColor": {
+     "label": "Lichtkleur"
+    },
+    "lightHeight": {
+     "label": "Lichthoogte"
+    },
+    "lighting": {
+     "label": "Verlichting",
+     "options": [
+      "Klassiek",
+      "Zacht",
+      "Direct"
+     ]
+    },
+    "perspective": {
+     "label": "Perspectief"
+    },
+    "position": {
+     "label": "Positie"
+    },
+    "radius": {
+     "label": "Straal"
+    },
+    "rotX": {
+     "label": "Rotatie X"
+    },
+    "rotY": {
+     "label": "Rotatie Y"
+    },
+    "rotZ": {
+     "label": "Rotatie Z"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "shading": {
+     "label": "Schaduwwerking"
+    },
+    "shine": {
+     "label": "Glans"
+    },
+    "texAnchor": {
+     "label": "Textuuranker",
+     "options": [
+      "Midden",
+      "Hoek"
+     ]
+    },
+    "texAngle": {
+     "label": "Textuurhoek"
+    },
+    "texCrop": {
+     "label": "Textuur uitsnijden"
+    },
+    "texMirror": {
+     "label": "Spiegelen"
+    },
+    "texMode": {
+     "label": "Textuur",
+     "options": [
+      "Passend",
+      "Tegels",
+      "Uitrekken"
+     ]
+    },
+    "texOffset": {
+     "label": "Textuurverschuiving"
+    },
+    "texRepeatX": {
+     "label": "Herhaling X"
+    },
+    "texRepeatY": {
+     "label": "Herhaling Y"
+    }
+   }
+  },
+  "offset": {
+   "description": "Verschuift het beeld van de laag en laat het aan de randen van het kader van de laag rondlopen.",
+   "name": "Verschuiving",
+   "params": {
+    "feather": {
+     "label": "Zachte rand"
+    },
+    "mask": {
+     "label": "Maskeren op laag"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    }
+   }
+  },
+  "ominodiffusion": {
+   "description": "Tekent de laag opnieuw in een klein palet en sleept de afrondingsfout mee in een richting, voor een glitchy, geditherde look die in beweging tot leven komt.",
+   "name": "Omino Diffusion+",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "angle": {
+     "label": "Hoek"
+    },
+    "blend": {
+     "label": "Overvloeimodus",
+     "options": [
+      "Normaal",
+      "Vermenigvuldigen",
+      "Bleken"
+     ]
+    },
+    "color1": {
+     "label": "Kleur 1"
+    },
+    "color2": {
+     "label": "Kleur 2"
+    },
+    "color3": {
+     "label": "Kleur 3"
+    },
+    "color4": {
+     "label": "Kleur 4"
+    },
+    "color5": {
+     "label": "Kleur 5"
+    },
+    "color6": {
+     "label": "Kleur 6"
+    },
+    "falloff": {
+     "label": "Afname gewicht"
+    },
+    "palette": {
+     "label": "Palet",
+     "options": [
+      "Zwart/wit",
+      "RGB posteriseren (2 niveaus)",
+      "RGB posteriseren (3 niveaus)",
+      "RGB posteriseren (4 niveaus)",
+      "Grijs (3 niveaus)",
+      "Grijs (4 niveaus)",
+      "CGA groen/rood/geel",
+      "CGA cyaan/magenta/wit",
+      "CGA blauw/cyaan/magenta/wit",
+      "Verzadigen en posteriseren",
+      "Aangepast (2 kleuren)",
+      "Aangepast (3 kleuren)",
+      "Aangepast (4 kleuren)",
+      "Aangepast (5 kleuren)",
+      "Aangepast (6 kleuren)"
+     ]
+    },
+    "steps": {
+     "label": "Stappen"
+    },
+    "strength": {
+     "label": "Sterkte"
+    },
+    "weight": {
+     "label": "Foutgewicht"
+    }
+   }
+  },
+  "ominoglass": {
+   "description": "Glas gemaakt van de helderheid van de laag: breekt wat erachter ligt met regenboogranden en belicht het oppervlak als een lens.",
+   "name": "Omino Glass",
+   "params": {
+    "aberration": {
+     "label": "Chromatische aberratie"
+    },
+    "ambient": {
+     "label": "Omgevingslicht"
+    },
+    "amount": {
+     "label": "Ruwheid"
+    },
+    "blend": {
+     "label": "Mengen"
+    },
+    "blur": {
+     "label": "Schuine kant"
+    },
+    "color": {
+     "label": "Kleur"
+    },
+    "direction": {
+     "label": "Richting"
+    },
+    "elevation": {
+     "label": "Elevatie"
+    },
+    "evolution": {
+     "label": "Evolutie"
+    },
+    "feature": {
+     "label": "Detailgrootte"
+    },
+    "intensity": {
+     "label": "Intensiteit"
+    },
+    "light": {
+     "label": "Lichtkleur"
+    },
+    "refraction": {
+     "label": "Breking"
+    },
+    "samples": {
+     "label": "Samples gladheid"
+    },
+    "scale": {
+     "label": "Schaal ruwheid"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "shading": {
+     "label": "Schaduwwerking",
+     "options": [
+      "Geen",
+      "Puntlicht",
+      "Gericht licht"
+     ]
+    },
+    "shine": {
+     "label": "Glans"
+    },
+    "specularity": {
+     "label": "Spiegelglans"
+    },
+    "useLuma": {
+     "label": "Luminantie van laag gebruiken"
+    }
+   }
+  },
+  "oscillate": {
+   "description": "Beweegt de laag heen en weer langs een hoek, in de diepte of rond in een baan.",
+   "name": "Oscilleren",
+   "params": {
+    "angle": {
+     "label": "Hoek"
+    },
+    "direction": {
+     "label": "Richting",
+     "options": [
+      "Hoek",
+      "Diepte",
+      "Baan"
+     ]
+    },
+    "frequency": {
+     "label": "Frequentie"
+    },
+    "magnitude": {
+     "label": "Uitslag"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "wave": {
+     "label": "Golf",
+     "options": [
+      "Sinus",
+      "Driehoek"
+     ]
+    }
+   }
+  },
+  "outline": {
+   "description": "Tekent een effen contour in Kleur rond de buitenkant van de vorm van de laag, Breedte pixels breed.",
+   "name": "Contour",
+   "params": {
+    "color": {
+     "label": "Kleur"
+    },
+    "radius": {
+     "label": "Breedte"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Contour",
+      "Vulling",
+      "Banden"
+     ]
+    }
+   }
+  },
+  "pagecurl": {
+   "description": "Slaat de laag om als een pagina: een hoek komt omhoog en rolt om, zodat de achterkant van de pagina zichtbaar wordt. Animeer Voortgang om de pagina om te slaan. Met Vorm volgen aan slaat de pagina om vanaf de randen van wat zichtbaar is, zodat een rond beeld of een 3D-model vanaf zijn eigen rand omkrult in plaats van vanaf een onzichtbaar kader.",
+   "name": "Pagina omslaan",
+   "params": {
+    "angle": {
+     "label": "Hoek"
+    },
+    "backAlpha": {
+     "label": "Dekking achterkant"
+    },
+    "backColor": {
+     "label": "Kleur achterkant"
+    },
+    "follow": {
+     "label": "Vorm volgen"
+    },
+    "progress": {
+     "label": "Voortgang"
+    },
+    "radius": {
+     "label": "Straal"
+    },
+    "shadow": {
+     "label": "Schaduw"
+    },
+    "shine": {
+     "label": "Glans"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    }
+   }
+  },
+  "palettemap": {
+   "description": "Zet elke pixel om naar de dichtstbijzijnde kleur in een palet: tot acht kleuren die je kiest, of een palet van tot 512 kleuren uit een voorinstelling of een geïmporteerd bestand. Ditherpatronen mengen naburige paletkleuren om meer tinten te tonen. Alfa mengt de nieuwe kleuren met de originele laag.",
+   "name": "Paletkaart",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "color1": {
+     "label": "Kleur 1"
+    },
+    "color2": {
+     "label": "Kleur 2"
+    },
+    "color3": {
+     "label": "Kleur 3"
+    },
+    "color4": {
+     "label": "Kleur 4"
+    },
+    "color5": {
+     "label": "Kleur 5"
+    },
+    "color6": {
+     "label": "Kleur 6"
+    },
+    "color7": {
+     "label": "Kleur 7"
+    },
+    "color8": {
+     "label": "Kleur 8"
+    },
+    "colors": {
+     "label": "Kleuren"
+    },
+    "dither": {
+     "label": "Dithering"
+    },
+    "palette": {
+     "label": "Palet"
+    },
+    "pattern": {
+     "label": "Ditherpatroon",
+     "options": [
+      "Geen",
+      "Ruis",
+      "Dambord",
+      "Bayer 2x2",
+      "Bayer 3x3",
+      "Bayer 4x4",
+      "Bayer 8x8",
+      "Clusterpunt 4x4",
+      "Clusterpunt 8x8",
+      "Horizontale lijnen",
+      "Verticale lijnen",
+      "Diagonale lijnen",
+      "Floyd-Steinberg",
+      "False Floyd-Steinberg",
+      "Sierra Lite",
+      "Fan",
+      "Shiau-Fan",
+      "Jarvis-Judice-Ninke",
+      "Stucki",
+      "Burkes",
+      "Sierra",
+      "Two-Row Sierra",
+      "Atkinson"
+     ]
+    },
+    "source": {
+     "label": "Kleuren uit",
+     "options": [
+      "Kleuren",
+      "Palet"
+     ]
+    }
+   }
+  },
+  "parenthelper": {
+   "description": "Wijzigt hoe een gekoppelde laag zijn bovenliggende laag volgt: schaal en rotatie kunnen volledig volgen, vergrendeld blijven of voor een ingestelde mate volgen. Automatisch draaien draait de laag terwijl hij beweegt, zoals een rollend wiel.",
+   "name": "Koppelhulp",
+   "params": {
+    "autoRotate": {
+     "label": "Automatisch draaien",
+     "options": [
+      "Uit",
+      "X-as",
+      "Y-as"
+     ]
+    },
+    "radiusAdjust": {
+     "label": "Straal aanpassen"
+    },
+    "rotateMode": {
+     "label": "Rotatie",
+     "options": [
+      "Normaal",
+      "Vergrendeld",
+      "Gewogen"
+     ]
+    },
+    "rotateWeight": {
+     "label": "Rotatiegewicht"
+    },
+    "scaleMode": {
+     "label": "Schaal",
+     "options": [
+      "Normaal",
+      "Vergrendeld",
+      "Gewogen"
+     ]
+    },
+    "scaleWeight": {
+     "label": "Schaalgewicht"
+    }
+   }
+  },
+  "particles": {
+   "description": "Laat deeltjes uit de laag vliegen: sneeuw, vonken, confetti, bellen, stof, hartjes, sterren, bloemblaadjes of kleine kopieën van de laag zelf, bewogen door zwaartekracht, wind en werveling. Begin met een voorinstelling en pas daarna de emitter, de hoeveelheid en de krachten aan. Op de beat geeft bij elke beat een uitbarsting: selecteer je muziek, open het menu en tik eerst op Beats markeren.",
+   "name": "Deeltjes",
+   "params": {
+    "beats": {
+     "label": "Beats",
+     "options": [
+      "Elke beat",
+      "Elke 2e beat",
+      "Elke 4e beat"
+     ]
+    },
+    "blend": {
+     "label": "Overvloeien",
+     "options": [
+      "Normaal",
+      "Optellen",
+      "Bleken"
+     ]
+    },
+    "bpm": {
+     "label": "BPM"
+    },
+    "color": {
+     "label": "Kleur"
+    },
+    "color2": {
+     "label": "Kleur 2"
+    },
+    "colorMode": {
+     "label": "Kleurmodus",
+     "options": [
+      "Eén kleur",
+      "Willekeurige mix",
+      "Over levensduur"
+     ]
+    },
+    "colorVariation": {
+     "label": "Kleurvariatie"
+    },
+    "count": {
+     "label": "Aantal"
+    },
+    "depth": {
+     "label": "Diepte"
+    },
+    "direction": {
+     "label": "Richting"
+    },
+    "drag": {
+     "label": "Luchtweerstand"
+    },
+    "emission": {
+     "label": "Emissie",
+     "options": [
+      "Doorlopend",
+      "Uitbarsting",
+      "Op de beat"
+     ]
+    },
+    "emitter": {
+     "label": "Emitter",
+     "options": [
+      "Punt",
+      "Lijn",
+      "Gebied",
+      "Contour"
+     ]
+    },
+    "emitterSize": {
+     "label": "Grootte emitter"
+    },
+    "endSize": {
+     "label": "Eindgrootte"
+    },
+    "every": {
+     "label": "Herhalen elke"
+    },
+    "fadeIn": {
+     "label": "Infaden"
+    },
+    "fadeOut": {
+     "label": "Uitfaden"
+    },
+    "gravity": {
+     "label": "Zwaartekracht"
+    },
+    "kind": {
+     "label": "Deeltje",
+     "options": [
+      "Sneeuw",
+      "Vonken",
+      "Confetti",
+      "Bellen",
+      "Stof",
+      "Hartjes",
+      "Sterren",
+      "Bloemblaadjes",
+      "Laag"
+     ]
+    },
+    "layer": {
+     "label": "Laag",
+     "options": [
+      "Onder deeltjes",
+      "Boven deeltjes",
+      "Verborgen"
+     ]
+    },
+    "lifeVariation": {
+     "label": "Variatie levensduur"
+    },
+    "lifetime": {
+     "label": "Levensduur"
+    },
+    "more": {
+     "label": "Meer instellingen"
+    },
+    "orientation": {
+     "label": "Oriëntatie",
+     "options": [
+      "Vrij",
+      "Beweging volgen"
+     ]
+    },
+    "perspective": {
+     "label": "Perspectief"
+    },
+    "position": {
+     "label": "Positie emitter"
+    },
+    "prewarm": {
+     "label": "Vol beginnen"
+    },
+    "randomRotation": {
+     "label": "Willekeurige rotatie"
+    },
+    "rate": {
+     "label": "Tempo"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "size": {
+     "label": "Grootte"
+    },
+    "sizeVariation": {
+     "label": "Variatie grootte"
+    },
+    "speed": {
+     "label": "Snelheid"
+    },
+    "speedVariation": {
+     "label": "Variatie snelheid"
+    },
+    "spin": {
+     "label": "Draaiing"
+    },
+    "spinVariation": {
+     "label": "Variatie draaiing"
+    },
+    "spread": {
+     "label": "Spreiding"
+    },
+    "start": {
+     "label": "Tijdstip uitbarsting"
+    },
+    "swirl": {
+     "label": "Werveling"
+    },
+    "swirlSpeed": {
+     "label": "Snelheid werveling"
+    },
+    "tint": {
+     "label": "Tint"
+    },
+    "twinkle": {
+     "label": "Fonkeling"
+    },
+    "wind": {
+     "label": "Wind"
+    },
+    "zSpeed": {
+     "label": "Z-snelheid"
+    },
+    "zSpread": {
+     "label": "Z-spreiding"
+    }
+   },
+   "presets": {
+    "beat-confetti": "Beatconfetti",
+    "bubbles": "Bellen",
+    "confetti": "Confetti",
+    "dust": "Stof",
+    "hearts": "Hartjes",
+    "layer-fountain": "Laagfontein",
+    "petals": "Bloemblaadjes",
+    "snow": "Sneeuw",
+    "sparks": "Vonken",
+    "twinkle": "Fonkeling"
+   }
+  },
+  "pixelate": {
+   "description": "Maakt van de laag blokken van elk één kleur, genomen uit het midden van het blok, op een raster dat gecentreerd is op de laag (of op het beeld met Schermruimte). Uitrekken, Verschuiving en Hoek bepalen het raster en Vignet maakt elk blok naar de randen toe donkerder.",
+   "name": "Pixeleren",
+   "params": {
+    "angle": {
+     "label": "Hoek"
+    },
+    "blockSize": {
+     "label": "Grootte"
+    },
+    "edges": {
+     "label": "Randen",
+     "options": [
+      "Spiegelen",
+      "Transparant"
+     ]
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "screenSpace": {
+     "label": "Schermruimte"
+    },
+    "stretch": {
+     "label": "Uitrekken"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    },
+    "threshold": {
+     "label": "Drempel"
+    },
+    "vignette": {
+     "label": "Vignet"
+    }
+   }
+  },
+  "pixeltiles": {
+   "description": "Bouwt de laag opnieuw op uit een raster van kleine tegels met pixelpatronen. Elke tegel bepaalt aan de hand van de helderheid eronder hoeveel van zijn patroon hij tekent, als een mix van ASCII-art en mozaïek. Chaos breekt het raster op met willekeurige tegels.",
+   "name": "Pixeltegels",
+   "params": {
+    "alpha": {
+     "label": "Mix"
+    },
+    "background": {
+     "label": "Achtergrond"
+    },
+    "brightness": {
+     "label": "Helderheid"
+    },
+    "chaos": {
+     "label": "Chaos"
+    },
+    "chaosAmount": {
+     "label": "Hoeveelheid chaos"
+    },
+    "chaosSpeed": {
+     "label": "Chaossnelheid"
+    },
+    "contrast": {
+     "label": "Contrast"
+    },
+    "detail": {
+     "label": "Detail"
+    },
+    "flip": {
+     "label": "Pixels spiegelen"
+    },
+    "foreground": {
+     "label": "Voorgrond"
+    },
+    "levels": {
+     "label": "Schakeringen"
+    },
+    "offset": {
+     "label": "Patroonverschuiving"
+    },
+    "original": {
+     "label": "Originele kleur gebruiken"
+    },
+    "pattern": {
+     "label": "Patroon",
+     "options": [
+      "Veel detail",
+      "Cijfers & letters",
+      "Horizontale lijnen",
+      "Stippen",
+      "Verticale lijnen",
+      "Grunge",
+      "Ringen",
+      "Effen",
+      "Diagonaal links",
+      "Diagonaal rechts"
+     ]
+    },
+    "randomPattern": {
+     "label": "Willekeurige patronen"
+    },
+    "scramble": {
+     "label": "Tegels husselen"
+    },
+    "seed": {
+     "label": "Willekeurige seed"
+    },
+    "tile": {
+     "label": "Tegelgrootte"
+    },
+    "tone": {
+     "label": "Toon uit",
+     "options": [
+      "Luminantie",
+      "Gemiddelde",
+      "Rood",
+      "Groen",
+      "Blauw"
+     ]
+    },
+    "transparent": {
+     "label": "Transparante achtergrond"
+    }
+   }
+  },
+  "polar": {
+   "description": "Buigt de laag rond het midden, zodat rechte lijnen cirkels worden, of rolt cirkels af tot rechte lijnen. Indeling bepaalt welke rand van de laag in het midden samenkomt.",
+   "name": "Poolcoördinaten",
+   "params": {
+    "amount": {
+     "label": "Interpolatie"
+    },
+    "direction": {
+     "label": "Type",
+     "options": [
+      "Rechthoekig naar polair",
+      "Polair naar rechthoekig"
+     ]
+    },
+    "middle": {
+     "label": "Indeling",
+     "options": [
+      "Bovenkant in midden",
+      "Onderkant in midden"
+     ]
+    },
+    "radius": {
+     "label": "Straal"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    }
+   }
+  },
+  "polardisplacement": {
+   "description": "Draait en trekt de lagen achter deze laag rond een middelpunt op basis van de kleuren van de laag, en verbergt daarna de laag zelf.",
+   "name": "Polaire verplaatsingskaart",
+   "params": {
+    "angle": {
+     "label": "Hoek"
+    },
+    "angleChannel": {
+     "label": "Hoekbron",
+     "options": [
+      "R",
+      "G",
+      "B",
+      "Luminantie",
+      "Alfa"
+     ]
+    },
+    "center": {
+     "label": "Midden"
+    },
+    "distanceChannel": {
+     "label": "Afstandsbron",
+     "options": [
+      "R",
+      "G",
+      "B",
+      "Luminantie",
+      "Alfa"
+     ]
+    },
+    "edges": {
+     "label": "Randen",
+     "options": [
+      "Herhalen",
+      "Spiegelen",
+      "Transparant",
+      "Tegels"
+     ]
+    },
+    "fromCenter": {
+     "label": "Vanuit midden"
+    },
+    "invert": {
+     "label": "Omkeren"
+    },
+    "reach": {
+     "label": "Binnen/buiten"
+    }
+   }
+  },
+  "posterize": {
+   "description": "Verdeelt elk kleurkanaal in een aantal vlakke Stappen, zodat vloeiende verlopen banden worden. Verschuiving verplaatst waar de randen van de banden vallen.",
+   "name": "Posteriseren",
+   "params": {
+    "levels": {
+     "label": "Stappen"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    }
+   }
+  },
+  "pulseopacity": {
+   "description": "Laat de laag steeds opnieuw uit- en infaden, op een sinus- of driehoeksgolf.",
+   "name": "Pulserende dekking",
+   "params": {
+    "frequency": {
+     "label": "Frequentie"
+    },
+    "phase": {
+     "label": "Startfase"
+    },
+    "strength": {
+     "label": "Sterkte"
+    },
+    "wave": {
+     "label": "Golf",
+     "options": [
+      "Sinus",
+      "Driehoek"
+     ]
+    }
+   }
+  },
+  "pulsesize": {
+   "description": "Laat de laag steeds opnieuw groeien en krimpen, op een sinus- of driehoeksgolf.",
+   "name": "Pulserende grootte",
+   "params": {
+    "frequency": {
+     "label": "Frequentie"
+    },
+    "grow": {
+     "label": "Groeien"
+    },
+    "phase": {
+     "label": "Startfase"
+    },
+    "shrink": {
+     "label": "Krimpen"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard",
+      "Standaard"
+     ]
+    },
+    "wave": {
+     "label": "Golf",
+     "options": [
+      "Sinus",
+      "Driehoek"
+     ]
+    }
+   }
+  },
+  "puppet": {
+   "description": "Vervormt de laag als een marionet: zet er pinnen op, sleep of animeer de pinnen en het beeld volgt ze vloeiend.",
+   "name": "Marionetpin",
+   "params": {
+    "density": {
+     "label": "Driehoekdichtheid"
+    },
+    "expansion": {
+     "label": "Mesh-uitbreiding"
+    },
+    "falloff": {
+     "label": "Afname"
+    },
+    "sway": {
+     "label": "Zwaaien"
+    },
+    "swayAmount": {
+     "label": "Zwaaisterkte"
+    },
+    "swayAngle": {
+     "label": "Zwaaihoek"
+    },
+    "swayDirection": {
+     "label": "Zwaairichting",
+     "options": [
+      "Hoek",
+      "Willekeurig"
+     ]
+    },
+    "swayPins": {
+     "label": "Zwaaipinnen",
+     "options": [
+      "Alle",
+      "Geselecteerd"
+     ]
+    },
+    "swaySeed": {
+     "label": "Zwaai-seed"
+    },
+    "swaySpeed": {
+     "label": "Zwaaisnelheid"
+    }
+   }
+  },
+  "pyramid": {
+   "description": "Plaatst de laag op de vlakken van een vierkante piramide.",
+   "name": "Piramide",
+   "params": {
+    "ambient": {
+     "label": "Omgevingslicht"
+    },
+    "base": {
+     "label": "Basis"
+    },
+    "glossiness": {
+     "label": "Glansgraad"
+    },
+    "height": {
+     "label": "Hoogte"
+    },
+    "light": {
+     "label": "Lichthoek"
+    },
+    "lightColor": {
+     "label": "Lichtkleur"
+    },
+    "lightHeight": {
+     "label": "Lichthoogte"
+    },
+    "lighting": {
+     "label": "Verlichting",
+     "options": [
+      "Klassiek",
+      "Zacht",
+      "Direct"
+     ]
+    },
+    "perspective": {
+     "label": "Perspectief"
+    },
+    "position": {
+     "label": "Positie"
+    },
+    "rotX": {
+     "label": "Rotatie X"
+    },
+    "rotY": {
+     "label": "Rotatie Y"
+    },
+    "rotZ": {
+     "label": "Rotatie Z"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "shading": {
+     "label": "Schaduwwerking"
+    },
+    "shine": {
+     "label": "Glans"
+    },
+    "texAnchor": {
+     "label": "Textuuranker",
+     "options": [
+      "Midden",
+      "Hoek"
+     ]
+    },
+    "texAngle": {
+     "label": "Textuurhoek"
+    },
+    "texCrop": {
+     "label": "Textuur uitsnijden"
+    },
+    "texMirror": {
+     "label": "Spiegelen"
+    },
+    "texMode": {
+     "label": "Textuur",
+     "options": [
+      "Passend",
+      "Tegels",
+      "Uitrekken"
+     ]
+    },
+    "texOffset": {
+     "label": "Textuurverschuiving"
+    },
+    "texRepeatX": {
+     "label": "Herhaling X"
+    },
+    "texRepeatY": {
+     "label": "Herhaling Y"
+    }
+   }
+  },
+  "radialblur": {
+   "description": "Past een radiale zoomvervaging toe door samples te middelen langs stralen vanuit een middelpunt, met instelbare sterkte. Adaptief laat de strepen langer worden naarmate ze verder van het midden liggen; uitgeschakeld zijn alle strepen even lang.",
+   "name": "Zoomvervaging",
+   "params": {
+    "adaptive": {
+     "label": "Adaptief"
+    },
+    "center": {
+     "label": "Midden"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    },
+    "zoom": {
+     "label": "Sterkte"
+    }
+   }
+  },
+  "radialrays": {
+   "description": "Tekent effen zonnestralen vanuit een punt over de ondoorzichtige delen van de laag.",
+   "name": "Radiale stralen",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "angle": {
+     "label": "Hoek"
+    },
+    "center": {
+     "label": "Midden"
+    },
+    "color": {
+     "label": "Kleur"
+    },
+    "count": {
+     "label": "Aantal"
+    },
+    "width": {
+     "label": "Breedte"
+    }
+   }
+  },
+  "radialrepeat": {
+   "description": "Maakt dynamisch meerdere kopieën van de laag, in een cirkel gerangschikt.",
+   "name": "Radiale herhaling",
+   "params": {
+    "angle": {
+     "label": "Hoek"
+    },
+    "copyDelay": {
+     "label": "Vertraging per kopie"
+    },
+    "count": {
+     "label": "Aantal"
+    },
+    "easing": {
+     "label": "Easing",
+     "options": [
+      "Lineair",
+      "Ease-in",
+      "Ease-out",
+      "Ease-in-out"
+     ]
+    },
+    "fillAmount": {
+     "label": "Hoeveelheid vulling"
+    },
+    "fillColor": {
+     "label": "Vulkleur"
+    },
+    "orientation": {
+     "label": "Oriëntatie"
+    },
+    "radius": {
+     "label": "Straal"
+    },
+    "randomOpacity": {
+     "label": "Willekeurige dekking"
+    },
+    "randomOrder": {
+     "label": "Willekeurige volgorde"
+    },
+    "randomPosition": {
+     "label": "Willekeurige positie"
+    },
+    "randomRotation": {
+     "label": "Willekeurige rotatie"
+    },
+    "randomScale": {
+     "label": "Willekeurige schaal"
+    },
+    "rangeEnd": {
+     "label": "Bereikeinde"
+    },
+    "rangeOffset": {
+     "label": "Bereikverschuiving"
+    },
+    "rangeOpacity": {
+     "label": "Bereikdekking"
+    },
+    "rangePosition": {
+     "label": "Bereikpositie"
+    },
+    "rangeRotation": {
+     "label": "Bereikrotatie"
+    },
+    "rangeScale": {
+     "label": "Bereikschaal"
+    },
+    "rangeStart": {
+     "label": "Bereikbegin"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    },
+    "sweep": {
+     "label": "Boog"
+    }
+   }
+  },
+  "radialshadow": {
+   "description": "Werpt lange schaduwen vanuit de ondoorzichtige delen van de laag, die vanaf een lichtpunt uitwaaieren.",
+   "name": "Radiale schaduw",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "color": {
+     "label": "Kleur"
+    },
+    "fade": {
+     "label": "Uitfaden"
+    },
+    "fill": {
+     "label": "Vulling"
+    },
+    "light": {
+     "label": "Licht"
+    },
+    "reach": {
+     "label": "Lengte"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    }
+   }
+  },
+  "radialwipe": {
+   "description": "Verbergt een segment van de laag dat vanaf Starthoek rond Midden zwaait, zoals een klokwijzer. Voortgang is de doorlopen hoek, Aantal herhaalt het segment rond de cirkel en Beide zwaait twee kanten op. Animeer Voortgang voor een overgang. Segmenten Exact houdt een gebroken Aantal aan, zodat het laatste segment smaller is, en Zachte rand verzacht beide zijden van elk segment.",
+   "name": "Radiale veeg",
+   "params": {
+    "center": {
+     "label": "Midden"
+    },
+    "count": {
+     "label": "Aantal"
+    },
+    "direction": {
+     "label": "Richting",
+     "options": [
+      "Met de klok mee",
+      "Tegen de klok in",
+      "Beide"
+     ]
+    },
+    "feather": {
+     "label": "Zachte rand"
+    },
+    "progress": {
+     "label": "Voortgang"
+    },
+    "start": {
+     "label": "Starthoek"
+    },
+    "wedges": {
+     "label": "Segmenten",
+     "options": [
+      "Heel",
+      "Exact"
+     ]
+    }
+   }
+  },
+  "randomdisplace": {
+   "description": "Beweegt de laag automatisch vloeiend maar willekeurig in de tijd. Seed kiest een andere beweging, Snelheid bepaalt hoe snel die rondzwerft en Evolutie verschuift het patroon.",
+   "name": "Willekeurige verplaatsing",
+   "params": {
+    "evolution": {
+     "label": "Evolutie"
+    },
+    "magnitude": {
+     "label": "Uitslag"
+    },
+    "scatter": {
+     "label": "Verstrooiing"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "speed": {
+     "label": "Snelheid"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    }
+   }
+  },
+  "randomjitter": {
+   "description": "Laat de laag willekeurig heen en weer springen langs een hoek.",
+   "name": "Willekeurige jitter",
+   "params": {
+    "angle": {
+     "label": "Hoek"
+    },
+    "frequency": {
+     "label": "Frequentie"
+    },
+    "magnitude": {
+     "label": "Uitslag"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "slack": {
+     "label": "Speling"
+    },
+    "zjitter": {
+     "label": "Z-jitter"
+    }
+   }
+  },
+  "rasterextrude": {
+   "description": "Duwt het beeld van de laag naar buiten tot een massief blok; de zijkanten krijgen de binnenkleur.",
+   "name": "Raster-extrusie",
+   "params": {
+    "ambient": {
+     "label": "Omgevingslicht"
+    },
+    "depth": {
+     "label": "Diepte"
+    },
+    "glossiness": {
+     "label": "Glansgraad"
+    },
+    "interior": {
+     "label": "Binnenkleur"
+    },
+    "light": {
+     "label": "Lichthoek"
+    },
+    "lightColor": {
+     "label": "Lichtkleur"
+    },
+    "lightHeight": {
+     "label": "Lichthoogte"
+    },
+    "lighting": {
+     "label": "Verlichting",
+     "options": [
+      "Klassiek",
+      "Zacht",
+      "Direct"
+     ]
+    },
+    "perspective": {
+     "label": "Perspectief"
+    },
+    "position": {
+     "label": "Positie"
+    },
+    "rotX": {
+     "label": "Rotatie X"
+    },
+    "rotY": {
+     "label": "Rotatie Y"
+    },
+    "rotZ": {
+     "label": "Rotatie Z"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "shading": {
+     "label": "Schaduwwerking"
+    },
+    "shine": {
+     "label": "Glans"
+    }
+   },
+   "shortcuts": {
+    "text3d": {
+     "description": "Maakt van een tekstlaag massieve 3D-letters die je in 3D kunt draaien. Hiermee wordt Raster-extrusie toegevoegd, dat op elke laag werkt.",
+     "name": "3D-tekst"
+    }
+   }
+  },
+  "rastertransform": {
+   "description": "Schaalt, draait en verplaatst het uiteindelijke beeld van de laag, na de effecten erboven, zodat ook hun resultaat getransformeerd kan worden. Vulling houdt een deel van het origineel eronder en Maskeren op laag houdt het resultaat binnen de oorspronkelijke vorm.",
+   "name": "Raster transformeren",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "angle": {
+     "label": "Hoek"
+    },
+    "fill": {
+     "label": "Vulling"
+    },
+    "mask": {
+     "label": "Maskeren op laag"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "sampling": {
+     "label": "Bemonstering",
+     "options": [
+      "Dichtstbijzijnde",
+      "Lineair"
+     ]
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    }
+   }
+  },
+  "rays": {
+   "description": "Laat lichtstralen schijnen vanuit de heldere delen van de laag, weg van een middelpunt.",
+   "name": "Stralen",
+   "params": {
+    "blend": {
+     "label": "Mengen"
+    },
+    "center": {
+     "label": "Midden"
+    },
+    "color": {
+     "label": "Kleur"
+    },
+    "intensity": {
+     "label": "Intensiteit"
+    },
+    "look": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    },
+    "reach": {
+     "label": "Lengte"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    },
+    "threshold": {
+     "label": "Drempel"
+    },
+    "thresholdAdd": {
+     "label": "Extra drempel"
+    }
+   }
+  },
+  "reorient360": {
+   "description": "Draait een 360°-panoramalaag binnen zijn bol, om de horizon recht te zetten of te veranderen waar de voorkant is.",
+   "name": "360°-bol heroriënteren",
+   "params": {
+    "pitch": {
+     "label": "Kantelen"
+    },
+    "roll": {
+     "label": "Rollen"
+    },
+    "yaw": {
+     "label": "Zwenken"
+    }
+   }
+  },
+  "repeat": {
+   "description": "Maakt dynamisch meerdere kopieën van de laag.",
+   "name": "Herhaling",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "angle": {
+     "label": "Hoek"
+    },
+    "count": {
+     "label": "Aantal"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    },
+    "time": {
+     "label": "Tijd"
+    }
+   }
+  },
+  "repeatalongpath": {
+   "description": "Maakt dynamisch meerdere kopieën van de laag langs de omtrek van de laag direct eronder.",
+   "name": "Herhalen langs pad",
+   "params": {
+    "copyDelay": {
+     "label": "Vertraging per kopie"
+    },
+    "count": {
+     "label": "Aantal"
+    },
+    "easing": {
+     "label": "Easing",
+     "options": [
+      "Lineair",
+      "Ease-in",
+      "Ease-out",
+      "Ease-in-out"
+     ]
+    },
+    "end": {
+     "label": "Einde"
+    },
+    "fillAmount": {
+     "label": "Hoeveelheid vulling"
+    },
+    "fillColor": {
+     "label": "Vulkleur"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "randomOpacity": {
+     "label": "Willekeurige dekking"
+    },
+    "randomOrder": {
+     "label": "Willekeurige volgorde"
+    },
+    "randomPosition": {
+     "label": "Willekeurige positie"
+    },
+    "randomRotation": {
+     "label": "Willekeurige rotatie"
+    },
+    "randomScale": {
+     "label": "Willekeurige schaal"
+    },
+    "rangeEnd": {
+     "label": "Bereikeinde"
+    },
+    "rangeOffset": {
+     "label": "Bereikverschuiving"
+    },
+    "rangeOpacity": {
+     "label": "Bereikdekking"
+    },
+    "rangePosition": {
+     "label": "Bereikpositie"
+    },
+    "rangeRotation": {
+     "label": "Bereikrotatie"
+    },
+    "rangeScale": {
+     "label": "Bereikschaal"
+    },
+    "rangeStart": {
+     "label": "Bereikbegin"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "start": {
+     "label": "Begin"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    },
+    "tangent": {
+     "label": "Raaklijn"
+    }
+   }
+  },
+  "replacecolor": {
+   "description": "Vervangt een kleur door een andere. Alfa bepaalt hoe sterk de vervanging is; Luminantie vergrendelen behoudt het licht en de schaduw van het origineel.",
+   "name": "Kleur vervangen",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "choke": {
+     "label": "Inkrimpen"
+    },
+    "feather": {
+     "label": "Zachte rand"
+    },
+    "lockLuminance": {
+     "label": "Luminantie vergrendelen"
+    },
+    "match": {
+     "label": "Vergelijken",
+     "options": [
+      "RGB",
+      "Chroma"
+     ]
+    },
+    "source": {
+     "label": "Te vervangen kleur"
+    },
+    "target": {
+     "label": "Nieuwe kleur"
+    },
+    "threshold": {
+     "label": "Drempel"
+    }
+   }
+  },
+  "retrodither": {
+   "description": "Maakt van de laag retro-pixelart: elk pixelblok krijgt een kleur uit een palet, zoals dat van een oude console of computer of een palet dat je importeert, en een ditherpatroon mengt paletkleuren om meer tinten na te bootsen.",
+   "name": "Retro-dither",
+   "params": {
+    "alpha": {
+     "label": "Mix"
+    },
+    "dither": {
+     "label": "Sterkte"
+    },
+    "palette": {
+     "label": "Palet"
+    },
+    "pattern": {
+     "label": "Dithering",
+     "options": [
+      "Geen",
+      "Ruis",
+      "Dambord",
+      "Bayer 2x2",
+      "Bayer 3x3",
+      "Bayer 4x4",
+      "Bayer 8x8",
+      "Clusterpunt 4x4",
+      "Clusterpunt 8x8",
+      "Horizontale lijnen",
+      "Verticale lijnen",
+      "Diagonale lijnen",
+      "Floyd-Steinberg",
+      "False Floyd-Steinberg",
+      "Sierra Lite",
+      "Fan",
+      "Shiau-Fan",
+      "Jarvis-Judice-Ninke",
+      "Stucki",
+      "Burkes",
+      "Sierra",
+      "Two-Row Sierra",
+      "Atkinson"
+     ]
+    },
+    "pixel": {
+     "label": "Pixelgrootte"
+    }
+   }
+  },
+  "rgbsplit": {
+   "description": "Splitst het rode, groene en blauwe kanaal: het kanaal bij Midden blijft staan en de andere twee schuiven in tegengestelde richting langs Hoek. Licht telt de verschoven kleuren op, Donker houdt ze effen, Masker houdt alleen over waar alle drie overlappen en Luma maakt de randen even ondoorzichtig als ze helder zijn. Gemiddelde maakt elke plek zo ondoorzichtig als het aandeel kanalen dat die plek bedekt.",
+   "name": "RGB-splitsing",
+   "params": {
+    "angle": {
+     "label": "Hoek"
+    },
+    "center": {
+     "label": "Midden",
+     "options": [
+      "R",
+      "G",
+      "B"
+     ]
+    },
+    "mode": {
+     "label": "Modus",
+     "options": [
+      "Licht",
+      "Donker",
+      "Masker",
+      "Luma",
+      "Gemiddelde"
+     ]
+    },
+    "strength": {
+     "label": "Sterkte"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    }
+   }
+  },
+  "ribbon": {
+   "description": "Tekent een kronkelend lint met wisselende breedte over de ondoorzichtige delen van de laag; animeer Fase om het te laten stromen, of spaar het uit de laag uit.",
+   "name": "Lint",
+   "params": {
+    "angle": {
+     "label": "Hoek"
+    },
+    "color": {
+     "label": "Kleur"
+    },
+    "frequency": {
+     "label": "Frequentie"
+    },
+    "magnitude": {
+     "label": "Uitslag"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "punch": {
+     "label": "Uitsparen"
+    },
+    "smoothing": {
+     "label": "Afvlakking"
+    },
+    "tint": {
+     "label": "Tint"
+    },
+    "tintAmount": {
+     "label": "Hoeveelheid tint"
+    },
+    "width": {
+     "label": "Breedte"
+    }
+   }
+  },
+  "ripple": {
+   "description": "Concentrische rimpelingen vanuit een middelpunt, met instelbare amplitude, golflengte en snelheid.",
+   "name": "Rimpeling",
+   "params": {
+    "amplitude": {
+     "label": "Amplitude"
+    },
+    "center": {
+     "label": "Midden"
+    },
+    "speed": {
+     "label": "Snelheid"
+    },
+    "wavelength": {
+     "label": "Golflengte"
+    }
+   }
+  },
+  "roughenedges": {
+   "description": "Vreet met ruis in de randen van de ondoorzichtige delen, voor een gescheurde, versleten of verbrande omtrek.",
+   "name": "Ruwe randen",
+   "params": {
+    "blur": {
+     "label": "Rand"
+    },
+    "evolution": {
+     "label": "Evolutie"
+    },
+    "octaves": {
+     "label": "Octaven"
+    },
+    "roughness": {
+     "label": "Ruwheid"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "seed": {
+     "label": "Seed"
+    }
+   }
+  },
+  "scaleassist": {
+   "description": "Voegt extra schaal toe bovenop de eigen grootte van de laag, langs X, Y, beide, of X met Y andersom. Lagen die eraan gekoppeld zijn, volgen de nieuwe grootte.",
+   "name": "Schaalhulp",
+   "params": {
+    "axis": {
+     "label": "As",
+     "options": [
+      "X",
+      "Y",
+      "X,Y",
+      "X,-Y"
+     ]
+    },
+    "damp": {
+     "label": "Demping"
+    },
+    "scale": {
+     "label": "Schaal"
+    }
+   }
+  },
+  "scanlines": {
+   "description": "Voegt horizontale scanlijnen toe voor een CRT-monitoreffect, met optioneel verticaal rollen.",
+   "name": "Scanlijnen",
+   "params": {
+    "darkness": {
+     "label": "Donkerheid"
+    },
+    "roll_speed": {
+     "label": "Rolsnelheid"
+    },
+    "spacing": {
+     "label": "Lijnafstand"
+    }
+   }
+  },
+  "scatter3d": {
+   "description": "Maakt van de laag een raster van verstrooide 3D-stukjes.",
+   "name": "3D-verstrooiing",
+   "params": {
+    "axis": {
+     "label": "Draaias",
+     "options": [
+      "X",
+      "Y",
+      "Z"
+     ]
+    },
+    "depth": {
+     "label": "Rasterdiepte"
+    },
+    "depthSpacing": {
+     "label": "Diepteafstand"
+    },
+    "intensity": {
+     "label": "Lichtintensiteit"
+    },
+    "light": {
+     "label": "Lichtrichting"
+    },
+    "lightHeight": {
+     "label": "Lichthoogte"
+    },
+    "perspective": {
+     "label": "Perspectief"
+    },
+    "rotX": {
+     "label": "Rotatie X"
+    },
+    "rotY": {
+     "label": "Rotatie Y"
+    },
+    "rotZ": {
+     "label": "Rotatie Z"
+    },
+    "scatter": {
+     "label": "Verstrooiing"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "shading": {
+     "label": "Schaduwwerking"
+    },
+    "shape": {
+     "label": "Vorm",
+     "options": [
+      "Kubus",
+      "Bol",
+      "Vierkant",
+      "Cirkel"
+     ]
+    },
+    "size": {
+     "label": "Stukgrootte"
+    },
+    "spacing": {
+     "label": "Rasterafstand"
+    },
+    "spin": {
+     "label": "Verstrooiingsrotatie"
+    },
+    "twist": {
+     "label": "Draaihoek"
+    }
+   }
+  },
+  "scatterfield": {
+   "description": "Verstrooit kopieën van de laag in een oneindig 3D-veld en verbergt de oorspronkelijke laag; met keyframe-animatie beweeg je in drie dimensies door het veld.",
+   "name": "Verstrooiingsveld",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "amount": {
+     "label": "Hoeveelheid"
+    },
+    "angle": {
+     "label": "Hoek"
+    },
+    "angleVariance": {
+     "label": "Hoekvariatie"
+    },
+    "blending": {
+     "label": "Overvloeimodus",
+     "options": [
+      "Normaal",
+      "Optellen",
+      "Bleken",
+      "Vermenigvuldigen",
+      "Lichter",
+      "Donkerder",
+      "Bedekken",
+      "Verschil"
+     ]
+    },
+    "color1": {
+     "label": "Kleur 1"
+    },
+    "color2": {
+     "label": "Kleur 2"
+    },
+    "color3": {
+     "label": "Kleur 3"
+    },
+    "coloring": {
+     "label": "Inkleuring",
+     "options": [
+      "Geen",
+      "Willekeurig",
+      "Diepte"
+     ]
+    },
+    "density": {
+     "label": "Dichtheid"
+    },
+    "evolution": {
+     "label": "Evolutie"
+    },
+    "fade": {
+     "label": "Uitfaden"
+    },
+    "interpolateHue": {
+     "label": "Kleurtoon interpoleren"
+    },
+    "lockLuminance": {
+     "label": "Luminantie vergrendelen"
+    },
+    "lockSaturation": {
+     "label": "Verzadiging vergrendelen"
+    },
+    "position": {
+     "label": "Positie"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "size": {
+     "label": "Grootte"
+    },
+    "sizeVariance": {
+     "label": "Groottevariatie"
+    },
+    "slack": {
+     "label": "Speling"
+    },
+    "z": {
+     "label": "Positie Z"
+    }
+   }
+  },
+  "scatterrepeat": {
+   "description": "Maakt kopieën van de laag en verstrooit ze willekeurig binnen een cirkel eromheen. Evolutie beweegt de kopieën; Verstrooiings-seed kiest een ander patroon.",
+   "name": "Verstrooide herhaling",
+   "params": {
+    "copyDelay": {
+     "label": "Vertraging per kopie"
+    },
+    "count": {
+     "label": "Aantal"
+    },
+    "easing": {
+     "label": "Easing",
+     "options": [
+      "Lineair",
+      "Ease-in",
+      "Ease-out",
+      "Ease-in-out"
+     ]
+    },
+    "evolution": {
+     "label": "Evolutie"
+    },
+    "fillAmount": {
+     "label": "Hoeveelheid vulling"
+    },
+    "fillColor": {
+     "label": "Vulkleur"
+    },
+    "radius": {
+     "label": "Straal"
+    },
+    "randomOpacity": {
+     "label": "Willekeurige dekking"
+    },
+    "randomOrder": {
+     "label": "Willekeurige volgorde"
+    },
+    "randomPosition": {
+     "label": "Willekeurige positie"
+    },
+    "randomRotation": {
+     "label": "Willekeurige rotatie"
+    },
+    "randomScale": {
+     "label": "Willekeurige schaal"
+    },
+    "rangeEnd": {
+     "label": "Bereikeinde"
+    },
+    "rangeOffset": {
+     "label": "Bereikverschuiving"
+    },
+    "rangeOpacity": {
+     "label": "Bereikdekking"
+    },
+    "rangePosition": {
+     "label": "Bereikpositie"
+    },
+    "rangeRotation": {
+     "label": "Bereikrotatie"
+    },
+    "rangeScale": {
+     "label": "Bereikschaal"
+    },
+    "rangeStart": {
+     "label": "Bereikbegin"
+    },
+    "scatterSeed": {
+     "label": "Verstrooiings-seed"
+    },
+    "seed": {
+     "label": "Seed"
+    }
+   }
+  },
+  "sepia": {
+   "description": "Warme bruine tinten, zoals een oude foto.",
+   "name": "Sepia",
+   "params": {
+    "amount": {
+     "label": "Hoeveelheid"
+    }
+   }
+  },
+  "sharpen": {
+   "description": "Past een onscherp masker toe met een 3x3-omgeving om fijne details te versterken.",
+   "name": "Verscherpen",
+   "params": {
+    "amount": {
+     "label": "Sterkte"
+    },
+    "radius": {
+     "label": "Straal"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    }
+   }
+  },
+  "shutterblur": {
+   "description": "Vervaagt de laag langs de manier waarop die echt beweegt, draait en groeit, zoals een camerasluiter. Een grotere sluiterhoek geeft langere sporen en meer samples geven vloeiendere. Het voorbeeld toont een snellere vervaging, tenzij Volledige onscherpte aan staat.",
+   "name": "Echte bewegingsonscherpte",
+   "params": {
+    "samples": {
+     "label": "Samples"
+    },
+    "shutter": {
+     "label": "Sluiterhoek"
+    }
+   }
+  },
+  "simplestarfield": {
+   "description": "Verstrooit kleine sterren in dieptelagen over de ondoorzichtige delen van de laag. Positie beweegt het veld met parallax, Diepte vliegt erdoorheen, Schaal zoomt in of uit, Grootte en Zachte rand vormen elke ster en Hoeveelheid bepaalt hoeveel het er zijn.",
+   "name": "Eenvoudig sterrenveld",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "amount": {
+     "label": "Hoeveelheid"
+    },
+    "blend": {
+     "label": "Overvloeimodus",
+     "options": [
+      "Normaal",
+      "Optellen",
+      "Bleken",
+      "Vermenigvuldigen"
+     ]
+    },
+    "brightness": {
+     "label": "Helderheid"
+    },
+    "color": {
+     "label": "Kleur"
+    },
+    "depth": {
+     "label": "Diepte"
+    },
+    "feather": {
+     "label": "Zachte rand"
+    },
+    "position": {
+     "label": "Positie"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "starSize": {
+     "label": "Grootte"
+    }
+   }
+  },
+  "smear": {
+   "description": "Smeert de laag over een vaste lengte in één richting uit, alsof hij snel bewoog.",
+   "name": "Uitsmeren",
+   "params": {
+    "angle": {
+     "label": "Richting"
+    },
+    "length": {
+     "label": "Lengte"
+    }
+   }
+  },
+  "smoothbevel": {
+   "description": "Geeft de ondoorzichtige delen van de laag een gladde, afgeronde schuine kant die van één kant wordt belicht.",
+   "name": "Gladde schuine kant",
+   "params": {
+    "angle": {
+     "label": "Lichthoek"
+    },
+    "angle_d": {
+     "label": "Diffuse hoek"
+    },
+    "angle_s": {
+     "label": "Spiegelende hoek"
+    },
+    "blur": {
+     "label": "Grootte"
+    },
+    "color_d": {
+     "label": "Diffuse kleur"
+    },
+    "color_s": {
+     "label": "Spiegelende kleur"
+    },
+    "depth": {
+     "label": "Diepte"
+    },
+    "elevation_d": {
+     "label": "Diffuse elevatie"
+    },
+    "elevation_s": {
+     "label": "Spiegelende elevatie"
+    },
+    "highlight": {
+     "label": "Hooglicht"
+    },
+    "intensity": {
+     "label": "Intensiteit"
+    },
+    "intensity_d": {
+     "label": "Diffuse intensiteit"
+    },
+    "intensity_s": {
+     "label": "Spiegelende intensiteit"
+    },
+    "shadow": {
+     "label": "Schaduw"
+    },
+    "spec": {
+     "label": "Spiegelcoëfficiënt"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    }
+   }
+  },
+  "smoothedges": {
+   "description": "Rondt de randen van de ondoorzichtige delen van de laag af en maakt ze glad, zonder de kleuren binnenin te veranderen. Maskeren op laag laat de randen alleen naar binnen bewegen.",
+   "name": "Gladde randen",
+   "params": {
+    "blur": {
+     "label": "Sterkte"
+    },
+    "mask": {
+     "label": "Maskeren op laag"
+    }
+   }
+  },
+  "softglow": {
+   "description": "Legt een zachte, vervaagde kopie van het beeld erover in de modus Bleken voor een dromerige gloed, vooral vanuit de hooglichten.",
+   "name": "Zachte gloed",
+   "params": {
+    "blend": {
+     "label": "Mengen"
+    },
+    "blur": {
+     "label": "Grootte"
+    },
+    "brightness": {
+     "label": "Helderheid"
+    },
+    "color": {
+     "label": "Kleur"
+    },
+    "contrast": {
+     "label": "Contrast"
+    },
+    "falloff": {
+     "label": "Afname",
+     "options": [
+      "Gelijkmatig",
+      "Laag"
+     ]
+    },
+    "highlights": {
+     "label": "Hooglichten"
+    },
+    "opacity": {
+     "label": "Dekking"
+    },
+    "outside": {
+     "label": "Gloed buiten"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    }
+   }
+  },
+  "solid": {
+   "description": "Legt één kleur over de laag met behoud van de vorm, met een keuze uit overvloeimodi.",
+   "name": "Effen kleur",
+   "params": {
+    "amount": {
+     "label": "Alfa"
+    },
+    "blend": {
+     "label": "Overvloeimodus",
+     "options": [
+      "Normaal",
+      "Vermenigvuldigen",
+      "Bleken",
+      "Bedekken",
+      "Zacht licht",
+      "Fel licht",
+      "Optellen",
+      "Donkerder",
+      "Lichter",
+      "Verschil",
+      "Kleur tegenhouden",
+      "Kleur doordrukken"
+     ]
+    },
+    "color": {
+     "label": "Kleur"
+    }
+   }
+  },
+  "solidmatte": {
+   "description": "Zet een effen kleur achter de laag en vult zo de transparante delen. Uitsparen toont alleen de kleur met de vorm van de laag eruit gesneden, en Schermruimte vult het hele scherm in plaats van het kader van de laag.",
+   "name": "Effen matte",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "color": {
+     "label": "Kleur"
+    },
+    "punch": {
+     "label": "Uitsparen"
+    },
+    "screenSpace": {
+     "label": "Schermruimte"
+    }
+   }
+  },
+  "spherize": {
+   "description": "Wikkelt de laag om een bol met een frontale projectie of een equirectangulaire textuur.",
+   "name": "Bolvorm",
+   "params": {
+    "ambient": {
+     "label": "Omgevingslicht"
+    },
+    "coverage": {
+     "label": "Bedekking"
+    },
+    "glossiness": {
+     "label": "Glansgraad"
+    },
+    "light": {
+     "label": "Lichthoek"
+    },
+    "lightColor": {
+     "label": "Lichtkleur"
+    },
+    "lightHeight": {
+     "label": "Lichthoogte"
+    },
+    "lighting": {
+     "label": "Verlichting",
+     "options": [
+      "Klassiek",
+      "Zacht",
+      "Direct"
+     ]
+    },
+    "perspective": {
+     "label": "Perspectief"
+    },
+    "position": {
+     "label": "Positie"
+    },
+    "projection": {
+     "label": "Projectie",
+     "options": [
+      "Frontaal",
+      "Equirectangulair"
+     ]
+    },
+    "radius": {
+     "label": "Straal"
+    },
+    "rotX": {
+     "label": "Rotatie X"
+    },
+    "rotY": {
+     "label": "Rotatie Y"
+    },
+    "rotZ": {
+     "label": "Rotatie Z"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "shading": {
+     "label": "Schaduwwerking"
+    },
+    "shine": {
+     "label": "Glans"
+    },
+    "texAnchor": {
+     "label": "Textuuranker",
+     "options": [
+      "Midden",
+      "Hoek"
+     ]
+    },
+    "texAngle": {
+     "label": "Textuurhoek"
+    },
+    "texCrop": {
+     "label": "Textuur uitsnijden"
+    },
+    "texMirror": {
+     "label": "Spiegelen"
+    },
+    "texMode": {
+     "label": "Textuur",
+     "options": [
+      "Passend",
+      "Tegels",
+      "Uitrekken"
+     ]
+    },
+    "texOffset": {
+     "label": "Textuurverschuiving"
+    },
+    "texRepeatX": {
+     "label": "Herhaling X"
+    },
+    "texRepeatY": {
+     "label": "Herhaling Y"
+    }
+   }
+  },
+  "spillclean": {
+   "description": "Verwijdert de groene of blauwe gloed die een gekeyde achtergrond bij de randen van de laag achterlaat, met behoud van de helderheid van de pixels.",
+   "name": "Key-spill verwijderen",
+   "params": {
+    "blur": {
+     "label": "Randbreedte"
+    },
+    "channel": {
+     "label": "Spillkleur",
+     "options": [
+      "Automatisch",
+      "Groen",
+      "Blauw"
+     ]
+    },
+    "strength": {
+     "label": "Sterkte"
+    }
+   }
+  },
+  "spin": {
+   "description": "Draait de laag met een constante snelheid rond; onder nul draait hij de andere kant op.",
+   "name": "Draaien",
+   "params": {
+    "rpm": {
+     "label": "RPM"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    }
+   }
+  },
+  "spinblur": {
+   "description": "Vervaagt de laag in cirkels rond een punt, alsof hij ronddraait.",
+   "name": "Draaivervaging",
+   "params": {
+    "center": {
+     "label": "Midden"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    },
+    "sweep": {
+     "label": "Hoek"
+    }
+   }
+  },
+  "spinstreaks": {
+   "description": "Maakt boogvormige strepen door kopieën van de laag rond een punt te draaien en te mengen waar ze overlappen. R, G, B en A kiezen per kanaal of de kopieën de laagste, hoogste of gemiddelde waarde houden, of dat kanaal ongemoeid laten.",
+   "name": "Draaistrepen",
+   "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Min",
+      "Max",
+      "Gem.",
+      "Uit"
+     ]
+    },
+    "alpha": {
+     "label": "Alfa"
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "Min",
+      "Max",
+      "Gem.",
+      "Uit"
+     ]
+    },
+    "bias": {
+     "label": "Bias"
+    },
+    "center": {
+     "label": "Midden"
+    },
+    "g": {
+     "label": "G",
+     "options": [
+      "Min",
+      "Max",
+      "Gem.",
+      "Uit"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "Min",
+      "Max",
+      "Gem.",
+      "Uit"
+     ]
+    },
+    "sweep": {
+     "label": "Boog"
+    }
+   }
+  },
+  "splittone": {
+   "description": "Kleurt de schaduwen naar de ene kleurtoon en de hooglichten naar een andere, met behoud van zwart, wit en helderheid. Schaduwniveau buigt de helderheidscurve en Hooglichtniveau verschuift waar de hooglichtkleur begint. De stijl Verloopkaart geeft elke pixel een kleur op basis van alleen de helderheid.",
+   "name": "Gesplitste tinten",
+   "params": {
+    "highlightAmount": {
+     "label": "Hoeveelheid hooglicht"
+    },
+    "highlightHue": {
+     "label": "Kleurtoon hooglichten"
+    },
+    "highlightLevel": {
+     "label": "Hooglichtniveau"
+    },
+    "shadowAmount": {
+     "label": "Hoeveelheid schaduw"
+    },
+    "shadowHue": {
+     "label": "Kleurtoon schaduwen"
+    },
+    "shadowLevel": {
+     "label": "Schaduwniveau"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Tint",
+      "Verloopkaart"
+     ]
+    }
+   }
+  },
+  "spotcolor": {
+   "description": "Behoudt één kleur en haalt de verzadiging uit alle andere kleuren in de laag.",
+   "name": "Kleuraccent",
+   "params": {
+    "choke": {
+     "label": "Inkrimpen"
+    },
+    "color": {
+     "label": "Kleur"
+    },
+    "feather": {
+     "label": "Zachte rand"
+    },
+    "grey": {
+     "label": "Grijs",
+     "options": [
+      "HD",
+      "SD"
+     ]
+    },
+    "saturation": {
+     "label": "Verzadiging"
+    },
+    "threshold": {
+     "label": "Drempel"
+    }
+   }
+  },
+  "squeeze": {
+   "description": "Knijpt het midden van de laag naar binnen bij positieve Sterkte en laat het naar buiten bollen bij negatieve Sterkte. Oud behoudt de vorm van oudere projecten. Zandloper duwt ook de boven- en onderrand in het midden naar buiten.",
+   "name": "Samendrukken",
+   "params": {
+    "amount": {
+     "label": "Sterkte"
+    },
+    "shape": {
+     "label": "Vorm",
+     "options": [
+      "Knijpen/opbollen",
+      "Oud",
+      "Zandloper"
+     ]
+    }
+   }
+  },
+  "star": {
+   "description": "Tekent één gloeiende ster op de laag.",
+   "name": "Ster",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blend": {
+     "label": "Overvloeimodus",
+     "options": [
+      "Normaal",
+      "Vermenigvuldigen",
+      "Bleken",
+      "Bedekken",
+      "Zacht licht",
+      "Fel licht",
+      "Optellen",
+      "Donkerder",
+      "Lichter",
+      "Verschil",
+      "Kleur tegenhouden",
+      "Kleur doordrukken"
+     ]
+    },
+    "brightness": {
+     "label": "Helderheid"
+    },
+    "color": {
+     "label": "Kleur"
+    },
+    "points": {
+     "label": "Punten"
+    },
+    "position": {
+     "label": "Positie"
+    },
+    "radius": {
+     "label": "Straal"
+    },
+    "shine": {
+     "label": "Glans"
+    }
+   }
+  },
+  "starfield": {
+   "description": "Vult de ondoorzichtige delen van de laag met een diep sterrenveld. Verschuiving beweegt door het veld, waarbij nabije sterren verder bewegen dan verre sterren.",
+   "name": "Sterrenveld",
+   "params": {
+    "brightness": {
+     "label": "Helderheid"
+    },
+    "darkMatter": {
+     "label": "Donkere materie"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "scale": {
+     "label": "Schaal"
+    }
+   }
+  },
+  "starpolyhedron": {
+   "description": "Plaatst de laag op een ster van twee gekruiste piramides.",
+   "name": "Sterveelvlak",
+   "params": {
+    "ambient": {
+     "label": "Omgevingslicht"
+    },
+    "glossiness": {
+     "label": "Glansgraad"
+    },
+    "light": {
+     "label": "Lichthoek"
+    },
+    "lightColor": {
+     "label": "Lichtkleur"
+    },
+    "lightHeight": {
+     "label": "Lichthoogte"
+    },
+    "lighting": {
+     "label": "Verlichting",
+     "options": [
+      "Klassiek",
+      "Zacht",
+      "Direct"
+     ]
+    },
+    "perspective": {
+     "label": "Perspectief"
+    },
+    "position": {
+     "label": "Positie"
+    },
+    "radius": {
+     "label": "Straal"
+    },
+    "rotX": {
+     "label": "Rotatie X"
+    },
+    "rotY": {
+     "label": "Rotatie Y"
+    },
+    "rotZ": {
+     "label": "Rotatie Z"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "shading": {
+     "label": "Schaduwwerking"
+    },
+    "shine": {
+     "label": "Glans"
+    },
+    "texAnchor": {
+     "label": "Textuuranker",
+     "options": [
+      "Midden",
+      "Hoek"
+     ]
+    },
+    "texAngle": {
+     "label": "Textuurhoek"
+    },
+    "texCrop": {
+     "label": "Textuur uitsnijden"
+    },
+    "texMirror": {
+     "label": "Spiegelen"
+    },
+    "texMode": {
+     "label": "Textuur",
+     "options": [
+      "Passend",
+      "Tegels",
+      "Uitrekken"
+     ]
+    },
+    "texOffset": {
+     "label": "Textuurverschuiving"
+    },
+    "texRepeatX": {
+     "label": "Herhaling X"
+    },
+    "texRepeatY": {
+     "label": "Herhaling Y"
+    }
+   }
+  },
+  "starprism": {
+   "description": "Snijdt de laag uit tot een ster en geeft die diepte.",
+   "name": "Sterprisma",
+   "params": {
+    "ambient": {
+     "label": "Omgevingslicht"
+    },
+    "depth": {
+     "label": "Diepte"
+    },
+    "glossiness": {
+     "label": "Glansgraad"
+    },
+    "inner": {
+     "label": "Binnenstraal"
+    },
+    "light": {
+     "label": "Lichthoek"
+    },
+    "lightColor": {
+     "label": "Lichtkleur"
+    },
+    "lightHeight": {
+     "label": "Lichthoogte"
+    },
+    "lighting": {
+     "label": "Verlichting",
+     "options": [
+      "Klassiek",
+      "Zacht",
+      "Direct"
+     ]
+    },
+    "perspective": {
+     "label": "Perspectief"
+    },
+    "points": {
+     "label": "Punten"
+    },
+    "position": {
+     "label": "Positie"
+    },
+    "radius": {
+     "label": "Straal"
+    },
+    "rotX": {
+     "label": "Rotatie X"
+    },
+    "rotY": {
+     "label": "Rotatie Y"
+    },
+    "rotZ": {
+     "label": "Rotatie Z"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "shading": {
+     "label": "Schaduwwerking"
+    },
+    "shine": {
+     "label": "Glans"
+    },
+    "smoothing": {
+     "label": "Afronding"
+    },
+    "starStyle": {
+     "label": "Stijl",
+     "options": [
+      "Plat",
+      "Puntig"
+     ]
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    },
+    "texAnchor": {
+     "label": "Textuuranker",
+     "options": [
+      "Midden",
+      "Hoek"
+     ]
+    },
+    "texAngle": {
+     "label": "Textuurhoek"
+    },
+    "texCrop": {
+     "label": "Textuur uitsnijden"
+    },
+    "texMirror": {
+     "label": "Spiegelen"
+    },
+    "texMode": {
+     "label": "Textuur",
+     "options": [
+      "Passend",
+      "Tegels",
+      "Uitrekken"
+     ]
+    },
+    "texOffset": {
+     "label": "Textuurverschuiving"
+    },
+    "texRepeatX": {
+     "label": "Herhaling X"
+    },
+    "texRepeatY": {
+     "label": "Herhaling Y"
+    }
+   }
+  },
+  "static": {
+   "description": "Flikkerende grijze ruis, zoals een tv zonder signaal.",
+   "name": "Statische ruis",
+   "params": {
+    "amount": {
+     "label": "Hoeveelheid"
+    },
+    "grain": {
+     "label": "Grootte"
+    }
+   }
+  },
+  "stretch": {
+   "description": "Snijdt de laag langs een lijn en trekt de twee helften uit elkaar, waarbij de pixels op de lijn de opening opvullen.",
+   "name": "Segment uitrekken",
+   "params": {
+    "angle": {
+     "label": "Hoek"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "relative": {
+     "label": "Meten in laaggrootte"
+    },
+    "spread": {
+     "label": "Spreiding"
+    },
+    "stretch": {
+     "label": "Uitrekken"
+    }
+   }
+  },
+  "stretchaxis": {
+   "description": "Rekt de laag in elke gewenste richting uit.",
+   "name": "Uitrekken langs as",
+   "params": {
+    "angle": {
+     "label": "Hoek"
+    },
+    "mask": {
+     "label": "Maskeren op laag"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    }
+   }
+  },
+  "stripes": {
+   "description": "Tekent een strepenpatroon over de ondoorzichtige delen van de laag, of spaart de strepen eruit uit.",
+   "name": "Strepen",
+   "params": {
+    "angle": {
+     "label": "Hoek"
+    },
+    "color": {
+     "label": "Kleur"
+    },
+    "count": {
+     "label": "Aantal"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "punch": {
+     "label": "Uitsparen"
+    },
+    "screenSpace": {
+     "label": "Schermruimte"
+    },
+    "smoothing": {
+     "label": "Afvlakking"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    },
+    "width": {
+     "label": "Breedte"
+    }
+   }
+  },
+  "stroketaper": {
+   "description": "Laat lijnen taps toelopen tot een punt: de pen- en penseelstreken van een vrije tekening, en de Lijn van lijnen en vormen (Rand en schaduw > Lijn). Van niets tot Begin, en van Einde tot niets. Samendrukken maakt de punt scherper.",
+   "name": "Taps toelopende lijn",
+   "params": {
+    "end": {
+     "label": "Einde"
+    },
+    "squeeze": {
+     "label": "Samendrukken"
+    },
+    "start": {
+     "label": "Begin"
+    }
+   }
+  },
+  "swing": {
+   "description": "Draait de laag heen en weer tussen twee hoeken.",
+   "name": "Schommelen",
+   "params": {
+    "angle1": {
+     "label": "Hoek 1"
+    },
+    "angle2": {
+     "label": "Hoek 2"
+    },
+    "freq": {
+     "label": "Frequentie"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    },
+    "wave": {
+     "label": "Golf",
+     "options": [
+      "Sinus",
+      "Driehoek"
+     ]
+    }
+   }
+  },
+  "temperature": {
+   "description": "Maakt het beeld warmer of koeler, zoals licht met een kleurtemperatuur in kelvin; bij 6500 K blijft het ongewijzigd.",
+   "name": "Kleurtemperatuur",
+   "params": {
+    "kelvin": {
+     "label": "Temperatuur"
+    },
+    "strength": {
+     "label": "Sterkte"
+    }
+   }
+  },
+  "textblips": {
+   "description": "Typt de tekst letter voor letter uit met een korte blip per letter, zoals een personage dat praat in een game. Kies een Stem en stel dan de Toonhoogte in, hoe snel de letters verschijnen en hoe lang er na leestekens wordt gepauzeerd. Spaties en leestekens blijven stil.",
+   "name": "Tekstblips",
+   "params": {
+    "delay": {
+     "label": "Vertraging"
+    },
+    "every": {
+     "label": "Blip elke"
+    },
+    "pause": {
+     "label": "Pauze bij leestekens"
+    },
+    "pitch": {
+     "label": "Toonhoogte"
+    },
+    "reveal": {
+     "label": "Uittypen"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "speed": {
+     "label": "Snelheid"
+    },
+    "variation": {
+     "label": "Toonvariatie"
+    },
+    "voice": {
+     "label": "Stem",
+     "options": [
+      "Klassiek",
+      "Zacht",
+      "Diep",
+      "Hoog",
+      "Robot",
+      "Piep",
+      "Typemachine",
+      "Chiptune",
+      "Skelet",
+      "Eigen geluid"
+     ]
+    },
+    "volume": {
+     "label": "Volume"
+    }
+   },
+   "presets": {
+    "fast-talker": "Snelle prater",
+    "hero": "Held",
+    "monster": "Monster",
+    "robot": "Robot",
+    "typewriter": "Typemachine"
+   }
+  },
+  "textpath": {
+   "description": "Zet de tekst letter voor letter langs een boog, een cirkel of de omtrek van de laag direct eronder, met behoud van vormgeving, lettertypen en emoji van de tekst.",
+   "name": "Tekst langs pad",
+   "params": {
+    "align": {
+     "label": "Uitlijning",
+     "options": [
+      "Links",
+      "Midden",
+      "Rechts"
+     ]
+    },
+    "baseline": {
+     "label": "Basislijnverschuiving"
+    },
+    "center": {
+     "label": "Midden"
+    },
+    "control1": {
+     "label": "Controlepunt 1"
+    },
+    "control2": {
+     "label": "Controlepunt 2"
+    },
+    "end": {
+     "label": "Einde"
+    },
+    "position": {
+     "label": "Positie"
+    },
+    "radius": {
+     "label": "Straal"
+    },
+    "reverse": {
+     "label": "Pad omkeren"
+    },
+    "rotate": {
+     "label": "Letters draaien"
+    },
+    "shape": {
+     "label": "Pad",
+     "options": [
+      "Boog",
+      "Cirkel",
+      "Laag eronder"
+     ]
+    },
+    "start": {
+     "label": "Begin"
+    }
+   }
+  },
+  "textprogress": {
+   "description": "Toont de tekst tussen Begin en Einde, per teken, woord of regel, met optioneel infaden, schuiven, schalen of vervagen.",
+   "name": "Tekstvoortgang",
+   "params": {
+    "appearance": {
+     "label": "Verschijnen als",
+     "options": [
+      "Ploppen",
+      "Infaden",
+      "Omhoog schuiven",
+      "Omlaag schuiven",
+      "Naar links schuiven",
+      "Naar rechts schuiven",
+      "Groeien",
+      "Krimpen",
+      "Vervaging"
+     ]
+    },
+    "direction": {
+     "label": "Richting",
+     "options": [
+      "Vanaf begin",
+      "Vanaf einde",
+      "Vanuit midden",
+      "Willekeurig"
+     ]
+    },
+    "distance": {
+     "label": "Afstand"
+    },
+    "progress": {
+     "label": "Einde"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "softness": {
+     "label": "Zachtheid"
+    },
+    "start": {
+     "label": "Begin"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    },
+    "unit": {
+     "label": "Op basis van",
+     "options": [
+      "Teken",
+      "Woord",
+      "Regel"
+     ]
+    }
+   },
+   "presets": {
+    "fade-in-by-word": "Per woord infaden",
+    "pop-in": "Inploppen",
+    "slide-up-by-letter": "Per letter omhoog",
+    "typewriter": "Typemachine"
+   }
+  },
+  "textrandomizer": {
+   "description": "Vervangt willekeurig een Hoeveelheid van de tekens tussen Begin en Einde. Animeer Evolutie of verhoog Snelheid om de vervangingen te laten wisselen; Onthullen zet ze terug naar de originele tekst.",
+   "name": "Willekeurige tekst",
+   "params": {
+    "amount": {
+     "label": "Hoeveelheid"
+    },
+    "characters": {
+     "label": "Eigen tekens"
+    },
+    "charset": {
+     "label": "Tekens",
+     "options": [
+      "Letters",
+      "Hoofdletters",
+      "Kleine letters",
+      "Cijfers",
+      "Letters en cijfers",
+      "Symbolen",
+      "Aangepast"
+     ]
+    },
+    "direction": {
+     "label": "Richting",
+     "options": [
+      "Vanaf begin",
+      "Vanaf einde",
+      "Vanuit midden",
+      "Willekeurig"
+     ]
+    },
+    "end": {
+     "label": "Einde"
+    },
+    "evolution": {
+     "label": "Evolutie"
+    },
+    "keepSpaces": {
+     "label": "Spaties behouden"
+    },
+    "progress": {
+     "label": "Onthullen"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "speed": {
+     "label": "Snelheid"
+    },
+    "start": {
+     "label": "Begin"
+    }
+   },
+   "presets": {
+    "scramble": "Husselen"
+   }
+  },
+  "textshake": {
+   "description": "Schudt elke letter afzonderlijk, zoals nerveuze dialoog in een game. Schudden drijft tussen plekken, Jitter springt bij elke stap naar een nieuwe plek, Golf laat de letters op en neer deinen, Cirkel beweegt ze in kleine rondjes en Wiebelen kantelt ze heen en weer. Verlaag Schuddende letters om maar een deel van de letters te laten schudden, om de paar momenten opnieuw willekeurig gekozen.",
+   "name": "Tekst schudden",
+   "params": {
+    "amount": {
+     "label": "Hoeveelheid"
+    },
+    "cycles": {
+     "label": "Snelheid"
+    },
+    "end": {
+     "label": "Einde"
+    },
+    "every": {
+     "label": "Nieuwe letters elke"
+    },
+    "letters": {
+     "label": "Schuddende letters"
+    },
+    "rotation": {
+     "label": "Rotatie"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "speed": {
+     "label": "Snelheid"
+    },
+    "spread": {
+     "label": "Spreiding"
+    },
+    "start": {
+     "label": "Begin"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Schudden",
+      "Jitter",
+      "Golf",
+      "Cirkel",
+      "Wiebelen"
+     ]
+    },
+    "tilt": {
+     "label": "Kanteling"
+    },
+    "unit": {
+     "label": "Op basis van",
+     "options": [
+      "Teken",
+      "Woord",
+      "Regel"
+     ]
+    }
+   },
+   "presets": {
+    "dizzy": "Duizelig",
+    "floaty": "Zwevend",
+    "nervous": "Nerveus",
+    "scared": "Bang",
+    "uneasy": "Onrustig",
+    "wavy": "Golvend",
+    "wobbly": "Wiebelig"
+   }
+  },
+  "texttransform": {
+   "description": "Verplaatst, schaalt, draait en kleurt letters, woorden of regels binnen een bereik en past hun dekking aan. Anker bepaalt of schalen en draaien elk onderdeel of het midden van de laag gebruiken. Verplaats het bereik met Verschuiving om de verandering door de tekst te laten lopen.",
+   "name": "Tekst transformeren",
+   "params": {
+    "anchor": {
+     "label": "Anker",
+     "options": [
+      "Onderdeel",
+      "Laag"
+     ]
+    },
+    "easeIn": {
+     "label": "Ease-in"
+    },
+    "easeOut": {
+     "label": "Ease-out"
+    },
+    "end": {
+     "label": "Einde"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "opacity": {
+     "label": "Dekking"
+    },
+    "overlap": {
+     "label": "Overlap"
+    },
+    "position": {
+     "label": "Positie"
+    },
+    "randomOrder": {
+     "label": "Willekeurige volgorde"
+    },
+    "rotation": {
+     "label": "Rotatie"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "shape": {
+     "label": "Vorm",
+     "options": [
+      "Vierkant",
+      "Oplopend",
+      "Aflopend",
+      "Driehoek",
+      "Rond",
+      "Vloeiend"
+     ]
+    },
+    "smoothness": {
+     "label": "Vloeiendheid"
+    },
+    "start": {
+     "label": "Begin"
+    },
+    "stretch": {
+     "label": "Uitrekken"
+    },
+    "tint": {
+     "label": "Tint"
+    },
+    "unit": {
+     "label": "Op basis van",
+     "options": [
+      "Teken",
+      "Woord",
+      "Regel",
+      "Contour"
+     ]
+    },
+    "version": {
+     "label": "Bereik",
+     "options": [
+      "Oud",
+      "Standaard"
+     ]
+    }
+   },
+   "presets": {
+    "spin-cascade": "Draaicascade",
+    "wave": "Golf"
+   }
+  },
+  "threshold": {
+   "description": "Puur zwart-wit, gesplitst bij een bepaalde helderheid.",
+   "name": "Drempel",
+   "params": {
+    "blend": {
+     "label": "Overvloeimodus",
+     "options": [
+      "Normaal",
+      "Vermenigvuldigen",
+      "Bleken",
+      "Bedekken",
+      "Zacht licht",
+      "Fel licht",
+      "Optellen",
+      "Donkerder",
+      "Lichter",
+      "Verschil",
+      "Kleur tegenhouden",
+      "Kleur doordrukken"
+     ]
+    },
+    "invert": {
+     "label": "Omkeren"
+    },
+    "level": {
+     "label": "Drempel"
+    },
+    "softness": {
+     "label": "Zachte rand"
+    }
+   }
+  },
+  "tile": {
+   "description": "Herhaalt het beeld in een raster.",
+   "name": "Tegel",
+   "params": {
+    "mirror": {
+     "label": "Spiegelen"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "scale": {
+     "label": "Schaal"
+    }
+   }
+  },
+  "tilerotate": {
+   "description": "Verdeelt de laag in een raster van tegels en draait het beeld in elke tegel afzonderlijk.",
+   "name": "Tegels draaien",
+   "params": {
+    "angle": {
+     "label": "Hoek"
+    },
+    "count": {
+     "label": "Aantal"
+    },
+    "edges": {
+     "label": "Randen",
+     "options": [
+      "Spiegelen",
+      "Transparant"
+     ]
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "random": {
+     "label": "Willekeurig"
+    },
+    "rotation": {
+     "label": "Rotatie"
+    },
+    "screenSpace": {
+     "label": "Schermruimte"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "stretch": {
+     "label": "Uitrekken"
+    }
+   }
+  },
+  "tiles": {
+   "description": "Herhaalt de laag om het scherm te vullen. Verhoog Uitsnijden voor kleinere tegels, met optioneel spiegelen, rijverschuiving en rotatie. Oude schaal behoudt oudere projecten. Binnen tegels houdt elke tegel zo groot als de laag en zoomt en draait het beeld daarbinnen.",
+   "name": "Tegels",
+   "params": {
+    "angle": {
+     "label": "Hoek"
+    },
+    "mirror": {
+     "label": "Spiegelen"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "sizing": {
+     "label": "Formaat",
+     "options": [
+      "Uitsnijden",
+      "Oude schaal",
+      "Binnen tegels"
+     ]
+    },
+    "vertical": {
+     "label": "Verticaal verschuiven"
+    },
+    "zoom": {
+     "label": "Uitsnijden"
+    }
+   }
+  },
+  "tileshift": {
+   "description": "Verdeelt de laag in een raster van tegels en schuift het beeld in elke tegel in een willekeurige richting.",
+   "name": "Tegels verschuiven",
+   "params": {
+    "angle": {
+     "label": "Hoek"
+    },
+    "count": {
+     "label": "Aantal"
+    },
+    "edges": {
+     "label": "Randen",
+     "options": [
+      "Spiegelen",
+      "Transparant"
+     ]
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "screenSpace": {
+     "label": "Schermruimte"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "strength": {
+     "label": "Sterkte"
+    },
+    "stretch": {
+     "label": "Uitrekken"
+    }
+   }
+  },
+  "timecode": {
+   "description": "Vervangt de tekst van een laag door een lopende klok met de laag- of projecttijd. Starten bij en een negatieve Snelheid maken er een aftelling van.",
+   "name": "Tijdcode",
+   "params": {
+    "format": {
+     "label": "Notatie",
+     "options": [
+      "HH:MM:SS:FF",
+      "HH:MM:SS",
+      "MM:SS",
+      "MM:SS.hh",
+      "SS.hh",
+      "Frames",
+      "MM:SS:FF"
+     ]
+    },
+    "offset": {
+     "label": "Starten bij"
+    },
+    "source": {
+     "label": "Tijd",
+     "options": [
+      "Laag",
+      "Project"
+     ]
+    },
+    "speed": {
+     "label": "Snelheid"
+    }
+   }
+  },
+  "timequant": {
+   "description": "Laat deze laag bewegen met een lagere framesnelheid, zoals schokkerige of stop-motionbeelden.",
+   "name": "Framesnelheid",
+   "params": {
+    "fps": {
+     "label": "Frames/s"
+    }
+   }
+  },
+  "tint": {
+   "description": "Zet de luminantie van het beeld om tussen een schaduwkleur en een hooglichtkleur, met een instelbare hoeveelheid.",
+   "name": "Tint",
+   "params": {
+    "amount": {
+     "label": "Hoeveelheid"
+    },
+    "highlightColor": {
+     "label": "Hooglichtkleur"
+    },
+    "shadowColor": {
+     "label": "Schaduwkleur"
+    }
+   }
+  },
+  "torus": {
+   "description": "Wikkelt de laag om een ring.",
+   "name": "Torus",
+   "params": {
+    "ambient": {
+     "label": "Omgevingslicht"
+    },
+    "glossiness": {
+     "label": "Glansgraad"
+    },
+    "light": {
+     "label": "Lichthoek"
+    },
+    "lightColor": {
+     "label": "Lichtkleur"
+    },
+    "lightHeight": {
+     "label": "Lichthoogte"
+    },
+    "lighting": {
+     "label": "Verlichting",
+     "options": [
+      "Klassiek",
+      "Zacht",
+      "Direct"
+     ]
+    },
+    "perspective": {
+     "label": "Perspectief"
+    },
+    "position": {
+     "label": "Positie"
+    },
+    "radius": {
+     "label": "Straal"
+    },
+    "rotX": {
+     "label": "Rotatie X"
+    },
+    "rotY": {
+     "label": "Rotatie Y"
+    },
+    "rotZ": {
+     "label": "Rotatie Z"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "shading": {
+     "label": "Schaduwwerking"
+    },
+    "shine": {
+     "label": "Glans"
+    },
+    "texAnchor": {
+     "label": "Textuuranker",
+     "options": [
+      "Midden",
+      "Hoek"
+     ]
+    },
+    "texAngle": {
+     "label": "Textuurhoek"
+    },
+    "texCrop": {
+     "label": "Textuur uitsnijden"
+    },
+    "texMirror": {
+     "label": "Spiegelen"
+    },
+    "texMode": {
+     "label": "Textuur",
+     "options": [
+      "Passend",
+      "Tegels",
+      "Uitrekken"
+     ]
+    },
+    "texOffset": {
+     "label": "Textuurverschuiving"
+    },
+    "texRepeatX": {
+     "label": "Herhaling X"
+    },
+    "texRepeatY": {
+     "label": "Herhaling Y"
+    },
+    "thickness": {
+     "label": "Dikte"
+    }
+   }
+  },
+  "tunnel": {
+   "description": "Bekleedt een eindeloze tunnel met de laag en vliegt erdoorheen. Fase verschuift de textuur in de lengte.",
+   "name": "Tunnel",
+   "params": {
+    "fog": {
+     "label": "Mist"
+    },
+    "fogColor": {
+     "label": "Mistkleur"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "position": {
+     "label": "Positie"
+    },
+    "repeat": {
+     "label": "Herhaling"
+    },
+    "rotX": {
+     "label": "Rotatie X"
+    },
+    "rotY": {
+     "label": "Rotatie Y"
+    },
+    "rotZ": {
+     "label": "Rotatie Z"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "speed": {
+     "label": "Snelheid"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    },
+    "twist": {
+     "label": "Draaiing"
+    }
+   }
+  },
+  "turbulence": {
+   "description": "Vult de ondoorzichtige delen van de laag met vloeiende fractale ruis, voor wolken, rook of een helderheidskaart.",
+   "name": "Turbulentie",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "bias": {
+     "label": "Bias"
+    },
+    "blend": {
+     "label": "Overvloeimodus",
+     "options": [
+      "Normaal",
+      "Vermenigvuldigen",
+      "Bleken",
+      "Bedekken",
+      "Zacht licht",
+      "Fel licht",
+      "Optellen",
+      "Donkerder",
+      "Lichter",
+      "Verschil",
+      "Kleur tegenhouden",
+      "Kleur doordrukken"
+     ]
+    },
+    "color1": {
+     "label": "Kleur 1"
+    },
+    "color2": {
+     "label": "Kleur 2"
+    },
+    "evolution": {
+     "label": "Evolutie"
+    },
+    "intensity": {
+     "label": "Intensiteit"
+    },
+    "octaves": {
+     "label": "Octaven"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "parallax": {
+     "label": "Parallax"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "stretch": {
+     "label": "Uitrekken"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    }
+   }
+  },
+  "turbulentdisplace": {
+   "description": "Duwt de laag alle kanten op met vloeiende fractale ruis, voor vuur, water, hittetrillingen of ruwe natuurlijke randen.",
+   "name": "Turbulente verplaatsing",
+   "params": {
+    "bias": {
+     "label": "Bias"
+    },
+    "direction": {
+     "label": "Richting",
+     "options": [
+      "Beide",
+      "Horizontaal",
+      "Verticaal",
+      "Radiaal",
+      "Draaiing"
+     ]
+    },
+    "evolution": {
+     "label": "Evolutie"
+    },
+    "octaves": {
+     "label": "Octaven"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "parallax": {
+     "label": "Parallax"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "screenSpace": {
+     "label": "Schermruimte"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "strength": {
+     "label": "Sterkte"
+    },
+    "stretch": {
+     "label": "Uitrekken"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    }
+   }
+  },
+  "twirl": {
+   "description": "Draait de laag rond Midden als een draaikolk, het sterkst in het midden en uitlopend bij Straal (een deel van de laaggrootte). Negatieve Sterkte draait de andere kant op. Meten op Scherm neemt Straal als deel van het scherm en laat de draaiing vloeiend uitlopen.",
+   "name": "Draaikolk",
+   "params": {
+    "center": {
+     "label": "Midden"
+    },
+    "radius": {
+     "label": "Straal"
+    },
+    "reach": {
+     "label": "Meten op",
+     "options": [
+      "Laag",
+      "Scherm"
+     ]
+    },
+    "strength": {
+     "label": "Sterkte"
+    }
+   }
+  },
+  "unsharpmask": {
+   "description": "Verscherpt door het verschil tussen de laag en een vervaagde kopie ervan weer toe te voegen. Sterkte bepaalt hoe breed de vervaging is, Hoeveelheid hoeveel er wordt toegevoegd, en Drempel boven 50% laat kleine verschillen ongemoeid. Maskerkleur Rood toont het masker in rood waar de helderheid meer dan Drempel boven 50% van de vervaagde kopie afwijkt.",
+   "name": "Onscherp masker",
+   "params": {
+    "amount": {
+     "label": "Hoeveelheid"
+    },
+    "maskColor": {
+     "label": "Maskerkleur",
+     "options": [
+      "Grijs",
+      "Rood"
+     ]
+    },
+    "radius": {
+     "label": "Sterkte"
+    },
+    "showMask": {
+     "label": "Masker tonen"
+    },
+    "threshold": {
+     "label": "Drempel"
+    }
+   }
+  },
+  "vhs": {
+   "description": "Ziet eruit als een oude videoband: kleuruitloop, uitgesmeerde lijnen, scanlijnen, bandruis en rollende trackingbanden.",
+   "name": "VHS",
+   "params": {
+    "chroma": {
+     "label": "Kleuruitloop"
+    },
+    "headSwitch": {
+     "label": "Kopwisseling"
+    },
+    "noise": {
+     "label": "Ruis"
+    },
+    "saturation": {
+     "label": "Verzadiging"
+    },
+    "scanlines": {
+     "label": "Scanlijnen"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "smear": {
+     "label": "Uitsmeren"
+    },
+    "tracking": {
+     "label": "Tracking"
+    },
+    "wobble": {
+     "label": "Wiebelen"
+    }
+   }
+  },
+  "videofeedback": {
+   "description": "Tekent de laag steeds opnieuw in zichzelf, zoals een camera die op zijn eigen scherm is gericht. Met Frame voor frame aan toont elke kopie de laag van één frame eerder, zodat beweging sporen achterlaat die de tunnel in wervelen.",
+   "name": "Videofeedback",
+   "params": {
+    "blend": {
+     "label": "Mengen",
+     "options": [
+      "Normaal",
+      "Optellen",
+      "Bleken"
+     ]
+    },
+    "center": {
+     "label": "Midden"
+    },
+    "copies": {
+     "label": "Kopieën"
+    },
+    "delay": {
+     "label": "Vertraging"
+    },
+    "fade": {
+     "label": "Uitfaden"
+    },
+    "hueShift": {
+     "label": "Kleurtoonverschuiving"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "rotation": {
+     "label": "Rotatie"
+    },
+    "trails": {
+     "label": "Frame voor frame"
+    },
+    "useLayerTransform": {
+     "label": "Laagtransformatie gebruiken"
+    },
+    "zoom": {
+     "label": "Zoom"
+    }
+   }
+  },
+  "viewer360": {
+   "description": "Toont een 360°-panoramalaag via een virtuele camera die je kunt draaien en zoomen.",
+   "name": "360°-viewer",
+   "params": {
+    "eyeDistance": {
+     "label": "Afstand"
+    },
+    "fov": {
+     "label": "Gezichtsveld"
+    },
+    "frame": {
+     "label": "Beeldverhouding"
+    },
+    "pitch": {
+     "label": "Kantelen"
+    },
+    "projection": {
+     "label": "Uitvoer",
+     "options": [
+      "Weergave",
+      "Panorama"
+     ]
+    },
+    "roll": {
+     "label": "Rollen"
+    },
+    "yaw": {
+     "label": "Zwenken"
+    }
+   }
+  },
+  "vignette": {
+   "description": "Maakt de laag donkerder naar de randen toe, buiten een afgeronde vorm: Grootte bepaalt de vorm, Ronding hoe rond die is, Zachte rand hoe zacht de rand is, Sterkte hoe donker het wordt en Tint hoeveel Kleur erin komt. Uitsparen maakt de randen in plaats daarvan transparant.",
+   "name": "Vignet",
+   "params": {
+    "color": {
+     "label": "Kleur"
+    },
+    "extent": {
+     "label": "Grootte"
+    },
+    "feather": {
+     "label": "Zachte rand"
+    },
+    "punch": {
+     "label": "Uitsparen"
+    },
+    "rounding": {
+     "label": "Ronding"
+    },
+    "strength": {
+     "label": "Sterkte"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Afgerond",
+      "Zacht ovaal"
+     ]
+    },
+    "tint": {
+     "label": "Tint"
+    }
+   }
+  },
+  "voronoicells": {
+   "description": "Vult de ondoorzichtige delen van de laag met een patroon van cellen rond willekeurig geplaatste punten.",
+   "name": "Voronoi-cellen",
+   "params": {
+    "color1": {
+     "label": "Kleur 1"
+    },
+    "color2": {
+     "label": "Kleur 2"
+    },
+    "lineColor": {
+     "label": "Lijnkleur"
+    },
+    "lineWidth": {
+     "label": "Lijndikte"
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "seed": {
+     "label": "Seed"
+    }
+   }
+  },
+  "vortexblur": {
+   "description": "Vervaagt de laag in een werveling rond Midden, het sterkst in het midden en uitlopend bij Straal (een deel van het scherm). Kleuraberratie trekt het rode, groene en blauwe kanaal uit elkaar rond Middenkanaal.",
+   "name": "Wervelvervaging",
+   "params": {
+    "aberration": {
+     "label": "Kleuraberratie"
+    },
+    "center": {
+     "label": "Midden"
+    },
+    "centerChannel": {
+     "label": "Middenkanaal",
+     "options": [
+      "Rood",
+      "Groen",
+      "Blauw"
+     ]
+    },
+    "radius": {
+     "label": "Straal"
+    },
+    "strength": {
+     "label": "Sterkte"
+    }
+   }
+  },
+  "warpblur": {
+   "description": "Smeert de laag uit langs vloeiende fractale ruis, zodat elke plek een andere lengte en richting op streept. Richting kiest hoe de strepen lopen, Eén as houdt ze alleen in die richting en Bias duwt alle strepen dezelfde kant op.",
+   "name": "Warpvervaging",
+   "params": {
+    "bias": {
+     "label": "Bias"
+    },
+    "direction": {
+     "label": "Richting",
+     "options": [
+      "Horizontaal",
+      "Verticaal",
+      "Beide",
+      "Radiaal",
+      "Spiraal",
+      "Draaiing"
+     ]
+    },
+    "evolution": {
+     "label": "Evolutie"
+    },
+    "octaves": {
+     "label": "Octaven"
+    },
+    "offset": {
+     "label": "Verschuiving"
+    },
+    "parallax": {
+     "label": "Parallax"
+    },
+    "scale": {
+     "label": "Schaal"
+    },
+    "screenSpace": {
+     "label": "Schermruimte"
+    },
+    "seed": {
+     "label": "Seed"
+    },
+    "singleAxis": {
+     "label": "Eén as"
+    },
+    "strength": {
+     "label": "Sterkte"
+    },
+    "stretch": {
+     "label": "Uitrekken"
+    }
+   }
+  },
+  "wavewarp": {
+   "description": "Buigt de laag met een sinusgolf: Tussenruimte bepaalt hoeveel golven erdoorheen lopen, Uitslag hoe ver ze duwen, Hoek de richting waarin de golven lopen en Vervormingshoek de richting waarin ze duwen. Schermruimte stemt de golven af op het scherm in plaats van op de laag. Kruisuitslag voegt een tweede golf toe, met formaat via Kruisafstand, die langs Vervormingshoek loopt en langs Hoek duwt. Oorsprong Scherm linksonder meet de golven vanaf die hoek van het scherm langs de korte zijde, en Fase schuift ze dan op. Demping laat de golven uitlopen richting Dempingsanker, een plek op de laag van 0 tot 1 langs Hoek; Dempingsafstand rekt de golven bij het anker uit boven 0 en ervan af onder 0.",
+   "name": "Golfvervorming",
+   "params": {
+    "angle": {
+     "label": "Hoek"
+    },
+    "crossMagnitude": {
+     "label": "Kruisuitslag"
+    },
+    "crossSpacing": {
+     "label": "Kruisafstand"
+    },
+    "damping": {
+     "label": "Demping"
+    },
+    "dampingOrigin": {
+     "label": "Dempingsanker"
+    },
+    "dampingSpace": {
+     "label": "Dempingsafstand"
+    },
+    "magnitude": {
+     "label": "Uitslag"
+    },
+    "origin": {
+     "label": "Oorsprong",
+     "options": [
+      "Laaghoek",
+      "Scherm linksonder"
+     ]
+    },
+    "phase": {
+     "label": "Fase"
+    },
+    "screenSpace": {
+     "label": "Schermruimte"
+    },
+    "spacing": {
+     "label": "Tussenruimte"
+    },
+    "speed": {
+     "label": "Snelheid"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    },
+    "warpAngle": {
+     "label": "Vervormingshoek"
+    }
+   }
+  },
+  "wipe": {
+   "description": "Verbergt de laag vanaf twee tegenoverliggende kanten. Animeer Begin of Einde voor een veegovergang.",
+   "name": "Veeg",
+   "params": {
+    "angle": {
+     "label": "Hoek"
+    },
+    "end": {
+     "label": "Einde"
+    },
+    "feather": {
+     "label": "Zachte rand"
+    },
+    "softness": {
+     "label": "Zachtheid"
+    },
+    "start": {
+     "label": "Begin"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    }
+   }
+  },
+  "zoomstreaks": {
+   "description": "Maakt strepen die vanuit een punt wegschieten door kopieën van de laag eromheen te schalen en de helderste pixels te houden. Gemiddeld geeft een zoomvervaging. R, G, B en A kiezen per kanaal of de kopieën de laagste, hoogste of gemiddelde waarde houden, of dat kanaal ongemoeid laten.",
+   "name": "Zoomstrepen",
+   "params": {
+    "a": {
+     "label": "A",
+     "options": [
+      "Min",
+      "Max",
+      "Gem.",
+      "Uit"
+     ]
+    },
+    "alpha": {
+     "label": "Alfa"
+    },
+    "b": {
+     "label": "B",
+     "options": [
+      "Min",
+      "Max",
+      "Gem.",
+      "Uit"
+     ]
+    },
+    "bias": {
+     "label": "Bias"
+    },
+    "center": {
+     "label": "Midden"
+    },
+    "g": {
+     "label": "G",
+     "options": [
+      "Min",
+      "Max",
+      "Gem.",
+      "Uit"
+     ]
+    },
+    "r": {
+     "label": "R",
+     "options": [
+      "Min",
+      "Max",
+      "Gem.",
+      "Uit"
+     ]
+    },
+    "strength": {
+     "label": "Sterkte"
+    }
+   }
+  }
+ }
+}

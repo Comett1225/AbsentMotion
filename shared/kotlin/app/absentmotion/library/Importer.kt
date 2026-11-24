@@ -34,6 +34,9 @@ import app.absentmotion.model.withSiblingRefs
 import org.json.JSONObject
 import java.io.File
 import java.io.IOException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.ensureActive
+import java.io.FilterInputStream
 import java.io.InputStream
 import java.io.Serializable
 import java.util.Locale
@@ -43,6 +46,18 @@ internal fun XmlNode.mapFonts(change: Map<String, String>): XmlNode =
     (this["font"]?.let(change::get)?.let { with("font", it) } ?: this).let { it.copy(children = it.children.map { child -> child.mapFonts(change) }) }
 
 class ImportFailed(val text: UiText) : Exception(text.toString())
+
+internal fun InputStream.stoppableImport(job: Job): InputStream = object : FilterInputStream(this) {
+    override fun read(): Int {
+        job.ensureActive()
+        return super.read()
+    }
+
+    override fun read(b: ByteArray, off: Int, len: Int): Int {
+        job.ensureActive()
+        return super.read(b, off, len)
+    }
+}
 
 fun reportText(value: String): UiText = txt(R.string.library_text_value, value)
 
@@ -363,7 +378,7 @@ class Importer(
             "id", "label", "startTime", "endTime", "fillType", "fillImage", "fillVideo", "inTime", "outTime", "speed", "blending",
             "parent", "hidden", "lock", "clippingMask", "mediaFillMode", "s", "tag", "align", "font", "size", "wrapWidth", "src", "type", "link",
             "presetId", "templatePPId", "points", "color", "stroke", "style", "scaleLinked", "loop", "loopIn", "mixPieces", "threeD",
-            "noiseId", "retimeLength", "pathLayer", "matteFrame", "matteEdge", "genIn", "genOut", "genLoop", "outlineShape", "outlineMark",
+            "noiseId", "retimeLength", "pathLayer", "matteFrame", "matteEdge", "genIn", "genOut", "genLoop", "outlineShape", "outlineMark", "textMetrics",
         )
 
         private fun uniqueLayerIds(root: XmlNode): XmlNode {

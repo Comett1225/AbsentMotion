@@ -2,7 +2,7 @@
  "id": "wavewarp",
  "name": "Wave Warp",
  "category": "distort",
- "description": "Bends the layer with a sine wave: Spacing sets how many waves cross it, Magnitude how far they push, Angle the direction the waves run and Warp Angle the direction they push. Screen Space sizes the waves to the screen instead of the layer. Cross Magnitude adds a second wave, sized by Cross Spacing, that runs along Warp Angle and pushes along Angle. Origin Screen Bottom Left measures the waves from that corner of the screen on its short side, and Phase then slides them along.",
+ "description": "Bends the layer with a sine wave: Spacing sets how many waves cross it, Magnitude how far they push, Angle the direction the waves run and Warp Angle the direction they push. Screen Space sizes the waves to the screen instead of the layer. Cross Magnitude adds a second wave, sized by Cross Spacing, that runs along Warp Angle and pushes along Angle. Origin Screen Bottom Left measures the waves from that corner of the screen on its short side, and Phase then slides them along. Damping fades the waves out toward Damping Anchor, a spot across the layer from 0 to 1 along Angle; Damping Spacing stretches the waves near the anchor above 0 and away from it below 0.",
  "params": [
   {
    "id": "phase",
@@ -20,7 +20,7 @@
    "default": 0,
    "min": -3600,
    "max": 3600,
-   "step": 1
+   "step": 0.1
   },
   {
    "id": "spacing",
@@ -48,6 +48,36 @@
    "min": -3600,
    "max": 3600,
    "step": 1
+  },
+  {
+   "id": "damping",
+   "label": "Damping",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "slider": true
+  },
+  {
+   "id": "dampingSpace",
+   "label": "Damping Spacing",
+   "type": "float",
+   "default": 0,
+   "min": -1,
+   "max": 1,
+   "step": 0.001,
+   "slider": true
+  },
+  {
+   "id": "dampingOrigin",
+   "label": "Damping Anchor",
+   "type": "float",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "slider": true
   },
   {
    "id": "speed",
@@ -91,7 +121,22 @@
     "Layer Corner",
     "Screen Bottom Left"
    ]
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "when": {
+    "style": [
+     1
+    ]
+   }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float4 screen;\nuniform float time;\nuniform float phase;\nuniform float angle;\nuniform float spacing;\nuniform float magnitude;\nuniform float warpAngle;\nuniform float speed;\nuniform float screenSpace;\nuniform float crossSpacing;\nuniform float crossMagnitude;\nuniform float origin;\n\nhalf4 main(float2 coord) {\n    float a = radians(angle);\n    float b = radians(warpAngle);\n    float2 da = float2(cos(a), sin(a));\n    float2 db = float2(cos(b), sin(b));\n    bool corner = origin > 0.5;\n    float2 at = corner ? (coord - float2(screen.x, screen.y + screen.w)) / max(min(screen.z, screen.w), 1.0) : coord / max(screenSpace > 0.5 ? screen.zw : size, float2(1.0));\n    float shift = corner ? phase : 0.0;\n    float t = (corner ? 0.0 : 6.2831853 * phase) + time * speed;\n    float unit = min(screen.z, screen.w) * 0.01;\n    float2 move = magnitude * unit * sin(spacing * (dot(at, da) + shift) + t) * db;\n    move += crossMagnitude * unit * sin(crossSpacing * (dot(at, db) + shift) + t) * da;\n    return image.eval(coord + move);\n}"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float4 screen;\nuniform float time;\nuniform float phase;\nuniform float angle;\nuniform float spacing;\nuniform float magnitude;\nuniform float warpAngle;\nuniform float speed;\nuniform float screenSpace;\nuniform float crossSpacing;\nuniform float crossMagnitude;\nuniform float origin;\nuniform float style;\nuniform float damping;\nuniform float dampingSpace;\nuniform float dampingOrigin;\n\nhalf4 main(float2 coord) {\n    float a = radians(angle);\n    float b = radians(warpAngle);\n    float2 da = float2(cos(a), sin(a));\n    float2 db = float2(cos(b), sin(b));\n    bool corner = origin > 0.5;\n    float2 at = corner ? (coord - float2(screen.x, screen.y + screen.w)) / max(min(screen.z, screen.w), 1.0) : coord / max(screenSpace > 0.5 ? screen.zw : size, float2(1.0));\n    float shift = corner ? phase : 0.0;\n    float t = (corner ? 0.0 : 6.2831853 * phase) + time * speed;\n    float unit = min(screen.z, screen.w) * 0.01;\n    float along = dot(at, da);\n    float off = abs(along - dampingOrigin);\n    float stretch = dampingSpace >= 0.0 ? mix(1.0, off, dampingSpace) : mix(1.0, 1.0 - off, -dampingSpace);\n    float k1 = style > 0.5 ? (spacing > 0.0 ? 1080.0 / spacing : 0.0) : spacing;\n    float k2 = style > 0.5 ? (crossSpacing > 0.0 ? 1080.0 / crossSpacing : 0.0) : crossSpacing;\n    float2 move = magnitude * unit * mix(1.0, off, damping) * sin(k1 * (along * stretch + shift) + t) * db;\n    move += crossMagnitude * unit * sin(k2 * (dot(at, db) + shift) + t) * da;\n    float2 p = coord + move;\n    return image.eval(style > 0.5 ? clamp(p, screen.xy + 0.5, screen.xy + screen.zw - 0.5) : p);\n}"
 }

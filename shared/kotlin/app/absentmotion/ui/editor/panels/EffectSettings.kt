@@ -13,6 +13,27 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.awaitHorizontalTouchSlopOrCancellation
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.horizontalDrag
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
+import androidx.compose.ui.semantics.collapse
+import androidx.compose.ui.semantics.expand
+import androidx.compose.ui.semantics.progressBarRangeInfo
+import androidx.compose.ui.semantics.setProgress
+import androidx.compose.ui.unit.Dp
+import app.absentmotion.ui.editor.effects.EffectIcons
+import kotlinx.coroutines.flow.first
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
@@ -75,7 +96,7 @@ import kotlinx.coroutines.withContext
 
 @Composable
 internal fun EffectSettings(state: EditorState, layer: Layer, instance: XmlNode, definition: EffectDefinition,
-                            active: EffectParam?, select: (EffectParam) -> Unit) {
+                            active: EffectParam?, select: (EffectParam?) -> Unit, scroll: ScrollState? = null) {
     val index = state.effectIndex
     val displayed = app.absentmotion.ui.editor.linkedNumbers(state, layer, definition.params.map { PropRef.effect(index, it.id) })
     val enabled = definition.available
@@ -91,34 +112,126 @@ internal fun EffectSettings(state: EditorState, layer: Layer, instance: XmlNode,
     }
     val mix = definition.key in PieceEffects && (definition.key != "particles" || instance.effectProperty("depth")?.valueAt(layer.t) == "true")
     if (mix && !deskLayout) MixPiecesRow(state, layer, enabled)
-    definition.params.filter { definition.shown(it, instance, layer.t) }.forEach { param ->
-        val raw = displayed[PropRef.effect(index, param.id)]?.take(param.default.split(',').size)?.joinToString(",") ?: instance.effectProperty(param.id)?.valueAt(layer.t) ?: param.missingDefault
-        fun set(text: String, gesture: Boolean = false) {
-            if (state.selectedId != layer.id || state.effectIndex != index || state.selected?.effects?.getOrNull(index)?.get("id") != instance["id"]) return
-            select(param)
-            state.editSelected(if (gesture) "effect-$index-${param.id}" else null) { current ->
-                current.withEffect(index) { it.withEffectProperty(param.id, param.type, text, current.t, current.snap) }
-            }
+    fun raw(param: EffectParam): String =
+        displayed[PropRef.effect(index, param.id)]?.take(param.default.split(',').size)?.joinToString(",") ?: instance.effectProperty(param.id)?.valueAt(layer.t) ?: param.missingDefault
+    fun set(param: EffectParam, text: String, gesture: Boolean = false) {
+        if (state.selectedId != layer.id || state.effectIndex != index || state.selected?.effects?.getOrNull(index)?.get("id") != instance["id"]) return
+        select(param)
+        state.editSelected(if (gesture) "effect-$index-${param.id}" else null) { current ->
+            current.withEffect(index) { it.withEffectProperty(param.id, param.type, text, current.t, current.snap) }
         }
-        when (param.kind) {
-            "switch" -> Row(Modifier.fillMaxWidth().height(38.dp).padding(horizontal = 8.dp).alpha(if (enabled) 1f else 0.35f), verticalAlignment = Alignment.CenterVertically) {
-                Text(param.label, Modifier.weight(1f), color = Am.OnDark, fontSize = 14.sp)
-                PanelSwitch(raw == "true") { if (enabled) set(it.toString()) }
+    }
+    val visible = definition.params.filter { definition.shown(it, instance, layer.t) }
+    val shown = visible.filter { p -> !p.header && (p.section == null || EffectSections.isOpen(definition.key, p.section)) }
+    val cut = rowCut(scroll, "${layer.id}:$index:${definition.id}", shown.count { it.tall })
+    CompositionLocalProvider(LocalRowCut provides cut) {
+        val drawn = mutableSetOf<String>()
+        visible.forEach { param ->
+            val section = param.section
+            if (section == null) {
+                key(param.id) { EffectRow(state, layer, instance, definition, param, raw(param), enabled, active, select, ::set) }
+                return@forEach
             }
-            "color" -> key(layer.id, index, param.id) { EffectColor(state, param, raw, enabled, active == param, { select(param) }, ::set) }
-            "choice" -> if (definition.key == "textblips" && param.id == "voice") BlipVoice(state, param, raw, instance["src"] != null, enabled) { set(it) }
-                else EffectChoice(param, raw, enabled, definition.key) { set(it) }
-            "text" -> if (param.palette) EffectPalette(param, raw, enabled, "${layer.id}:${state.effectIndex}") { set(it) } else EffectText(param, raw, enabled, state::endGesture) { set(it, true) }
-            else -> {
-                val shown = definition.bounded(param, (layer.endTime - layer.startTime) / 1000f) { p ->
-                    (instance.effectProperty(p.id)?.valueAt(layer.t) ?: p.missingDefault).finiteFloat() ?: 0f
+            if (!drawn.add(section)) return@forEach
+            val members = visible.filter { it.section == section }
+            val toggle = members.firstOrNull { it.header }
+            val open = EffectSections.isOpen(definition.key, section)
+            key("section:$section") {
+                SectionBar(toggle?.label ?: sectionTitle(section), open, toggle?.let { raw(it) == "true" }, enabled, { on -> toggle?.let { set(it, on.toString()) } }) {
+                    EffectSections.toggle(definition.key, section)
+                    if (open && active?.section == section) select(null)
                 }
-                val within = if (shown === param) raw else formatFloats(floatArrayOf((raw.finiteFloat() ?: 0f).coerceIn(shown.min, shown.max)))
-                EffectNumbers(state, shown, within, enabled, active == param, { select(param) }, { text, gesture -> set(text, gesture) })
+            }
+            if (open) members.filterNot { it.header }.forEach { member ->
+                key(member.id) { EffectRow(state, layer, instance, definition, member, raw(member), enabled, active, select, ::set) }
             }
         }
     }
     if (mix && deskLayout) MixPiecesRow(state, layer, enabled)
+}
+
+@Composable
+private fun EffectRow(state: EditorState, layer: Layer, instance: XmlNode, definition: EffectDefinition, param: EffectParam, raw: String, enabled: Boolean,
+                      active: EffectParam?, select: (EffectParam?) -> Unit, set: (EffectParam, String, Boolean) -> Unit) {
+    val keyed = instance.effectProperty(param.id)?.isKeyframed == true
+    when (param.kind) {
+        "switch" -> Row(Modifier.fillMaxWidth().height(38.dp).padding(horizontal = 8.dp).alpha(if (enabled) 1f else 0.35f), verticalAlignment = Alignment.CenterVertically) {
+            Text(param.label, Modifier.weight(1f), color = Am.OnDark, fontSize = 14.sp)
+            PanelSwitch(raw == "true") { if (enabled) set(param, it.toString(), false) }
+        }
+        "color" -> key(layer.id, state.effectIndex, param.id) { EffectColor(state, param, raw, enabled, active == param, keyed, { select(param) }) { text, gesture -> set(param, text, gesture) } }
+        "choice" -> if (definition.key == "textblips" && param.id == "voice") BlipVoice(state, param, raw, instance["src"] != null, enabled) { set(param, it, false) }
+            else EffectChoice(param, raw, enabled, definition.key) { set(param, it, false) }
+        "text" -> if (param.palette) EffectPalette(param, raw, enabled, "${layer.id}:${state.effectIndex}") { set(param, it, false) }
+            else EffectText(param, raw, enabled, state::endGesture) { set(param, it, true) }
+        else -> {
+            val bounded = definition.bounded(param, (layer.endTime - layer.startTime) / 1000f) { p ->
+                (instance.effectProperty(p.id)?.valueAt(layer.t) ?: p.missingDefault).finiteFloat() ?: 0f
+            }
+            val within = if (bounded === param) raw else formatFloats(floatArrayOf((raw.finiteFloat() ?: 0f).coerceIn(bounded.min, bounded.max)))
+            EffectNumbers(state, bounded, within, enabled, active == param, { select(param) }, keyed) { text, gesture -> set(param, text, gesture) }
+        }
+    }
+}
+
+private val EffectParam.tall: Boolean get() = kind == "float" || kind == "angle" || kind == "point"
+
+internal object EffectSections {
+    private val open = androidx.compose.runtime.mutableStateMapOf<String, Boolean>()
+
+    fun isOpen(effect: String, section: String?): Boolean = section == null || open["$effect/$section"] == true
+
+    fun toggle(effect: String, section: String) { open["$effect/$section"] = !isOpen(effect, section) }
+}
+
+internal val LocalRowCut = androidx.compose.runtime.compositionLocalOf { 0.dp }
+
+private val MaxRowCut = 8.dp
+
+@Composable
+private fun rowCut(scroll: ScrollState?, owner: String, tall: Int): Dp {
+    var cut by remember(owner) { mutableStateOf(0.dp) }
+    if (scroll == null) return 0.dp
+    val density = LocalDensity.current
+    val viewport = scroll.viewportSize
+    val rows by rememberUpdatedState(tall)
+    LaunchedEffect(owner, viewport) {
+        if (viewport <= 0) return@LaunchedEffect
+        val applied = with(density) { (cut * rows).toPx() }
+        val natural = snapshotFlow { scroll.maxValue }.first { it != Int.MAX_VALUE } + applied
+        val each = if (rows > 0 && natural > 0f) with(density) { ceil(natural / rows).toDp() } else 0.dp
+        cut = if (each <= MaxRowCut) each else 0.dp
+    }
+    return cut
+}
+
+@Composable
+private fun sectionTitle(key: String): String = when (key) {
+    "range" -> stringResource(R.string.effect_section_range)
+    "transform" -> stringResource(R.string.effect_section_transform)
+    "visual" -> stringResource(R.string.effect_section_visual)
+    "easing" -> stringResource(R.string.effect_section_easing)
+    "light" -> stringResource(R.string.effect_section_light)
+    "texture" -> stringResource(R.string.effect_section_texture)
+    "roughness" -> stringResource(R.string.effect_section_roughness)
+    "palette" -> stringResource(R.string.effect_section_palette)
+    "back" -> stringResource(R.string.effect_section_back)
+    "colorblend" -> stringResource(R.string.effect_section_colorblend)
+    else -> key
+}
+
+@Composable
+private fun SectionBar(title: String, open: Boolean, on: Boolean?, enabled: Boolean, onSwitch: (Boolean) -> Unit, onToggle: () -> Unit) {
+    Column(Modifier.fillMaxWidth().alpha(if (enabled) 1f else 0.35f)) {
+        Box(Modifier.fillMaxWidth().height(1.dp).background(Color(0x40000000)))
+        Row(Modifier.fillMaxWidth().height(37.dp).background(Color(0x1F000000))
+            .semantics { if (open) collapse { onToggle(); true } else expand { onToggle(); true } }
+            .clickable(role = Role.Button, onClick = onToggle).padding(start = 8.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+            Icon(if (open) EffectIcons.Expanded else EffectIcons.Expand, null, Modifier.size(18.dp), tint = Am.OnDark)
+            Text(title, Modifier.weight(1f).padding(start = 8.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            if (on != null) PanelSwitch(on) { if (enabled) onSwitch(it) }
+        }
+    }
 }
 
 private val PieceEffects = setOf("scatter3d", "fracture3d", "particles")
@@ -140,9 +253,20 @@ internal fun PropertyLabel(label: String, active: Boolean, enabled: Boolean, mod
     }
 }
 
+internal fun Modifier.keyframeMark(keyed: Boolean?): Modifier = if (keyed == null) this else drawWithContent {
+    drawContent()
+    val r = 2.2.dp.toPx()
+    val y = 2.5.dp.toPx() + r
+    val color = if (keyed) Am.Accent else Am.Caption
+    for (i in 0..1) {
+        val x = 3.dp.toPx() + r + i * r * 1.35f
+        drawPath(Path().apply { moveTo(x, y - r); lineTo(x + r, y); lineTo(x, y + r); lineTo(x - r, y); close() }, color)
+    }
+}
+
 @Composable
 internal fun EffectNumbers(state: EditorState, param: EffectParam, raw: String, enabled: Boolean, active: Boolean,
-                          select: () -> Unit, set: (String, Boolean) -> Unit) {
+                          select: () -> Unit, keyframed: Boolean? = null, set: (String, Boolean) -> Unit) {
     val count = if (param.kind == "point") 2 else 1
     val parsed = raw.split(',').map { it.trim().finiteFloat() ?: 0f }
     fun stored(v: List<Float>) = v.joinToString(",")
@@ -159,42 +283,98 @@ internal fun EffectNumbers(state: EditorState, param: EffectParam, raw: String, 
         set(stored(changed), gesture)
     }
     val decimals = param.step.toBigDecimal().stripTrailingZeros().scale().coerceAtLeast(0).let { if (percent) (it - 2).coerceAtLeast(0) else it }
-    val unit = if (percent) "%" else if (param.kind == "angle") "°" else param.unit
+    val unit = if (percent) "%" else if (param.kind == "angle") "\u00BA" else param.unit
     fun keypad(index: Int) {
         state.keypad = KeypadRequest(values.mapIndexed { i, v -> KeypadField(if (count == 1) param.label else listOf("X", "Y")[i], v * factor, unit, param.min * factor, param.max * factor) }, index) { next ->
             set(stored(next.map { v -> (v/factor).coerceIn(param.min, param.max) }), false)
         }
     }
     fun tap(index: Int) { component = index; select() }
+    fun type(index: Int) { tap(index); keypad(index) }
     val scalarRuler = count == 1
-    Row(Modifier.fillMaxWidth().height(57.dp)
+    val label = Modifier.width(75.dp).height(45.dp).keyframeMark(keyframed)
+    Row(Modifier.fillMaxWidth().height(57.dp - LocalRowCut.current)
         .then(if (scalarRuler) Modifier.padding(start = 3.dp) else Modifier.padding(3.dp))
         .alpha(if (enabled) 1f else 0.35f), verticalAlignment = Alignment.CenterVertically) {
-        PropertyLabel(param.label, active, enabled, Modifier.width(75.dp).height(45.dp), select)
+        PropertyLabel(param.label, active, enabled, label, select)
         if (scalarRuler) {
             Box(Modifier.weight(1f).fillMaxHeight()) {
+                val slider = param.slider
                 key(param.id) {
-                    EffectRuler(values[0], param.step / param.slow, param.min, param.max, enabled,
+                    if (slider != null) EffectSlider(values[0], slider, defaults.getOrNull(0), enabled, select, { adjust(it, true) }, state::endGesture,
+                        Modifier.matchParentSize().padding(end = 58.dp))
+                    else EffectRuler(values[0], param.rulerStep, param.min, param.max, enabled,
                         select, { adjust(it, true) }, state::endGesture,
                         Modifier.matchParentSize().padding(end = 45.dp, top = .5.dp, bottom = .5.dp), defaults.getOrNull(0), state.settings.vibration)
                 }
                 ValueBox(formatFixed(values[0] * factor, decimals) + unit, false, false,
-                    Modifier.align(Alignment.CenterEnd).padding(end = 2.dp).width(56.dp).height(45.dp), 8f, enabled, { tap(0) }) { tap(0); keypad(0) }
+                    Modifier.align(Alignment.CenterEnd).padding(end = 2.dp).width(56.dp).height(45.dp), 8f, enabled, { type(0) }) { type(0) }
             }
             return@Row
         }
         key(param.id, component) {
-            EffectRuler(values[component], param.step / param.slow, param.min, param.max, enabled,
+            EffectRuler(values[component], param.rulerStep, param.min, param.max, enabled,
                 select, { adjust(it, true) }, state::endGesture, Modifier.weight(1f).fillMaxHeight(), defaults.getOrNull(component), state.settings.vibration)
         }
         Column(Modifier.padding(horizontal = 2.dp, vertical = 4.dp).fillMaxHeight(), Arrangement.spacedBy(2.dp)) {
             values.forEachIndexed { i, value ->
                 Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
                     Text(if (i == 0) "X:" else "Y:", Modifier.padding(end = 5.dp), color = Am.Caption, fontSize = deskSp(10f))
-                    ValueBox(formatFixed(value * factor, decimals), i == component, active && i == component, Modifier.width(55.dp).fillMaxHeight(), 5.5f, enabled, { tap(i) }) { tap(i); keypad(i) }
+                    ValueBox(formatFixed(value * factor, decimals), i == component, active && i == component, Modifier.width(55.dp).fillMaxHeight(), 5.5f, enabled, { type(i) }) { type(i) }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun EffectSlider(value: Float, range: Pair<Float, Float>, default: Float?, enabled: Boolean,
+                         onStart: () -> Unit, onValue: (Float) -> Unit, onEnd: () -> Unit, modifier: Modifier) {
+    val (low, high) = range
+    val current by rememberUpdatedState(value)
+    val start by rememberUpdatedState(onStart)
+    val change by rememberUpdatedState(onValue)
+    val end by rememberUpdatedState(onEnd)
+    val inset = 12.dp
+    Canvas(modifier
+        .semantics {
+            progressBarRangeInfo = ProgressBarRangeInfo(value.coerceIn(low, high), low..high)
+            if (enabled) setProgress { v -> start(); change(v.coerceIn(low, high)); end(); true }
+        }
+        .pointerInput(enabled, low, high) {
+            if (!enabled) return@pointerInput
+            awaitEachGesture {
+                val down = awaitFirstDown(requireUnconsumed = false)
+                val from = current.coerceIn(low, high)
+                val drag = awaitHorizontalTouchSlopOrCancellation(down.id) { c, _ -> c.consume() } ?: return@awaitEachGesture
+                val track = (size.width - 2 * inset.toPx()).coerceAtLeast(1f)
+                fun at(x: Float) = (from + (x - down.position.x) / track * (high - low)).coerceIn(low, high)
+                start()
+                change(at(drag.position.x))
+                horizontalDrag(drag.id) { c -> c.consume(); change(at(c.position.x)) }
+                end()
+            }
+        }
+        .pointerInput(enabled, default) {
+            if (!enabled || default == null) return@pointerInput
+            detectTapGestures(onDoubleTap = { start(); change(default.coerceIn(low, high)); end() })
+        }
+    ) {
+        val left = inset.toPx()
+        val width = (size.width - 2 * left).coerceAtLeast(1f)
+        fun x(v: Float) = left + (v.coerceIn(low, high) - low) / (high - low) * width
+        val y = size.height / 2f
+        val line = if (enabled) Am.OnDarkDim else Am.Inactive
+        drawLine(line, Offset(left, y), Offset(left + width, y), 2.dp.toPx(), StrokeCap.Round)
+        drawLine(if (enabled) Am.Accent else Am.Inactive, Offset(x(0f), y), Offset(x(value), y), 3.dp.toPx(), StrokeCap.Round)
+        if (default != null) {
+            val d = x(default)
+            for (side in listOf(-1f, 1f)) for (k in 0..1) {
+                val from = y + side * (10.dp.toPx() + k * 4.dp.toPx())
+                drawLine(line, Offset(d, from), Offset(d, from + side * 2.5.dp.toPx()), 1.dp.toPx())
+            }
+        }
+        drawCircle(if (enabled) Am.OnDark else Am.Inactive, 8.dp.toPx(), Offset(x(value), y))
     }
 }
 
@@ -228,14 +408,31 @@ private fun EffectChoice(param: EffectParam, raw: String, enabled: Boolean, effe
         value = withContext(Dispatchers.IO) { choicePictures(context, effect, param.id, param.options.size) }
     }
     val sheet = pictures != null
-    Row(Modifier.fillMaxWidth().height(38.dp).padding(horizontal = 8.dp).alpha(if (enabled) 1f else 0.35f), verticalAlignment = Alignment.CenterVertically) {
-        Text(param.label, Modifier.weight(1f), color = Am.OnDark, fontSize = 14.sp)
-        Box {
-            Text(param.options[chosen] + if (sheet) "  \u203A" else "", Modifier.clip(PanelShape).background(Color(0x33000000)).clickable(enabled = enabled) { open = true }
-                .padding(horizontal = 12.dp, vertical = 6.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1)
+    fun pick(i: Int) = set(formatFloats(floatArrayOf(i.toFloat())))
+    Row(Modifier.fillMaxWidth().height(38.dp).padding(start = 8.dp, end = 2.dp).alpha(if (enabled) 1f else 0.35f), verticalAlignment = Alignment.CenterVertically) {
+        Text(param.label, Modifier.width(70.dp).padding(end = 4.dp), color = Am.OnDark, maxLines = 2, lineHeight = 13.sp,
+            autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(8.sp, 12.sp, 0.5.sp))
+        Spacer(Modifier.width(3.dp))
+        if (param.options.size <= 3) Row(Modifier.weight(1f).height(30.dp).clip(PanelShape).selectableGroup(), Arrangement.spacedBy(1.dp)) {
+            param.options.forEachIndexed { i, option ->
+                val on = i == chosen
+                Box(Modifier.weight(1f).fillMaxHeight().background(if (on) PanelDark else Am.FieldHi.copy(alpha = 0.3f))
+                    .selectable(on, enabled, Role.RadioButton) { if (!on) pick(i) }.padding(horizontal = 4.dp), contentAlignment = Alignment.Center) {
+                    Text(option, color = if (on) Am.Accent else Am.OnDark, maxLines = 1, softWrap = false, textAlign = TextAlign.Center,
+                        autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(8.sp, 13.sp, 0.5.sp))
+                }
+            }
+        } else Box(Modifier.weight(1f).height(30.dp)) {
+            Row(Modifier.fillMaxSize().clip(PanelShape).background(Color(0x33000000)).clickable(enabled = enabled, role = Role.DropdownList) { open = true }
+                .padding(start = 10.dp, end = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text(param.options[chosen], Modifier.weight(1f), color = Am.Accent, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.End)
+                Icon(app.absentmotion.ui.editor.ChromeIcons.ChevronDown, null, Modifier.padding(start = 4.dp).size(16.dp), tint = Am.Accent)
+            }
             if (!sheet) Presence(open) {
                 MenuPopup(DropOrRise, { open = false }) {
-                    param.options.forEachIndexed { i, option -> MenuRow(option) { set(formatFloats(floatArrayOf(i.toFloat()))); open = false } }
+                    Column(Modifier.heightIn(max = 360.dp).deskVerticalScroll()) {
+                        param.options.forEachIndexed { i, option -> MenuRow(option) { pick(i); open = false } }
+                    }
                 }
             }
         }
@@ -243,7 +440,7 @@ private fun EffectChoice(param: EffectParam, raw: String, enabled: Boolean, effe
     if (sheet && open) MotionSheet(param.label, { open = false }) {
         TileGrid(param.options.indices.toList()) { i, modifier ->
             val picture = pictures?.getOrNull(i)
-            Tile(param.options[i], i == chosen, modifier, { set(formatFloats(floatArrayOf(i.toFloat()))) }, picture?.let { p -> { drawCropped(p) } })
+            Tile(param.options[i], i == chosen, modifier, { pick(i) }, picture?.let { p -> { drawCropped(p) } })
         }
         Spacer(Modifier.height(12.dp))
     }
@@ -395,7 +592,7 @@ internal fun pictureColors(bytes: ByteArray, limit: Int = Palettes.MAX_PICTURE_C
 }
 
 @Composable
-private fun EffectColor(state: EditorState, param: EffectParam, raw: String, enabled: Boolean, active: Boolean, select: () -> Unit, set: (String, Boolean) -> Unit) {
+private fun EffectColor(state: EditorState, param: EffectParam, raw: String, enabled: Boolean, active: Boolean, keyed: Boolean, select: () -> Unit, set: (String, Boolean) -> Unit) {
     val color = parseColor(raw) ?: 0xFFFFFFFF.toInt()
     var expanded by remember(param.id) { mutableStateOf(false) }
     var library by remember(param.id) { mutableStateOf(false) }
@@ -410,7 +607,7 @@ private fun EffectColor(state: EditorState, param: EffectParam, raw: String, ena
     val eyedropper = stringResource(R.string.a11y_eyedropper)
     Column {
         Row(Modifier.fillMaxWidth().height(38.dp).padding(3.dp).alpha(if (enabled) 1f else 0.35f), verticalAlignment = Alignment.CenterVertically) {
-            PropertyLabel(param.label, active, enabled, Modifier.width(75.dp).fillMaxHeight(), select)
+            PropertyLabel(param.label, active, enabled, Modifier.width(75.dp).fillMaxHeight().keyframeMark(keyed), select)
             Box(Modifier.weight(1f).fillMaxHeight().padding(5.dp).clip(PanelShape).background(Color(color))
                 .semantics { contentDescription = picker }.clickable(enabled = enabled, role = Role.Button) {
                     select()

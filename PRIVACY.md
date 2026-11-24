@@ -9,7 +9,7 @@ Projects, imported pictures, videos and audio, and everything you export stay on
 permissions let the app show your library and use the files you pick, on the device. Nothing is uploaded.
 
 The camera and microphone permissions are used only by the in-app camera, while it is open, to take the photos and
-videos you add to a project. Recordings are saved on the device. Backups of your projects are written to
+videos you add to a project, and the camera to scan the code in Send between devices. Recordings are saved on the device. Backups of your projects are written to
 `Documents/AbsentMotion` on the device and stay there.
 
 While an export runs, the app shows its progress in a notification, so the export can continue when you switch to another app.
@@ -35,6 +35,8 @@ The app asks for the internet permission for these things only:
 - **Community.** When you open the Community tab, the app loads the list of shared presets and bundles and their pictures from GitHub (`raw.githubusercontent.com`); to draw a preset's picture it downloads that preset file, and when you tap Add it downloads the item. Nothing is uploaded, and GitHub sees your IP address, as for any web request.
 - **Video Downloader.** Only if you use Tools > Video Downloader: the first time, the app downloads its add-on (about 25 MB): Python from `python.org` and yt-dlp from GitHub (`github.com`, served from `objects.githubusercontent.com` or `release-assets.githubusercontent.com`). While the add-on is installed, it asks GitHub at most once a day whether there is a newer yt-dlp and downloads it if there is. When you paste a link, the add-on contacts that website (for example YouTube, Instagram or TikTok) to read the video's details and download the parts you choose, the same as a web browser would; the files are saved on the device.
 - **Update check.** While "Check for a new version each time the app opens" is on (the app asks you once, on its first screens or at the first start after an update, and the switch is also in Settings), and when you tap Check for Update, the app makes one normal HTTPS request to GitHub (`api.github.com`) to read the latest version number. While the switch is on, the app also reads the project's README from `api.github.com` once each time it opens, to keep the Discord and feedback links up to date. Nothing else is sent, and GitHub sees your IP address, as for any web request. Only if a newer version is shown and you tap Download update, the app downloads that version's app file (about 60 MB) from the GitHub release (`github.com`, which serves it from `release-assets.githubusercontent.com` or `objects.githubusercontent.com`), and for older releases its `SHA256SUMS.txt`; it is installed only after you confirm it in Android's installer.
+
+**Send between devices** moves a project straight from one of your devices to another over your own Wi-Fi, only while you use it. The two devices connect to each other directly on the local network, nothing goes through the internet, and the transfer is encrypted with a one-time key from the QR code.
 
 Nothing else is sent anywhere. Background removal uses an offline model that is part of the app, so nothing is downloaded or
 sent for it. Text to speech uses the voices already installed on your device and works offline.

@@ -27,7 +27,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.TextButton
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -176,6 +175,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlin.coroutines.coroutineContext
+import app.absentmotion.ui.home.DialogPill
 
 private val RulerHeight = 42.dp
 private val RowHeight get() = if (deskLayout) 30.dp else 28.dp
@@ -467,8 +467,8 @@ private fun DesktopTimelineRename(view: TimelineView) {
             OutlinedTextField(name, { name = it }, Modifier.focusRequester(focus), singleLine = true, keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done), keyboardActions = KeyboardActions(onDone = { confirm() }))
             LaunchedEffect(id) { focus.requestFocus() }
         },
-        confirmButton = { TextButton(onClick = { confirm() }, enabled = name.isNotBlank()) { Text(stringResource(R.string.ok)) } },
-        dismissButton = { TextButton(onClick = { view.renameId = null }) { Text(stringResource(R.string.cancel)) } },
+        confirmButton = { DialogPill(stringResource(R.string.ok), enabled = name.isNotBlank()) { confirm() } },
+        dismissButton = { DialogPill(stringResource(R.string.cancel), primary = false) { view.renameId = null } },
     )
 }
 

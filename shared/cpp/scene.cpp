@@ -543,7 +543,19 @@ bool ParseLayer(const XmlNode& node, int fps, Layer* out) {
     l.fillType = StrAttr(*n, "fillType");
     l.mediaUri = StrAttr(*n, "fillImage");
     if (l.mediaUri.empty()) l.mediaUri = StrAttr(*n, "fillVideo");
-    if (l.kind == "model") l.mediaUri = (StrAttr(*n, "pose") == "skin" ? "skin:" : "") + StrAttr(*n, "src");
+    if (l.kind == "model") {
+        l.mediaUri = (StrAttr(*n, "pose") == "skin" ? "skin:" : "") + StrAttr(*n, "src");
+        std::string looks;
+        for (const auto& c : n->children) {
+            if (c->name != "material") continue;
+            const char* index = c->attr("index");
+            const char* picture = c->attr("picture");
+            const char* tint = c->attr("tint");
+            if (index && picture) looks += (looks.empty() ? "" : "\x1d") + std::string(index) + "\x1f" + picture;
+            if (index && tint && *tint == '#') l.tints.emplace_back(atoi(index), (uint32_t)strtoul(tint + 1, nullptr, 16));
+        }
+        if (!looks.empty()) l.mediaUri += "\x1e" + looks;
+    }
     l.video = l.fillType == "media" && StrAttr(*n, "fillImage").empty() && !l.mediaUri.empty();
     l.mediaFillMode = StrAttr(*n, "mediaFillMode");
     l.startTime = IntAttr(*n, "startTime", 0);
@@ -604,6 +616,14 @@ bool ParseLayer(const XmlNode& node, int fps, Layer* out) {
 
 }
 
+static void MarkAlight(std::vector<Layer>* layers) {
+    for (Layer& l : *layers) {
+        l.alight = true;
+        if (l.text) AlightText(*l.text, std::any_of(l.effects.begin(), l.effects.end(), [](const LayerEffect& e) { return !e.hidden && e.id == "absent.texttransform"; }));
+        if (l.children) MarkAlight(l.children.get());
+    }
+}
+
 bool ParseScene(const std::string& xml, Scene* scene, std::string* error) {
     CNumbers();
     auto root = ParseXml(xml, error);
@@ -637,6 +657,7 @@ bool ParseScene(const std::string& xml, Scene* scene, std::string* error) {
         Layer l;
         if (ParseLayer(*n, next.fps, &l)) next.layers.push_back(std::move(l));
     }
+    if (StrAttr(*root, "alightImport") == "true") MarkAlight(&next.layers);
     BindLinks(next.layers);
     std::sort(next.beats.begin(), next.beats.end());
     next.beats.erase(std::unique(next.beats.begin(), next.beats.end()), next.beats.end());
@@ -748,7 +769,7 @@ void DrawMedia(SkCanvas* canvas, const Layer& layer, const SkPath& path, float o
     canvas->save();
     canvas->clipPath(path, true);
     const float density = canvas->getTotalMatrix().getMinScale() * dst.width() / std::max(image->width(), 1);
-    const bool minified = density > 0 && density < 0.5f && (image->hasMipmaps() || !image->isTextureBacked());
+    const bool minified = !layer.alight && density > 0 && density < 0.25f && (image->hasMipmaps() || !image->isTextureBacked());
     canvas->drawImageRect(image, dst, minified ? SkSamplingOptions(SkFilterMode::kLinear, SkMipmapMode::kLinear) : SkSamplingOptions(SkFilterMode::kLinear), &paint);
     canvas->restore();
 }

@@ -26,6 +26,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import app.absentmotion.model.MediaFillMode
+import androidx.compose.foundation.border
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -85,6 +87,26 @@ internal fun ColorFillPanel(state: EditorState, layer: Layer, modifier: Modifier
         FillTabs(state, layer, Modifier.offset(28.px, 37.px).size(856.px, 83.px))
         if (type == "color") ColorPicker(state, layer, Modifier.offset(28.px, 162.px).size(856.px, 359.px))
         if (type == "gradient") GradientPanel(state, layer, Modifier.fillMaxSize())
+        if (type == "media") MediaFitRow(state, layer, Modifier.offset(28.px, 162.px).size(856.px, 83.px))
+    }
+}
+
+@Composable
+private fun MediaFitRow(state: EditorState, layer: Layer, modifier: Modifier) {
+    val current = MediaFillMode.entries.firstOrNull { it.xml == layer.node["mediaFillMode"] } ?: MediaFillMode.Fill
+    val shape = RoundedCornerShape(50)
+    Row(modifier.clip(shape).border(1.5.dp, Am.Accent, shape).background(Am.Field)) {
+        for (mode in MediaFillMode.entries) {
+            val active = mode == current
+            val label = stringResource(when (mode) { MediaFillMode.Fill -> R.string.media_fill_fill; MediaFillMode.Fit -> R.string.media_fill_fit; MediaFillMode.Stretch -> R.string.media_fill_stretch })
+            Box(
+                Modifier.weight(1f).fillMaxHeight().background(if (active) TabActive else Am.Field)
+                    .clickable(role = androidx.compose.ui.semantics.Role.Tab) { if (!active) state.editSelected { it.copy(node = it.node.with("mediaFillMode", mode.xml)) } },
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(label, color = if (active) Am.Accent else Am.OnDark, fontSize = 15.sp, maxLines = 1, softWrap = false, fontWeight = if (active) androidx.compose.ui.text.font.FontWeight.SemiBold else null)
+            }
+        }
     }
 }
 

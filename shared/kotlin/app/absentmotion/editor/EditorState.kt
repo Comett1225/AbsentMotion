@@ -31,6 +31,7 @@ enum class EditorPanel(@StringRes val title: Int) {
     EditShape(R.string.edit_panel_shape_options), EditText(R.string.edit_panel_edit_text),
     BorderShadow(R.string.edit_panel_frame_shadow), Blending(R.string.edit_panel_opacity_blend), Effects(R.string.edit_panel_effects), Camera(R.string.edit_panel_camera_options), Model(R.string.edit_panel_model_options), Crop(R.string.layer_tool_crop),
     Edge(R.string.cutout_edge), Light(R.string.light_options), Frame(R.string.layer_tool_frame),
+    Textures(R.string.model_textures), Pose(R.string.model_pose),
 }
 
 data class KeyTarget(val ref: PropRef, val default: String, val type: String = "float")
@@ -75,6 +76,7 @@ class LayerPoints(
     val pick: (Int) -> Unit = {},
     val tap: ((app.absentmotion.model.Pt) -> Unit)? = null,
     val source: (app.absentmotion.model.Pt) -> app.absentmotion.model.Pt = { it },
+    val scene: Boolean = false,
     val move: (Int, app.absentmotion.model.Pt) -> Unit,
 )
 

@@ -2,7 +2,7 @@
  "id": "colorbalance",
  "name": "Color Balance",
  "category": "color",
- "description": "Pushes the shadows, midtones and highlights towards their own colors (gray leaves a range unchanged).",
+ "description": "Pushes the shadows, midtones and highlights towards their own colors (gray leaves a range unchanged). Keep Brightness holds each pixel's brightness while the colors change.",
  "params": [
   {
    "id": "shadows",
@@ -30,7 +30,34 @@
    "min": 0.0,
    "max": 1.0,
    "step": 0.01
+  },
+  {
+   "id": "preserve",
+   "label": "Keep Brightness",
+   "type": "switch",
+   "default": true,
+   "when": {
+    "style": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 1,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "legacyDefault": 0,
+   "when": {
+    "style": [
+     0
+    ]
+   }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nlayout(color) uniform half4 shadows;\nlayout(color) uniform half4 midtones;\nlayout(color) uniform half4 highlights;\nuniform float amount;\nfloat luma(float3 c) { return dot(c, float3(0.2126, 0.7152, 0.0722)); }\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    if (c.a <= 0.0) return c;\n    float3 base = float3(c.rgb) / float(c.a);\n    float l = luma(base);\n    float lows = 1.0 - smoothstep(0.0, 0.5, l);\n    float highs = smoothstep(0.5, 1.0, l);\n    float3 shift = lows * (float3(shadows.rgb) - 0.5) + (1.0 - lows - highs) * (float3(midtones.rgb) - 0.5) + highs * (float3(highlights.rgb) - 0.5);\n    float3 rgb = base + shift * clamp(amount, 0.0, 1.0);\n    return half4(half3(clamp(rgb, 0.0, 1.0)) * c.a, c.a);\n}"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nlayout(color) uniform half4 shadows;\nlayout(color) uniform half4 midtones;\nlayout(color) uniform half4 highlights;\nuniform float amount;\nuniform float preserve;\nuniform float style;\nfloat luma(float3 c) { return dot(c, float3(0.2126, 0.7152, 0.0722)); }\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    if (c.a <= 0.0) return c;\n    float3 base = float3(c.rgb) / float(c.a);\n    if (style > 0.5) {\n        float y = dot(base, float3(0.299, 0.587, 0.114));\n        float lo = 1.0 - smoothstep(0.225, 0.425, y);\n        float hi = smoothstep(0.565, 0.765, y);\n        float3 gray = float3(128.0 / 255.0);\n        float3 v = (lo * (float3(shadows.rgb) - gray) + (1.0 - lo - hi) * (float3(midtones.rgb) - gray) + hi * (float3(highlights.rgb) - gray)) * 4.0 * amount;\n        float3 o = base * (1.0 + v);\n        if (preserve > 0.5) o -= dot(o, float3(0.299, 0.587, 0.114)) - y;\n        return half4(half3(clamp(o, 0.0, 1.0)) * c.a, c.a);\n    }\n    float l = luma(base);\n    float lows = 1.0 - smoothstep(0.0, 0.5, l);\n    float highs = smoothstep(0.5, 1.0, l);\n    float3 shift = lows * (float3(shadows.rgb) - 0.5) + (1.0 - lows - highs) * (float3(midtones.rgb) - 0.5) + highs * (float3(highlights.rgb) - 0.5);\n    float3 rgb = base + shift * clamp(amount, 0.0, 1.0);\n    return half4(half3(clamp(rgb, 0.0, 1.0)) * c.a, c.a);\n}"
 }

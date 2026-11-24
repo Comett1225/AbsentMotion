@@ -39,6 +39,8 @@ TEXTURE = [{"id": "texMode", "label": "Texture", "type": "choice", "default": 0,
            dict({"id": "texOffset", "label": "Texture Offset", "type": "point", "default": [0, 0], "min": -100, "max": 100, "step": 0.01}, when=TILED),
            dict(number("texCrop", "Texture Crop", 1, 0.05, 10), when=TILED),
            dict({"id": "texAnchor", "label": "Texture Anchor", "type": "choice", "default": 0, "options": ["Center", "Corner"]}, when=TILED)]
+LIGHT = [dict(p, section="light") for p in LIGHT]
+TEXTURE = [dict(p, section="texture") for p in TEXTURE]
 SMOOTH = number("smoothing", "Smoothing", 0.15, 0, 1)
 INSIDE = colour("interior", "Interior Color", "#ff3d4152")
 
@@ -67,7 +69,7 @@ float4 shade(float4 c, float3 n, float3 v) {
         float d = max(dot(n, normalize(float3(cos(a), -sin(a), -lightHeight))), 0.0);
         float3 lit = c.rgb * ((lighting > 1.5 ? 0.0 : 0.38) + (ambient + shading * d) * float3(lightColor.rgb));
         float g = shine * pow(d, glossiness);
-        return float4(min(lit + g * (1.0 - lit), float3(1.0)), c.a);
+        return float4(min(lit + g * (c.a - lit), float3(c.a)), c.a);
     }
     float3 l = normalize(float3(cos(a), -sin(a), -1.2));
     float k = 1.0 - shading + shading * (0.3 + 0.85 * max(dot(n, l), 0.0));
@@ -556,11 +558,58 @@ ORDER = ["cube", "box", "hollowbox", "cylinder", "ellipsoid", "torus", "pyramid"
          "starpolyhedron", "heart", "cross", "rasterextrude", "flip", "spherize", "tunnel"]
 
 
+STANDARD_STYLE = {"id": "style", "label": "Style", "type": "choice", "default": 0, "options": ["Classic", "Standard"], "when": {"style": [1]}}
+
+STANDARD = {
+    'cube': [
+        ('uniform float scale;\n',
+         'uniform float scale;\nuniform float style;\n'),
+        ('float4 pic(float2 uv) {\n    return float4(image.eval(clamp(uv * size, float2(0.5), max(size - 0.5, float2(0.5)))));\n',
+         'float4 pic(float2 uv) {\n    float2 at = clamp(uv * size, float2(0.5), max(size - 0.5, float2(0.5)));\n    float f = size.x / max(2.0 * edge * min(size.x, size.y) * 0.5 * scale, 1.0);\n    if (style < 0.5 || f < 1.5) return float4(image.eval(at));\n    float4 sum = float4(0.0);\n    for (int i = 0; i < 4; i++) {\n        for (int j = 0; j < 4; j++) sum += float4(image.eval(clamp(at + (float2(float(i), float(j)) - 1.5) * 0.25 * f, float2(0.5), max(size - 0.5, float2(0.5)))));\n    }\n    return sum / 16.0;\n'),
+    ],
+    'hollowbox': [
+        ('uniform float scale;\n',
+         'uniform float scale;\nuniform float style;\n'),
+        ('float4 pic(float2 uv) {\n    return float4(image.eval(clamp(uv * size, float2(0.5), max(size - 0.5, float2(0.5)))));\n',
+         'float4 pic(float2 uv) {\n    float2 at = clamp(uv * size, float2(0.5), max(size - 0.5, float2(0.5)));\n    float f = size.x / max(2.0 * width * min(size.x, size.y) * 0.5 * scale, 1.0);\n    if (style < 0.5 || f < 1.5) return float4(image.eval(at));\n    float4 sum = float4(0.0);\n    for (int i = 0; i < 4; i++) {\n        for (int j = 0; j < 4; j++) sum += float4(image.eval(clamp(at + (float2(float(i), float(j)) - 1.5) * 0.25 * f, float2(0.5), max(size - 0.5, float2(0.5)))));\n    }\n    return sum / 16.0;\n'),
+    ],
+    'cross': [
+        ('uniform float scale;\n',
+         'uniform float scale;\nuniform float style;\n'),
+        ('    float dist = max(2.0 + 40.0 * pow(1.0 - clamp(perspective, 0.0, 1.0), 3.0), rb + 0.5);\n    float3 rw = normalize(float3((coord - size * 0.5 - position) / unit, dist));\n',
+         '    float dist = max(2.0 + 40.0 * pow(1.0 - clamp(perspective, 0.0, 1.0), 3.0), rb + 0.5);\n    float3 rw = normalize(float3((coord - size * 0.5 - position * (style > 0.5 ? scale : 1.0)) / unit, dist));\n'),
+    ],
+    'heart': [
+        ('uniform float scale;\n',
+         'uniform float scale;\nuniform float style;\n'),
+        ('    float dist = max(2.0 + 40.0 * pow(1.0 - clamp(perspective, 0.0, 1.0), 3.0), rb + 0.5);\n    float3 rw = normalize(float3((coord - size * 0.5 - position) / unit, dist));\n',
+         '    float dist = max(2.0 + 40.0 * pow(1.0 - clamp(perspective, 0.0, 1.0), 3.0), rb + 0.5);\n    float3 rw = normalize(float3((coord - size * 0.5 - position * (style > 0.5 ? scale : 1.0)) / unit, dist));\n'),
+    ],
+    'starprism': [
+        ('uniform float scale;\n',
+         'uniform float scale;\nuniform float style;\n'),
+        ('    float dist = max(2.0 + 40.0 * pow(1.0 - clamp(perspective, 0.0, 1.0), 3.0), rb + 0.5);\n    float3 rw = normalize(float3((coord - size * 0.5 - position) / unit, dist));\n',
+         '    float dist = max(2.0 + 40.0 * pow(1.0 - clamp(perspective, 0.0, 1.0), 3.0), rb + 0.5);\n    float3 rw = normalize(float3((coord - size * 0.5 - position * (style > 0.5 ? scale : 1.0)) / unit, dist));\n'),
+    ],
+    'tunnel': [
+        ('uniform float scale;\n',
+         'uniform float scale;\nuniform float style;\n'),
+        ('half4 main(float2 coord) {\n',
+         'half4 main(float2 coord) {\n    if (style > 0.5) {\n        float2 n = (coord - size * 0.5 - position) / max(size * 0.5 * scale, float2(0.5));\n        float r = length(n);\n        if (r > 0.995) return half4(0.0);\n        float4 shade = float4(fogColor.rgb * fogColor.a, fogColor.a);\n        if (r < 0.0001) return half4(shade);\n        float g = 1.0 / r + phase + time * speed;\n        float2 q = 0.5 + 0.5 * float2(-abs(n.x), n.y) / r * g;\n        q = 1.0 - abs(1.0 - mod(q, 2.0));\n        float4 c = pic(q);\n        return half4(mix(c, shade, 1.0 - exp(-0.45 * fog * (1.0 / r - 1.0))));\n    }\n'),
+    ],
+}
+
+
 def main():
     found = {key: (name, description, params, sksl) for key, name, description, params, sksl in EFFECTS}
     assert sorted(found) == sorted(ORDER)
     for key in ORDER:
         name, description, params, sksl = found[key]
+        if key in STANDARD:
+            params = params + [STANDARD_STYLE]
+            for before, after in STANDARD[key]:
+                assert sksl.count(before) == 1, (key, before)
+                sksl = sksl.replace(before, after)
         effect = {"id": key, "name": name, "category": "3d", "since": SINCE, "description": description, "params": params, "sksl": sksl}
         if key in SHORTCUTS:
             effect["shortcuts"] = SHORTCUTS[key]

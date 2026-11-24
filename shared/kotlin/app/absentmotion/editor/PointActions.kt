@@ -10,6 +10,7 @@ import app.absentmotion.model.withContoursAt
 import app.absentmotion.model.withEveryShape
 import app.absentmotion.model.withShapeKeyToggled
 import app.absentmotion.model.withHandleMoved
+import app.absentmotion.model.withHandlesPulled
 import app.absentmotion.model.withPointAppended
 import app.absentmotion.model.withPointCurveToggled
 import app.absentmotion.model.withPointInserted
@@ -52,17 +53,32 @@ fun Knot.at(handle: Handle): Pt? = when (handle) {
 fun Pt.dragged(screenDelta: Pt, previewScale: Float, toScene: (Pt) -> Pt, toLayer: (Pt) -> Pt): Pt =
     toLayer(toScene(this) + screenDelta * (1f / previewScale))
 
-fun EditorState.moveSelectedTo(mode: PointMode, to: Pt, key: Any? = "point-drag") {
+fun EditorState.moveSelectedTo(mode: PointMode, to: Pt, key: Any? = "point-drag", free: Boolean = false) {
     if (mode.handle == Handle.Add) return
     change(mode, key) { list ->
         val c = list.getOrNull(mode.contour) ?: return@change list
         val k = c.knots.getOrNull(mode.point) ?: return@change list
         val moved = when (mode.handle) {
             Handle.Main -> c.withPointMoved(mode.point, to - k.p)
-            else -> c.withHandleMoved(mode.point, mode.handle, to, mode.angleLock, mode.distanceLock)
+            else -> c.withHandleMoved(mode.point, mode.handle, to, mode.angleLock && !free, mode.distanceLock)
         }
         list.replaced(mode.contour, moved)
     }
+}
+
+fun EditorState.pullHandles(mode: PointMode, to: Pt) {
+    change(mode, "point-drag") { list ->
+        val c = list.getOrNull(mode.contour)?.takeIf { mode.point in it.knots.indices } ?: return@change list
+        list.replaced(mode.contour, c.withHandlesPulled(mode.point, to))
+    }
+}
+
+fun EditorState.closePath(mode: PointMode) {
+    val c = pointContours(mode).getOrNull(mode.contour) ?: return
+    if (c.closed || !c.canToggleClosed) return
+    toggleClosed(mode)
+    mode.point = 0
+    mode.handle = Handle.Main
 }
 
 fun EditorState.toggleCurve(mode: PointMode) {

@@ -60,7 +60,7 @@ internal fun CommunityDetails.problem(scene: Scene, access: MediaAccess, addedBy
     else -> null
 }
 
-class Exporter(context: Context, private val engine: EngineThread, private val store: ExportStore, private val access: MediaAccess = MediaAccess.forApp(context), private val bundles: ExportStore? = null) {
+class Exporter(context: Context, private val engine: EngineThread, private val store: ExportStore, private val access: MediaAccess = MediaAccess.forApp(context), private val bundles: ExportStore? = null, private val stage: ExportStore? = null) {
     private val context = context.applicationContext
 
     suspend fun export(kind: ExportKind, scene: Scene, s: ExportSettings, frame: Int, name: String, note: (UiText) -> Unit = {}, community: CommunityDetails? = null, includeAddedEffects: Boolean = true, progress: (Float) -> Unit): ExportResult {
@@ -79,7 +79,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                             progress(0f)
                             mix = ExportAudio.mixFor?.invoke(scene, f.audio.effectiveRate)
                             closingUnlessAbandoned(mix) {
-                                direct(saved, name, f.container.ext, f.container.mime, "Movies/$AppFolder") { fd ->
+                                direct(saved, name, f.container.ext, f.container.mime, "Movies/$AppFolder", stage ?: store) { fd ->
                                     watched { alive ->
                                         cool { thermal ->
                                             exportVideo(engine, scene, xml, f, fd, mix, thermal.hot, { thermal.pauseMs().also { paused += it } }, note, { looks = it }) { alive(); progress(it) }
@@ -105,7 +105,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                     }
                     ExportKind.Gif -> {
                         exportSize(scene, s.shortSide, even = false).let { (w, h) -> checkPicture(w, h) }
-                        direct(saved, name, "gif", "image/gif", "Pictures/$AppFolder") { fd ->
+                        direct(saved, name, "gif", "image/gif", "Pictures/$AppFolder", stage ?: store) { fd ->
                             watched { alive -> cool { gif(scene, xml, s, fdStream(fd), it::pauseMs) { p -> alive(); progress(p) } } }
                         }.verified(kind, scene, s, false)
                     }
@@ -114,7 +114,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                         imageProblem(shape.image, android.os.Build.VERSION.SDK_INT)?.let { throw ExportError(it) }
                         checkPicture(scene.width, scene.height)
                         val pixels = engine.exportSession(xml) { still(scene.frameStart(frame), scene.width, scene.height) } ?: throw ExportError(txt(R.string.export_error_draw_still))
-                        save(saved, null, "$name.${shape.image.ext}", shape.image.mime) { encode(pixels, scene.width, scene.height, shape, null, it) }
+                        save(saved, null, "$name.${shape.image.ext}", shape.image.mime, stage ?: store) { encode(pixels, scene.width, scene.height, shape, null, it) }
                         ExportResult(saved, shape.image.mime, store.location("Pictures/$AppFolder")).verified(kind, scene, shape, false)
                     }
                     ExportKind.Xml -> {
@@ -137,7 +137,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
             } }
         } catch (t: Throwable) {
             val full = storageFull(t)
-            withContext(NonCancellable + Dispatchers.IO) { saved.forEach { runCatching { (if (kind == ExportKind.Package) bundles ?: store else store).delete(it) } } }
+            withContext(NonCancellable + Dispatchers.IO) { synchronized(saved) { saved.toList() }.forEach { runCatching { (if (kind == ExportKind.Package) bundles ?: store else store).delete(it) } } }
             throw if (full) StorageFullException() else plainCodecError(t)
         }
     }
@@ -152,8 +152,8 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
     private fun storageFull(t: Throwable): Boolean =
         t !is kotlinx.coroutines.CancellationException && (crashReason(t, "") == CrashReason.Storage || runCatching { freeSpace() < MinFreeBytes }.getOrDefault(false))
 
-    private suspend fun save(saved: MutableList<Uri>, folder: String?, name: String, mime: String, write: (java.io.OutputStream) -> Unit) =
-        withContext(Dispatchers.IO) { saved.add(store.save(folder, name, mime, write)) }
+    private suspend fun save(saved: MutableList<Uri>, folder: String?, name: String, mime: String, target: ExportStore = store, write: (java.io.OutputStream) -> Unit) =
+        withContext(Dispatchers.IO) { saved.add(target.save(folder, name, mime, write)) }
 
     private suspend fun checkPicture(width: Int, height: Int) {
         val side = engine.maxPictureSize()

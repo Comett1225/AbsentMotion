@@ -29,7 +29,7 @@ class RepeatEffectsTest {
     }
 
     @Test fun repeatMatchesTheRecordedParameters() {
-        assertEquals(listOf("Count", "Time", "Offset", "Angle", "Scale", "Alpha"), effect("repeat").params.map { it.label })
+        assertEquals(listOf("Count", "Time", "Offset", "Angle", "Scale", "Alpha", "Style"), effect("repeat").params.map { it.label })
         assertEquals(listOf("float", 10f, 0f, 9999f, false), param("repeat", "count").shape())
         assertEquals(listOf("float", 0f, 0f, 9999f, false), param("repeat", "time").shape())
         assertEquals(listOf("point", listOf(0f, 0f)), param("repeat", "offset").shape().take(2))
@@ -40,18 +40,18 @@ class RepeatEffectsTest {
     }
 
     @Test fun theRangedRepeatsMatchTheRecordedParameters() {
-        assertEquals(listOf("Count", "Position") + ranged, effect("linearrepeat").params.map { it.label })
+        assertEquals(listOf("Count", "Position") + ranged + "Style", effect("linearrepeat").params.map { it.label })
         assertEquals(listOf("float", 5f, 0f, 150f, false), param("linearrepeat", "count").shape())
         assertEquals(listOf(500f, 0f), param("linearrepeat", "position").value())
-        assertEquals(listOf("Count", "Radius", "Orientation", "Angle", "Sweep", "Scale") + ranged, effect("radialrepeat").params.map { it.label })
+        assertEquals(listOf("Count", "Radius", "Orientation", "Angle", "Sweep", "Scale") + ranged + "Style", effect("radialrepeat").params.map { it.label })
         assertEquals(8f, param("radialrepeat", "count").value())
         assertEquals(listOf("float", 300f, 0f, 2000f, false), param("radialrepeat", "radius").shape())
         assertEquals(listOf(0f, 0f, 360f), listOf("orientation", "angle", "sweep").map { param("radialrepeat", it).value() })
         assertTrue(listOf("orientation", "angle", "sweep").all { param("radialrepeat", it).kind == "angle" })
-        assertEquals(listOf("Count", "Position", "Stagger") + ranged, effect("gridrepeat").params.map { it.label })
+        assertEquals(listOf("Count", "Position", "Stagger") + ranged + "Style", effect("gridrepeat").params.map { it.label })
         assertEquals(listOf(500f, 500f), param("gridrepeat", "position").value())
         assertEquals(listOf("float", 0f, -9999f, 9999f, false), param("gridrepeat", "stagger").shape())
-        assertEquals(listOf("Count", "Start", "End", "Phase", "Tangent") + ranged, effect("repeatalongpath").params.map { it.label })
+        assertEquals(listOf("Count", "Start", "End", "Phase", "Tangent") + ranged + "Style", effect("repeatalongpath").params.map { it.label })
         assertEquals(listOf("float", 25f, 0f, 150f, false), param("repeatalongpath", "count").shape())
         assertEquals(listOf("float", 0f, 0f, 1f, true), param("repeatalongpath", "start").shape())
         assertEquals(listOf("float", 1f, 0f, 1f, true), param("repeatalongpath", "end").shape())

@@ -675,6 +675,14 @@ inspected for a `META-INF/NOTICE` file.
 - URL: https://developer.android.com/jetpack/androidx/releases/camera and https://github.com/google/auto
 - Used in: the in-app camera (photo and video capture from the Add menu and from the new project sheet).
 
+### ZXing Core
+
+- Version: 3.5.4 (`com.google.zxing:core`).
+- Licence: Apache-2.0.
+- Copyright: see upstream.
+- URL: https://github.com/zxing/zxing
+- Used in: reading QR codes from pictures on Android and desktop.
+
 ### kotlinx.coroutines
 
 - Version: 1.9.0 (`kotlinx-coroutines-core` and `kotlinx-coroutines-android`, declared by the app at the version Compose resolves).

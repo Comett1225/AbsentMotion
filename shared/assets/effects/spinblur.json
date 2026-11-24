@@ -25,7 +25,23 @@
    "min": 0,
    "max": 360,
    "step": 0.1
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 1,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "legacyDefault": 0,
+   "when": {
+    "style": [
+     0
+    ]
+   }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 center;\nuniform float sweep;\nhalf4 main(float2 coord) {\n    float2 c = center * size;\n    float span = radians(sweep);\n    if (span <= 0.0) return image.eval(coord);\n    float2 d = coord - c;\n    half4 sum = half4(0.0);\n    for (int i = 0; i < 48; i++) {\n        float a = span * (float(i) / 47.0 - 0.5);\n        sum += image.eval(c + float2(cos(a) * d.x - sin(a) * d.y, sin(a) * d.x + cos(a) * d.y));\n    }\n    return sum / 48.0;\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float4 screen;\nuniform float time;\nuniform float2 center;\nuniform float sweep;\nuniform float style;\nhalf4 main(float2 coord) {\n    float2 c = center * size;\n    float span = radians(sweep);\n    if (span <= 0.0) return image.eval(coord);\n    float2 d = coord - c;\n    float2 lo = style > 0.5 ? screen.xy + 0.5 : float2(-1e9);\n    float2 hi = style > 0.5 ? screen.xy + screen.zw - 0.5 : float2(1e9);\n    half4 sum = half4(0.0);\n    for (int i = 0; i < 48; i++) {\n        float a = span * (float(i) / 47.0 - 0.5);\n        sum += image.eval(clamp(c + float2(cos(a) * d.x - sin(a) * d.y, sin(a) * d.x + cos(a) * d.y), lo, hi));\n    }\n    return sum / 48.0;\n}\n"
 }

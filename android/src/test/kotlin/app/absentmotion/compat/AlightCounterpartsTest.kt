@@ -38,7 +38,7 @@ class AlightCounterpartsTest {
         assertEquals("absent.halftone", e["id"])
         assertEquals(18f, e.number("cell"), 1e-3f)
         assertEquals(45f, e.number("angle"), 1e-3f)
-        assertEquals(1f, e.number("style"), 0f)
+        assertEquals(2f, e.number("style"), 0f)
         assertEquals("#ff103152", e.value("ink"))
         assertEquals("#fffcecda", e.value("paper"))
         assertEquals(54f, convert("com.alightcreative.effects.halftonedots", f("amount", 20f)).number("cell"), 1e-3f)
@@ -50,9 +50,9 @@ class AlightCounterpartsTest {
         assertEquals(style.default, style.missingDefault)
     }
 
-    @Test fun zoomBlurStrengthFollowsTheFittedScale() {
-        assertEquals(0.6f, convert("com.alightcreative.effects.zoomblur", f("strength", 0.15f)).number("amount"), 2e-3f)
-        assertEquals(1.4f, convert("com.alightcreative.effects.zoomblur", f("strength", 0.35f)).number("amount"), 2e-3f)
+    @Test fun zoomBlurStrengthIsAlightsOwn() {
+        assertEquals(0.15f, convert("com.alightcreative.effects.zoomblur", f("strength", 0.15f)).number("zoom"), 2e-3f)
+        assertEquals(0.35f, convert("com.alightcreative.effects.zoomblur", f("strength", 0.35f)).number("zoom"), 2e-3f)
     }
 
     @Test fun rgbSplitAndSpinBlurKeepTheirFittedValues() {

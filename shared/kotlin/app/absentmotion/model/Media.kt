@@ -69,10 +69,14 @@ fun XmlNode.imageUris(): Set<String> = buildSet {
 
 fun XmlNode.modelUris(): Set<String> = buildSet {
     fun walk(n: XmlNode) {
-        if (n.name == "model") n["src"]?.let { add(app.absentmotion.media.modelKey(it, n["pose"])) }
+        if (n.name == "model") n.modelKey()?.let(::add)
         n.children.forEach(::walk)
     }
     walk(this@modelUris)
+}
+
+fun XmlNode.modelKey(): String? = this["src"]?.let { src ->
+    app.absentmotion.media.modelKey(src, this["pose"], children.mapNotNull { m -> if (m.name == "material") m["index"]?.let { i -> m["picture"]?.let { i to it } } else null })
 }
 
 fun XmlNode.mapMediaUris(change: (String) -> String): XmlNode {

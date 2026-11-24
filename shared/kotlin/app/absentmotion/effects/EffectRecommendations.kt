@@ -1,5 +1,10 @@
 package app.absentmotion.effects
 
+import org.json.JSONArray
+import org.json.JSONObject
+import kotlin.math.ln
+import kotlin.math.pow
+
 internal enum class EffectTargetKind { Photo, Video, Text, Shape, Group, Model }
 
 internal enum class ScreenColor { Green, Blue }
@@ -26,7 +31,50 @@ private data class RecommendationRule(
     val boost: (EffectRecommendationTarget) -> Int = { 0 },
 )
 
-private data class RankedEffect(val effect: EffectDefinition, val family: String, val score: Int)
+private data class RankedEffect(val effect: EffectDefinition, val family: String, val score: Double, val habit: Double, val fits: Boolean)
+
+internal data class EffectUse(val weight: Double, val last: Long, val skipped: Int = 0)
+
+private const val HabitHalfLifeMs = 30L * 24 * 60 * 60 * 1000
+private const val HabitSkipCost = 0.6
+private const val MaxSkips = 5
+private const val MaxPerKind = 40
+private const val StrongHabit = 2.5
+
+internal class EffectHabits(val uses: Map<EffectTargetKind, Map<String, EffectUse>> = emptyMap()) {
+    private fun faded(use: EffectUse, now: Long) = use.weight * 0.5.pow((now - use.last).coerceAtLeast(0L).toDouble() / HabitHalfLifeMs)
+
+    fun strength(kind: EffectTargetKind, id: String, now: Long): Double =
+        uses[kind]?.get(id)?.let { faded(it, now) / (1 + HabitSkipCost * it.skipped) } ?: 0.0
+
+    fun used(kinds: Collection<EffectTargetKind>, id: String, now: Long) =
+        change(kinds) { old -> old + (id to EffectUse((old[id]?.let { faded(it, now) } ?: 0.0) + 1, now)) }
+
+    fun ignored(kinds: Collection<EffectTargetKind>, ids: Collection<String>) =
+        change(kinds) { old -> old + ids.mapNotNull { id -> old[id]?.let { id to it.copy(skipped = minOf(it.skipped + 1, MaxSkips)) } } }
+
+    private fun change(kinds: Collection<EffectTargetKind>, edit: (Map<String, EffectUse>) -> Map<String, EffectUse>) = EffectHabits(
+        uses + kinds.toSet().associateWith { kind -> edit(uses[kind].orEmpty()).entries.sortedByDescending { it.value.last }.take(MaxPerKind).associate { it.key to it.value } },
+    )
+
+    fun encode(): String = JSONObject().also { root ->
+        uses.forEach { (kind, map) -> root.put(kind.name, JSONObject().also { o -> map.forEach { (id, u) -> o.put(id, JSONArray().put(u.weight).put(u.last).put(u.skipped)) } }) }
+    }.toString()
+
+    companion object {
+        fun decode(text: String?): EffectHabits = runCatching {
+            val root = JSONObject(text ?: return EffectHabits())
+            EffectHabits(EffectTargetKind.entries.mapNotNull { kind ->
+                val o = root.optJSONObject(kind.name) ?: return@mapNotNull null
+                kind to o.keys().asSequence().mapNotNull { id ->
+                    val a = o.optJSONArray(id) ?: return@mapNotNull null
+                    val weight = a.optDouble(0, 0.0).takeIf { it.isFinite() && it > 0 } ?: return@mapNotNull null
+                    id to EffectUse(weight, a.optLong(1, 0L), a.optInt(2, 0).coerceIn(0, MaxSkips))
+                }.toMap()
+            }.toMap())
+        }.getOrDefault(EffectHabits())
+    }
+}
 
 private val PhotoAndVideo = setOf(EffectTargetKind.Photo, EffectTargetKind.Video)
 private val FootageAndGroups = PhotoAndVideo + EffectTargetKind.Group
@@ -68,6 +116,8 @@ internal fun recommendedEffects(
     targets: List<EffectRecommendationTarget>,
     recent: List<String>,
     favourites: Set<String>,
+    habits: EffectHabits = EffectHabits(),
+    now: Long = 0L,
 ): List<EffectDefinition> {
     if (targets.isEmpty()) return emptyList()
     val available = definitions.filter { it.available && it.shortcut == null }.associateBy { it.id }
@@ -75,17 +125,33 @@ internal fun recommendedEffects(
     val allText = targets.all { it.kind == EffectTargetKind.Text }
     val animated = targets.all { it.animated || it.effects.any(MotionEffects::contains) }
     val recentIds = recent.take(8).toSet()
-    val ranked = RecommendationRules.mapNotNull { rule ->
+    fun habit(id: String) = targets.map { habits.strength(it.kind, id, now) }.average().let { if (it < 0.05) 0.0 else minOf(7.0, 2.5 * ln(1 + it)) }
+    fun extra(id: String) = (if (id in favourites) 1 else 0) + (if (id in recentIds) 1 else 0)
+    fun allowed(effect: EffectDefinition) = effect.id !in applied && !(effect.category == "text" && !allText)
+    val ruled = RecommendationRules.mapNotNull { rule ->
         val effect = available["absent.${rule.key}"] ?: return@mapNotNull null
-        if (effect.id in applied || effect.category == "text" && !allText || rule.needsMotion && !animated || !targets.all(rule.needs)) return@mapNotNull null
+        if (!allowed(effect) || rule.needsMotion && !animated || !targets.all(rule.needs)) return@mapNotNull null
         val context = if (targets.all { it.kind in rule.preferred }) 4 else 0
         val pairing = if (rule.alongside.isNotEmpty() && targets.all { it.effects.any(rule.alongside::contains) }) 2 else 0
-        val favourite = if (effect.id in favourites) 1 else 0
-        val recency = if (effect.id in recentIds) 1 else 0
-        RankedEffect(effect, rule.family ?: effect.category ?: return@mapNotNull null, context + pairing + favourite + recency + targets.minOf(rule.boost))
-    }.sortedByDescending { it.score }
-    val diverse = ranked.distinctBy { it.family }.take(3)
-    return (diverse + (ranked - diverse.toSet()).take(3 - diverse.size)).map { it.effect }
+        val learned = habit(effect.id)
+        RankedEffect(effect, rule.family ?: effect.category ?: return@mapNotNull null, context + pairing + extra(effect.id) + targets.minOf(rule.boost) + learned, learned, true)
+    }
+    val ruledIds = ruled.mapTo(HashSet()) { it.effect.id }
+    val learnedOnly = targets.flatMapTo(LinkedHashSet()) { habits.uses[it.kind].orEmpty().keys }.mapNotNull { id ->
+        val effect = available[id]?.takeIf { it.id !in ruledIds && allowed(it) } ?: return@mapNotNull null
+        val learned = habit(id).takeIf { it > 0 } ?: return@mapNotNull null
+        RankedEffect(effect, effect.category ?: return@mapNotNull null, learned + extra(id), learned, false)
+    }
+    val ranked = (ruled + learnedOnly).sortedByDescending { it.score }
+    val picks = ArrayList<RankedEffect>(3)
+    fun take(candidates: List<RankedEffect>, diverse: Boolean = true) = candidates.forEach { r ->
+        if (picks.size < 3 && r !in picks && (!diverse || picks.none { it.family == r.family })) picks += r
+    }
+    take(ranked.filter { it.habit >= StrongHabit }.take(2), diverse = false)
+    take(ranked.filter { it.fits })
+    take(ranked)
+    take(ranked, diverse = false)
+    return picks.map { it.effect }
 }
 
 internal fun mediaLook(pixels: IntArray, width: Int, height: Int): MediaLook {

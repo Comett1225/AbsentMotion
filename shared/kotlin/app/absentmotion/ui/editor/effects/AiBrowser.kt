@@ -15,7 +15,6 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -113,6 +112,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 import app.absentmotion.ui.HoldName
+import app.absentmotion.ui.home.DialogPill
 
 @Composable
 internal fun AiBackdrop(modifier: Modifier, action: AiAction? = null) {
@@ -290,9 +290,9 @@ internal fun AiVideoDialog(tools: AiTools, scene: Scene) {
             }
         },
         confirmButton = {
-            TextButton({ tools.apply(AiAction.Video, confirmed = true) }, enabled = !tooLong && size != null) { Text(stringResource(R.string.start), color = Am.Accent) }
+            DialogPill(stringResource(R.string.start), enabled = !tooLong && size != null) { tools.apply(AiAction.Video, confirmed = true) }
         },
-        dismissButton = { TextButton({ tools.videoSetup = null }) { Text(stringResource(R.string.cancel), color = Am.Accent) } },
+        dismissButton = { DialogPill(stringResource(R.string.cancel), primary = false, editor = true) { tools.videoSetup = null } },
         containerColor = Am.Field)
 }
 
@@ -319,8 +319,8 @@ internal fun AiNoiseDialog(tools: AiTools) {
                 }
             }
         },
-        confirmButton = { TextButton({ tools.apply(AiAction.Noise, confirmed = true) }) { Text(stringResource(R.string.start), color = Am.Accent) } },
-        dismissButton = { TextButton({ tools.noiseSetup = null }) { Text(stringResource(R.string.cancel), color = Am.Accent) } },
+        confirmButton = { DialogPill(stringResource(R.string.start)) { tools.apply(AiAction.Noise, confirmed = true) } },
+        dismissButton = { DialogPill(stringResource(R.string.cancel), primary = false, editor = true) { tools.noiseSetup = null } },
         containerColor = Am.Field)
 }
 
@@ -345,8 +345,8 @@ internal fun AiCutoutDialog(tools: AiTools, scene: Scene) {
                 if (asks) CutoutQualityChoice(tools, size)
             }
         },
-        confirmButton = { TextButton({ tools.apply(AiAction.Background, confirmed = true) }) { Text(stringResource(R.string.start), color = Am.Accent) } },
-        dismissButton = { TextButton({ tools.cutoutSetup = null }) { Text(stringResource(R.string.cancel), color = Am.Accent) } },
+        confirmButton = { DialogPill(stringResource(R.string.start)) { tools.apply(AiAction.Background, confirmed = true) } },
+        dismissButton = { DialogPill(stringResource(R.string.cancel), primary = false, editor = true) { tools.cutoutSetup = null } },
         containerColor = Am.Field)
 }
 
@@ -447,13 +447,14 @@ internal fun AiEnhanceDialog(tools: AiTools, scene: Scene, onQuickSharpen: () ->
             }
         },
         confirmButton = {
-            TextButton({
+            DialogPill(
+                stringResource(if (options.usesAi && missing > 0) R.string.ai_download_and_start else R.string.start),
+                enabled = !options.usesAi || (fits && !tooLong && (!cannot || AiNative.loaded)),
+            ) {
                 if (options.usesAi) tools.apply(AiAction.Enhance, confirmed = true, struggles = cannot) else { tools.enhanceSetup = null; onQuickSharpen() }
-            }, enabled = !options.usesAi || (fits && !tooLong && (!cannot || AiNative.loaded))) {
-                Text(stringResource(if (options.usesAi && missing > 0) R.string.ai_download_and_start else R.string.start), color = Am.Accent)
             }
         },
-        dismissButton = { TextButton({ tools.enhanceSetup = null }) { Text(stringResource(R.string.cancel), color = Am.Accent) } },
+        dismissButton = { DialogPill(stringResource(R.string.cancel), primary = false, editor = true) { tools.enhanceSetup = null } },
         containerColor = Am.Field)
 }
 
@@ -467,7 +468,7 @@ private fun EnhanceSwitch(label: String, on: Boolean, onChange: (Boolean) -> Uni
 
 @Composable
 internal fun AiProgressDialog(tools: AiTools) {
-    RiskDialog(tools.risk, Am.OnDark, Am.Accent, Am.Warning, Am.Field) { tools.risk = null; it?.proceed?.invoke() }
+    RiskDialog(tools.risk, Am.OnDark, Am.Warning, Am.Field) { tools.risk = null; it?.proceed?.invoke() }
     if (tools.message.isEmpty()) return
     val action = tools.running
     app.absentmotion.ui.theme.ThemeFade.Hold(action != null)
@@ -479,7 +480,7 @@ internal fun AiProgressDialog(tools: AiTools) {
         text = {
             Column(if (action != null) Modifier.keepScreenOn() else Modifier) {
                 Text(tools.message, color = Am.OnDark, fontSize = 14.sp)
-                if (action == null && tools.retry != null) TextButton({ reporting = true }) { Text(stringResource(R.string.report_button), color = Am.Accent) }
+                if (action == null && tools.retry != null) DialogPill(stringResource(R.string.report_button), Modifier.padding(top = 12.dp), primary = false, editor = true) { reporting = true }
                 if (action != null) {
                     Spacer(Modifier.height(16.dp))
                     LinearProgressIndicator(progress = { tools.progress }, Modifier.fillMaxWidth(), color = Am.Accent)
@@ -487,11 +488,11 @@ internal fun AiProgressDialog(tools: AiTools) {
             }
         },
         confirmButton = {
-            TextButton({ if (action != null) tools.cancel() else tools.retry?.let(tools::apply) ?: tools.dismiss() }) {
-                Text(stringResource(if (action != null) R.string.cancel else if (tools.retry != null) R.string.aibrowser_retry else R.string.ok), color = Am.Accent)
+            DialogPill(stringResource(if (action != null) R.string.cancel else if (tools.retry != null) R.string.aibrowser_retry else R.string.ok), primary = action == null, editor = true) {
+                if (action != null) tools.cancel() else tools.retry?.let(tools::apply) ?: tools.dismiss()
             }
         },
-        dismissButton = { if (action == null && tools.retry != null) TextButton(tools::dismiss) { Text(stringResource(R.string.cancel), color = Am.Accent) } },
+        dismissButton = { if (action == null && tools.retry != null) DialogPill(stringResource(R.string.cancel), primary = false, editor = true, onClick = tools::dismiss) },
         containerColor = Am.Field)
 }
 
@@ -549,16 +550,16 @@ internal fun AiSmoothDialog(tools: AiTools, scene: Scene) {
             }
         },
         confirmButton = {
-            TextButton({ tools.apply(AiAction.Smooth, confirmed = true, struggles = cannot) }, enabled = plan != null && !tooLong && (!cannot || AiNative.loaded)) {
-                Text(stringResource(if (download) R.string.ai_download_and_start else R.string.start), color = Am.Accent)
+            DialogPill(stringResource(if (download) R.string.ai_download_and_start else R.string.start), enabled = plan != null && !tooLong && (!cannot || AiNative.loaded)) {
+                tools.apply(AiAction.Smooth, confirmed = true, struggles = cannot)
             }
         },
-        dismissButton = { TextButton({ tools.smoothSetup = null }) { Text(stringResource(R.string.cancel), color = Am.Accent) } },
+        dismissButton = { DialogPill(stringResource(R.string.cancel), primary = false, editor = true) { tools.smoothSetup = null } },
         containerColor = Am.Field)
     if (help) AlertDialog(onDismissRequest = { help = false },
         title = { Text(stringResource(R.string.export_interpolation), color = Am.OnDark) },
         text = { SmoothingHelp(Am.OnDark, Modifier.heightIn(max = 420.dp)) },
-        confirmButton = { TextButton({ help = false }) { Text(stringResource(R.string.ok), color = Am.Accent) } },
+        confirmButton = { DialogPill(stringResource(R.string.ok)) { help = false } },
         containerColor = Am.Field)
 }
 

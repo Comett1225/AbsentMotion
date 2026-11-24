@@ -104,7 +104,22 @@
    "min": 0.05,
    "max": 10,
    "step": 0.01
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "when": {
+    "style": [
+     1
+    ]
+   }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float rotX;\nuniform float rotY;\nuniform float rotZ;\nuniform float phase;\nuniform float speed;\nuniform float twist;\nuniform float repeat;\nuniform float fog;\nlayout(color) uniform half4 fogColor;\nuniform float2 position;\nuniform float scale;\n\nconst float PI = 3.14159265;\n\nfloat3x3 turn() {\n    float3 a = radians(float3(rotX, rotY, rotZ));\n    float cx = cos(a.x), sx = sin(a.x), cy = cos(a.y), sy = sin(a.y), cz = cos(a.z), sz = sin(a.z);\n    return float3x3(cz, -sz, 0.0, sz, cz, 0.0, 0.0, 0.0, 1.0) * float3x3(cy, 0.0, sy, 0.0, 1.0, 0.0, -sy, 0.0, cy) *\n        float3x3(1.0, 0.0, 0.0, 0.0, cx, -sx, 0.0, sx, cx);\n}\n\nfloat4 pic(float2 uv) {\n    return float4(image.eval(clamp(uv * size, float2(0.5), max(size - 0.5, float2(0.5)))));\n}\n\nfloat2 cover(float2 uv, float2 face) {\n    float r = (face.x / max(face.y, 0.0001)) / (size.x / max(size.y, 0.0001));\n    return (uv - 0.5) * (r > 1.0 ? float2(1.0, 1.0 / r) : float2(r, 1.0)) + 0.5;\n}\n\n\nhalf4 main(float2 coord) {\n    float unit = max(min(size.x, size.y) * 0.5 * scale, 0.5);\n    float3 rd = turn() * normalize(float3((coord - size * 0.5 - position) / unit, 1.4));\n    float r = length(rd.xy);\n    float4 haze = float4(fogColor.rgb * fogColor.a, fogColor.a);\n    if (r < 0.0001) return half4(haze);\n    float3 p = rd / r;\n    float tile = 2.0 * PI / max(floor(repeat + 0.5), 1.0);\n    float along = tile * size.y / max(size.x, 0.0001);\n    float z = p.z + time * speed;\n    float u = fract((atan(p.y, p.x) + radians(twist) * p.z) / tile);\n    float v = fract(z / along + phase);\n    float4 c = pic(float2(u, v));\n    float k = 1.0 - exp(-abs(p.z) * fog * 0.6);\n    return half4(mix(c, haze, k));\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float rotX;\nuniform float rotY;\nuniform float rotZ;\nuniform float phase;\nuniform float speed;\nuniform float twist;\nuniform float repeat;\nuniform float fog;\nlayout(color) uniform half4 fogColor;\nuniform float2 position;\nuniform float scale;\nuniform float style;\n\nconst float PI = 3.14159265;\n\nfloat3x3 turn() {\n    float3 a = radians(float3(rotX, rotY, rotZ));\n    float cx = cos(a.x), sx = sin(a.x), cy = cos(a.y), sy = sin(a.y), cz = cos(a.z), sz = sin(a.z);\n    return float3x3(cz, -sz, 0.0, sz, cz, 0.0, 0.0, 0.0, 1.0) * float3x3(cy, 0.0, sy, 0.0, 1.0, 0.0, -sy, 0.0, cy) *\n        float3x3(1.0, 0.0, 0.0, 0.0, cx, -sx, 0.0, sx, cx);\n}\n\nfloat4 pic(float2 uv) {\n    return float4(image.eval(clamp(uv * size, float2(0.5), max(size - 0.5, float2(0.5)))));\n}\n\nfloat2 cover(float2 uv, float2 face) {\n    float r = (face.x / max(face.y, 0.0001)) / (size.x / max(size.y, 0.0001));\n    return (uv - 0.5) * (r > 1.0 ? float2(1.0, 1.0 / r) : float2(r, 1.0)) + 0.5;\n}\n\n\nhalf4 main(float2 coord) {\n    if (style > 0.5) {\n        float2 n = (coord - size * 0.5 - position) / max(size * 0.5 * scale, float2(0.5));\n        float r = length(n);\n        if (r > 0.995) return half4(0.0);\n        float4 shade = float4(fogColor.rgb * fogColor.a, fogColor.a);\n        if (r < 0.0001) return half4(shade);\n        float g = 1.0 / r + phase + time * speed;\n        float2 q = 0.5 + 0.5 * float2(-abs(n.x), n.y) / r * g;\n        q = 1.0 - abs(1.0 - mod(q, 2.0));\n        float4 c = pic(q);\n        return half4(mix(c, shade, 1.0 - exp(-0.45 * fog * (1.0 / r - 1.0))));\n    }\n    float unit = max(min(size.x, size.y) * 0.5 * scale, 0.5);\n    float3 rd = turn() * normalize(float3((coord - size * 0.5 - position) / unit, 1.4));\n    float r = length(rd.xy);\n    float4 haze = float4(fogColor.rgb * fogColor.a, fogColor.a);\n    if (r < 0.0001) return half4(haze);\n    float3 p = rd / r;\n    float tile = 2.0 * PI / max(floor(repeat + 0.5), 1.0);\n    float along = tile * size.y / max(size.x, 0.0001);\n    float z = p.z + time * speed;\n    float u = fract((atan(p.y, p.x) + radians(twist) * p.z) / tile);\n    float v = fract(z / along + phase);\n    float4 c = pic(float2(u, v));\n    float k = 1.0 - exp(-abs(p.z) * fog * 0.6);\n    return half4(mix(c, haze, k));\n}\n"
 }

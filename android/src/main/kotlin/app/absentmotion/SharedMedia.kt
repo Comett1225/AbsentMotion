@@ -15,7 +15,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
@@ -41,6 +40,7 @@ import app.absentmotion.ui.home.rememberFileBitmap
 import app.absentmotion.ui.theme.Am
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import app.absentmotion.ui.home.DialogPill
 
 internal enum class SharedMediaKind { Video, Picture, Sound }
 
@@ -129,7 +129,7 @@ internal fun SharedMediaDialog(media: List<SharedMedia>, store: ProjectStore, ch
                 }
             }
         },
-        confirmButton = { TextButton(onCancel) { Text(stringResource(R.string.cancel), color = Am.Navy) } },
+        confirmButton = { DialogPill(stringResource(R.string.cancel), primary = false, onClick = onCancel) },
         containerColor = Am.Card,
     )
 }

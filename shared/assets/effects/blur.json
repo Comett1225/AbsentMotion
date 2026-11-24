@@ -12,7 +12,8 @@
    "default": 10,
    "min": 0,
    "max": 300,
-   "step": 0.1
+   "step": 0.1,
+   "drag": 1
   },
   {
    "id": "shape",
@@ -36,6 +37,21 @@
    "when": {
     "shape": [
      2
+    ]
+   }
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "when": {
+    "style": [
+     1
     ]
    }
   }

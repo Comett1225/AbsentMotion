@@ -530,18 +530,19 @@ JNIEXPORT jboolean JNICALL JNI(setPixels)(JNIEnv* e, jobject, jlong h, jstring u
     return true;
 }
 JNIEXPORT jboolean JNICALL JNI(setModel)(JNIEnv* e, jobject, jstring uri, jfloatArray positions, jfloatArray normals,
-                                       jfloatArray uvs, jintArray colors, jintArray triangles, jintArray slots, jboolean twoSided) {
+                                       jfloatArray uvs, jintArray colors, jintArray triangles, jintArray slots, jboolean twoSided,
+                                       jintArray parts, jintArray skinInts, jfloatArray skinFloats) {
     const auto key = str(e, uri);
     if (!positions) { am::SetModel(key, nullptr); return true; }
     if (!normals || !uvs || !colors || !triangles || !slots) return false;
     auto floats = [&](jfloatArray a) {
-        std::vector<float> v((size_t)e->GetArrayLength(a));
-        e->GetFloatArrayRegion(a, 0, (jsize)v.size(), v.data());
+        std::vector<float> v(a ? (size_t)e->GetArrayLength(a) : 0);
+        if (a) e->GetFloatArrayRegion(a, 0, (jsize)v.size(), v.data());
         return v;
     };
     auto ints = [&](jintArray a) {
-        std::vector<int> v((size_t)e->GetArrayLength(a));
-        e->GetIntArrayRegion(a, 0, (jsize)v.size(), v.data());
+        std::vector<int> v(a ? (size_t)e->GetArrayLength(a) : 0);
+        if (a) e->GetIntArrayRegion(a, 0, (jsize)v.size(), v.data());
         return v;
     };
     auto model = std::make_shared<am::Model>();
@@ -556,7 +557,8 @@ JNIEXPORT jboolean JNICALL JNI(setModel)(JNIEnv* e, jobject, jstring uri, jfloat
     const size_t count = model->positions.size() / 3;
     const bool ok = model->positions.size() == count * 3 && model->normals.size() == count * 3 && model->uvs.size() == count * 2 &&
         model->colors.size() == count && model->triangles.size() % 3 == 0 && model->slots.size() == model->triangles.size() / 3 &&
-        std::all_of(model->triangles.begin(), model->triangles.end(), [&](int i) { return i >= 0 && (size_t)i < count; });
+        std::all_of(model->triangles.begin(), model->triangles.end(), [&](int i) { return i >= 0 && (size_t)i < count; }) &&
+        am::SetModelParts(model.get(), ints(parts), ints(skinInts), floats(skinFloats));
     if (ok) am::SetModel(key, std::move(model));
     return ok;
 }
@@ -591,6 +593,15 @@ JNIEXPORT jfloatArray JNICALL JNI(layerBounds)(JNIEnv* e, jobject, jlong h, jlon
     if (b.isEmpty()) return nullptr;
     float v[4] = {b.left(), b.top(), b.right(), b.bottom()};
     return floats(e, v, 4);
+}
+JNIEXPORT jfloatArray JNICALL JNI(modelJoints)(JNIEnv* e, jobject, jlong h, jlong id, jdouble t) {
+    Desktop* d = ptr(h);
+    const am::SceneScope scope(d->scene);
+    am::SetCameraView(d->cameraView);
+    const auto* layer = d->scene.layer(id);
+    if (!layer || layer->kind != "model") return nullptr;
+    const std::vector<float> xy = am::ModelJoints(d->scene.layers, *layer, d->scene.width, d->scene.height, t, d->scene.depthOrder);
+    return xy.empty() ? nullptr : floats(e, xy.data(), (int)xy.size());
 }
 JNIEXPORT jstring JNICALL JNI(layerOutline)(JNIEnv* e, jobject, jlong h, jlong id, jdouble t) {
     Desktop* d = ptr(h);

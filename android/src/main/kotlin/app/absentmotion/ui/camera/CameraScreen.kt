@@ -56,7 +56,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -106,6 +105,7 @@ import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 import app.absentmotion.ui.editor.panels.buttonLabel
 import app.absentmotion.ui.HoldName
+import app.absentmotion.ui.home.DialogPill
 
 private enum class Flash(@StringRes val label: Int, val mode: Int) {
     Off(R.string.camera_off, ImageCapture.FLASH_MODE_OFF), Auto(R.string.camera_auto, ImageCapture.FLASH_MODE_AUTO), On(R.string.camera_on, ImageCapture.FLASH_MODE_ON),
@@ -183,7 +183,10 @@ private fun Context.findActivity(): Activity? {
 }
 
 @Composable
-private fun Permitted(onClose: () -> Unit, content: @Composable (mic: Boolean, askMic: () -> Unit) -> Unit) {
+internal fun Permitted(
+    onClose: () -> Unit, withMic: Boolean = true, @StringRes explain: Int = R.string.camera_permission_explain, @StringRes blockedText: Int = R.string.camera_permission_blocked,
+    content: @Composable (mic: Boolean, askMic: () -> Unit) -> Unit,
+) {
     val context = LocalContext.current
     fun has(name: String) = context.checkSelfPermission(name) == PackageManager.PERMISSION_GRANTED
     var camera by remember { mutableStateOf(has(Manifest.permission.CAMERA)) }
@@ -224,19 +227,20 @@ private fun Permitted(onClose: () -> Unit, content: @Composable (mic: Boolean, a
         Text(stringResource(R.string.camera_access), color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(12.dp))
         Text(
-            stringResource(if (blocked) R.string.camera_permission_blocked else R.string.camera_permission_explain),
+            stringResource(if (blocked) blockedText else explain),
             Modifier.widthIn(max = 420.dp), color = Color.White.copy(alpha = 0.8f), fontSize = 15.sp, lineHeight = 21.sp, textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(24.dp))
         Box(
             Modifier.height(48.dp).clip(RoundedCornerShape(24.dp)).background(Am.Accent).clickable {
                 if (blocked) context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null)))
-                else request.launch(arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO))
+                else request.launch(if (withMic) arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO) else arrayOf(Manifest.permission.CAMERA))
             }.padding(horizontal = 24.dp),
             Alignment.Center,
         ) { Text(stringResource(if (blocked) R.string.camera_open_settings else R.string.camera_allow), color = Am.OnAccent, fontSize = 16.sp, fontWeight = FontWeight.Medium) }
-        Box(Modifier.height(48.dp).clickable(onClick = onClose).padding(horizontal = 24.dp), Alignment.Center) {
-            Text(stringResource(R.string.action_close), color = Color.White, fontSize = 16.sp)
+        Spacer(Modifier.height(12.dp))
+        Box(Modifier.height(48.dp).clip(RoundedCornerShape(24.dp)).background(Color.White.copy(alpha = 0.16f)).clickable(onClick = onClose).padding(horizontal = 24.dp), Alignment.Center) {
+            Text(stringResource(R.string.action_close), color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Medium)
         }
     }
 }
@@ -404,15 +408,15 @@ private fun CameraBody(ui: CameraUi, aspect: Float, mic: Boolean, askMic: () -> 
         title = { Text(stringResource(R.string.camera_discard_title)) },
         text = { Text(stringResource(R.string.camera_discard_text)) },
         confirmButton = {
-            TextButton({
+            DialogPill(stringResource(R.string.discard)) {
                 ui.askDiscard = false
                 ui.recording?.let { recording ->
                     ui.discarding = true
                     runCatching { recording.close() }
                 }
-            }) { Text(stringResource(R.string.discard)) }
+            }
         },
-        dismissButton = { TextButton({ ui.askDiscard = false }) { Text(stringResource(R.string.camera_keep_recording)) } },
+        dismissButton = { DialogPill(stringResource(R.string.camera_keep_recording), primary = false) { ui.askDiscard = false } },
     )
     val recording = ui.recording != null
     val locked = recording || ui.countdown > 0

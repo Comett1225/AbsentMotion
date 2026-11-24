@@ -78,7 +78,7 @@ class AlightLookMigrationTest {
         val empty = migrate("""<effect id="com.alightcreative.effects.lumastamper" />""")
         val explicit = migrate("""<effect id="com.alightcreative.effects.lumastamper"><property name="color" type="color" value="#ffff5566" /><property name="clipLow" type="float" value="0" /><property name="clipHigh" type="float" value="0" /><property name="gamma" type="float" value="1" /><property name="invert" type="bool" value="false" /></effect>""")
         assertEquals(empty.toXml(), explicit.toXml())
-        assertEquals(1f, empty.number("compositing"), 0f)
+        assertEquals(0f, empty.number("compositing"), 0f)
         assertEquals(0f, migrate("""<effect id="com.alightcreative.effects.lumastamper" />""", clipped = true).number("compositing"), 0f)
         assertEquals(0f, empty.number("low"), 0f)
         assertEquals(1f, empty.number("high"), 0f)

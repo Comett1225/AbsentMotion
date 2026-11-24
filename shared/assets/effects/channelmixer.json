@@ -1,0 +1,64 @@
+{
+ "id": "channelmixer",
+ "name": "Channel Mixer",
+ "category": "color",
+ "since": "5.3.0",
+ "description": "Rebuilds the picture from its red, green and blue channels: each channel adds its own Color, then Gamma bends each channel and Offset lifts or lowers all of them.",
+ "params": [
+  {
+   "id": "red",
+   "label": "Red",
+   "type": "color",
+   "default": "#ff0000"
+  },
+  {
+   "id": "green",
+   "label": "Green",
+   "type": "color",
+   "default": "#00ff00"
+  },
+  {
+   "id": "blue",
+   "label": "Blue",
+   "type": "color",
+   "default": "#0000ff"
+  },
+  {
+   "id": "gammaRed",
+   "label": "Red Gamma",
+   "type": "float",
+   "default": 1,
+   "min": 0.01,
+   "max": 10,
+   "step": 0.01
+  },
+  {
+   "id": "gammaGreen",
+   "label": "Green Gamma",
+   "type": "float",
+   "default": 1,
+   "min": 0.01,
+   "max": 10,
+   "step": 0.01
+  },
+  {
+   "id": "gammaBlue",
+   "label": "Blue Gamma",
+   "type": "float",
+   "default": 1,
+   "min": 0.01,
+   "max": 10,
+   "step": 0.01
+  },
+  {
+   "id": "offset",
+   "label": "Offset",
+   "type": "float",
+   "default": 0,
+   "min": -1,
+   "max": 1,
+   "step": 0.01
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nlayout(color) uniform half4 red;\nlayout(color) uniform half4 green;\nlayout(color) uniform half4 blue;\nuniform float gammaRed;\nuniform float gammaGreen;\nuniform float gammaBlue;\nuniform float offset;\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    if (c.a <= 0.0) return half4(0.0);\n    float3 f = float3(c.rgb) / float(c.a);\n    float3 m = f.r * float3(red.rgb) + f.g * float3(green.rgb) + f.b * float3(blue.rgb);\n    m = pow(max(m, 0.0), 1.0 / max(float3(gammaRed, gammaGreen, gammaBlue), float3(0.01))) + offset;\n    return half4(half3(clamp(m, 0.0, 1.0)) * c.a, c.a);\n}"
+}

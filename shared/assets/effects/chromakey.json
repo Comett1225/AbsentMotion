@@ -39,7 +39,36 @@
    "label": "Invert",
    "type": "switch",
    "default": false
+  },
+  {
+   "id": "luma",
+   "label": "Luma Weight",
+   "type": "float",
+   "default": 0.25,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "when": {
+    "style": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "when": {
+    "style": [
+     1
+    ]
+   }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nlayout(color) uniform half4 key;\nuniform float tolerance;\nuniform float softness;\nuniform float invert;\nuniform float defringe;\nfloat2 chroma(half3 c) { return float2(-0.1687 * c.r - 0.3313 * c.g + 0.5 * c.b, 0.5 * c.r - 0.4187 * c.g - 0.0813 * c.b); }\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    float d = distance(chroma(unpremul(c).rgb), chroma(key.rgb));\n    float keep = smoothstep(tolerance, tolerance + softness + 0.0001, d);\n    float k = invert > 0.5 ? 1.0 - keep : keep;\n    if (defringe > 0.5 && k > 0.0 && k < 1.0 && c.a > 0.0) {\n        return half4(c.rgb * half(k * k), c.a * half(k));\n    }\n    return c * half(k);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nlayout(color) uniform half4 key;\nuniform float tolerance;\nuniform float softness;\nuniform float invert;\nuniform float defringe;\nuniform float luma;\nuniform float style;\nfloat2 chroma(half3 c) { return float2(-0.1687 * c.r - 0.3313 * c.g + 0.5 * c.b, 0.5 * c.r - 0.4187 * c.g - 0.0813 * c.b); }\nfloat3 yuv(float3 c) {\n    float y = dot(c, float3(0.299, 0.587, 0.114));\n    return float3(y, 0.492 * (c.b - y), 0.877 * (c.r - y));\n}\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    float keep;\n    if (style > 0.5) {\n        if (key.a <= 0.0) return c;\n        float3 e = yuv(float3(unpremul(c).rgb)) - yuv(float3(key.rgb));\n        float d = length(float3(luma * e.x, e.yz));\n        keep = clamp((d - tolerance + softness) / max(softness, 0.0001), 0.0, 1.0);\n    } else {\n        float d = distance(chroma(unpremul(c).rgb), chroma(key.rgb));\n        keep = smoothstep(tolerance, tolerance + softness + 0.0001, d);\n    }\n    float k = invert > 0.5 ? 1.0 - keep : keep;\n    if (defringe > 0.5 && k > 0.0 && k < 1.0 && c.a > 0.0) {\n        return half4(c.rgb * half(k * k), c.a * half(k));\n    }\n    return c * half(k);\n}\n"
 }

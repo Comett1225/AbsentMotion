@@ -36,8 +36,10 @@ object DeskKeys {
             app.absentmotion.ui.home.DeskModals.open > 0 || app.absentmotion.ui.home.EmbedRequest.templateId != null
 
     fun handle(state: EditorState, event: KeyEvent, close: () -> Unit): Boolean {
-        if (!deskLayout || event.type != KeyEventType.KeyDown) return false
-        if (DeskShortcuts.viewer?.invoke(event) == true) return true
+        if (!deskLayout) return false
+        if (event.type == KeyEventType.KeyDown && DeskShortcuts.viewer?.invoke(event) == true) return true
+        if (DeskTyping.active == 0 && app.absentmotion.ui.editor.DrawingKeys.handle(state, event)) return true
+        if (event.type != KeyEventType.KeyDown) return false
         if (DeskTyping.active > 0 || modal(state)) return false
         val action = DeskShortcuts.find(DeskShortcuts.chord(event)) { !it.global } ?: return false
         if (event.nativeKeyEvent.repeatCount > 0 && !action.repeats) return true

@@ -26,7 +26,8 @@ class NativeEngine(backend: Backend = Backend.GANESH) : AutoCloseable {
         return DesktopNative.setPixels(handle, uri, bitmap.width, bitmap.height, px)
     }
 
-    fun setModel(uri: String, mesh: app.absentmotion.media.Mesh?): Boolean = DesktopNative.setModel(uri, mesh?.positions, mesh?.normals, mesh?.uvs, mesh?.colors, mesh?.triangles, mesh?.slots, mesh?.twoSided == true)
+    fun setModel(uri: String, mesh: app.absentmotion.media.Mesh?): Boolean = DesktopNative.setModel(uri, mesh?.positions, mesh?.normals, mesh?.uvs, mesh?.colors, mesh?.triangles, mesh?.slots,
+        mesh?.twoSided == true, mesh?.parts, mesh?.skin?.ints(), mesh?.skin?.floats())
 
     fun setPictureFile(uri: String, path: String, raw: Boolean = false): Boolean = DesktopNative.setPicture(handle, uri, path, raw)
 
@@ -68,6 +69,7 @@ class NativeEngine(backend: Backend = Backend.GANESH) : AutoCloseable {
     fun propertyNumbers(layerId: Long, effect: Int, name: String, timeMs: Double): FloatArray? = DesktopNative.propertyNumbers(handle, layerId, effect, name, timeMs)
     fun layerMatrix(layerId: Long, timeMs: Double): FloatArray? = DesktopNative.layerMatrix(handle, layerId, timeMs)
     fun layerBounds(layerId: Long, timeMs: Double): FloatArray? = DesktopNative.layerBounds(handle, layerId, timeMs)
+    fun modelJoints(layerId: Long, timeMs: Double): FloatArray? = DesktopNative.modelJoints(handle, layerId, timeMs)
     fun layerOutline(layerId: Long, timeMs: Double): String? = DesktopNative.layerOutline(handle, layerId, timeMs)
     fun hitTest(x: Float, y: Float, timeMs: Double): Long = DesktopNative.hitTest(handle, x, y, timeMs)
     fun still(timeMs: Double, width: Int, height: Int): ByteArray? = DesktopNative.still(handle, timeMs, width, height, true)

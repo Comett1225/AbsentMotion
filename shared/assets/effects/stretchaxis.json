@@ -28,7 +28,22 @@
    "label": "Mask To Layer",
    "type": "switch",
    "default": false
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "when": {
+    "style": [
+     1
+    ]
+   }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float scale;\nuniform float angle;\nuniform float mask;\nhalf4 main(float2 coord) {\n    float a = radians(angle);\n    float2 d = float2(cos(a), sin(a));\n    float2 v = coord - size * 0.5;\n    float along = dot(v, d);\n    half4 color = image.eval(coord + d * (along / max(scale, 0.01) - along));\n    if (mask > 0.5) color *= image.eval(coord).a;\n    return color;\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float scale;\nuniform float angle;\nuniform float mask;\nuniform float style;\nhalf4 main(float2 coord) {\n    float a = radians(angle);\n    float2 d = float2(cos(a), sin(a));\n    float2 v = coord - size * 0.5;\n    float along = dot(v, d);\n    float2 q = coord + d * (along / max(scale, 0.01) - along);\n    if (style > 0.5) {\n        if (scale <= 0.0 || coord.x < 0.0 || coord.y < 0.0 || coord.x > size.x || coord.y > size.y) return half4(0.0);\n        q = clamp(q, float2(0.5), size - 0.5);\n    }\n    half4 color = image.eval(q);\n    if (mask > 0.5) color *= image.eval(coord).a;\n    return color;\n}\n"
 }

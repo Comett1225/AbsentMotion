@@ -12,7 +12,8 @@
    "default": 1,
    "min": 0,
    "max": 4,
-   "step": 0.01
+   "step": 0.01,
+   "slider": true
   },
   {
    "id": "position",

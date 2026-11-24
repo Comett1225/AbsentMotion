@@ -23,13 +23,15 @@ class AlightEffectCoverageTest {
 
     private fun XmlNode.floats(name: String): List<Float> = children.single { it["name"] == name }["value"]!!.split(',').map { it.trim().toFloat() }
 
-    @Test fun centrePointsBecomeShareOfTheLayer() {
+    @Test fun zoomBlurCentresMoveAFiveHundredthOfTheLayerPerUnit() {
         val blur = migrate("""<effect id="com.alightcreative.effects.zoomblur3"><property name="centerPoint" type="vec2" value="40.000000,-25.000000" /><property name="strength" type="float" value="0.3" /></effect>""")
         assertEquals("absent.radialblur", blur["id"])
         val c = blur.floats("center")
-        assertEquals(0.5f + 0.45f * 40f / 220f, c[0], 1e-4f)
-        assertEquals(0.5f - 0.37f * 25f / 165f, c[1], 1e-4f)
-        assertEquals(1.2f, blur.floats("amount")[0], 1e-5f)
+        assertEquals(0.58f, c[0], 1e-4f)
+        assertEquals(0.45f, c[1], 1e-4f)
+        assertEquals(0.3f, blur.floats("zoom")[0], 1e-5f)
+        assertEquals(1f, blur.floats("style")[0], 0f)
+        assertEquals(listOf(0.58f, 0.45f), migrate("""<effect id="com.alightcreative.effects.zoomblur3"><property name="centerPoint" type="vec2" value="40.000000,-25.000000" /></effect>""", "270,540").floats("center"))
     }
 
     @Test fun pointsLeftAtAlightsDefaultTakeTheCurrentDefaultNotTheLegacyOne() {
@@ -42,7 +44,8 @@ class AlightEffectCoverageTest {
             <property name="intensity" type="float" value="2" /><property name="threshold" type="float" value="0.7" /><property name="thresholdColor" type="color" value="#FF3366CC" />
             <property name="fillColor" type="color" value="#FF3366CC" /><property name="blend" type="float" value="0.25" /><property name="quality" type="float" value="150" /></effect>""")
         assertEquals("absent.rays", varied["id"])
-        assertEquals(listOf(1.1125f, 2f, 0.7f, 0.25f), listOf("reach", "intensity", "threshold", "blend").map { varied.floats(it)[0] })
+        assertEquals(1.1125f * 0.065f, varied.floats("reach")[0], 1e-5f)
+        assertEquals(listOf(2f, 0.7f, 0.25f), listOf("intensity", "threshold", "blend").map { varied.floats(it)[0] })
         assertEquals(0.5f + 40f / 220f, varied.floats("center")[0], 1e-4f)
         assertEquals("#FF3366CC", varied.children.single { it["name"] == "thresholdAdd" }["value"])
         assertEquals("#FF3366CC", varied.children.single { it["name"] == "color" }["value"])
@@ -101,6 +104,46 @@ class AlightEffectCoverageTest {
         assertEquals("absent.simplestarfield", older["id"])
         assertEquals(listOf(40f, -25f), older.floats("position"))
         assertEquals(249.75f, older.floats("depth")[0], 1e-4f)
+    }
+
+    @Test fun warpBlurImportsEverySetting() {
+        val w = migrate("""<effect id="com.alightcreative.effects.warpblur"><property name="parr" type="vec2" value="40.000000,-25.000000" /><property name="position" type="vec2" value="12.000000,8.000000" />
+            <property name="intensity" type="float" value="0.8125" /><property name="evolution" type="float" value="12.5" /><property name="direction" type="int" value="5" />
+            <property name="scale" type="float" value="13.25" /><property name="stretch" type="vec2" value="2.000000,0.500000" /><property name="seed" type="float" value="1.25" />
+            <property name="singleAxis" type="bool" value="false" /><property name="screenSpace" type="bool" value="true" /><property name="octaves" type="float" value="6.75" />
+            <property name="offs" type="float" value="0.25" /></effect>""")
+        assertEquals("absent.warpblur", w["id"])
+        assertEquals(listOf(40f, -25f), w.floats("parallax"))
+        assertEquals(listOf(12f, 8f), w.floats("offset"))
+        assertEquals(listOf(2f, 0.5f), w.floats("stretch"))
+        assertEquals(listOf(0.8125f, 12.5f, 5f, 13.25f, 1.25f, 6.75f, 0.25f), listOf("strength", "evolution", "direction", "scale", "seed", "octaves", "bias").map { w.floats(it)[0] })
+        assertEquals("false", w.children.single { it["name"] == "singleAxis" }["value"])
+        assertEquals("true", w.children.single { it["name"] == "screenSpace" }["value"])
+    }
+
+    @Test fun olderAlightEffectsConvert() {
+        val balance = migrate("""<effect id="com.alightcreative.effects.colorbalance"><property name="crLow" type="float" value="100" /><property name="ybHigh" type="float" value="-50" /><property name="fixLum" type="bool" value="false" /></effect>""")
+        assertEquals("absent.colorbalance", balance["id"])
+        assertEquals("#ffff8080", balance.children.single { it["name"] == "shadows" }["value"])
+        assertEquals("#ff808080", balance.children.single { it["name"] == "midtones" }["value"])
+        assertEquals("#ff808040", balance.children.single { it["name"] == "highlights" }["value"])
+        assertEquals("false", balance.children.single { it["name"] == "preserve" }["value"])
+        assertEquals(1f, balance.floats("style")[0], 0f)
+        val mixer = migrate("""<effect id="com.alightcreative.effects.rgb-mixer"><property name="gamma" type="float" value="2" /><property name="rmix" type="color" value="#ff00ff00" /></effect>""")
+        assertEquals("absent.channelmixer", mixer["id"])
+        assertEquals(listOf(2f, 2f, 2f), listOf("gammaRed", "gammaGreen", "gammaBlue").map { mixer.floats(it)[0] })
+        assertEquals("#ff00ff00", mixer.children.single { it["name"] == "red" }["value"])
+        val adjust = migrate("""<effect id="com.alightcreative.effects.coloradj"><property name="saturation" type="float" value="0.5" /><property name="vib" type="float" value="-1" /></effect>""")
+        assertEquals(listOf(1.5f, -2f), listOf("saturation", "vibrance").map { adjust.floats(it)[0] })
+        val key = migrate("""<effect id="com.alightcreative.effects.chromakey-adv"><property name="c1active" type="bool" value="false" /><property name="c1color" type="color" value="#ffe04545" /></effect>""")
+        assertEquals("#00000000", key.children.single { it["name"] == "key" }["value"])
+        assertEquals(1f, key.floats("style")[0], 0f)
+        val outlines = listOf("outlinebasic", "outlinebad", "outline").map { migrate("""<effect id="com.alightcreative.effects.$it"><property name="radius" type="float" value="40" /></effect>""") }
+        assertEquals(listOf(0f, 1f, 2f), outlines.map { it.floats("style")[0] })
+        assertEquals(listOf(37.25f, 40f, 38f), outlines.map { it.floats("radius")[0] })
+        assertEquals("absent.difference", migrate("""<effect id="com.alightcreative.effects.diff" />""")["id"])
+        assertEquals("absent.vortexblur", migrate("""<effect id="com.alightcreative.effects.chromaticvortexblur"><property name="colorAberration" type="float" value="0.3" /></effect>""")["id"])
+        assertEquals("absent.movealongpath", migrate("""<effect id="com.alightcreative.effect.movealongpath"><property name="progress" type="float" value="0.5" /></effect>""")["id"])
     }
 
     @Test fun commonAlightEffectsAllRun() {

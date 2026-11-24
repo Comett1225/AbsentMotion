@@ -215,7 +215,7 @@ class EffectMigrationTest {
         val all = effects(result.scene.node)
         assertEquals(listOf("colorize", "chromaticzoomblur", "texttransform", "texttransform").map { "absent.$it" }, all.map { it["id"] })
         assertTrue(result.dropped.toString(), result.dropped.isEmpty())
-        close(180.70256f, all[0].number("hue"))
+        close(-179.29744f, all[0].number("hue"))
         close(0.442514f, all[0].number("amount"))
         close(1f, all[0].number("style"))
         close(0.03f, all[1].number("amount"))
@@ -287,6 +287,20 @@ class EffectMigrationTest {
         assertEquals(once.scene.node, migration.migrate(once.scene).scene.node)
     }
 
+    @Test fun onlyAlightTextGetsPixelMetrics() {
+        fun texts(xml: String) = migration.migrate(Scene.parse(xml)).scene.node.let { root ->
+            generateSequence(listOf(root)) { level -> level.flatMap { it.children }.takeIf { it.isNotEmpty() } }.flatten().filter { it.name == "text" }.toList()
+        }
+        val body = """<text id="1" startTime="0" endTime="1000" size="40" font="googlefonts?name=Roboto&amp;weight=400" wrapWidth="1060" align="center"><content>A</content></text>
+            <embedScene id="2" startTime="0" endTime="1000"><scene width="100" height="100" fps="30" totalTime="1000">
+              <text id="3" startTime="0" endTime="1000" size="40" font="googlefonts?name=Roboto&amp;weight=400" wrapWidth="100" align="left"><content>B</content></text></scene></embedScene>
+          </scene>"""
+        val alight = texts("""<scene width="1080" height="1080" fps="30" totalTime="1000" am="com.alightcreative.motion/5.0.273">$body""")
+        assertEquals(listOf("pixel", "pixel"), alight.map { it["textMetrics"] })
+        val own = texts("""<scene width="1080" height="1080" fps="30" totalTime="1000" am="app.absentmotion">$body""")
+        assertEquals(listOf(null, null), own.map { it["textMetrics"] })
+    }
+
     @Test fun twoAlightPropertiesMergedIntoOnePointKeepBothAnimations() {
         fun clouds(x: String, y: String) = effects(migration.migrate(Scene.parse("""<scene width="100" height="100" fps="30" totalTime="1000" am="com.alightcreative.motion/5.0.273">
             <shape id="1" startTime="0" endTime="1000" fillType="color" s=".rect"><effect id="com.alightcreative.effects.clouds">
@@ -300,7 +314,7 @@ class EffectMigrationTest {
 
     @Test fun currentAbsentEffectsWithAnUnknownSettingAreLeftAlone() {
         val xml = """<scene width="100" height="100" fps="30" totalTime="1000"><shape id="1" startTime="0" endTime="1000" s=".rect">
-            <effect id="absent.swing"><property name="frequency" type="float" value="2" /><property name="phase" type="float" value="0.8" /><property name="future" type="float" value="1" /></effect></shape></scene>"""
+            <effect id="absent.swing"><property name="freq" type="float" value="2" /><property name="phase" type="float" value="0.8" /><property name="future" type="float" value="1" /></effect></shape></scene>"""
         val scene = Scene.parse(xml)
         assertEquals(scene.node, migration.migrate(scene).scene.node)
     }
@@ -431,19 +445,19 @@ class EffectMigrationTest {
             for (p in effect.children) assertEquals("${definition.key}.${p["name"]}", definition.params.single { it.id == p["name"] }.type, p["type"])
         }
         assertEquals(mapOf("magnitude" to 50f, "frequency" to 2f, "evolution" to 0f, "seed" to 0f, "angle" to 45f, "slack" to 0.25f, "zshake" to 0f, "pattern" to 1f), numbers("autoshake"))
-        assertEquals(mapOf("progress" to 0f, "orientation" to 0f, "inset" to 0f), numbers("movealongpath"))
+        assertEquals(mapOf("progress" to 0f, "orientation" to 0f, "inset" to 0f, "style" to 1f), numbers("movealongpath"))
         assertEquals("true", own("movealongpath").prop("rotate")["value"])
         assertEquals(mapOf("feather" to 0f), numbers("offset"))
         assertEquals("false", own("offset").prop("mask")["value"])
         assertEquals(mapOf("direction" to 0f, "angle" to 45f, "frequency" to 2f, "magnitude" to 25f, "wave" to 0f, "phase" to 0f), numbers("oscillate"))
-        assertEquals(mapOf("frequency" to 2f, "shrink" to 0.9f, "grow" to 1.1f, "phase" to 0f, "wave" to 0f), numbers("pulsesize"))
-        assertEquals(mapOf("magnitude" to 50f, "evolution" to 0f, "seed" to 0f, "scatter" to 0.5f, "speed" to 0f), numbers("randomdisplace"))
+        assertEquals(mapOf("frequency" to 1f, "shrink" to 0.9f, "grow" to 1.1f, "phase" to 0f, "wave" to 0f, "style" to 2f), numbers("pulsesize"))
+        assertEquals(mapOf("magnitude" to 50f, "evolution" to 0f, "seed" to 0f, "scatter" to 0.5f, "speed" to 0f, "style" to 1f), numbers("randomdisplace"))
         assertEquals(mapOf("angle" to 45f, "frequency" to 30f, "magnitude" to 25f, "seed" to 0f, "slack" to 0f, "zjitter" to 0f), numbers("randomjitter"))
-        assertEquals(mapOf("frequency" to 5.98f, "angle1" to -30f, "angle2" to 30f, "phase" to 0f, "wave" to 0f), numbers("swing"))
-        assertEquals(mapOf("rpm" to -936f), numbers("spin"))
-        assertEquals(mapOf("scale" to 18.51f, "angle" to 0f), numbers("stretchaxis"))
+        assertEquals(mapOf("freq" to 5.98f, "angle1" to -30f, "angle2" to 30f, "phase" to 0f, "wave" to 0f), numbers("swing"))
+        assertEquals(mapOf("rpm" to -936f, "style" to 1f), numbers("spin"))
+        assertEquals(mapOf("scale" to 18.51f, "angle" to 0f, "style" to 1f), numbers("stretchaxis"))
         assertEquals("false", own("stretchaxis").prop("mask")["value"])
-        assertEquals(mapOf("frequency" to 5.98f, "strength" to 1f, "phase" to 0f, "wave" to 0f), numbers("pulseopacity"))
+        assertEquals(mapOf("frequency" to 2.99f, "strength" to 1f, "phase" to 0f, "wave" to 0f), numbers("pulseopacity"))
         assertEquals(mapOf("axis" to 3f, "scale" to 369.99628f, "damp" to 1f), numbers("scaleassist"))
         assertEquals(result.scene.node, migration.migrate(result.scene).scene.node)
     }

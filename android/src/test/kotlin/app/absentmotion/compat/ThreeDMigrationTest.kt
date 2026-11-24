@@ -54,7 +54,7 @@ class ThreeDMigrationTest {
         assertEquals(listOf(0f, 0f, 0f), listOf("rotX", "rotY", "rotZ").map { box.floats(it)[0] })
         assertEquals(listOf(0f, 0f), box.floats("position"))
         assertEquals(1f, box.floats("perspective")[0], 1e-6f)
-        assertEquals(0.525f, box.floats("shading")[0], 1e-6f)
+        assertEquals(0.8f, box.floats("shading")[0], 1e-6f)
         assertEquals(45f, box.floats("light")[0], 1e-6f)
         assertEquals(0f, box.floats("smoothing")[0], 1e-6f)
         assertEquals(0.87f, box.floats("height")[0], 1e-6f)
@@ -83,7 +83,7 @@ class ThreeDMigrationTest {
             <property name="lightColor" type="color" value="#ffffffff" /><property name="lightDir" type="vec2" value="75.000000,-75.000000" /><property name="lightDepth" type="float" value="100.000000" />
             <property name="mirror" type="bool" value="false" /><property name="texRepeatX" type="float" value="1.000000" /><property name="MAX_ITER" type="float" value="60.000000" /></effect>""")
         val cylinder = ok.scene.node.children.single { it.name == "shape" }.children.single { it.name == "effect" }
-        assertEquals(0.5f * 0.525f, cylinder.floats("shading")[0], 1e-6f)
+        assertEquals(0.5f * 0.8f, cylinder.floats("shading")[0], 1e-6f)
         assertEquals(0.4f, cylinder.floats("shine")[0], 1e-6f)
         assertTrue(ok.dropped.toString(), ok.dropped.isEmpty())
         val changed = result("""<effect id="com.alightcreative.effects.cylinder"><property name="lightColor" type="color" value="#FF3366CC" /><property name="texRepeatX" type="float" value="5.75" /></effect>""")
@@ -98,8 +98,8 @@ class ThreeDMigrationTest {
         assertEquals(0.58f, cylinder.floats("radius")[0], 1e-5f)
         assertEquals(0.9f, cylinder.floats("height")[0], 1e-5f)
         assertEquals(0.4f, cylinder.floats("smoothing")[0], 1e-6f)
-        assertEquals(0.28f, migrate(alight("cube2")).floats("edge")[0], 1e-6f)
-        assertEquals(0.58f, migrate(alight("cube2", "width" to "2")).floats("edge")[0], 1e-5f)
+        assertEquals(0.2837f, migrate(alight("cube2")).floats("edge")[0], 1e-6f)
+        assertEquals(0.5674f, migrate(alight("cube2", "width" to "2")).floats("edge")[0], 1e-5f)
         assertEquals(0.78f, migrate(alight("spherize2", "radius" to "2.5")).floats("radius")[0], 1e-5f)
         val torus = migrate(alight("torus", "radius" to "2", "thickness" to "1"))
         assertEquals(0.6f, torus.floats("radius")[0], 1e-5f)
@@ -143,7 +143,7 @@ class ThreeDMigrationTest {
     @Test fun tunnelKeepsPhaseTwirlAndFog() {
         val t = migrate("""<effect id="com.alightcreative.effects.tunnel"><property name="phase" type="float" value="2.7" /><property name="twirl" type="float" value="45" />
             <property name="fog" type="float" value="2" /><property name="wrap" type="float" value="4" /></effect>""")
-        assertEquals(listOf(2.7f, 45f, 0.8f, 4f, 0f), listOf("phase", "twist", "fog", "repeat", "speed").map { t.floats(it)[0] })
+        assertEquals(listOf(2.7f, 45f, 2f, 4f, 0f), listOf("phase", "twist", "fog", "repeat", "speed").map { t.floats(it)[0] })
     }
 
     @Test fun migratedEffectsStayMigrated() {

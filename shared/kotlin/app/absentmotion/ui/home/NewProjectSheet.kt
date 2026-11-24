@@ -36,7 +36,6 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.LayoutDirection
 import app.absentmotion.platform.PlatformFeatures
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.TextButton
 import app.absentmotion.library.SavedSize
 import app.absentmotion.library.SavedSizes
 import androidx.compose.foundation.layout.Arrangement
@@ -825,8 +824,8 @@ internal fun SizeNameDialog(title: String, initial: String, dark: Boolean, onDis
                 },
             )
         },
-        confirmButton = { TextButton({ onDone(text.text) }) { Text(stringResource(R.string.done), color = accent) } },
-        dismissButton = { TextButton(onDismiss) { Text(stringResource(R.string.cancel), color = accent) } },
+        confirmButton = { DialogPill(stringResource(R.string.done)) { onDone(text.text) } },
+        dismissButton = { DialogPill(stringResource(R.string.cancel), primary = false, editor = dark, onClick = onDismiss) },
         containerColor = if (dark) Am.Field else Am.Card,
     )
 }

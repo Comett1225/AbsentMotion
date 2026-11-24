@@ -3,7 +3,7 @@
  "name": "Drop Shadow",
  "category": "stylize",
  "since": "5.0.0",
- "description": "Draws a soft shadow of the layer's shape behind it, moved by Offset X and Offset Y.",
+ "description": "Draws a soft shadow of the layer's shape behind it, moved by Offset X and Offset Y. Spread grows the shadow before it fades out.",
  "params": [
   {
    "id": "color",
@@ -47,7 +47,17 @@
    "min": -2000,
    "max": 2000,
    "step": 1
+  },
+  {
+   "id": "spread",
+   "label": "Spread",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 0.95,
+   "step": 0.01,
+   "percent": true
   }
  ],
- "sksl": "uniform shader image;\nuniform shader blurred;\nuniform float2 size;\nuniform float time;\nlayout(color) uniform half4 color;\nuniform float opacity;\nuniform float blur;\nuniform float x;\nuniform float y;\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    float sa = float(blurred.eval(coord - float2(x, y)).a) * clamp(opacity, 0.0, 1.0) * float(color.a);\n    half4 s = half4(half3(color.rgb) * half(sa), half(sa));\n    return src + s * (1.0 - src.a);\n}"
+ "sksl": "uniform shader image;\nuniform shader blurred;\nuniform float2 size;\nuniform float time;\nlayout(color) uniform half4 color;\nuniform float opacity;\nuniform float blur;\nuniform float x;\nuniform float y;\nuniform float spread;\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    float sa = min(float(blurred.eval(coord - float2(x, y)).a) / (1.0 - clamp(spread, 0.0, 0.95)), 1.0) * clamp(opacity, 0.0, 1.0) * float(color.a);\n    half4 s = half4(half3(color.rgb) * half(sa), half(sa));\n    return src + s * (1.0 - src.a);\n}"
 }

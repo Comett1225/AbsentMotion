@@ -3,6 +3,7 @@ package app.absentmotion.model
 import app.absentmotion.ui.editor.TimelineMath
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -14,6 +15,22 @@ class KeyframeWindowTest {
     private fun keyed(start: Int, end: Int, vararg times: Float) = Layer(XmlNode("shape", linkedMapOf("id" to "1", "startTime" to "$start", "endTime" to "$end"), listOf(
         XmlNode("transform", children = listOf(XmlNode("opacity").withKeyframes(times.map { Keyframe(it, "1") }))),
     )))
+
+    @Test fun theEasingStretchStaysChosenWhileThePlayheadSitsOnAKeyframe() {
+        val node = XmlNode("opacity").withKeyframes(listOf(0f, 0.5f, 1f).map { Keyframe(it, "1") })
+        fun at(t: Float) = node.stretchAt(t - 0.001f..t + 0.001f)
+        assertEquals(listOf(1, 1, 1, 2, 2), listOf(0f, 0.25f, 0.5f, 0.75f, 1f).map(::at))
+        assertEquals(-1, XmlNode("opacity").withKeyframes(listOf(Keyframe(0.5f, "1"))).stretchAt(0.499f..0.501f))
+        assertEquals(-1, node.stretchAt(-0.2f..-0.1f))
+    }
+
+    @Test fun twoKeysAtTheSameTimeLeaveTheEasingPlayheadOut() {
+        val s = scene(30)
+        val start = s.frameStart(0)
+        val end = s.frameEnd(30)
+        assertNull(keyed(start, end, 0f, 0f, 1f).at(s.frameTime(0), 30).stretchProgress(PropRef.Opacity))
+        assertEquals(0.5f, keyed(start, end, 0f, 1f).at(s.frameTime(15), 30).stretchProgress(PropRef.Opacity)!!, 0.05f)
+    }
 
     @Test fun keysOnTheFirstAndLastFrameOfAClipAreFoundOnThoseFrames() {
         for (fps in rates) {

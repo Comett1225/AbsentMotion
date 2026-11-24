@@ -93,6 +93,21 @@
    "min": 0,
    "max": 1000,
    "step": 1
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "when": {
+    "style": [
+     1
+    ]
+   }
   }
  ],
  "presets": [

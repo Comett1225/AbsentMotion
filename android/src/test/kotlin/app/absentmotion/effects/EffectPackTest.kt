@@ -27,7 +27,7 @@ class EffectPackTest {
         val declared = Regex("""(layout\s*\(\s*color\s*\)\s*)?uniform\s+(\w+)\s+(\w+)\s*;""")
         for (effect in catalog.definitions) {
             if (effect.native) {
-                assertTrue("${effect.key} is not a built-in", effect.category in setOf("move", "repeat", "text") || effect.id in setOf("absent.blur", "absent.glow", "absent.motionblur", "absent.smear", "absent.backdrop", "absent.drawingprogress", "absent.stroketaper", "absent.puppet", "absent.particles", "absent.scatter3d", "absent.fracture3d"))
+                assertTrue("${effect.key} is not a built-in", effect.category in setOf("move", "repeat", "text") || effect.id in setOf("absent.blur", "absent.glow", "absent.outline", "absent.motionblur", "absent.smear", "absent.backdrop", "absent.drawingprogress", "absent.stroketaper", "absent.puppet", "absent.particles", "absent.scatter3d", "absent.fracture3d"))
                 assertNull(effect.sksl)
                 continue
             }
@@ -37,6 +37,7 @@ class EffectPackTest {
             val expected = mapOf("image" to ("shader" to false), "size" to ("float2" to false), "time" to ("float" to false)) +
                 copies.associateWith { "shader" to false } +
                 (if ("duration" in uniforms) mapOf("duration" to ("float" to false)) else emptyMap()) +
+                (if ("cycles" in uniforms) mapOf("cycles" to ("float" to false)) else emptyMap()) +
                 listOf("backdrop", "below", "extent").filter { it in uniforms }.associateWith { "shader" to false } +
                 (if ("screen" in uniforms) mapOf("screen" to ("float4" to false)) else emptyMap()) +
                 (if ("visible" in uniforms) mapOf("visible" to ("float4" to false)) else emptyMap()) +
@@ -133,11 +134,12 @@ class EffectPackTest {
         assertTrue(catalog.definitions.all { d ->
             d.since == null || d.since in releases || d.since.split('.').map { it.toInt() }.zip(last).firstOrNull { it.first != it.second }?.let { it.first > it.second } == true
         })
-        val major = (releases + catalog.definitions.mapNotNull { it.since }).maxOf { it.substringBefore('.').toInt() }
-        assertTrue(catalog.newest.isNotEmpty() && catalog.newest.all { it.substringBefore('.').toInt() == major })
+        fun line(v: String) = v.split('.').take(2).map { it.toInt() }
+        val newestLine = (releases + catalog.definitions.mapNotNull { it.since }).map(::line).maxWith(compareBy({ it[0] }, { it[1] }))
+        assertTrue(catalog.newest.isNotEmpty() && catalog.newest.all { line(it) == newestLine })
         val fresh = catalog.listed("new").map { it.shortcut ?: it.key }.toSet()
         val tiles = catalog.definitions + catalog.definitions.flatMap { it.shortcutTiles() }
-        assertEquals(tiles.filter { it.since?.substringBefore('.')?.toInt() == major }.map { it.shortcut ?: it.key }.toSet(), fresh)
+        assertEquals(tiles.filter { it.since?.let(::line) == newestLine }.map { it.shortcut ?: it.key }.toSet(), fresh)
         assertTrue(fresh.none { it in listOf("textpath", "puppet") })
         assertTrue(listOf("blur", "glow", "vhs", "oscillate", "timequant").none { it in fresh })
         assertEquals(File("../version.properties").readLines().first { it.startsWith("versionName=") }.removePrefix("versionName="), releases.last())

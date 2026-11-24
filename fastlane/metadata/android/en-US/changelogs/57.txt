@@ -1,0 +1,8 @@
+Now in Dutch.
+Send a project between your phone and computer on the same Wi-Fi by scanning a code.
+Textures and Pose for 3D models.
+Drawing: smoothing, opacity, hardness, pressure, zoom, whole-stroke eraser.
+8 new effects, and 156 Alight Motion effects now look the same after import.
+Fill, Fit and Stretch for picture and video fills.
+Import QR codes from pictures; new Alight Motion importer tool.
+Community: download counts and details beside the picture.

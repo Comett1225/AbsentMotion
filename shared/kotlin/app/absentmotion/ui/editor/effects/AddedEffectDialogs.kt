@@ -12,7 +12,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -47,6 +46,7 @@ import app.absentmotion.i18n.text
 import app.absentmotion.i18n.txt
 import app.absentmotion.library.CommunityClient
 import app.absentmotion.library.CommunityDamagedException
+import app.absentmotion.library.communityDownloadSource
 import app.absentmotion.library.CommunityFeed
 import app.absentmotion.library.CommunityIndex
 import app.absentmotion.library.CommunityItem
@@ -66,6 +66,7 @@ import app.absentmotion.platform.asImageBitmap
 import app.absentmotion.platform.rememberLauncherForActivityResult
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.ui.home.TrustedHttp
+import app.absentmotion.ui.home.UpdateSource
 import app.absentmotion.ui.home.sessionAllowed
 import app.absentmotion.ui.home.sessionIndex
 import app.absentmotion.ui.theme.Am
@@ -81,6 +82,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.File
+import app.absentmotion.ui.home.DialogPill
 
 internal sealed interface ProjectEffectPrompt {
     data class Bundle(val names: List<String>) : ProjectEffectPrompt
@@ -282,7 +284,7 @@ internal class AddedEffectImport(private val context: Context, private val getEn
             }
             val progress = txt(R.string.added_effect_community_downloading, label)
             val file = try {
-                communityRequest(progress, label) { it.download(item) } ?: return false
+                communityRequest(progress, label, communityDownloadSource(item)) { it.download(item) } ?: return false
             } catch (_: CommunityItemUnavailable) {
                 continue
             }
@@ -311,9 +313,9 @@ internal class AddedEffectImport(private val context: Context, private val getEn
         return true
     }
 
-    private suspend fun <T> communityRequest(progress: UiText, label: String? = null, load: (CommunityClient) -> T): T? {
+    private suspend fun <T> communityRequest(progress: UiText, label: String? = null, source: UpdateSource = CommunityFeed.source, load: (CommunityClient) -> T): T? {
         while (true) {
-            val result = download(progress, load) ?: return null
+            val result = download(progress, source, load) ?: return null
             if (result.isSuccess) return result.getOrThrow()
             val failure = result.exceptionOrNull()
             val reason = when (failure) {
@@ -332,8 +334,8 @@ internal class AddedEffectImport(private val context: Context, private val getEn
         }
     }
 
-    private suspend fun <T> download(progress: UiText, load: (CommunityClient) -> T): Result<T>? = supervisorScope {
-        val http = TrustedHttp(CommunityFeed.source)
+    private suspend fun <T> download(progress: UiText, source: UpdateSource, load: (CommunityClient) -> T): Result<T>? = supervisorScope {
+        val http = TrustedHttp(source)
         val stop = CompletableDeferred<ProjectEffectAnswer>()
         projectAnswer = stop
         projectPrompt = ProjectEffectPrompt.Progress(progress)
@@ -461,18 +463,16 @@ internal fun AddedEffectDialogs(importer: AddedEffectImport, showImport: Boolean
                 }
             },
             confirmButton = {
-                TextButton({ scope.launch { importer.install() } }, enabled = working.isNotEmpty() && !importer.busy) {
-                    Text(stringResource(action.label), color = Am.Navy)
-                }
+                DialogPill(stringResource(action.label), enabled = working.isNotEmpty() && !importer.busy) { scope.launch { importer.install() } }
             },
-            dismissButton = { TextButton(cancel, enabled = !importer.busy) { Text(stringResource(R.string.cancel), color = Am.Navy) } },
+            dismissButton = { DialogPill(stringResource(R.string.cancel), primary = false, enabled = !importer.busy, onClick = cancel) },
             containerColor = Am.Card,
         )
     } else if (showFiles && error != null) {
         AlertDialog(
             onDismissRequest = importer::dismissError,
             text = { Text(error.text(), color = Am.Navy) },
-            confirmButton = { TextButton(importer::dismissError) { Text(stringResource(R.string.done), color = Am.Navy) } },
+            confirmButton = { DialogPill(stringResource(R.string.done), onClick = importer::dismissError) },
             containerColor = Am.Card,
         )
     } else {
@@ -484,12 +484,12 @@ internal fun AddedEffectDialogs(importer: AddedEffectImport, showImport: Boolean
             onDismissRequest = cancel,
             title = { Text(stringResource(R.string.added_effect_remove_question, effect.name), color = Am.Navy) },
             confirmButton = {
-                TextButton({
+                DialogPill(stringResource(R.string.added_effect_remove)) {
                     cancel()
                     scope.launch { importer.remove(effect) }
-                }) { Text(stringResource(R.string.added_effect_remove), color = Am.Navy) }
+                }
             },
-            dismissButton = { TextButton(cancel) { Text(stringResource(R.string.cancel), color = Am.Navy) } },
+            dismissButton = { DialogPill(stringResource(R.string.cancel), primary = false, onClick = cancel) },
             containerColor = Am.Card,
         )
     }
@@ -516,8 +516,8 @@ private fun ProjectEffectsDialog(prompt: ProjectEffectPrompt, answer: (ProjectEf
             text = {
                 Text(stringResource(R.string.added_effect_bundle_question, prompt.names.joinToString(", ")), Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState()), color = Am.Navy)
             },
-            confirmButton = { EffectDialogButton(R.string.community_add, add) },
-            dismissButton = { EffectDialogButton(R.string.added_effect_open_without, open) },
+            confirmButton = { EffectDialogButton(R.string.community_add, onClick = add) },
+            dismissButton = { EffectDialogButton(R.string.added_effect_open_without, primary = false, onClick = open) },
             containerColor = Am.Card,
         )
         is ProjectEffectPrompt.Missing -> AlertDialog(
@@ -534,12 +534,10 @@ private fun ProjectEffectsDialog(prompt: ProjectEffectPrompt, answer: (ProjectEf
                     }
                 }
             },
-            confirmButton = { EffectDialogButton(if (prompt.updates.isNotEmpty()) R.string.added_effect_update else R.string.added_effect_from_file, pick) },
+            confirmButton = { EffectDialogButton(if (prompt.updates.isNotEmpty()) R.string.added_effect_update else R.string.added_effect_from_file, onClick = pick) },
             dismissButton = {
-                Column {
-                    if (prompt.look) EffectDialogButton(R.string.added_effect_community_look) { answer(ProjectEffectAnswer.Look) }
-                    EffectDialogButton(R.string.added_effect_open_anyway, open)
-                }
+                if (prompt.look) EffectDialogButton(R.string.added_effect_community_look, primary = false) { answer(ProjectEffectAnswer.Look) }
+                EffectDialogButton(R.string.added_effect_open_anyway, primary = false, onClick = open)
             },
             containerColor = Am.Card,
         )
@@ -547,8 +545,8 @@ private fun ProjectEffectsDialog(prompt: ProjectEffectPrompt, answer: (ProjectEf
             onDismissRequest = next,
             title = { Text(stringResource(R.string.community_ask_title), color = Am.Navy) },
             text = { Text(stringResource(R.string.community_ask_note), color = Am.HomeMid) },
-            confirmButton = { EffectDialogButton(R.string.community_ask_button, add) },
-            dismissButton = { EffectDialogButton(R.string.cancel, next) },
+            confirmButton = { EffectDialogButton(R.string.community_ask_button, onClick = add) },
+            dismissButton = { EffectDialogButton(R.string.cancel, primary = false, onClick = next) },
             containerColor = Am.Card,
         )
         is ProjectEffectPrompt.Packs -> AlertDialog(
@@ -565,8 +563,8 @@ private fun ProjectEffectsDialog(prompt: ProjectEffectPrompt, answer: (ProjectEf
                     }
                 }
             },
-            confirmButton = { EffectDialogButton(if (prompt.update) R.string.added_effect_update else R.string.update_install, add) },
-            dismissButton = { EffectDialogButton(R.string.added_effect_open_without, open) },
+            confirmButton = { EffectDialogButton(if (prompt.update) R.string.added_effect_update else R.string.update_install, onClick = add) },
+            dismissButton = { EffectDialogButton(R.string.added_effect_open_without, primary = false, onClick = open) },
             containerColor = Am.Card,
         )
         is ProjectEffectPrompt.Progress -> AlertDialog(
@@ -577,7 +575,7 @@ private fun ProjectEffectsDialog(prompt: ProjectEffectPrompt, answer: (ProjectEf
                     Text(prompt.label.text(), color = Am.Navy)
                 }
             },
-            confirmButton = { if (prompt.cancellable) EffectDialogButton(R.string.cancel, open) },
+            confirmButton = { if (prompt.cancellable) EffectDialogButton(R.string.cancel, primary = false, onClick = open) },
             containerColor = Am.Card,
         )
         is ProjectEffectPrompt.Notice -> AlertDialog(
@@ -589,10 +587,10 @@ private fun ProjectEffectsDialog(prompt: ProjectEffectPrompt, answer: (ProjectEf
             },
             confirmButton = {
                 if (prompt.retry) EffectDialogButton(R.string.aibrowser_retry) { answer(ProjectEffectAnswer.Retry) }
-                else EffectDialogButton(R.string.done, next)
+                else EffectDialogButton(R.string.done, onClick = next)
             },
             dismissButton = {
-                if (prompt.canOpen) EffectDialogButton(R.string.added_effect_open_without, open)
+                if (prompt.canOpen) EffectDialogButton(R.string.added_effect_open_without, primary = false, onClick = open)
             },
             containerColor = Am.Card,
         )
@@ -600,9 +598,7 @@ private fun ProjectEffectsDialog(prompt: ProjectEffectPrompt, answer: (ProjectEf
 }
 
 @Composable
-private fun EffectDialogButton(label: Int, onClick: () -> Unit) {
-    TextButton(onClick) { Text(stringResource(label), color = Am.Navy) }
-}
+private fun EffectDialogButton(label: Int, primary: Boolean = true, onClick: () -> Unit) = DialogPill(stringResource(label), primary = primary, onClick = onClick)
 
 @Composable
 private fun AddedEffectPreviewRow(preview: AddedEffectPreview, categories: Map<String, String>, installedEffect: EffectDefinition?, mixed: Boolean) {

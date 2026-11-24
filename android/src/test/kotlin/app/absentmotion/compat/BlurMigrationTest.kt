@@ -31,29 +31,49 @@ class BlurMigrationTest {
     @Test fun olderZoomBlurKeepsItsCenterAndDrawsEvenStreaksUnlessAdaptive() {
         val d = migrate("zoomblur")
         assertEquals("absent.radialblur", d["id"])
-        assertEquals(0.6f, d.number("amount"), 1e-5f)
-        assertEquals(1f, d.number("streak"), 0f)
+        assertEquals(0.15f, d.number("zoom"), 1e-5f)
+        assertEquals("false", d.value("adaptive"))
         val v = migrate("zoomblur", "strength" to "0.3625", "cx" to "0.625", "cy" to "0.625", "adaptive" to "true")
-        assertEquals(1.45f, v.number("amount"), 1e-5f)
+        assertEquals(0.3625f, v.number("zoom"), 1e-5f)
         assertEquals(listOf(0.625f, 0.375f), v.numbers("center"))
-        assertEquals(0f, v.number("streak"), 0f)
+        assertEquals("true", v.value("adaptive"))
         assertEquals(listOf(0.25f, 0.5f), migrate("zoomblur", "cx" to "0.25").numbers("center"))
         assertTrue(result("zoomblur", "cx" to "0.3", "cy" to "0.7").dropped.isEmpty())
     }
 
-    @Test fun newerZoomBlursMoveTheCenterLessAndTurnAdaptiveOffIntoEvenStreaks() {
+    @Test fun newerZoomBlursMoveTheCenterAFiveHundredthPerUnitAndTurnAdaptiveOffIntoEvenStreaks() {
         for (id in listOf("zoomblur2", "zoomblur3")) {
             val d = migrate(id)
-            assertEquals(0.6f, d.number("amount"), 1e-5f)
-            assertNull(d.value("streak"))
+            assertEquals(0.15f, d.number("zoom"), 1e-5f)
+            assertNull(d.value("adaptive"))
             val v = migrate(id, "centerPoint" to "40,-25", "strength" to "0.3625", "adaptive" to "false")
-            assertEquals(1.45f, v.number("amount"), 1e-5f)
-            assertEquals(0.5f + 0.45f * 40f / 220f, v.numbers("center")[0], 1e-5f)
-            assertEquals(0.5f - 0.37f * 25f / 165f, v.numbers("center")[1], 1e-4f)
+            assertEquals(0.3625f, v.number("zoom"), 1e-5f)
+            assertEquals(0.58f, v.numbers("center")[0], 1e-5f)
+            assertEquals(0.45f, v.numbers("center")[1], 1e-5f)
+            assertEquals(1f, v.number("style"), 0f)
             migrate(id, "centerPoint" to "0,0").numbers("center").forEach { assertEquals(0.5f, it, 1e-5f) }
-            assertEquals(1f, v.number("streak"), 0f)
-            assertEquals(0f, migrate(id, "adaptive" to "true").number("streak"), 0f)
+            assertEquals("false", v.value("adaptive"))
+            assertEquals("true", migrate(id, "adaptive" to "true").value("adaptive"))
+            assertEquals(1f, migrate(id, "strength" to "1.5").number("zoom"), 0f)
         }
+    }
+
+    @Test fun savedZoomBlursKeepTheirLookWithAlightsSettings() {
+        fun own(vararg props: Pair<String, String>) = migration.migrate(Scene.parse("""<scene title="p" width="1080" height="1080" fps="30" totalTime="1000"><shape id="1" startTime="0" endTime="1000" fillType="color" s=".rect">
+            <effect id="absent.radialblur">${props.joinToString("") { (k, v) -> """<property name="$k" value="$v" />""" }}</effect>
+            <property name="size" type="vec2" value="110,82.5" /></shape></scene>""")).scene.node.children.single { it.name == "shape" }.children.single { it.name == "effect" }
+        val spread = own("center" to "0.3,0.6", "amount" to "0.4", "streak" to "0")
+        assertEquals(0.5f, spread.number("zoom"), 1e-5f)
+        assertEquals("true", spread.value("adaptive"))
+        assertEquals(listOf(0.3f, 0.6f), spread.numbers("center"))
+        assertNull(spread.value("amount"))
+        assertNull(spread.value("style"))
+        val even = own("amount" to "1.2", "streak" to "1")
+        assertEquals(0.3f, even.number("zoom"), 1e-5f)
+        assertEquals("false", even.value("adaptive"))
+        assertEquals(0.25f, own("amount" to "0.2").number("zoom"), 1e-5f)
+        assertEquals(0.5f, own("strength" to "2").number("zoom"), 1e-5f)
+        assertEquals(0.3f, own("zoom" to "0.3", "adaptive" to "true").number("zoom"), 0f)
     }
 
     @Test fun directionalBlurIsCenteredAndMeasuredOnTheScreen() {
@@ -87,12 +107,13 @@ class BlurMigrationTest {
         assertEquals(201.5125f, box.number("strength"), 1e-3f)
         assertEquals(1f, box.number("shape"), 0f)
         val plain = migrate("boxblur")
-        assertEquals(3.73f, plain.number("strength"), 1e-4f)
+        assertEquals(3.75f, plain.number("strength"), 1e-4f)
         assertEquals(1f, plain.number("shape"), 0f)
+        assertEquals(1f, plain.number("style"), 0f)
         assertEquals(1f, migrate("boxblur", "strength" to "25.75", "iter" to "1").number("shape"), 0f)
         val old = migrate("boxblur", "strength" to "25.75", "iter" to "3")
         assertEquals("absent.blur", old["id"])
-        assertEquals(96.0475f, old.number("strength"), 1e-3f)
+        assertEquals(96.5625f, old.number("strength"), 1e-3f)
         assertEquals(0f, old.number("shape"), 0f)
         assertTrue(result("boxblur", "strength" to "25.75", "iter" to "3").dropped.isEmpty())
         assertEquals(51.1125f, migrate("boxblur2", "strength" to "0.3625", "iter" to "3").number("strength"), 1e-3f)
@@ -102,7 +123,8 @@ class BlurMigrationTest {
 
     @Test fun sharpenKeepsTheRadiusAndUnsharpMaskShowsAlightsRedMask() {
         val s = migrate("sharpen", "strength" to "5.75", "radius" to "3.25")
-        assertEquals(13.5125f, s.number("amount"), 1e-3f)
+        assertEquals(23f, s.number("amount"), 1e-3f)
+        assertEquals(1f, s.number("style"), 0f)
         assertEquals(3.25f, s.number("radius"), 1e-5f)
         val u = migrate("unsharpmask", "strength" to "0.515", "showMask" to "true")
         assertEquals(1.2875f, u.number("radius"), 1e-5f)
@@ -111,11 +133,14 @@ class BlurMigrationTest {
     }
 
     @Test fun newChoicesKeepTheOldLookByDefault() {
-        for ((effect, param) in listOf("radialblur" to "streak", "directionalblur" to "spread", "unsharpmask" to "maskColor", "blur" to "shape", "linearstreaks" to "copies")) {
+        for ((effect, param) in listOf("directionalblur" to "spread", "unsharpmask" to "maskColor", "blur" to "shape", "linearstreaks" to "copies")) {
             val p = catalog.find("absent.$effect")!!.params.single { it.id == param }
             assertEquals(0f, p.default.toFloat(), 0f)
             assertEquals(p.default, p.missingDefault)
         }
+        val adaptive = catalog.find("absent.radialblur")!!.params.single { it.id == "adaptive" }
+        assertEquals("true", adaptive.default)
+        assertEquals(adaptive.default, adaptive.missingDefault)
         assertEquals(listOf("Lighten", "Average", "Darken", "Off"), catalog.find("absent.linearstreaks")!!.params.single { it.id == "mode" }.options)
     }
 }

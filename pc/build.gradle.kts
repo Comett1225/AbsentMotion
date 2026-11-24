@@ -64,6 +64,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.9.0")
     implementation("org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose:2.9.6")
     implementation("org.json:json:20250517")
+    implementation("com.google.zxing:core:3.5.4")
     implementation("net.sf.kxml:kxml2:2.3.0")
     implementation("org.jetbrains.runtime:jbr-api:1.5.0")
     if (androidJar != null || System.getenv("AM_ANDROID_API") != null) compileOnly(androidApi)
@@ -132,7 +133,7 @@ compose.desktop {
                 bundleID = "app.absentmotion.desktop"
                 iconFile.set(file("../macos/AbsentMotion.icns"))
                 infoPlist {
-                    extraKeysRawXml = "<key>NSCameraUsageDescription</key><string>AbsentMotion uses the camera to take photos and record videos for your project.</string><key>NSMicrophoneUsageDescription</key><string>AbsentMotion uses the microphone to record sound with your videos.</string>"
+                    extraKeysRawXml = "<key>NSCameraUsageDescription</key><string>AbsentMotion uses the camera to take photos and record videos for your project.</string><key>NSMicrophoneUsageDescription</key><string>AbsentMotion uses the microphone to record sound with your videos.</string><key>NSLocalNetworkUsageDescription</key><string>AbsentMotion uses your Wi-Fi to send projects between your phone and this computer.</string>"
                 }
                 fileAssociation("application/x-absentmotion-project", "absproj", "AbsentMotion project")
                 fileAssociation("application/x-absentmotion-project", "amproj", "AbsentMotion project")
@@ -273,6 +274,12 @@ tasks.test {
         inputs.property(name, providers.environmentVariable(name).orElse(""))
     }
     outputs.upToDateWhen { System.getenv("ALIGHT_GLOW_CAPTURES").isNullOrBlank() && (System.getenv("ALIGHT_STILLS").isNullOrBlank() || System.getenv("ALIGHT_TEST_IMAGE").isNullOrBlank()) }
+    val alightRender = providers.systemProperty("am.alightRender")
+    listOf("am.alightRender", "am.out", "am.size", "am.fps", "am.pngTimes").forEach { name ->
+        providers.systemProperty(name).orNull?.let { systemProperty(name, it) }
+    }
+    outputs.upToDateWhen { !alightRender.isPresent }
+    outputs.doNotCacheIf("Alight render writes to the requested output directory") { alightRender.isPresent }
     systemProperty("am.native", layout.buildDirectory.file("$nativeDir/$nativeName").get().asFile.absolutePath)
     systemProperties(judgeTools + bundledTools)
     systemProperty("am.mediaReader", providers.gradleProperty("mediaReader").getOrElse("standard"))

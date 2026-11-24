@@ -717,6 +717,14 @@ class EngineThread(private val background: Int, context: Context? = null, privat
         }
     }
 
+    suspend fun modelJoints(layerId: Long, timeMs: Int): FloatArray? = captureLock.withLock {
+        withContext(dispatcher) {
+            applyPending()
+            prepareTextTime(timeMs)
+            engine().modelJoints(layerId, timeMs.toDouble())
+        }
+    }
+
     suspend fun layerOutline(layerId: Long, timeMs: Int): String? = captureLock.withLock {
         withContext(dispatcher) {
             applyPending()

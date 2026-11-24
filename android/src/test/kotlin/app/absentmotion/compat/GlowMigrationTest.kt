@@ -30,7 +30,7 @@ class GlowMigrationTest {
             <property name="blendMode" type="int" value="1" /></effect>"""))
         val g = glow(result.scene)
         assertEquals("absent.glow", g["id"])
-        assertEquals(120f, g.value("radius").toFloat(), 1e-4f)
+        assertEquals(174f, g.value("radius").toFloat(), 1e-4f)
         assertEquals(0.6f, g.value("alpha").toFloat(), 1e-4f)
         assertEquals(0.3f, g.value("hardness").toFloat(), 1e-4f)
         assertEquals("#ff40ff80", g.value("color"))

@@ -3,6 +3,7 @@ package app.absentmotion.compat
 import app.absentmotion.effects.EffectCatalog
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
+import app.absentmotion.model.keyframes
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -47,6 +48,24 @@ class WarpMigrationTest {
         assertEquals("0.000000" to 2, options("absent.twirl", "reach"))
     }
 
+    @Test fun vortexBlurCentresLikeAlightsSwirl() {
+        for (id in listOf("vortexblur", "chromaticvortexblur")) {
+            assertEquals(listOf(0.5f, 0.5f), migrate(id, "centerPoint" to "0,0").numbers("center"))
+            val moved = migrate(id, "centerPoint" to "40,-25").numbers("center")
+            assertEquals(0.5f + 40f / 220, moved[0], 1e-5f)
+            assertEquals(0.5f + 25f / 165, moved[1], 1e-5f)
+        }
+    }
+
+    @Test fun anAnimatedWaveDirectionKeepsTheWarpAngleTurningWithIt() {
+        val effect = """<effect id="com.alightcreative.effects.wavewarp2"><property name="a1d" type="float"><kf t="0.000000" v="0.000000" /><kf t="1.000000" v="180.000000" /></property></effect>"""
+        val scene = Scene.parse("""<scene title="p" width="1080" height="1080" fps="30" totalTime="1000"><shape id="1" startTime="0" endTime="1000" fillType="color" s=".rect">
+            $effect<property name="size" type="vec2" value="110,82.5" /></shape></scene>""")
+        val warp = migration.migrate(scene).scene.node.children.single { it.name == "shape" }.children.single { it.name == "effect" }
+            .children.single { it["name"] == "warpAngle" }
+        assertEquals(listOf(0f to 90f, 1f to 270f), warp.keyframes.map { it.t to it.v.toFloat() })
+    }
+
     @Test fun pinchBulgeKeepsAlightsStrengthAndRadius() {
         for (id in listOf("pinchbulge", "pinchbulge2")) {
             val v = migrate(id, "strength" to "-0.425", "radius" to "0.85", "centerPoint" to "40,-25")
@@ -63,20 +82,26 @@ class WarpMigrationTest {
         assertEquals("0.000000" to 2, options("absent.bulge", "curve"))
     }
 
-    @Test fun innerPinchBulgeIsASmoothLensOnTheLayerWithAlightsDefaults() {
+    @Test fun innerPinchBulgeKeepsEveryAlightSetting() {
         val d = migrate("pinchbulgeinside")
-        assertEquals("absent.bulge", d["id"])
-        assertEquals(0.5f, d.number("amount"), 1e-6f)
-        assertEquals(0.3f, d.number("radius"), 1e-6f)
-        assertEquals(0f, d.number("reach"), 1e-6f)
-        assertEquals(1f, d.number("curve"), 1e-6f)
-        val v = migrate("pinchbulgeinside", "centerPoint" to "40,-25", "strength" to "0.625", "radius" to "0.85")
-        assertEquals(0.625f, v.number("amount"), 1e-6f)
+        assertEquals("absent.innerbulge", d["id"])
+        assertEquals(0.5f, d.number("strength"), 1e-6f)
+        assertEquals(1f, d.number("style"), 1e-6f)
+        val v = migrate("pinchbulgeinside", "centerPoint" to "40,-25", "strength" to "0.625", "radius" to "0.85", "feather" to "0.25", "gaussian" to "true")
+        assertEquals(0.625f, v.number("strength"), 1e-6f)
         assertEquals(0.85f, v.number("radius"), 1e-6f)
-        val unsupported = migrate("pinchbulgeinside", "radius" to "0.85", "gaussian" to "true")
-        assertEquals(0.3f, unsupported.number("radius"), 1e-6f)
+        assertEquals(0.25f, v.number("feather"), 1e-6f)
+        assertEquals("true", v.value("gaussian"))
         assertEquals(0.5f + 40f * 0.165f / 220, v.numbers("center")[0], 1e-5f)
         assertEquals(0.5f - 25f * 0.165f / 165, v.numbers("center")[1], 1e-5f)
+        assertEquals("0.000000", catalog.find("absent.innerbulge")!!.params.single { it.id == "style" }.missingDefault)
+    }
+
+    @Test fun waveWarpKeepsItsDamping() {
+        val v = migrate("wavewarp2", "damping" to "0.25", "dampingSpace" to "-0.5", "dampingOrigin" to "0.625")
+        assertEquals(0.25f, v.number("damping"), 1e-6f)
+        assertEquals(-0.5f, v.number("dampingSpace"), 1e-6f)
+        assertEquals(0.625f, v.number("dampingOrigin"), 1e-6f)
     }
 
     @Test fun oldWaveWarpCrossesTwoPixelWavesFromTheScreenCorner() {
@@ -84,16 +109,17 @@ class WarpMigrationTest {
         assertEquals("absent.wavewarp", d["id"])
         assertEquals(10f / 10.8f, d.number("magnitude"), 1e-5f)
         assertEquals(10f / 10.8f, d.number("crossMagnitude"), 1e-5f)
-        assertEquals(54f, d.number("spacing"), 1e-3f)
-        assertEquals(54f, d.number("crossSpacing"), 1e-3f)
+        assertEquals(20f, d.number("spacing"), 1e-3f)
+        assertEquals(20f, d.number("crossSpacing"), 1e-3f)
         assertEquals(270f, d.number("angle"), 1e-6f)
         assertEquals(0f, d.number("warpAngle"), 1e-6f)
         assertEquals(1f, d.number("origin"), 1e-6f)
+        assertEquals(1f, d.number("style"), 1e-6f)
         val v = migrate("wavewarp", "xamp" to "32.5", "xspace" to "40", "yamp" to "20", "yspace" to "60", "phase" to "250")
-        assertEquals(32.5f / 10.8f, v.number("magnitude"), 1e-5f)
-        assertEquals(27f, v.number("spacing"), 1e-3f)
-        assertEquals(20f / 10.8f, v.number("crossMagnitude"), 1e-5f)
-        assertEquals(18f, v.number("crossSpacing"), 1e-3f)
+        assertEquals(20f / 10.8f, v.number("magnitude"), 1e-5f)
+        assertEquals(60f, v.number("spacing"), 1e-3f)
+        assertEquals(32.5f / 10.8f, v.number("crossMagnitude"), 1e-5f)
+        assertEquals(40f, v.number("crossSpacing"), 1e-3f)
         assertEquals(250f / 1080f, v.number("phase"), 1e-5f)
         assertEquals("0.000000" to 2, options("absent.wavewarp", "origin"))
         assertEquals("0.000000", catalog.find("absent.wavewarp")!!.params.single { it.id == "crossMagnitude" }.default)
@@ -135,7 +161,7 @@ class WarpMigrationTest {
         assertEquals(43.2f, d.number("stretch"), 1e-4f)
         assertNull(d.value("relative"))
         val v = migrate("stretchsegment", "stretch" to "232.5", "offset" to "500")
-        assertEquals(502.2f, v.number("stretch"), 1e-3f)
+        assertEquals(1004.4f, v.number("stretch"), 1e-2f)
         assertEquals(-540f, v.number("offset"), 1e-3f)
     }
 

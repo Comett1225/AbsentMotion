@@ -132,6 +132,8 @@ One image per frame, saved in a folder named like the **Filename** (the project 
 
 The **Saved to storage** screen shows where the file is, plays it back (or shows the image or the pictures one by one; if the phone cannot play the video right now, it shows its first frame with a play button that tries again), and has **Share Video**, **Share GIF**, **Share Image Sequence**, **Share Image**, **Share Audio** or **Share Project XML** to send it with Android's share sheet, and **OK**.
 
+A video, GIF or image is not saved on its own: the screen says **Ready to save**, shows it, and **Save video**, **Save GIF** or **Save image** saves it to Movies/AbsentMotion or Pictures/AbsentMotion. The share button sends it without saving it. If you leave without saving, exporting the same project again with the same settings (and, for an image, the same frame) shows it at once, without exporting it again. On a computer, they are saved straight away.
+
 ## Keep a copy as a Template
 
 The switch **Also keep a copy as a Template** (off every time) keeps the project and its media under **Templates** on the home screen after a successful export. See [Assets, templates and presets](@assets-templates).

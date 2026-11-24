@@ -290,7 +290,7 @@ class DeskParityRoundTest {
 
     @Test fun missingGoogleFontsAreOffered() {
         prepare("fonts")
-        System.setProperty("am.fontOffer", "on")
+        System.setProperty("am.fontOffer", "offline")
         session(1280, 800) { app ->
             openEditor(app, "text.xml")
             waitUntil(timeoutMillis = 20_000) { app.fontOffer != null }

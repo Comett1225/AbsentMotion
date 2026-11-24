@@ -49,6 +49,7 @@ import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 import app.absentmotion.ui.HoldName
 import app.absentmotion.ui.home.swipeOpens
+import app.absentmotion.ui.home.DialogPill
 
 private val BrowserBg get() = Am.PanelInset
 private val DrawerBg get() = Am.Panel
@@ -249,9 +250,9 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
         }
     }
     deleting?.let { entry -> AlertDialog(onDismissRequest = { deleting = null }, title = { Text(stringResource(R.string.remove_this_imported_font)) }, text = { Text(entry.name.label) },
-        confirmButton = { TextButton({ library.deleteImported(entry.name.xml); deleting = null; revision++ }) { Text(stringResource(R.string.delete_font), color = Am.Accent) } },
-        dismissButton = { TextButton({ deleting = null }) { Text(stringResource(R.string.cancel), color = Am.Accent) } }, containerColor = Am.Field, titleContentColor = Am.OnDark, textContentColor = Am.OnDark) }
-    error?.let { failure -> AlertDialog(onDismissRequest = { error = null }, title = { Text(stringResource(failure.title)) }, text = { Text(stringResource(failure.body, failure.detail)) }, confirmButton = { TextButton({ error = null }) { Text(stringResource(R.string.ok), color = Am.Accent) } }, containerColor = Am.Field, titleContentColor = Am.OnDark, textContentColor = Am.OnDark) }
+        confirmButton = { DialogPill(stringResource(R.string.delete_font)) { library.deleteImported(entry.name.xml); deleting = null; revision++ } },
+        dismissButton = { DialogPill(stringResource(R.string.cancel), primary = false, editor = true) { deleting = null } }, containerColor = Am.Field, titleContentColor = Am.OnDark, textContentColor = Am.OnDark) }
+    error?.let { failure -> AlertDialog(onDismissRequest = { error = null }, title = { Text(stringResource(failure.title)) }, text = { Text(stringResource(failure.body, failure.detail)) }, confirmButton = { DialogPill(stringResource(R.string.ok)) { error = null } }, containerColor = Am.Field, titleContentColor = Am.OnDark, textContentColor = Am.OnDark) }
 }
 
 private val DrawerShape = RoundedCornerShape(8.dp)

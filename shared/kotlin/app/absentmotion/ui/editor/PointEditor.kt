@@ -30,6 +30,8 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.input.pointer.PointerType
+import androidx.compose.ui.input.pointer.isPrimaryPressed
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.onSizeChanged
@@ -43,6 +45,8 @@ import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.PointMode
 import app.absentmotion.editor.at
 import app.absentmotion.editor.canToggleClosed
+import app.absentmotion.editor.closePath
+import app.absentmotion.editor.pullHandles
 import app.absentmotion.editor.deletePoint
 import app.absentmotion.editor.dragged
 import app.absentmotion.editor.endsAt
@@ -68,6 +72,15 @@ import app.absentmotion.R
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.animatedColor
 import kotlin.math.hypot
+import kotlin.math.PI
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.roundToInt
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.isAltPressed
+import androidx.compose.ui.input.pointer.isShiftPressed
+import androidx.compose.ui.unit.IntOffset
 import kotlin.math.min
 import app.absentmotion.ui.HoldName
 
@@ -92,107 +105,187 @@ internal fun weightedDrag(dx: Float, dy: Float, weight: Float): Pt {
     return Pt(dx * keep, dy * keep)
 }
 
+internal fun angleSnapped(from: Pt, to: Pt): Pt {
+    val d = to - from
+    if (d.length < 1e-4f) return to
+    val a = Math.round(atan2(d.y, d.x) / (PI / 4)) * (PI / 4)
+    return from + Pt(cos(a).toFloat(), sin(a).toFloat()) * d.length
+}
+
+private fun EditorState.ghostClosesPath(mode: PointMode, radius: Float): Boolean {
+    val c = pointContours(mode).getOrNull(mode.contour) ?: return false
+    val g = mode.ghost ?: return false
+    if (mode.handle != Handle.Add || !c.endsAt(mode.point) || !c.canToggleClosed) return false
+    val m = mode.screenMatrix(scene, timeMs) ?: return false
+    return m.map(g).distanceTo(m.map(c.knots[0].p)) * mode.previewScale < radius
+}
+
 @Composable
 internal fun PointOverlay(state: EditorState, mode: PointMode, modifier: Modifier, reserveEnd: Dp = 0.dp) {
     var size by remember { mutableStateOf(IntSize.Zero) }
     val scene = state.scene
-    val reservePx = with(LocalDensity.current) { reserveEnd.toPx() }
-    val (scale, dx, dy) = previewFrame(size.width + reservePx, size.height.toFloat(), reservePx, scene.width.toFloat(), scene.height.toFloat(), 1f, Offset.Zero)
+    val density = LocalDensity.current
+    val reservePx = with(density) { reserveEnd.toPx() }
+    val (scale, dx, dy) = previewFrame(size.width + reservePx, size.height.toFloat(), reservePx, scene.width.toFloat(), scene.height.toFloat(), state.canvasZoom, state.canvasPan)
     SideEffect { mode.previewScale = scale }
     val view by rememberUpdatedState(Triple(scale, dx, dy))
     var pulling by remember { mutableStateOf<Pair<Offset, Offset>?>(null) }
-    Canvas(
-        modifier.onSizeChanged { size = it }.pointerInput(state, mode) {
-            awaitEachGesture {
-                val down = awaitFirstDown(requireUnconsumed = false)
-                down.consume()
-                state.playing = false
-                val (s, ox, oy) = view
-                val m = mode.screenMatrix(state.scene, state.timeMs) ?: return@awaitEachGesture
-                fun scene(p: Offset) = Pt((p.x - ox) / s, (p.y - oy) / s)
-                val contours = state.pointContours(mode)
-                val inScene = contours.map { c -> c.copy(knots = c.knots.map { k -> Knot(m.map(k.p), k.inHandle?.let { h -> m.map(h) }, k.outHandle?.let { h -> m.map(h) }) }) }
-                val picked = inScene.hit(scene(down.position), 24.dp.toPx() / s, mode.contour.takeIf { mode.point >= 0 }?.let { it to mode.point })
-                var moved = false
-                if (picked != null) {
-                    mode.contour = picked.first
-                    mode.point = picked.second
-                    mode.handle = picked.third
-                    val start = contours[picked.first].knots[picked.second].at(picked.third) ?: return@awaitEachGesture
-                    val weight = maxOf(viewConfiguration.touchSlop, 10.dp.toPx())
-                    try {
+    var hover by remember { mutableStateOf<Offset?>(null) }
+    var shift by remember { mutableStateOf(false) }
+    val matrix = mode.screenMatrix(scene, state.timeMs)
+    fun onScreen(p: Pt) = matrix?.map(p)?.let { Offset(it.x * scale + dx, it.y * scale + dy) }
+    val current = state.pointContours(mode).getOrNull(mode.contour)
+    val appending = mode.handle == Handle.Add && current?.endsAt(mode.point) == true
+    val first = current?.knots?.firstOrNull()?.takeIf { appending && current.canToggleClosed }?.let { onScreen(it.p) }
+    val hoverCloses = first != null && hover?.let { (it - first).getDistance() < with(density) { 12.dp.toPx() } } == true
+    val closeCue = hoverCloses || state.ghostClosesPath(mode, with(density) { 22.dp.toPx() })
+    Box(modifier) {
+        Canvas(
+            Modifier.matchParentSize().onSizeChanged { size = it }.canvasNavigation(state, frame = {
+                previewFrame(size.width + reservePx, size.height.toFloat(), reservePx, state.scene.width.toFloat(), state.scene.height.toFloat(), state.canvasZoom, state.canvasPan)
+            }).pointerInput(Unit) {
+                awaitPointerEventScope {
+                    while (true) {
+                        val event = awaitPointerEvent()
+                        val change = event.changes.firstOrNull() ?: continue
+                        hover = if (event.type == PointerEventType.Exit || change.type != PointerType.Mouse) null else change.position
+                        shift = event.keyboardModifiers.isShiftPressed
+                    }
+                }
+            }.pointerInput(state, mode) {
+                var lastTap: Triple<Int, Int, Long>? = null
+                awaitEachGesture {
+                    val down = awaitFirstDown(requireUnconsumed = false)
+                    if (down.type == PointerType.Mouse && !currentEvent.buttons.isPrimaryPressed) return@awaitEachGesture
+                    val keys = currentEvent.keyboardModifiers
+                    down.consume()
+                    state.playing = false
+                    val (s, ox, oy) = view
+                    val m = mode.screenMatrix(state.scene, state.timeMs) ?: return@awaitEachGesture
+                    fun scene(p: Offset) = Pt((p.x - ox) / s, (p.y - oy) / s)
+                    val contours = state.pointContours(mode)
+                    val inScene = contours.map { c -> c.copy(knots = c.knots.map { k -> Knot(m.map(k.p), k.inHandle?.let { h -> m.map(h) }, k.outHandle?.let { h -> m.map(h) }) }) }
+                    val picked = inScene.hit(scene(down.position), 24.dp.toPx() / s, mode.contour.takeIf { mode.point >= 0 }?.let { it to mode.point })
+                    val contour = contours.getOrNull(mode.contour)
+                    val adding = mode.handle == Handle.Add && contour?.endsAt(mode.point) == true
+                    var moved = false
+                    if (picked != null && adding && picked.first == mode.contour && picked.second == 0 && picked.third == Handle.Main && contour.canToggleClosed) {
+                        state.closePath(mode)
+                        lastTap = null
+                    } else if (picked != null) {
+                        val tapped = lastTap
+                        if (picked.third == Handle.Main && tapped != null && tapped.first == picked.first && tapped.second == picked.second && down.uptimeMillis - tapped.third < 350) {
+                            lastTap = null
+                            mode.contour = picked.first
+                            mode.point = picked.second
+                            mode.handle = Handle.Main
+                            state.toggleCurve(mode)
+                            return@awaitEachGesture
+                        }
+                        lastTap = if (picked.third == Handle.Main) Triple(picked.first, picked.second, down.uptimeMillis) else null
+                        mode.contour = picked.first
+                        mode.point = picked.second
+                        mode.handle = picked.third
+                        val alt = keys.isAltPressed
+                        val start = contours[picked.first].knots[picked.second].at(picked.third) ?: return@awaitEachGesture
+                        val weight = maxOf(viewConfiguration.touchSlop, 10.dp.toPx())
+                        try {
+                            while (true) {
+                                val change = awaitPointerEvent().changes.firstOrNull { it.id == down.id } ?: break
+                                if (!change.pressed || change.isConsumed) break
+                                val raw = change.position - down.position
+                                val far = raw.getDistance()
+                                if (!moved && far > weight) { moved = true; mode.holding = true }
+                                if (moved) {
+                                    if (alt && picked.third == Handle.Main) state.pullHandles(mode, m.inverseMap(scene(change.position)))
+                                    else state.moveSelectedTo(mode, start.dragged(weightedDrag(raw.x, raw.y, weight), s, m::map, m::inverseMap), free = alt)
+                                }
+                                change.consume()
+                            }
+                        } finally {
+                            mode.holding = false
+                        }
+                        if (moved) { state.endGesture(); lastTap = null }
+                    } else if (adding) {
+                        val last = contour.knots.lastOrNull()?.p?.let(m::map)
+                        val tapAt = scene(down.position).let { p -> if (keys.isShiftPressed && last != null) angleSnapped(last, p) else p }
                         while (true) {
                             val change = awaitPointerEvent().changes.firstOrNull { it.id == down.id } ?: break
-                            if (!change.pressed) break
-                            val raw = change.position - down.position
-                            val far = raw.getDistance()
-                            if (!moved && far > weight) { moved = true; mode.holding = true }
-                            if (moved) {
-                                val eased = weightedDrag(raw.x, raw.y, weight)
-                                state.moveSelectedTo(mode, start.dragged(eased, s, m::map, m::inverseMap))
+                            if (change.isConsumed) break
+                            if (!change.pressed) {
+                                val at = m.inverseMap(tapAt)
+                                val pull = if (moved) m.inverseMap(scene(change.position)) - at else null
+                                pulling = null
+                                state.placePoint(mode, at, pull)
+                                break
                             }
+                            if (!moved && (change.position - down.position).getDistance() > viewConfiguration.touchSlop) moved = true
+                            if (moved) pulling = Offset(tapAt.x * s + ox, tapAt.y * s + oy) to change.position
                             change.consume()
                         }
-                    } finally {
-                        mode.holding = false
+                        pulling = null
                     }
-                    if (moved) state.endGesture()
-                } else if (mode.handle == Handle.Add && contours.getOrNull(mode.contour)?.endsAt(mode.point) == true) {
-                    while (true) {
-                        val change = awaitPointerEvent().changes.firstOrNull { it.id == down.id } ?: break
-                        if (!change.pressed) {
-                            val at = m.inverseMap(scene(down.position))
-                            val pull = if (moved) m.inverseMap(scene(change.position)) - at else null
-                            pulling = null
-                            state.placePoint(mode, at, pull)
-                            break
-                        }
-                        if (!moved && (change.position - down.position).getDistance() > viewConfiguration.touchSlop) moved = true
-                        if (moved) pulling = down.position to change.position
-                        change.consume()
+                }
+            },
+        ) {
+            val m = matrix ?: return@Canvas
+            fun screen(p: Pt) = m.map(p).let { Offset(it.x * scale + dx, it.y * scale + dy) }
+            val mint = Am.Accent
+            val ring = 11.dp.toPx()
+            state.onionShape(mode)?.forEach { c ->
+                if (c.knots.size < 2) return@forEach
+                val outline = Path()
+                outline.moveTo(screen(c.knots[0].p).x, screen(c.knots[0].p).y)
+                for (i in 0 until if (c.closed) c.knots.size else c.knots.size - 1) {
+                    val a = c.knots[i]
+                    val b = c.knots[(i + 1) % c.knots.size]
+                    val end = screen(b.p)
+                    if (a.outHandle == null && b.inHandle == null) outline.lineTo(end.x, end.y)
+                    else {
+                        val c1 = screen(a.outHandle ?: a.p)
+                        val c2 = screen(b.inHandle ?: b.p)
+                        outline.cubicTo(c1.x, c1.y, c2.x, c2.y, end.x, end.y)
                     }
-                    pulling = null
+                }
+                if (c.closed) outline.close()
+                drawPath(outline, Color.Black.copy(alpha = 0.5f), style = Stroke(3.dp.toPx()))
+                drawPath(outline, Color.White.copy(alpha = 0.7f), style = Stroke(1.2.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(6.dp.toPx(), 4.dp.toPx()))))
+            }
+            val pointer = hover
+            if (mode.handle == Handle.Add && pointer == null) {
+                val c = state.pointContours(mode).getOrNull(mode.contour)
+                val g = c?.let { ghostOf(it, mode) }
+                if (c != null && g != null && !closeCue) {
+                    val at = screen(g)
+                    c.knots.getOrNull(mode.point)?.let { drawLine(mint, screen(it.p), at, 1.5.dp.toPx()) }
+                    drawCircle(Color.Black, ring + 1.5.dp.toPx(), at, style = Stroke(5.dp.toPx()))
+                    drawCircle(mint, ring, at, style = Stroke(2.5.dp.toPx()))
                 }
             }
-        },
-    ) {
-        val m = mode.screenMatrix(state.scene, state.timeMs) ?: return@Canvas
-        fun screen(p: Pt) = m.map(p).let { Offset(it.x * scale + dx, it.y * scale + dy) }
-        val mint = Am.Accent
-        val ring = 11.dp.toPx()
-        state.onionShape(mode)?.forEach { c ->
-            if (c.knots.size < 2) return@forEach
-            val outline = Path()
-            outline.moveTo(screen(c.knots[0].p).x, screen(c.knots[0].p).y)
-            for (i in 0 until if (c.closed) c.knots.size else c.knots.size - 1) {
-                val a = c.knots[i]
-                val b = c.knots[(i + 1) % c.knots.size]
-                val end = screen(b.p)
-                if (a.outHandle == null && b.inHandle == null) outline.lineTo(end.x, end.y)
-                else {
-                    val c1 = screen(a.outHandle ?: a.p)
-                    val c2 = screen(b.inHandle ?: b.p)
-                    outline.cubicTo(c1.x, c1.y, c2.x, c2.y, end.x, end.y)
-                }
+            val lastKnot = current?.knots?.lastOrNull()
+            if (appending && pointer != null && !hoverCloses && pulling == null && lastKnot != null) {
+                val from = screen(lastKnot.p)
+                val to = if (shift) angleSnapped(m.map(lastKnot.p), Pt((pointer.x - dx) / scale, (pointer.y - dy) / scale)).let { Offset(it.x * scale + dx, it.y * scale + dy) } else pointer
+                drawLine(mint, from, to, 1.5.dp.toPx(), StrokeCap.Round, PathEffect.dashPathEffect(floatArrayOf(6.dp.toPx(), 4.dp.toPx())))
             }
-            if (c.closed) outline.close()
-            drawPath(outline, Color.Black.copy(alpha = 0.5f), style = Stroke(3.dp.toPx()))
-            drawPath(outline, Color.White.copy(alpha = 0.7f), style = Stroke(1.2.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(6.dp.toPx(), 4.dp.toPx()))))
-        }
-        if (mode.handle == Handle.Add) {
-            val c = state.pointContours(mode).getOrNull(mode.contour)
-            val g = c?.let { ghostOf(it, mode) }
-            if (c != null && g != null) {
-                val at = screen(g)
-                c.knots.getOrNull(mode.point)?.let { drawLine(mint, screen(it.p), at, 1.5.dp.toPx()) }
-                drawCircle(Color.Black, ring + 1.5.dp.toPx(), at, style = Stroke(5.dp.toPx()))
-                drawCircle(mint, ring, at, style = Stroke(2.5.dp.toPx()))
+            if (closeCue && first != null) {
+                drawCircle(Color.Black, ring + 1.5.dp.toPx(), first, style = Stroke(5.dp.toPx()))
+                drawCircle(mint, ring, first, style = Stroke(2.5.dp.toPx()))
+            }
+            pulling?.let { (from, to) ->
+                drawLine(Color.White, from, to, 2.dp.toPx(), StrokeCap.Round)
+                drawCircle(mint, 6.dp.toPx(), to)
+                drawCircle(Color.White, 8.dp.toPx(), from)
             }
         }
-        pulling?.let { (from, to) ->
-            drawLine(Color.White, from, to, 2.dp.toPx(), StrokeCap.Round)
-            drawCircle(mint, 6.dp.toPx(), to)
-            drawCircle(Color.White, 8.dp.toPx(), from)
+        val tipAt = hover
+        if (hoverCloses && tipAt != null) {
+            Text(
+                stringResource(R.string.a11y_close_path),
+                Modifier.offset { IntOffset((tipAt.x + 14.dp.toPx()).roundToInt(), (tipAt.y + 10.dp.toPx()).roundToInt()) }
+                    .background(Am.Field, RoundedCornerShape(6.dp)).padding(horizontal = 8.dp, vertical = 4.dp),
+                color = Am.OnDark, fontSize = 12.sp, maxLines = 1,
+            )
         }
     }
 }
@@ -251,7 +344,9 @@ private fun Trackpad(state: EditorState, mode: PointMode, contour: Contour?, mod
                 while (true) {
                     val change = awaitPointerEvent().changes.firstOrNull { it.id == down.id } ?: break
                     if (!change.pressed) {
-                        if (!dragged && change.uptimeMillis - down.uptimeMillis < 300 && mode.handle == Handle.Add) state.placePoint(mode)
+                        if (!dragged && change.uptimeMillis - down.uptimeMillis < 300 && mode.handle == Handle.Add) {
+                            if (state.ghostClosesPath(mode, 22.dp.toPx())) state.closePath(mode) else state.placePoint(mode)
+                        }
                         break
                     }
                     val d = change.positionChange()
@@ -275,7 +370,12 @@ private fun Trackpad(state: EditorState, mode: PointMode, contour: Contour?, mod
             }
         }
         Text(
-            when { !adding -> stringResource(R.string.point_drag_to_move); atEnd -> stringResource(R.string.point_aim_next); else -> stringResource(R.string.point_drag_to_add) },
+            when {
+                !adding -> stringResource(R.string.point_drag_to_move)
+                state.ghostClosesPath(mode, with(LocalDensity.current) { 22.dp.toPx() }) -> stringResource(R.string.point_tap_to_close)
+                atEnd -> stringResource(R.string.point_aim_next)
+                else -> stringResource(R.string.point_drag_to_add)
+            },
             Modifier.align(Alignment.Center).padding(horizontal = 20.dp), color = Guide, fontSize = 13.sp, textAlign = TextAlign.Center,
         )
         Row(Modifier.align(Alignment.TopCenter).padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(14.dp)) {

@@ -116,6 +116,8 @@ public:
 
     virtual bool layerBounds(int64_t layerId, double timeMs, float ltrb[4]) = 0;
 
+    virtual std::vector<float> modelJoints(int64_t layerId, double timeMs) = 0;
+
     virtual int64_t hitTest(float x, float y, double timeMs) = 0;
 
     virtual bool still(double timeMs, int width, int height, std::vector<uint8_t>* rgba) = 0;

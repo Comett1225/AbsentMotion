@@ -71,6 +71,8 @@ class DeskLayoutInvariantsTest {
         Case("camera") { selectedId = null; addCamera(); panel = EditorPanel.Camera },
         Case("light") { selectedId = null; addLight(); panel = EditorPanel.Light },
         Case("model") { selectedId = null; addModel(cube.toURI().toString(), "cube.obj"); panel = EditorPanel.Model },
+        Case("model-tools") { panel = EditorPanel.Tools },
+        Case("textures") { panel = EditorPanel.Textures },
     )
 
     private fun SemanticsNode.label(): String? {

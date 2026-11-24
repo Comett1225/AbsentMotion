@@ -1,6 +1,8 @@
 package app.absentmotion
 
+import app.absentmotion.editor.endShifts
 import app.absentmotion.editor.withClipEdgesAt
+import app.absentmotion.editor.withEndsAt
 import app.absentmotion.model.*
 import org.junit.Assert.*
 import org.junit.Test
@@ -73,6 +75,24 @@ class ClipTimingTest {
         assertEquals("30", node.valueAt(0f))
         assertEquals("45", node.valueAt(1f))
         assertEquals("15", XmlNode("rotation", mapOf("value" to "15")).valueAt(0.5f))
+    }
+
+    @Test fun selectedClipsEndAtThePlayheadLongerOnesTrimmedShorterOnesExtended() {
+        val s = Scene.parse("""<scene width="100" height="100" fps="30"><media uri="v" duration="8000000"/>
+            <shape id="1" startTime="0" endTime="4999"/><shape id="2" startTime="0" endTime="4999" fillType="media" fillVideo="v"/><shape id="3" startTime="0" endTime="9999"/></scene>""")
+        val ten = s.withEndsAt(listOf(1, 2), 299, s.frameTime(299))
+        assertEquals(listOf(s.frameEnd(299), 8000, 9999), listOf(1L, 2L, 3L).map { ten.layer(it)!!.endTime })
+        val half = s.withEndsAt(listOf(1, 3), 149, s.frameTime(149))
+        assertEquals(listOf(s.frameEnd(149), s.frameEnd(149)), listOf(1L, 3L).map { half.layer(it)!!.endTime })
+        assertTrue(s.node === s.withEndsAt(listOf(1, 2), 149, s.frameTime(149)).node)
+    }
+
+    @Test fun trimEndCountsOnlyClipsWhoseEndReallyMoves() {
+        val s = Scene.parse("""<scene width="100" height="100" fps="30"><media uri="v" duration="5000000"/>
+            <shape id="1" startTime="0" endTime="5000" fillType="media" fillVideo="v" outTime="5000"/><shape id="2" startTime="0" endTime="4999"/></scene>""")
+        assertEquals(listOf(0), s.endShifts(listOf(1), 240, s.frameTime(240)))
+        assertEquals(listOf(0, s.frameEnd(240) - 4999), s.endShifts(listOf(1, 2), 240, s.frameTime(240)))
+        assertEquals(listOf(s.frameEnd(60) - 5000), s.endShifts(listOf(1), 60, s.frameTime(60)))
     }
 
     @Test fun extendingToThePlayheadOnlyMovesEdgesOutwardAndStopsAtTheSourceEnd() {

@@ -1,0 +1,59 @@
+{
+ "id": "vortexblur",
+ "name": "Vortex Blur",
+ "category": "blur",
+ "since": "5.3.0",
+ "description": "Blurs the layer in a whirl around Center, strongest in the middle and fading out at Radius (a share of the screen). Color Aberration spreads the red, green and blue channels apart around Center Channel.",
+ "params": [
+  {
+   "id": "center",
+   "label": "Center",
+   "type": "point",
+   "default": [
+    0.5,
+    0.5
+   ],
+   "min": -1,
+   "max": 2
+  },
+  {
+   "id": "strength",
+   "label": "Strength",
+   "type": "float",
+   "default": 0.1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "radius",
+   "label": "Radius",
+   "type": "float",
+   "default": 0.3,
+   "min": 0.01,
+   "max": 3,
+   "step": 0.001
+  },
+  {
+   "id": "aberration",
+   "label": "Color Aberration",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "centerChannel",
+   "label": "Center Channel",
+   "type": "choice",
+   "default": 1,
+   "options": [
+    "Red",
+    "Green",
+    "Blue"
+   ]
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float4 screen;\nuniform float time;\nuniform float2 center;\nuniform float strength;\nuniform float radius;\nuniform float aberration;\nuniform float centerChannel;\nfloat2 spin(float2 d, float a, float z) {\n    return float2(cos(a) * d.x - sin(a) * d.y, sin(a) * d.x + cos(a) * d.y) * z;\n}\nhalf4 main(float2 coord) {\n    float2 c = center * size;\n    float2 d = coord - c;\n    float r = max(radius, 0.001);\n    float x = clamp(1.0 - length(d) / (r * 1.0435 * min(screen.z, screen.w)), 0.0, 1.0);\n    float s = max(strength, 0.0);\n    float fall = pow(x, 1.94);\n    float turn = 42.76 * pow(s, 3.025) / (r * r) * fall;\n    float pull = 1.575 * s * fall;\n    if (turn <= 0.0 && pull <= 0.0) return image.eval(coord);\n    float3 k = max(1.0 + aberration * (float3(0.0, 1.0, 2.0) - centerChannel), float3(0.0));\n    float4 sum = float4(0.0);\n    float3 alpha = float3(0.0);\n    for (int i = 0; i < 48; i++) {\n        float t = pow(float(i) / 47.0, 1.594);\n        if (aberration > 0.0) {\n            float3 a = -turn * t * k;\n            float3 z = 1.0 - pull * t * k;\n            half4 pr = image.eval(c + spin(d, a.r, z.r));\n            half4 pg = image.eval(c + spin(d, a.g, z.g));\n            half4 pb = image.eval(c + spin(d, a.b, z.b));\n            sum.rgb += float3(pr.r, pg.g, pb.b);\n            alpha += float3(pr.a, pg.a, pb.a);\n        } else {\n            half4 p = image.eval(c + spin(d, -turn * t, 1.0 - pull * t));\n            sum += float4(p);\n        }\n    }\n    float a = aberration > 0.0 ? (alpha.r + alpha.g + alpha.b) / 144.0 : sum.a / 48.0;\n    return half4(half3(min(sum.rgb / 48.0, float3(a))), half(a));\n}"
+}

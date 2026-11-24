@@ -45,7 +45,7 @@ class DistortTextAuditTest {
         assertTrue(result.dropped.toString(), result.dropped.isEmpty())
         assertEquals(result.scene.node, migration.migrate(result.scene).scene.node)
         assertEquals("0.000000", defaults("tiles")["sizing"])
-        assertEquals("0.000000", defaults("squeeze")["shape"])
+        assertEquals("2.000000", defaults("squeeze")["shape"])
     }
 
     @Test fun importedTextRangesAndEvolutionAreRetained() {

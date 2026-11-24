@@ -32,7 +32,6 @@ import androidx.compose.ui.Alignment
 import app.absentmotion.platform.LocalContext
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -183,7 +182,11 @@ private val INTEL_TAGS = listOf("x64", "x86_64", "amd64", "intel")
 
 internal fun installerExtensions(os: String, site: InstallSite? = installSite()): List<String> = when {
     os.startsWith("mac", ignoreCase = true) -> if (site?.kind == InstallKind.MacApp) listOf("-update.zip", ".dmg") else listOf(".dmg")
-    os.startsWith("windows", ignoreCase = true) -> if (site?.kind == InstallKind.Setup) listOf(".ampack", ".msi") else listOf(".msi", ".exe")
+    os.startsWith("windows", ignoreCase = true) -> when (site?.kind) {
+        InstallKind.Setup -> listOf(".ampack", ".msi")
+        InstallKind.Msi -> listOf(".exe", ".msi")
+        else -> listOf(".msi", ".exe")
+    }
     site?.kind == InstallKind.Deb -> listOf(".deb")
     site?.kind == InstallKind.AppImage -> listOf(".appimage")
     site?.kind == InstallKind.Tarball -> listOf(".tar.gz")
@@ -228,9 +231,7 @@ internal fun OutdatedHint(outdated: Outdated?, modifier: Modifier = Modifier) {
     val links = LocalUriHandler.current
     Column(modifier.fillMaxWidth()) {
         Text(stringResource(R.string.update_outdated, outdated.installed, outdated.newest), color = Am.Navy)
-        TextButton({ runCatching { links.openUri(outdated.link) } }, Modifier.align(Alignment.End)) {
-            Text(stringResource(R.string.update_download), color = Am.Navy)
-        }
+        DialogPill(stringResource(R.string.update_download), Modifier.align(Alignment.End).padding(top = 8.dp), primary = false) { runCatching { links.openUri(outdated.link) } }
     }
 }
 
@@ -274,9 +275,9 @@ internal fun UpdateAskDialog(settings: AppSettings) {
                         Text(stringResource(R.string.update_check_on_open), Modifier.weight(1f).verticalScroll(rememberScrollState()), color = Am.Navy, fontSize = 17.sp, lineHeight = 23.sp, fontWeight = FontWeight.Medium)
                         Text(stringResource(R.string.update_check_note), Modifier.weight(1f).verticalScroll(rememberScrollState()), color = Am.HomeMid, fontSize = 14.sp, lineHeight = 20.sp)
                     }
-                    Row(Modifier.align(Alignment.End)) {
-                        TextButton({ settings.chooseUpdates(false) }) { Text(stringResource(R.string.update_not_now), color = Am.Navy) }
-                        TextButton({ settings.chooseUpdates(true) }) { Text(stringResource(R.string.update_turn_on), color = Am.Navy) }
+                    Row(Modifier.align(Alignment.End).padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        DialogPill(stringResource(R.string.update_not_now), primary = false) { settings.chooseUpdates(false) }
+                        DialogPill(stringResource(R.string.update_turn_on)) { settings.chooseUpdates(true) }
                     }
                 }
             }
@@ -291,8 +292,8 @@ internal fun UpdateAskDialog(settings: AppSettings) {
                 Text(stringResource(R.string.update_check_note), Modifier.padding(top = 6.dp), color = Am.HomeMid, fontSize = 14.sp, lineHeight = 20.sp)
             }
         },
-        dismissButton = { TextButton({ settings.chooseUpdates(false) }) { Text(stringResource(R.string.update_not_now), color = Am.Navy) } },
-        confirmButton = { TextButton({ settings.chooseUpdates(true) }) { Text(stringResource(R.string.update_turn_on), color = Am.Navy) } },
+        dismissButton = { DialogPill(stringResource(R.string.update_not_now), primary = false) { settings.chooseUpdates(false) } },
+        confirmButton = { DialogPill(stringResource(R.string.update_turn_on)) { settings.chooseUpdates(true) } },
         containerColor = Am.Card,
     )
 }
@@ -324,9 +325,9 @@ internal fun UpdateOfferContent(available: UpdateAnswer.Available, installed: St
     if (available.external) detail(stringResource(R.string.update_external))
     if (metered) detail(stringResource(R.string.update_metered))
     sourceLabel?.let { detail(it) }
-    FlowRow(Modifier.fillMaxWidth().padding(top = 20.dp), horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        TextButton(onChangelog, Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.update_changelog), color = Am.Navy, fontSize = 15.sp) }
-        TextButton(onLater, Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.update_later), color = Am.Navy, fontSize = 15.sp) }
+    FlowRow(Modifier.fillMaxWidth().padding(top = 20.dp), horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        DialogPill(stringResource(R.string.update_changelog), primary = false, onClick = onChangelog)
+        DialogPill(stringResource(R.string.update_later), primary = false, onClick = onLater)
         if (release.apk != null || !available.external) Button(onDownload, Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.buttonColors(containerColor = Am.Navy, contentColor = Am.OnNavy)) {
             Text(stringResource(if (release.apk != null) R.string.update_download_update else R.string.update_download), fontSize = 15.sp, fontWeight = FontWeight.Medium)
         }

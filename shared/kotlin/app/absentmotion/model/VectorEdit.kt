@@ -22,6 +22,8 @@ fun Contour.withHandleMoved(i: Int, handle: Handle, to: Pt, angleLock: Boolean, 
     },
 )
 
+fun Contour.withHandlesPulled(i: Int, to: Pt) = copy(knots = knots.replaced(i) { k -> Knot(k.p, k.p * 2f - to, to) })
+
 fun Contour.withPointCurveToggled(i: Int): Contour = copy(
     knots = knots.replaced(i) { k ->
         if (!k.sharp) return@replaced Knot(k.p)

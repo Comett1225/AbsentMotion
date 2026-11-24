@@ -110,7 +110,7 @@ class AlightEditImportTest {
         assertEquals(listOf("343.000000", "19.000000"), shake.keys("magnitude").map { it["v"] })
         val glow = e.getValue("absent.softglow")
         assertEquals(0.25f, glow.value("blend")!!.toFloat(), 1e-6f)
-        assertEquals(24f, glow.value("blur")!!.toFloat(), 1e-4f)
+        assertEquals(21f, glow.value("blur")!!.toFloat(), 1e-4f)
         assertEquals(0.1f, e.getValue("absent.threshold").value("softness")!!.toFloat(), 1e-6f)
     }
 

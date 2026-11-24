@@ -83,7 +83,7 @@ class DeskEngineFeaturesTest {
             val stripes = steps.zipWithNext().count { (a, b) -> a * b < 0 }
             assertTrue("the streak shows $stripes stripes", stripes <= 2)
             fun lit(x: Int) = pixels[(60 * 640 + x) * 4].toInt() and 0xff
-            assertTrue("the blur trails behind the layer like Alight's", lit(190) < 8 && lit(100) > 20)
+            assertTrue("the blur is centred on the layer like Alight's", lit(100) > 20 && lit(190) > 20 && lit(320) < 8)
         } finally { engine.close() }
     }
 

@@ -9,7 +9,7 @@ namespace am::textanim {
 enum Shape { kSquare, kRampUp, kRampDown, kTriangle, kRound, kSmooth };
 enum Direction { kFromStart, kFromEnd, kFromCentre, kRandom };
 enum Charset { kLetters, kUpper, kLower, kNumbers, kLettersNumbers, kSymbols, kCustom };
-enum Timecode { kHMSF, kHMS, kMS, kMSHundredths, kSHundredths, kFrames };
+enum Timecode { kHMSF, kHMS, kMS, kMSHundredths, kSHundredths, kFrames, kMSF };
 
 struct Wiggle {
     float x = 0, y = 0, angle = 0;
@@ -27,6 +27,7 @@ bool Space(uint32_t c);
 bool Spaceless(uint32_t c);
 Segments Split(const std::string& utf8, const std::vector<int>& wordBreaks = {});
 std::vector<int> Ranks(int count, int direction, uint64_t seed, int* steps);
+std::vector<int> ShuffledRanks(int count, float seed);
 float Reveal(float progress, int rank, int steps, float softness);
 float RangeWeight(int shape, int index, int count, float start, float end);
 std::string CountNumbers(const std::string& text, double add, double multiply, int decimals, int separator);

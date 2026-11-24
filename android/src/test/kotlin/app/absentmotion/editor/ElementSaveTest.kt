@@ -82,6 +82,17 @@ class ElementSaveTest {
         assertEquals("shape", sceneOf(group(prop("location", 0f to "200,200,0"), inner = inner)).let { it.elementNodes(it.layer(9)!!, null).single().name })
     }
 
+    @Test fun aGroupWithDepthIsSavedWholeSoItsPiecesKeepTheirPerspective() {
+        fun saved(group: XmlNode) = sceneOf(group).let { it.elementNodes(it.layer(9)!!, null).single().name }
+        val flat = layer("shape", 5, null, listOf(prop("location", 0f to "300,200,0")))
+        val deep = layer("shape", 5, null, listOf(prop("location", 0f to "300,200,-400")))
+        val diving = layer("shape", 5, null, listOf(prop("location", 0f to "300,200,0", 1f to "300,200,-100")))
+        val tilted = layer("shape", 5, null, listOf(prop("location", 0f to "300,200,0"), prop("tilt", 0f to "0,30")))
+        assertEquals("shape", saved(group(prop("location", 0f to "200,200,0"), inner = listOf(flat))))
+        for (piece in listOf(deep, diving, tilted)) assertEquals("embedScene", saved(group(prop("location", 0f to "200,200,0"), inner = listOf(piece))))
+        assertEquals("embedScene", saved(group(prop("location", 0f to "200,200,80"), inner = listOf(flat))))
+    }
+
     @Test fun boundsAreSampledBetweenKeyframesSoALongRotatingBarIsNotCropped() {
         val times = boundsSampleTimes(0, 2000, 30, listOf(0, 2000))
         assertEquals(0, times.first())

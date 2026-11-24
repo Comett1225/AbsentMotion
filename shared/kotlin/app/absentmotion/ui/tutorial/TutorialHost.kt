@@ -36,7 +36,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -102,6 +101,7 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.roundToInt
 import app.absentmotion.ui.HoldName
+import app.absentmotion.ui.home.DialogPill
 
 @Composable
 fun TutorialHost(
@@ -536,8 +536,8 @@ private fun PausedBanner(onContinue: () -> Unit, onExit: () -> Unit) {
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(stringResource(R.string.tutorial_paused), Modifier.weight(1f), color = Am.HomeInk, fontSize = 15.sp, lineHeight = 20.sp)
-                TextButton(onExit) { Text(stringResource(R.string.tutorial_paused_exit), color = Am.Navy, fontSize = 14.sp) }
-                TextButton(onContinue) { Text(stringResource(R.string.tutorial_paused_continue), color = Am.Navy, fontSize = 14.sp, fontWeight = FontWeight.Bold) }
+                DialogPill(stringResource(R.string.tutorial_paused_exit), Modifier.padding(start = 8.dp), primary = false, onClick = onExit)
+                DialogPill(stringResource(R.string.tutorial_paused_continue), Modifier.padding(start = 8.dp), onClick = onContinue)
             }
         }
     }
@@ -595,13 +595,12 @@ private fun OfferLink(label: String, onClick: () -> Unit) {
 @Composable
 private fun Question(dark: Boolean, title: Int, body: Int, yes: Int, no: Int, onYes: () -> Unit, onNo: () -> Unit) {
     val ink = if (dark) Am.OnDark else Am.HomeInk
-    val button = if (dark) Am.Accent else Am.Navy
     AlertDialog(
         onDismissRequest = onNo,
         title = { Text(stringResource(title), color = ink) },
         text = { Text(stringResource(body), color = ink) },
-        confirmButton = { TextButton(onYes) { Text(stringResource(yes), color = button) } },
-        dismissButton = { TextButton(onNo) { Text(stringResource(no), color = button) } },
+        confirmButton = { DialogPill(stringResource(yes), onClick = onYes) },
+        dismissButton = { DialogPill(stringResource(no), primary = false, editor = dark, onClick = onNo) },
         containerColor = if (dark) Am.Field else Am.Card,
     )
 }

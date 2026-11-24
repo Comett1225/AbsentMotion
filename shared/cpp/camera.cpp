@@ -547,4 +547,16 @@ bool SeeLayers(const std::vector<Layer>& layers, int width, int height, bool top
     return true;
 }
 
+Layer Sighted(const std::vector<Layer>& layers, const Layer& l, int width, int height, double timeMs, bool depthOrder) {
+    Layer copy = l;
+    const Layer* camera = gCameraView ? ActiveCamera(layers, timeMs) : nullptr;
+    const Placement p = EffectivePlacement(layers, l, timeMs);
+    const View now = camera ? LayerView(layers, *camera, width, height, timeMs, depthOrder) : DefaultView(width, height);
+    copy.parent = 0;
+    copy.placed = true;
+    copy.sight = {&layers, &l, camera, width, height, depthOrder};
+    copy.projected = Solid(l, p) || (camera && now.tilt != SkM44() && Spatial(l, p, timeMs));
+    return copy;
+}
+
 }

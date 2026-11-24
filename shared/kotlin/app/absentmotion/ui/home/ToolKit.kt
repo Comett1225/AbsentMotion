@@ -61,6 +61,8 @@ import kotlinx.coroutines.withContext
 
 internal val LocalAddToProject = androidx.compose.runtime.staticCompositionLocalOf<((Uri) -> Unit)?> { null }
 
+internal val LocalImportLink = androidx.compose.runtime.staticCompositionLocalOf<(() -> Unit)?> { null }
+
 internal sealed interface ToolStep {
     data object Ready : ToolStep
     data class Running(val percent: Int) : ToolStep

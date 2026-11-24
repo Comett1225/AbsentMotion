@@ -1,5 +1,6 @@
 set(WIN "${AM_ROOT}/windows/native")
-set(SKIA_LIB_DIR "${SKIA}/out/win-x64" CACHE PATH "Skia libraries")
+set(SKIA_LIB_DIR "${SKIA}/out/win-ft-x64")
+target_compile_definitions(amdesktop PRIVATE AM_FREETYPE_FILES=1)
 set(FFMPEG_DIR "$ENV{FFMPEG_DIR}" CACHE PATH "FFmpeg development files")
 set(CMAKE_MSVC_RUNTIME_LIBRARY MultiThreadedDLL)
 target_sources(amdesktop PRIVATE "${AM_ROOT}/pc/native/gpu_vulkan.cpp" "${WIN}/file_dialog_win.cpp")

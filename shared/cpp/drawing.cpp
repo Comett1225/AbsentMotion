@@ -9,7 +9,9 @@
 #include <strings.h>
 #include <vector>
 
+#include "include/core/SkBlurTypes.h"
 #include "include/core/SkCanvas.h"
+#include "include/core/SkMaskFilter.h"
 #include "include/core/SkPaint.h"
 #include "include/core/SkPathBuilder.h"
 #include "include/core/SkPathMeasure.h"
@@ -93,6 +95,10 @@ void ParseStrokes(const XmlNode& drawing, Layer* layer) {
             for (int i = 0; i < 4; i++) s.color[i] = ((argb >> (24 - 8 * i)) & 0xff) / 255.0f;
         }
         if (const char* w = n->attr("width")) s.width = strtof(w, nullptr);
+        if (const char* h = n->attr("hardness")) {
+            const float v = strtof(h, nullptr);
+            if (std::isfinite(v)) s.hardness = std::clamp(v, 0.0f, 1.0f);
+        }
         if (const char* type = n->attr("type")) {
             if (!strcasecmp(type, "brush")) s.tool = kBrush;
             else if (!strcasecmp(type, "fill")) s.tool = kFill;
@@ -125,6 +131,8 @@ void ParseStrokes(const XmlNode& drawing, Layer* layer) {
 }
 
 namespace {
+
+float Softness(const FreehandStroke& s) { return (1 - s.hardness) * std::max(s.width, 0.0f) / 4; }
 
 struct Reveal {
     float start = 0, end = 1, taperStart = 0, taperEnd = 1, squeeze = 0;
@@ -290,6 +298,7 @@ void DrawDrawing(SkCanvas* canvas, const Layer& layer, float opacity, float t) {
             paint.setStrokeCap(SkPaint::kRound_Cap);
             paint.setStrokeJoin(SkPaint::kRound_Join);
         }
+        if (const float soft = Softness(s); soft > 0) paint.setMaskFilter(SkMaskFilter::MakeBlur(kNormal_SkBlurStyle, soft));
         canvas->drawPath(geometry, paint);
     });
     if (erases) canvas->restore();
@@ -302,6 +311,7 @@ SkPath DrawingBounds(const Layer& layer) {
         if (s.tool == kEraser || s.geometry.isEmpty()) continue;
         SkRect r = s.geometry.getBounds();
         if (!s.filled) r.outset(s.width / 2, s.width / 2);
+        r.outset(Softness(s) * 3, Softness(s) * 3);
         if (any) all.join(r); else all = r;
         any = true;
     }

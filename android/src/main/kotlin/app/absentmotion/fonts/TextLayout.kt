@@ -75,14 +75,13 @@ private fun FontLibrary.layoutText(input: TextInput, layer: Layer): XmlNode {
             .setLineSpacing(0f, input.lineSpacing).build()
     }
     val layout = lay(layer.content)
-    val plain = lay(" \n \n ")
     val lines = List(layout.lineCount) { index ->
         val raw = layer.content.substring(layout.getLineStart(index), layout.getLineEnd(index))
         val line = if (raw.lastOrNull()?.isWhitespace() == true) raw.dropLast(1) else raw
         val spaces = line.count { it == ' ' }
         val spacing = if (layer.textAlign == "justify" && index < layout.lineCount - 1 && !raw.endsWith('\n') && spaces > 0)
             (layer.wrapWidth - paint.measureText(line)) / spaces else 0f
-        XmlNode("_line", mapOf("baseline" to "${layout.getLineBaseline(index)}", "rtl" to "${layout.getParagraphDirection(index) < 0}",
+        XmlNode("_line", mapOf("rtl" to "${layout.getParagraphDirection(index) < 0}",
             "wordSpacing" to "$spacing", "from" to "${layout.getLineStart(index)}"), text = line)
     }
     return node.with("_fontPath", input.file).with("_fontFamily", systemFamily(layer.font) ?: name.family)
@@ -90,5 +89,5 @@ private fun FontLibrary.layoutText(input: TextInput, layer: Layer): XmlNode {
         .with("_letterSpacing", "${paint.letterSpacing}").with("_lineSpacing", "${input.lineSpacing}")
         .with("_fontWeight", "${weight ?: name.weight}").with("_fontAxes", if (weight != null) "true" else null).with("_fontItalic", "${name.italic}").with("_emoji", input.emoji).with("_emojiFlags", input.flags)
         .with("_locale", input.locales.takeUnless { it.isEmpty }?.get(0)?.toLanguageTag())
-        .withChild("_layout", XmlNode("_layout", mapOf("height" to "${layout.height}", "step" to "${plain.getLineBaseline(2) - plain.getLineBaseline(1)}"), lines))
+        .withChild("_layout", XmlNode("_layout", children = lines))
 }

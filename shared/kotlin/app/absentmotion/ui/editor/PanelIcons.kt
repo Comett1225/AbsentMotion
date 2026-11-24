@@ -89,6 +89,9 @@ internal object PanelIcons {
     val Bot = icon("Bot", width = 1.7f, stroke = "M12 8L12 4L8 4M6 8L18 8A2 2 0 0 1 20 10L20 18A2 2 0 0 1 18 20L6 20A2 2 0 0 1 4 18L4 10A2 2 0 0 1 6 8ZM2 14L4 14M20 14L22 14M15 13L15 15M9 13L9 15")
     val Screenshot = icon("Screenshot", width = 1.7f, stroke = "M14.5 4L9.5 4L7 7L4 7A2 2 0 0 0 2 9L2 18A2 2 0 0 0 4 20L20 20A2 2 0 0 0 22 18L22 9A2 2 0 0 0 20 7L17 7ZM9 13A3 3 0 1 0 15 13A3 3 0 1 0 9 13Z")
     val Reverse = icon("Reverse", width = 1.7f, stroke = "M16 3L20 7L16 11M20 7L4 7M8 21L4 17L8 13M4 17L20 17")
+    val Textures = icon("Textures", width = 1.5f, stroke = "M6 3.5L18 3.5A2.5 2.5 0 0 1 20.5 6L20.5 18A2.5 2.5 0 0 1 18 20.5L6 20.5A2.5 2.5 0 0 1 3.5 18L3.5 6A2.5 2.5 0 0 1 6 3.5Z" +
+        "M3.5 9.5L20.5 9.5M3.5 14.5L20.5 14.5M9.5 3.5L9.5 20.5M14.5 3.5L14.5 20.5")
+    val Bone = icon("Bone", width = 1.6f, stroke = "M7.5 5.5A2.2 2.2 0 1 0 4.5 8.5L5.5 9.4L14.6 18.5L15.5 19.5A2.2 2.2 0 1 0 18.5 16.5A2.2 2.2 0 1 0 15.5 13.5L6.4 4.4Z")
 }
 
 private const val STAR = "M11.525 2.295A0.53 0.53 0 0 1 12.475 2.295L14.785 6.974A2.123 2.123 0 0 0 16.38 8.134L21.546 8.89A0.53 0.53 0 0 1 21.84 9.794L18.104 13.432" +

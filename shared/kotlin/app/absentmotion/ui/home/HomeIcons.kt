@@ -25,7 +25,11 @@ internal object HomeIcons {
     val Upload = icon("Upload", stroke = "M6 22A2 2 0 0 1 4 20L4 4A2 2 0 0 1 6 2L14 2A2.4 2.4 0 0 1 15.704 2.706L19.292 6.294A2.4 2.4 0 0 1 20 8L20 20A2 2 0 0 1 18 22ZM14 2L14 7A1 1 0 0 0 15 8" +
             "L20 8M12 12L12 18M15 15L12 12L9 15")
     val Link = icon("Link", stroke = "M9 17L7 17A5 5 0 0 1 7 7L9 7M15 7L17 7A5 5 0 1 1 17 17L15 17M8 12L16 12")
+    val ProjectImporter = icon("ProjectImporter", stroke = "M9 3V14M5.5 10.5L9 14L12.5 10.5M3 14V19A2 2 0 0 0 5 21H19A2 2 0 0 0 21 19V14M15.5 3H21V8.5H15.5ZM18.25 5.75H18.35", width = 1.7f)
     val ArrowDown = icon("ArrowDown", stroke = "M12 5L12 19M19 12L12 19L5 12", width = 1f)
+    val Devices = icon("Devices", stroke = "M3.8 8.5L7.6 8.5A1.6 1.6 0 0 1 9.2 10.1L9.2 18.9A1.6 1.6 0 0 1 7.6 20.5L3.8 20.5A1.6 1.6 0 0 1 2.2 18.9L2.2 10.1A1.6 1.6 0 0 1 3.8 8.5ZM5.2 18L6.2 18" +
+            "M13.6 10.6L20.2 10.6A1 1 0 0 1 21.2 11.6L21.2 15.8A1 1 0 0 1 20.2 16.8L13.6 16.8A1 1 0 0 1 12.6 15.8L12.6 11.6A1 1 0 0 1 13.6 10.6ZM11 19.6L22.8 19.6M5.6 5.6C8.4 2.6 13.6 2.4 16.6 5.8M17 3L16.7 6L13.7 5.7")
+    val Wifi = icon("Wifi", stroke = "M2.5 9A14 14 0 0 1 21.5 9M5.5 12.3A9.6 9.6 0 0 1 18.5 12.3M8.6 15.6A5 5 0 0 1 15.4 15.6", fill = "M10.7 19A1.3 1.3 0 1 0 13.3 19A1.3 1.3 0 1 0 10.7 19Z", width = 1.7f)
 
     val Aspect = icon("Aspect", stroke = "M15 15L21 21M15 9L21 3M21 16L21 21L16 21M21 8L21 3L16 3M3 16L3 21L8 21M3 21L9 15M3 8L3 3L8 3M9 9L3 3")
     val Resolution = icon("Resolution", stroke = "M5 3L19 3A2 2 0 0 1 21 5L21 19A2 2 0 0 1 19 21L5 21A2 2 0 0 1 3 19L3 5A2 2 0 0 1 5 3ZM3 9L21 9M3 15L21 15M9 3L9 21M15 3L15 21")

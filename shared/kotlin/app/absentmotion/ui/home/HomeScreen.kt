@@ -36,6 +36,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -73,7 +74,6 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -90,6 +90,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithCache
@@ -165,6 +166,7 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 import app.absentmotion.i18n.text
@@ -209,8 +211,10 @@ fun HomeScreen(
     var version by remember { mutableIntStateOf(0) }
     var tab by rememberSaveable { mutableIntStateOf(lastTab) }
     var page by rememberSaveable { mutableIntStateOf(lastPage) }
-    var arrangingTools by remember { mutableStateOf(false) }
-    LaunchedEffect(page) { if (page != 2) arrangingTools = false }
+    var customizingTools by remember { mutableStateOf(false) }
+    var chosen by remember { mutableStateOf<Set<String>>(emptySet()) }
+    var deletingMany by remember { mutableStateOf<List<ProjectInfo>?>(null) }
+    LaunchedEffect(page, tab) { chosen = emptySet() }
     DisposableEffect(Unit) { onDispose { lastTab = tab; lastPage = page } }
     var creating by remember { mutableStateOf(false) }
     var opening by remember { mutableIntStateOf(0) }
@@ -231,6 +235,22 @@ fun HomeScreen(
     app.absentmotion.platform.BackHandler(search != null) { search = null }
     LaunchedEffect(version, changes) { projects = withContext(Dispatchers.IO) { store.list(includeDamaged = true) }; loaded = true }
     val shown = remember(projects, tab, query) { projects.filter { it.isElement == (tab == 1) && matchesSearch(query, it.title) } }
+    LaunchedEffect(shown) { if (chosen.isNotEmpty()) chosen = chosen.filterTo(LinkedHashSet()) { id -> shown.any { it.id == id } } }
+    app.absentmotion.platform.BackHandler(chosen.isNotEmpty()) { chosen = emptySet() }
+    fun duplicate(ids: List<String>) {
+        if (duplicating || ids.isEmpty()) return
+        duplicating = true
+        app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.home_duplicating), app.absentmotion.platform.Toast.LENGTH_SHORT).show()
+        scope.launch { try {
+            val failed = withContext(Dispatchers.IO) { ids.count { id -> runCatching { store.duplicate(id) }.onFailure { app.absentmotion.platform.Log.w("AMStore", "cannot duplicate $id", it) }.isFailure } }
+            if (failed > 0) app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.home_create_project_failed), app.absentmotion.platform.Toast.LENGTH_LONG).show()
+            version++
+        } finally { duplicating = false } }
+    }
+    fun delete(ids: Set<String>) {
+        projects = projects.filter { it.id !in ids }
+        scope.launch { withContext(Dispatchers.IO) { ids.forEach { store.delete(it, context.getExternalFilesDir(null)?.resolve("ai")) } }; version++ }
+    }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) onImportFile(uri) }
     val toReport = imported.filter { it.sections.isNotEmpty() || it.community != null }
     LaunchedEffect(imported) {
@@ -250,32 +270,35 @@ fun HomeScreen(
     ) {
         Box(Modifier.fillMaxSize().background(Am.HomeBg).swipeOpens(page != 3 && !creating, rtl) { scope.launch { drawer.open() } }) {
             Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars.union(WindowInsets.captionBar))) {
-                TopBar(onMenu = { scope.launch { drawer.open() } }, search, page, { search = it }, settings, onArrangeTools = { arrangingTools = true })
+                val picked = shown.filter { it.id in chosen }
+                if (chosen.isNotEmpty() && page == 0) SelectionBar(
+                    picked.size, picked.size == 1, picked.none { it.damaged },
+                    onClose = { chosen = emptySet() },
+                    onSelectAll = { chosen = shown.mapTo(LinkedHashSet()) { it.id } },
+                    onExport = { picked.singleOrNull()?.let { chosen = emptySet(); onExport(it.id) } },
+                    onDuplicate = { val ids = picked.map { it.id }; chosen = emptySet(); duplicate(ids) },
+                    onSend = { picked.singleOrNull()?.let { chosen = emptySet(); DeviceSend.scan(context, it) } },
+                    onDelete = { deletingMany = picked },
+                ) else TopBar(onMenu = { scope.launch { drawer.open() } }, search, page, { search = it }, settings, onCustomizeTools = { customizingTools = true })
                 val fill = Modifier.weight(1f)
                 if (page == 3) CommunityTab(fill, engine) { onImportFile(Uri.fromFile(it)) }
-                else if (page == 2) ToolsTab(fill, store, settings, arrangingTools, { arrangingTools = it }) { id -> version++; onOpen(id) }
+                else if (page == 2) ToolsTab(fill, store, settings, customizingTools, { customizingTools = it }, onImportLink = { onImportLink?.invoke() }) { id -> version++; onOpen(id) }
                 else if (page == 1) TemplatesTab(version + changes, onTemplate, onTemplateProject, fill, query, engine) else ProjectsPane(
                     Modifier.weight(1f), shown, loaded, tab, { tab = it }, settings, version + changes, onOpen, onExport, query,
                     onUpload = { picker.launch(arrayOf("text/xml", "application/xml", "application/zip", "application/octet-stream")) },
                     onImportLink = onImportLink,
-                    onDuplicate = { id -> if (!duplicating) {
-                        duplicating = true
-                        app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.home_duplicating), app.absentmotion.platform.Toast.LENGTH_SHORT).show()
-                        scope.launch { try {
-                            val copied = withContext(Dispatchers.IO) { runCatching { store.duplicate(id) }.onFailure { app.absentmotion.platform.Log.w("AMStore", "cannot duplicate $id", it) }.isSuccess }
-                            if (!copied) app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.home_create_project_failed), app.absentmotion.platform.Toast.LENGTH_LONG).show()
-                            version++
-                        } finally { duplicating = false } }
-                    } },
-                    onDelete = { id -> projects = projects.filter { it.id != id }; scope.launch { withContext(Dispatchers.IO) { store.delete(id, context.getExternalFilesDir(null)?.resolve("ai")) }; version++ } },
+                    onDuplicate = { id -> duplicate(listOf(id)) },
+                    onDelete = { id -> delete(setOf(id)) },
                     onHistory = onHistory,
                     onCollect = onCollect,
                     wide = wide,
                     usedBy = store::linkedBy,
+                    chosen = chosen,
+                    onChosen = { chosen = it },
                 )
                 Spacer(Modifier.height(BarHeight + navInset))
             }
-            BottomBar(onNew = newProject, page, { page = it; if (it >= 2) search = null; if (it != 2) arrangingTools = false }, Modifier.align(Alignment.BottomCenter), navInset, wide, settings.vibration)
+            BottomBar(onNew = newProject, page, { page = it; if (it >= 2) search = null; if (it != 2) customizingTools = false }, Modifier.align(Alignment.BottomCenter), navInset, wide, settings.vibration)
             if (drawer.isOpen || drawer.targetValue == DrawerValue.Open || drawer.isAnimationRunning) Box(Modifier.fillMaxSize().pointerInput(Unit) {
                 awaitEachGesture {
                     awaitFirstDown(requireUnconsumed = false).consume()
@@ -284,6 +307,18 @@ fun HomeScreen(
                     if (up != null) scope.launch { drawer.close() }
                 }
             })
+            deletingMany?.let { targets ->
+                val elements = targets.all { it.isElement }
+                val users by produceState(emptyList<String>(), targets) { value = withContext(Dispatchers.IO) { targets.filter { it.isElement }.flatMap { store.linkedBy(it.id) }.distinct() } }
+                AlertDialog(
+                    onDismissRequest = { deletingMany = null },
+                    title = { Text(pluralStringResource(if (elements) R.plurals.home_delete_assets_title else R.plurals.home_delete_projects_title, targets.size, targets.size), color = Am.Navy) },
+                    text = if (users.isEmpty()) null else { { Text(stringResource(R.string.home_delete_asset_used, users.take(6).joinToString(", ") + if (users.size > 6) ", …" else ""), color = Am.Navy) } },
+                    dismissButton = { DialogPill(stringResource(R.string.cancel), primary = false) { deletingMany = null } },
+                    confirmButton = { DialogPill(stringResource(R.string.delete)) { deletingMany = null; chosen = emptySet(); delete(targets.mapTo(HashSet()) { it.id }) } },
+                    containerColor = Am.Card,
+                )
+            }
             if (toReport.isNotEmpty()) ImportDialog(toReport, onDismiss = onImportShown, onOpen = { onImportShown(); toReport.first().let { if (it.template) onTemplate(it.id) else onOpen(it.id) } })
             Presence(creating) {
                 NewProjectSheet(
@@ -320,7 +355,7 @@ private val lastScroll = intArrayOf(0, 0)
 private const val SearchAnimMs = 200
 
 @Composable
-private fun TopBar(onMenu: () -> Unit, search: String?, page: Int, onSearch: (String?) -> Unit, settings: AppSettings, onArrangeTools: () -> Unit) {
+private fun TopBar(onMenu: () -> Unit, search: String?, page: Int, onSearch: (String?) -> Unit, settings: AppSettings, onCustomizeTools: () -> Unit) {
     val searching = search != null
     var shownText by remember { mutableStateOf(search.orEmpty()) }
     if (search != null) shownText = search
@@ -364,7 +399,35 @@ private fun TopBar(onMenu: () -> Unit, search: String?, page: Int, onSearch: (St
             }
         }
         if (page < 2) SearchButton(search, onSearch, Modifier.align(Alignment.CenterEnd))
-        else if (page == 2) ToolsMoreButton(onArrangeTools, Modifier.align(Alignment.CenterEnd))
+        else if (page == 2) ToolsCustomizeButton(onCustomizeTools, Modifier.align(Alignment.CenterEnd))
+    }
+}
+
+@Composable
+private fun SelectionBar(
+    count: Int, single: Boolean, healthy: Boolean, onClose: () -> Unit, onSelectAll: () -> Unit,
+    onExport: () -> Unit, onDuplicate: () -> Unit, onSend: () -> Unit, onDelete: () -> Unit,
+) {
+    Row(Modifier.fillMaxWidth().height(57.dp), verticalAlignment = Alignment.CenterVertically) {
+        BarButton(HomeIcons.Close, stringResource(R.string.action_close), Modifier.size(50.dp), onClick = onClose)
+        Text(
+            pluralStringResource(R.plurals.home_selected, count, count), Modifier.weight(1f), color = Am.Navy, fontWeight = FontWeight.Medium, maxLines = 1,
+            autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(12.sp, 18.sp, 1.sp),
+        )
+        BarButton(app.absentmotion.ui.editor.ChromeIcons.SelectAll, stringResource(R.string.home_select_all), onClick = onSelectAll)
+        BarButton(HomeIcons.Export, stringResource(R.string.export), enabled = single && healthy, onClick = onExport)
+        BarButton(HomeIcons.Duplicate, stringResource(R.string.home_duplicate), enabled = healthy, onClick = onDuplicate)
+        BarButton(HomeIcons.Devices, stringResource(R.string.send_to_device), enabled = single && healthy, onClick = onSend)
+        BarButton(HomeIcons.Delete, stringResource(R.string.delete), onClick = onDelete)
+        Spacer(Modifier.width(4.dp))
+    }
+}
+
+@Composable
+private fun BarButton(icon: ImageVector, label: String, modifier: Modifier = Modifier.size(42.dp, 50.dp), enabled: Boolean = true, onClick: () -> Unit) {
+    Box(modifier.alpha(if (enabled) 1f else 0.35f).clickable(enabled = enabled, role = androidx.compose.ui.semantics.Role.Button, onClick = onClick), contentAlignment = Alignment.Center) {
+        Icon(icon, label, Modifier.size(24.dp), tint = Am.Navy)
+        HoldName(label)
     }
 }
 
@@ -408,6 +471,8 @@ private fun ProjectsPane(
     onCollect: (String) -> Unit,
     wide: Boolean = false,
     usedBy: (String) -> List<String> = { emptyList() },
+    chosen: Set<String> = emptySet(),
+    onChosen: (Set<String>) -> Unit = {},
 ) {
     val thumbs = remember {
         object : LinkedHashMap<String, Thumb>(16, 0.75f, true) {
@@ -423,6 +488,7 @@ private fun ProjectsPane(
             lastScroll[1] = if (wide) gridState.firstVisibleItemScrollOffset else listState.firstVisibleItemScrollOffset
         }
     }
+    val context = LocalContext.current
     var menu by remember { mutableStateOf<OpenMenu?>(null) }
     var deleting by remember { mutableStateOf<ProjectInfo?>(null) }
     var origin by remember { mutableStateOf(Offset.Zero) }
@@ -444,7 +510,11 @@ private fun ProjectsPane(
             onDelete = { menu = null; deleting = info },
             onHistory = { menu = null; onHistory(info) },
             onCollect = { menu = null; onCollect(info.id) },
+            onSend = { menu = null; DeviceSend.scan(context, info) },
             vibrate = settings.vibration,
+            selecting = chosen.isNotEmpty(),
+            selected = info.id in chosen,
+            onChoose = { menu = null; onChosen(if (info.id in chosen) chosen - info.id else chosen + info.id) },
         )
     }
 
@@ -499,8 +569,8 @@ private fun ProjectsPane(
             onDismissRequest = { deleting = null },
             title = { Text(stringResource(if (target.isElement) R.string.home_delete_asset_title else R.string.home_delete_project_title), color = Am.Navy) },
             text = if (users.isEmpty()) null else { { Text(stringResource(R.string.home_delete_asset_used, users.take(6).joinToString(", ") + if (users.size > 6) ", …" else ""), color = Am.Navy) } },
-            dismissButton = { TextButton({ deleting = null }) { Text(stringResource(R.string.cancel), color = Am.Navy) } },
-            confirmButton = { TextButton({ deleting = null; onDelete(target.id) }) { Text(stringResource(R.string.delete), color = Am.Navy) } },
+            dismissButton = { DialogPill(stringResource(R.string.cancel), primary = false) { deleting = null } },
+            confirmButton = { DialogPill(stringResource(R.string.delete)) { deleting = null; onDelete(target.id) } },
             containerColor = Am.Card,
         )
     }
@@ -682,14 +752,20 @@ private fun ProjectCard(
     onDelete: () -> Unit,
     onHistory: () -> Unit,
     onCollect: () -> Unit,
+    onSend: () -> Unit,
     vibrate: Boolean,
+    selecting: Boolean = false,
+    selected: Boolean = false,
+    onChoose: () -> Unit = {},
 ) {
     val coords = remember { arrayOfNulls<LayoutCoordinates>(1) }
     val pick = remember { HoldPick() }
     Box(
         modifier.padding(bottom = 12.dp).fillMaxWidth().heightIn(min = 96.dp)
             .onGloballyPositioned { coords[0] = it }
-            .clip(RoundedCornerShape(12.dp)).background(Am.Card).clickable(onClick = onOpen),
+            .clip(RoundedCornerShape(12.dp)).background(Am.Card)
+            .border(2.dp, animatedColor(if (selected) Am.Accent else Color.Transparent), RoundedCornerShape(12.dp))
+            .combinedClickable(onLongClick = onChoose, onClick = if (selecting) onChoose else onOpen),
     ) {
         Thumbnail(info, version, thumbs, Modifier.padding(8.dp))
         Column(Modifier.padding(start = 104.dp, top = 16.dp, end = 52.dp, bottom = 12.dp)) {
@@ -704,7 +780,15 @@ private fun ProjectCard(
                 Row { row.forEach { (icon, text) -> Fact(icon, text) } }
             }
         }
-        Box(
+        if (selecting) Box(Modifier.align(Alignment.CenterEnd).size(48.dp), contentAlignment = Alignment.Center) {
+            Box(
+                Modifier.size(24.dp).clip(CircleShape).background(animatedColor(if (selected) Am.Accent else Color.Transparent))
+                    .border(2.dp, animatedColor(if (selected) Am.Accent else Grey), CircleShape),
+                contentAlignment = Alignment.Center,
+            ) {
+                if (selected) Icon(app.absentmotion.ui.editor.PanelIcons.Check, null, Modifier.size(16.dp), tint = Am.OnAccent)
+            }
+        } else Box(
             Modifier.align(Alignment.CenterEnd).size(48.dp).clickable { coords[0]?.let { onMenu(it.boundsInRoot()) } }
                 .holdToPick(pick, vibrate) { coords[0]?.let { onMenu(it.boundsInRoot()) } },
             contentAlignment = Alignment.Center,
@@ -719,6 +803,7 @@ private fun ProjectCard(
                     MenuRow(stringResource(R.string.home_collect_media), HomeIcons.Folder, onCollect, pick)
                 }
                 MenuRow(stringResource(R.string.version_history), ChromeIcons.Undo, onHistory, pick)
+                if (!info.damaged) MenuRow(stringResource(R.string.send_to_device), HomeIcons.Devices, onSend, pick)
                 MenuRow(stringResource(if (info.isElement) R.string.home_delete_asset else R.string.delete), HomeIcons.Delete, onDelete, pick)
             }
         }

@@ -40,9 +40,9 @@ suspend fun EditorState.saveToMyElements(store: ProjectStore): Boolean {
     val layer = selected ?: return false
     val host = scene
     val group = layer.nested
-    val bounds = if (group == null) lifetimeBounds(layer) else null
-    val width = group?.let { host.width } ?: ((bounds?.let { it[2] - it[0] } ?: host.width.toFloat()) + 2).toInt()
-    val height = group?.let { host.height } ?: ((bounds?.let { it[3] - it[1] } ?: host.height.toFloat()) + 2).toInt()
+    val bounds = if (group == null && layer.flatOnScreen()) lifetimeBounds(layer) else null
+    val width = bounds?.let { (it[2] - it[0] + 2).toInt() } ?: host.width
+    val height = bounds?.let { (it[3] - it[1] + 2).toInt() } ?: host.height
     val element = Scene(Scene.create(layer.label.ifBlank { AppText.get(R.string.model_layer_element) }, width, height, host.fps, 0).node.with("type", "element"))
     withContext(Dispatchers.IO) {
         store.createElement(host.elementNodes(layer, bounds).fold(element) { acc, node -> acc.add(Layer(node), node.mediaUris().mapNotNull { host.media(it) }) })
@@ -53,8 +53,16 @@ suspend fun EditorState.saveToMyElements(store: ProjectStore): Boolean {
 internal val PLAIN_GROUP_ATTRS = setOf("id", "label", "startTime", "endTime", "tag", "parent")
 internal val PLACEMENT = setOf("location", "scale", "rotation", "pivot")
 
-internal fun Layer.flattensIntoAsset(): Boolean = nested?.let { inner -> inner.retime == "off" && inner.layers.all { it.endTime <= endTime - startTime } } == true &&
-    node.attrs.keys.all { it in PLAIN_GROUP_ATTRS } &&
+private fun Layer.flatOnScreen(): Boolean {
+    val transform = node.child("transform")
+    fun zero(name: String, from: Int) = transform?.child(name)?.let { e ->
+        (listOf(e["value"]) + e.children.filter { it.name == "kf" }.map { it["v"] }).all { v -> v == null || v.split(',').drop(from).all { (it.trim().toFloatOrNull() ?: 0f) == 0f } }
+    } ?: true
+    return kind != "model" && kind != "camera" && kind != "light" && zero("location", 2) && zero("tilt", 0)
+}
+
+internal fun Layer.flattensIntoAsset(): Boolean = nested?.let { inner -> inner.retime == "off" && inner.layers.all { it.endTime <= endTime - startTime && it.flatOnScreen() } } == true &&
+    flatOnScreen() && node.attrs.keys.all { it in PLAIN_GROUP_ATTRS } &&
     node.children.all { it.name == "scene" || it.name == "transform" && it.children.all { part -> part.name in PLACEMENT } }
 
 internal fun Scene.elementNodes(layer: Layer, bounds: FloatArray?): List<XmlNode> {

@@ -31,7 +31,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -214,12 +213,12 @@ private fun Body(text: String, live: Boolean) =
 
 @Composable
 private fun Buttons(content: @Composable () -> Unit) {
-    FlowRow(Modifier.fillMaxWidth().padding(top = 20.dp), horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End), verticalArrangement = Arrangement.spacedBy(4.dp)) { content() }
+    FlowRow(Modifier.fillMaxWidth().padding(top = 20.dp), horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End), verticalArrangement = Arrangement.spacedBy(8.dp)) { content() }
 }
 
 @Composable
 private fun Secondary(label: String, onClick: () -> Unit) {
-    TextButton(onClick, Modifier.heightIn(min = 48.dp)) { Text(label, color = Am.Navy, fontSize = 15.sp) }
+    DialogPill(label, primary = false, onClick = onClick)
 }
 
 @Composable

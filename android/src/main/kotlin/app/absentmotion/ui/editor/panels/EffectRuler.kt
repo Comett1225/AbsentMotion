@@ -70,6 +70,7 @@ private class EffectRulerView(context: Context, private val scope: CoroutineScop
     private var vibrate = true
     private var tapUp = 0L
     private var resetting = false
+    private var vertical = false
     private val interceptSlop = ViewConfiguration.get(context).scaledTouchSlop * 3 / 4
 
     private val detector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
@@ -207,8 +208,11 @@ private class EffectRulerView(context: Context, private val scope: CoroutineScop
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (!isEnabled) return false
-        if (event.actionMasked == MotionEvent.ACTION_DOWN) resetting = false
-        else if (resetting) {
+        if (event.actionMasked == MotionEvent.ACTION_DOWN) { resetting = false; vertical = false }
+        else if (vertical) {
+            if (event.actionMasked == MotionEvent.ACTION_UP || event.actionMasked == MotionEvent.ACTION_CANCEL) vertical = false
+            return true
+        } else if (resetting) {
             if (event.actionMasked == MotionEvent.ACTION_UP || event.actionMasked == MotionEvent.ACTION_CANCEL) resetting = false
             return true
         }
@@ -221,6 +225,13 @@ private class EffectRulerView(context: Context, private val scope: CoroutineScop
             change(value.coerceIn(low * step, high * step))
             end()
             if (vibrate) appHaptic(click = false)
+            return true
+        }
+        if (event.actionMasked == MotionEvent.ACTION_MOVE && !tracking && !fine && rulerScrollsPanel(event.rawX - downX, event.rawY - downY, interceptSlop.toFloat())) {
+            vertical = true
+            val cancel = MotionEvent.obtain(event).apply { action = MotionEvent.ACTION_CANCEL }
+            detector.onTouchEvent(cancel)
+            cancel.recycle()
             return true
         }
         if (event.actionMasked == MotionEvent.ACTION_MOVE && abs(event.rawX - downX) > interceptSlop &&
@@ -271,6 +282,8 @@ private class EffectRulerView(context: Context, private val scope: CoroutineScop
 
 internal fun rulerAccessibleTick(tick: Int, low: Int, high: Int, direction: Int): Int =
     (tick + direction * maxOf(1, (high - low) / 20)).coerceIn(low, high)
+
+internal fun rulerScrollsPanel(dx: Float, dy: Float, slop: Float): Boolean = abs(dy) > slop && abs(dy) > abs(dx)
 
 internal fun rulerSnap(position: Float, spacing: Int): Float =
     (position / spacing).roundToInt() * spacing.toFloat()

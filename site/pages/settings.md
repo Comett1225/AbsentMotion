@@ -62,9 +62,13 @@ The color names are the editor and home screen colors: TopBar, PreviewBg, Timeli
 
 - **Back up all projects**, **Restore from backup** and **Weekly automatic backup (projects only)** (off by default). See [Projects, backup and import](@projects).
 
+## Tools
+
+**Tools** opens **Customize tools**: tick the tools to show and drag them into order, separately for the **Tools page** and **In a project**. **Reset** brings back every tool in the usual order.
+
 ## Language
 
-The **Language** row shows the current language and opens the list of the 25 languages: English, Indonesian, Hindi, Portuguese (Brazil), Spanish (Latin America), Spanish (Spain), Filipino, Vietnamese, Thai, Malay, Arabic, Persian, Urdu, Turkish, Russian, Bengali, Japanese, Korean, Chinese (Traditional), Chinese (Simplified), French, German, Italian, Polish and Ukrainian. Picking one applies it at once. On Windows, Mac and Linux the new language is used after you restart the app.
+The **Language** row shows the current language and opens the list of the 26 languages: English, Indonesian, Hindi, Portuguese (Brazil), Spanish (Latin America), Spanish (Spain), Filipino, Vietnamese, Thai, Malay, Arabic, Persian, Urdu, Turkish, Russian, Bengali, Japanese, Korean, Chinese (Traditional), Chinese (Simplified), French, German, Italian, Polish, Dutch and Ukrainian. Picking one applies it at once. On Windows, Mac and Linux the new language is used after you restart the app.
 
 ## About, Help and other rows
 

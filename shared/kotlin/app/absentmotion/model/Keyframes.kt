@@ -130,6 +130,8 @@ fun XmlNode.withKeyframeToggled(t: Float, snap: ClosedFloatingPointRange<Float>)
 
 fun XmlNode.stretchAt(snap: ClosedFloatingPointRange<Float>): Int {
     val keys = keyframes
+    val on = keys.indexOfFirst { it.t in snap }
+    if (on >= 0) return if (on > 0) on else if (keys.size > 1) 1 else -1
     val next = keys.indexOfFirst { it.t > snap.endInclusive }
     return if (next > 0 && keys[next - 1].t < snap.start) next else -1
 }

@@ -15,6 +15,7 @@ import app.absentmotion.platform.SystemBars
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.key
@@ -54,6 +55,8 @@ import app.absentmotion.library.Recovery
 import app.absentmotion.library.RecoveryHandler
 import app.absentmotion.library.RecoveryOffer
 import app.absentmotion.library.ImportFailed
+import app.absentmotion.library.ProjectLinkImportFailure
+import app.absentmotion.library.stoppableImport
 import app.absentmotion.library.ImportReport
 import app.absentmotion.library.Importer
 import app.absentmotion.library.MediaKeeper
@@ -65,7 +68,6 @@ import app.absentmotion.model.XmlNode
 import app.absentmotion.model.formatFloats
 import app.absentmotion.model.fontNames
 import app.absentmotion.fonts.FontName
-import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.job
 import app.absentmotion.ui.home.EmbedRequest
 import app.absentmotion.ui.home.TemplateEditor
@@ -93,7 +95,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.absentmotion.ui.home.UnsupportedPhone
@@ -118,6 +119,7 @@ import java.io.File
 import app.absentmotion.ui.editor.MediaPicks
 import app.absentmotion.ui.theme.Am
 import app.absentmotion.ui.theme.enterZoom
+import app.absentmotion.ui.home.DialogPill
 
 class MainActivity : ComponentActivity() {
     private val visualPicker = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia()) { uri ->
@@ -249,6 +251,9 @@ class MainActivity : ComponentActivity() {
         }
         watchMemory()
         TestHooks.start(this)
+        app.absentmotion.ui.home.DeviceSend.importer = { file -> importProjectFiles(listOf(Uri.fromFile(file)), quiet = true) }
+        app.absentmotion.ui.home.DeviceSend.opener = ::open
+        app.absentmotion.ui.home.DeviceSend.changed = { projectsChanged++ }
         lifecycleScope.launch { androidx.compose.runtime.snapshotFlow { settings.openGl }.drop(1).collect { engine.restart() } }
         engine.fonts?.let { fonts -> lifecycleScope.launch { fonts.revision.collect { settings.uiFont?.takeIf { FontName.parse(it).source == "imported" && fonts.localFile(it) == null }?.let { settings.uiFont = null } } } }
         Updater.calm = ::updateCalm
@@ -295,7 +300,7 @@ class MainActivity : ComponentActivity() {
                         CompositionLocalProvider(LocalWide provides tabletEditor(config.smallestScreenWidthDp, config.screenWidthDp), LocalTablet provides isTablet(config.smallestScreenWidthDp)) {
                             HomeScreen(
                                 store, settings, onOpen = ::open, onExport = ::exportFromList,
-                                imported = imported, onImportShown = { imported = emptyList() }, onImportFile = { importUris(listOf(it)) },
+                                imported = if (projectLinkInput == null) imported else emptyList(), onImportShown = { imported = emptyList() }, onImportFile = { importUris(listOf(it)) },
                                 onTemplate = { id -> if (!opening && !openingProject) { openingProject = true; openJob = lifecycleScope.launch { try { if (engineWorks()) editingTemplate = id } finally { openingProject = false } } } }, onTemplateProject = ::projectFromTemplate,
                                 onHistory = { historyFor = Triple(it.id, it.title, it.damaged) }, onCollect = ::collectMedia, changes = projectsChanged, engine = { engine },
                                 onImportLink = { if (!opening && !openingProject) projectLinkInput = "" },
@@ -315,7 +320,7 @@ class MainActivity : ComponentActivity() {
                         else {
                             val screen = LocalConfiguration.current
                             CompositionLocalProvider(LocalWide provides tabletEditor(screen.smallestScreenWidthDp, screen.screenWidthDp), LocalTablet provides isTablet(screen.smallestScreenWidthDp), app.absentmotion.ui.editor.panels.LocalVibration provides settings.vibration, LocalDensity provides dense) {
-                                key(open) { Ltr { app.absentmotion.platform.DeskTyping.Track { EditorScreen(open, onExit = ::closeEditor) } } }
+                                key(open) { Ltr { app.absentmotion.platform.DeskTyping.Track { CompositionLocalProvider(app.absentmotion.ui.home.LocalImportLink provides { if (!opening && !openingProject) projectLinkInput = "" }) { EditorScreen(open, onExit = ::closeEditor) } } } }
                             }
                         }
                         if (open.exportOpen) ExportScreen(open.project, open.exportFrame, engine, settings, fromProjectList = false, outdated) { open.exportOpen = false }
@@ -328,27 +333,24 @@ class MainActivity : ComponentActivity() {
                         onDismissRequest = { chooseLinkApp = null },
                         title = { Text(stringResource(R.string.project_link_open_with), color = Am.Navy) },
                         text = {
-                            androidx.compose.foundation.layout.Column {
-                                TextButton({ chooseLinkApp = null; projectLinkInput = link.toString() }) {
-                                    Text(applicationInfo.loadLabel(packageManager).toString(), color = Am.Navy)
-                                }
-                                TextButton({ chooseLinkApp = null; openInAlight(link) }) {
-                                    Text("Alight Motion", color = Am.Navy)
-                                }
+                            androidx.compose.foundation.layout.Column(verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)) {
+                                DialogPill(applicationInfo.loadLabel(packageManager).toString(), Modifier.fillMaxWidth()) { chooseLinkApp = null; projectLinkInput = link.toString() }
+                                DialogPill("Alight Motion", Modifier.fillMaxWidth()) { chooseLinkApp = null; openInAlight(link) }
                             }
                         },
-                        confirmButton = { TextButton({ chooseLinkApp = null }) { Text(stringResource(R.string.cancel), color = Am.Navy) } },
+                        confirmButton = { DialogPill(stringResource(R.string.cancel), primary = false) { chooseLinkApp = null } },
                         containerColor = Am.Card,
                     )
                 }
                 projectLinkInput?.let { input ->
                     androidx.compose.runtime.key(input) {
                         app.absentmotion.ui.home.ProjectLinkDialog({ projectLinkInput = null }, input) { uri, alightShare ->
-                            importProjectFiles(listOf(uri), asProjects = alightShare)
+                            importProjectFiles(listOf(uri), asProjects = alightShare, fromLink = true)
                         }
                     }
                 }
                 app.absentmotion.ui.home.MobileDataDialog()
+                app.absentmotion.ui.home.DeviceSendHost()
                 engineProblem?.takeIf { problemShown }?.let { UnsupportedPhone(it) { problemShown = false } }
                 openFailed?.let { id -> OpenFailedDialog({ openFailed = null; historyFor = Triple(id, "", false) }, outdated) { openFailed = null } }
                 importFailed?.let { reason ->
@@ -360,7 +362,7 @@ class MainActivity : ComponentActivity() {
                                 OutdatedHint(outdated, Modifier.padding(top = 8.dp))
                             }
                         },
-                        confirmButton = { TextButton({ importFailed = null }) { Text(stringResource(R.string.ok), color = Am.Navy) } },
+                        confirmButton = { DialogPill(stringResource(R.string.ok)) { importFailed = null } },
                         containerColor = Am.Card,
                     )
                 }
@@ -369,16 +371,16 @@ class MainActivity : ComponentActivity() {
                         onDismissRequest = { declineFonts(state) },
                         title = { Text(stringResource(R.string.fonts_missing_title)) },
                         text = { Text(stringResource(R.string.fonts_missing_body, names.joinToString(", ") { FontName.parse(it).label })) },
-                        confirmButton = { TextButton({ downloadFonts(names) }) { Text(stringResource(R.string.update_download), color = Am.Accent) } },
-                        dismissButton = { TextButton({ declineFonts(state) }) { Text(stringResource(R.string.update_not_now), color = Am.Accent) } },
+                        confirmButton = { DialogPill(stringResource(R.string.update_download)) { downloadFonts(names) } },
+                        dismissButton = { DialogPill(stringResource(R.string.update_not_now), primary = false, editor = true) { declineFonts(state) } },
                         containerColor = Am.Field, titleContentColor = Am.OnDark, textContentColor = Am.OnDark,
                     )
                 }
                 if (saveFailed && open != null) AlertDialog(
                     onDismissRequest = { saveFailed = false },
                     text = { Text(stringResource(R.string.home_close_save_failed)) },
-                    confirmButton = { TextButton({ saveFailed = false; closeEditor() }) { Text(stringResource(R.string.home_save_failed_retry), color = Am.Accent) } },
-                    dismissButton = { TextButton({ saveFailed = false; closeAnyway = true; closeEditor() }) { Text(stringResource(R.string.home_save_failed_leave), color = Am.Accent) } },
+                    confirmButton = { DialogPill(stringResource(R.string.home_save_failed_retry)) { saveFailed = false; closeEditor() } },
+                    dismissButton = { DialogPill(stringResource(R.string.home_save_failed_leave), primary = false, editor = true) { saveFailed = false; closeAnyway = true; closeEditor() } },
                     containerColor = Am.Field, textContentColor = Am.OnDark,
                 )
                 if (open?.historyOpen == true) VersionHistory(store, open.projectId, open.project.title, engine, onRestore = { restoreVersion(open.projectId, it) }, editor = true) { open.historyOpen = false }
@@ -521,12 +523,12 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private suspend fun importProjectFiles(uris: List<Uri>, asProjects: Boolean = false) {
+    private suspend fun importProjectFiles(uris: List<Uri>, asProjects: Boolean = false, fromLink: Boolean = false, quiet: Boolean = false): List<ImportReport> =
         kotlinx.coroutines.coroutineScope {
             val reports = ArrayList<ImportReport>()
             var failure: String? = null
             var presetsAdded = 0
-            val overlay = !opening
+            val overlay = !opening && !quiet
             if (overlay) { opening = true; openJob = coroutineContext.job }
             try {
                 CrashLogs.during("importing") { withContext(Dispatchers.IO) {
@@ -534,7 +536,7 @@ class MainActivity : ComponentActivity() {
                     val importer = Importer.forApp(applicationContext, store)
                     val presets = app.absentmotion.library.PresetStore(applicationContext)
                     for (uri in uris) try {
-                        val items = importer.import { contentResolver.openInputStream(uri)?.let { stoppable(it, job) } }
+                        val items = importer.import { contentResolver.openInputStream(uri)?.stoppableImport(job) }
                         withContext(Dispatchers.Main) { addedEffects.confirmImported(items, store) }
                         reports += items.map { it.copy(bundledEffects = emptyMap()) }.mapNotNull {
                             afterImport()
@@ -555,28 +557,24 @@ class MainActivity : ComponentActivity() {
                 if (overlay) opening = false
                 projectsChanged++
             }
-            failure?.let { importFailed = it }
+            if (!fromLink && !quiet) failure?.let { importFailed = it }
             if (presetsAdded > 0) Toast.makeText(this@MainActivity, getString(R.string.community_added_preset), Toast.LENGTH_SHORT).show()
-            if (reports.isNotEmpty()) imported = reports
+            if (reports.isNotEmpty() && !quiet) imported = if (fromLink) imported + reports else reports
             var drawn = false
             for (report in reports) if (!report.template) {
-                val scene = withContext(Dispatchers.IO) { store.load(report.id) } ?: continue
+                val scene = withContext(Dispatchers.IO) { store.load(report.id)?.also { engine.fonts?.fetchMissing(it) } } ?: continue
                 drawn = saveThumbnail(scene, scene.totalTime / 2, report.id) || drawn
             }
             if (drawn) projectsChanged++
+            if (fromLink || quiet) failure?.let { throw ProjectLinkImportFailure(it) }
+            reports
         }
-    }
-
-    private fun stoppable(input: java.io.InputStream, job: kotlinx.coroutines.Job) = object : java.io.FilterInputStream(input) {
-        override fun read(): Int { job.ensureActive(); return super.read() }
-        override fun read(b: ByteArray, off: Int, len: Int): Int { job.ensureActive(); return super.read(b, off, len) }
-    }
 
     private fun offerFonts(state: EditorState) {
         val library = engine.fonts ?: return
         if (state.projectId in fontsDeclined) return
         lifecycleScope.launch {
-            val missing = withContext(Dispatchers.IO) { state.project.fontNames().filter { FontName.parse(it).source == "googlefonts" && library.localFile(it) == null } }
+            val missing = withContext(Dispatchers.IO) { library.fetchMissing(state.project) }
             if (missing.isNotEmpty() && editor === state) fontOffer = state to missing
         }
     }
@@ -830,7 +828,7 @@ class MainActivity : ComponentActivity() {
     @android.annotation.SuppressLint("RestrictedApi")
     override fun dispatchKeyEvent(event: android.view.KeyEvent): Boolean {
         val state = editor
-        if (state != null && event.action == android.view.KeyEvent.ACTION_DOWN && app.absentmotion.platform.DeskKeys.handle(state, androidx.compose.ui.input.key.KeyEvent(event), ::closeEditor)) return true
+        if (state != null && (event.action == android.view.KeyEvent.ACTION_DOWN || event.action == android.view.KeyEvent.ACTION_UP) && app.absentmotion.platform.DeskKeys.handle(state, androidx.compose.ui.input.key.KeyEvent(event), ::closeEditor)) return true
         return super.dispatchKeyEvent(event)
     }
 

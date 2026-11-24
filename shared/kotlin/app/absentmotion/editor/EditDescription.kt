@@ -97,6 +97,8 @@ fun EditorState.goTo(spot: EditSpot): Boolean {
         R.string.history_opacity, R.string.history_blend -> EditorPanel.Blending
         R.string.history_text -> if (shown.kind == "text") EditorPanel.EditText else EditorPanel.Tools
         R.string.history_speed -> EditorPanel.Speed
+        R.string.model_pose -> EditorPanel.Pose
+        R.string.model_textures -> EditorPanel.Textures
         else -> EditorPanel.Tools
     }
     revealCount++
@@ -272,7 +274,8 @@ private fun childArea(name: String, before: List<XmlNode>, after: List<XmlNode>)
     "gain" -> R.string.history_volume
     "speedMap" -> R.string.history_speed
     "content" -> R.string.history_text
-    "property" -> R.string.history_shape
+    "property" -> if (((before - after.toSet()) + (after - before.toSet())).all { it["name"]?.startsWith("bone.") == true }) R.string.model_pose else R.string.history_shape
+    "material" -> R.string.model_textures
     AI_TAG -> R.string.history_ai
     else -> null
 }

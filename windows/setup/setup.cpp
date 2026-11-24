@@ -1128,7 +1128,11 @@ int Update(const Options& o, Shared& s) {
                 StopWith(kInUse, L"Files of AbsentMotion were still in use: " + SystemMessage(e) + InUse(root));
             }
             moved = true;
-            if (!RemoveMsi(msi, root, logDir)) {
+            const std::wstring keptLink = msiLink + L".keep";
+            const bool kept = desktop && MoveFileExW(Long(msiLink).c_str(), Long(keptLink).c_str(), MOVEFILE_REPLACE_EXISTING);
+            const bool removed = RemoveMsi(msi, root, logDir);
+            if (kept && !MoveFileExW(Long(keptLink).c_str(), Long(msiLink).c_str(), MOVEFILE_REPLACE_EXISTING)) Log(L"could not put the desktop shortcut back: " + SystemMessage(GetLastError()));
+            if (!removed) {
                 if (MoveRetry(old, root, 20000)) moved = false;
                 StopWith(kOld, L"Windows Installer did not remove the old version");
             }

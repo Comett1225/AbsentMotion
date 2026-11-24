@@ -38,7 +38,7 @@ class DefaultsMigrationTest {
         assertEquals(120.05f, fx("gaussianblur", "strength" to "0.6125").number("strength"), 1e-2f)
         assertEquals(0.85f, fx("voronoi2").number("scale"), 1e-5f)
         assertEquals(21.8875f, fx("voronoi2", "scale" to "25.75").number("scale"), 1e-3f)
-        assertEquals(43.4f, fx("voronoi", "scale" to "62").number("scale"), 1e-3f)
+        assertEquals(12f / 62f, fx("voronoi", "scale" to "62").number("scale"), 1e-4f)
         val cells = fx("voronoi2")
         assertEquals("#ffffffff", cells.value("color1"))
         assertEquals("#ff000000", cells.value("color2"))
@@ -136,13 +136,13 @@ class DefaultsMigrationTest {
         assertEquals(1f, d.number("blur"), 0f)
         assertEquals(1.2f, d.number("feather"), 1e-5f)
         val v = fx("lensblur2", "centerPoint" to "40,-25", "strength" to "0.3625", "radius" to "0.3625")
-        assertEquals(63.075f, v.number("sweep"), 1e-3f)
+        assertEquals(16.3125f, v.number("sweep"), 1e-3f)
         assertEquals(0.725f, v.number("radius"), 1e-5f)
         assertEquals(0.5f + 0.45f * 40f / 220f, v.numbers("center")[0], 1e-5f)
         assertEquals(0.5f - 0.37f * 25f / 165f, v.numbers("center")[1], 1e-4f)
         val old = fx("lensblur", "cx" to "0.625", "cy" to "0.625", "strength" to "0.3625")
         assertEquals(listOf(0.625f, 0.375f), old.numbers("center"))
-        assertEquals(63.075f, old.number("sweep"), 1e-3f)
+        assertEquals(16.3125f, old.number("sweep"), 1e-3f)
         assertTrue(result("com.alightcreative.effects.lensblur", "cx" to "0.3", "cy" to "0.7", "radius" to "0.2").dropped.isEmpty())
     }
 
@@ -187,13 +187,14 @@ class DefaultsMigrationTest {
         assertEquals("#FF3366CC", scan.value("color"))
     }
 
-    @Test fun displacementMapThreePushesItselfByTheLayerBelow() {
-        val map = fx("displacemap3", "offs" to "40,-25", "fromctr" to "true")
+    @Test fun displacementMapThreeMovesTheLayersBelowLikeTwo() {
+        val map = fx("displacemap3", "offs" to "40,-25", "fromctr" to "true", "typex" to "0", "typey" to "3")
         assertEquals("absent.displacementmap", map["id"])
-        assertEquals(1f, map.number("map"), 0f)
-        assertEquals(432f, map.numbers("offset")[0], 1e-2f)
-        assertEquals(-270f, map.numbers("offset")[1], 1e-2f)
-        assertEquals(1f, fx("displacemap3").number("map"), 0f)
+        assertTrue(map.value("map")?.toFloat()?.equals(0f) ?: true)
+        assertEquals(listOf(40f, -25f), map.numbers("offset"))
+        assertEquals(1f, map.number("style"), 0f)
+        assertEquals(3f, map.number("xchannel"), 0f)
+        assertEquals(2f, map.number("ychannel"), 0f)
         assertEquals(listOf(40f, -25f), fx("displacemap2", "offs" to "40,-25").numbers("offset"))
         assertTrue(fx("displacemap2").value("map")?.toFloat()?.equals(0f) ?: true)
     }

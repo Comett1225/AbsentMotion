@@ -169,6 +169,34 @@ std::vector<int> Ranks(int count, int direction, uint64_t seed, int* steps) {
     return ranks;
 }
 
+std::vector<int> ShuffledRanks(int count, float seed) {
+    constexpr uint64_t kMask = (1ull << 48) - 1, kMultiplier = 0x5DEECE66Dull;
+    const float scaled = seed * 35432882176.0f;
+    const float start = 15234322.0f + scaled;
+    const int64_t key = std::isfinite(start) ? (int64_t)std::clamp((double)start, -9.2e18, 9.2e18) : 0;
+    uint64_t state = ((uint64_t)key ^ kMultiplier) & kMask;
+    const auto next = [&] {
+        state = (state * kMultiplier + 0xB) & kMask;
+        return (int64_t)(state >> 17);
+    };
+    std::vector<int> ranks(std::max(count, 0));
+    std::iota(ranks.begin(), ranks.end(), 0);
+    for (int i = count; i > 1; i--) {
+        int64_t j = 0;
+        if ((i & -i) == i) {
+            j = (i * next()) >> 31;
+        } else {
+            int64_t bits = 0;
+            do {
+                bits = next();
+                j = bits % i;
+            } while (bits - j + (i - 1) > INT32_MAX);
+        }
+        std::swap(ranks[i - 1], ranks[(size_t)j]);
+    }
+    return ranks;
+}
+
 float Reveal(float progress, int rank, int steps, float softness) {
     if (steps <= 0) return 1;
     const float soft = std::max(softness, 0.0f);
@@ -248,11 +276,12 @@ std::string FormatTimecode(double seconds, double fps, int format) {
             break;
         case kSHundredths: snprintf(buffer, sizeof buffer, "%lld.%02lld", hundredths / 100, hundredths % 100); break;
         case kFrames: snprintf(buffer, sizeof buffer, "%lld", frames); break;
+        case kMSF: snprintf(buffer, sizeof buffer, "%02lld:%02lld:%02lld", frames / (60 * rate), frames / rate % 60, frames % rate); break;
         default:
             snprintf(buffer, sizeof buffer, "%02lld:%02lld:%02lld:%02lld", frames / (3600 * rate), frames / (60 * rate) % 60,
                      frames / rate % 60, frames % rate);
     }
-    const bool nonzero = format == kFrames || format == kHMSF ? frames > 0
+    const bool nonzero = format == kFrames || format == kHMSF || format == kMSF ? frames > 0
                          : format == kHMS || format == kMS ? whole > 0 : hundredths > 0;
     return (negative && nonzero ? "-" : "") + std::string(buffer);
 }

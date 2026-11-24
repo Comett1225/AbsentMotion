@@ -70,6 +70,7 @@ enum class AppLanguage(val tag: String, val nativeName: String) {
     German("de", "Deutsch"),
     Italian("it", "Italiano"),
     Polish("pl", "Polski"),
+    Dutch("nl", "Nederlands"),
     Ukrainian("uk", "Українська");
 
     val language: String get() = tag.substringBefore('-')

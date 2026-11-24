@@ -32,7 +32,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -88,6 +87,7 @@ import kotlin.math.roundToInt
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 import app.absentmotion.ui.HoldName
+import app.absentmotion.ui.home.DialogPill
 
 private val RowShape = RoundedCornerShape(12.dp)
 private val Orange get() = Am.Accent
@@ -266,14 +266,14 @@ fun PresetScreen(state: EditorState) {
         AlertDialog(
             onDismissRequest = { deleting = null }, title = { Text(stringResource(R.string.template_delete_preset)) },
             confirmButton = {
-                TextButton({
+                DialogPill(stringResource(R.string.delete)) {
                     deleting = null
                     scope.launch { withContext(Dispatchers.IO) { store.delete(preset.id) }; rev++ }
                     if (chosen == preset.id) { chosen = null; pos = pos.coerceAtMost((base.endTime - base.startTime).coerceAtLeast(1)) }
                     Toast.makeText(context, context.getString(R.string.preset_deleted), Toast.LENGTH_SHORT).show()
-                }) { Text(stringResource(R.string.delete), color = Am.Accent) }
+                }
             },
-            dismissButton = { TextButton({ deleting = null }) { Text(stringResource(R.string.cancel), color = Am.Accent) } },
+            dismissButton = { DialogPill(stringResource(R.string.cancel), primary = false, editor = true) { deleting = null } },
             containerColor = Am.Field, titleContentColor = Am.OnDark,
         )
     }
@@ -332,8 +332,8 @@ internal fun RenamePresetDialog(title: String, onDone: (String) -> Unit, onDismi
                 decorationBox = { field -> Box { if (text.isEmpty()) Text(title, color = Am.OnDarkDim, fontSize = 16.sp); field() } },
             )
         },
-        confirmButton = { TextButton({ onDone(text.ifBlank { title }) }) { Text(stringResource(R.string.done), color = Am.Accent) } },
-        dismissButton = { TextButton(onDismiss) { Text(stringResource(R.string.cancel), color = Am.Accent) } },
+        confirmButton = { DialogPill(stringResource(R.string.done)) { onDone(text.ifBlank { title }) } },
+        dismissButton = { DialogPill(stringResource(R.string.cancel), primary = false, editor = true, onClick = onDismiss) },
         containerColor = Am.Field, titleContentColor = Am.OnDark, textContentColor = Am.OnDark,
     )
 }
@@ -354,8 +354,8 @@ internal fun PresetSavedDialog(preset: SavedPreset, store: PresetStore, onDismis
     }
     AlertDialog(
         onDismissRequest = onDismiss, title = { Text(stringResource(R.string.preset_stored)) },
-        confirmButton = { TextButton({ renaming = true }) { Text(stringResource(R.string.name_it), color = Am.Accent) } },
-        dismissButton = { TextButton(onDismiss) { Text(stringResource(R.string.action_close), color = Am.Accent) } },
+        confirmButton = { DialogPill(stringResource(R.string.name_it)) { renaming = true } },
+        dismissButton = { DialogPill(stringResource(R.string.action_close), primary = false, editor = true, onClick = onDismiss) },
         containerColor = Am.Field, titleContentColor = Am.OnDark,
     )
 }

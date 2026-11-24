@@ -207,12 +207,16 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
         const val MAX_LEAD_MS = 100.0
         const val RETRY_NS = 1_000_000_000L
         const val MAX_RETRIES = 3
+        const val SHARP_AFTER_MS = 200L
     }
 
     private inner class Session(val id: Long, val uri: String) {
         private val decoderLock = Mutex()
-        private val queue = Channel<Pair<Request, VideoSample>>(Channel.CONFLATED)
+        private val queue = Channel<Triple<Request, VideoSample, Boolean>>(Channel.CONFLATED)
+        private var sharpJob: Job? = null
         private var decoder: VideoDecoder? = null
+        private var sharp: VideoDecoder? = null
+        private var publishedSharp = false
         private var source: String? = null
         private var proxy: String? = null
         private var proxyRevision = -1
@@ -233,13 +237,32 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
         private var aiFailed = false
         private val worker = scope.launch {
             try {
-                for ((request, layer) in queue) {
+                for ((request, layer, full) in queue) {
                     if (paused || stopped) continue
-                    try { decode(request, layer, exact = false) }
+                    if (full) {
+                        if (latest !== request) { latest?.let { requests.trySend(it) }; continue }
+                        try { decode(request, layer, exact = false, full = true) }
+                        catch (e: CancellationException) { throw e }
+                        catch (e: Exception) {
+                            Log.w("AMVideo", "Cannot show the full-quality frame of $uri layer $id", e)
+                            decoderLock.withLock { sharp?.close(); sharp = null }
+                        }
+                        continue
+                    }
+                    try {
+                        decode(request, layer, exact = false)
+                        if (!request.playing && proxy != null) {
+                            sharpJob?.cancel()
+                            sharpJob = scope.launch {
+                                delay(SHARP_AFTER_MS)
+                                if (latest === request && !stopped) queue.trySend(Triple(request, layer, true))
+                            }
+                        }
+                    }
                     catch (e: CancellationException) { throw e }
                     catch (e: Exception) {
                         Log.w("AMVideo", "Cannot decode $uri layer $id", e)
-                        decoderLock.withLock { decoder?.close(); decoder = null; retryAt = System.nanoTime() + RETRY_NS }
+                        decoderLock.withLock { decoder?.close(); decoder = null; sharp?.close(); sharp = null; retryAt = System.nanoTime() + RETRY_NS }
                         if (++failures <= MAX_RETRIES) scope.launch {
                             delay(RETRY_NS / 1_000_000 + 10)
                             if (!stopped) latest?.let { requests.trySend(it) }
@@ -247,11 +270,11 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
                     }
                 }
             } finally {
-                withContext(NonCancellable) { decoderLock.withLock { decoder?.close(); decoder = null } }
+                withContext(NonCancellable) { decoderLock.withLock { decoder?.close(); decoder = null; sharp?.close(); sharp = null } }
             }
         }
 
-        fun request(request: Request, sample: VideoSample) { queue.trySend(request to sample) }
+        fun request(request: Request, sample: VideoSample) { queue.trySend(Triple(request, sample, false)) }
         suspend fun exact(request: Request, sample: VideoSample) {
             try { decode(request, sample, exact = true) }
             catch (e: CancellationException) { throw e }
@@ -262,8 +285,8 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
             }
         }
 
-        private suspend fun decode(request: Request, sample: VideoSample, exact: Boolean) = decoderLock.withLock {
-            val source = show(request, sample, exact) ?: return@withLock
+        private suspend fun decode(request: Request, sample: VideoSample, exact: Boolean, full: Boolean = false) = decoderLock.withLock {
+            val source = show(request, sample, exact, full) ?: return@withLock
             trail(source, request, sample, exact)
         }
 
@@ -294,7 +317,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
             if (added && !exact && !obsolete(request, exact)) engine.videoFrameReady()
         }
 
-        private suspend fun show(request: Request, sample: VideoSample, exact: Boolean): VideoDecoder? {
+        private suspend fun show(request: Request, sample: VideoSample, exact: Boolean, full: Boolean = false): VideoDecoder? {
             val layer = sample.layer
             if (stopped) {
                 exportCheck(!exact) { txt(R.string.media_error_video_unavailable, uri) }
@@ -309,14 +332,17 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
                 proxy = VideoProxies.ready(context, uri, version)
             }
             val wanted = if (exact) uri else proxy ?: uri
-            if (this.source != wanted) { decoder?.close(); decoder = null; publishedPts = null; publishedMix = null; publishedMosh = null }
-            val source = decoder ?: open(wanted).also { decoder = it }
+            if (full && wanted == uri) return null
+            if (request.playing) { sharp?.close(); sharp = null }
+            if (!full && this.source != wanted) { decoder?.close(); decoder = null; publishedPts = null; publishedMix = null; publishedMosh = null; publishedSharp = false }
+            val source = if (full) sharp ?: VideoDecoder(context, uri).also { sharp = it } else decoder ?: open(wanted).also { decoder = it }
             fun ready() {
                 if (exact) return
                 installed[id] = PreviewVideoStamp(request.scene, request.timeMs, request.playing, uri)
                 if (!obsolete()) engine.videoFrameReady()
             }
             val plan = layer.moshPlan(sample.timeMs, sample.scene)
+            if (full && plan != null) return null
             if (plan != null && moshed(source, sample, plan, exact, ::abandoned)) {
                 if (publishedMosh == null) return null
                 ready()
@@ -326,9 +352,10 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
             val ahead = if (request.playing) leadMs * (sample.track.timeAt(request.timeMs.toDouble(), false)?.rate ?: 1.0) else 0.0
             val time = layer.videoTimeUs((sample.timeMs + ahead).toInt(), sample.scene)
             val pts = source.wantedPts(time)
-            if (publishedPts == pts) { ready(); return source }
+            if (publishedPts == pts && (publishedSharp || !full)) { ready(); return source }
             val seeks = source.seeks
             val image = source.frame(time, exact || !request.playing, ::obsolete) ?: (if (exact) source.frame(time, true, ::obsolete) else null) ?: run {
+                if (full) return null
                 if (!exact && !obsolete()) {
                     retryAt = System.nanoTime() + RETRY_NS
                     if (++failures <= MAX_RETRIES) scope.launch {
@@ -345,6 +372,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
                 if (exact) exportCheck(accepted) { txt(R.string.media_error_import_frame, source.timestamps.frameNumber(pts), uri) }
                 if (accepted) {
                     publishedPts = pts
+                    publishedSharp = full
                     publishedMix = null
                     publishedMosh = null
                     held.clear()
@@ -481,6 +509,7 @@ class VideoLibrary(context: Context, private val engine: EngineThread) {
         suspend fun close() {
             stopped = true
             installed.remove(id)
+            sharpJob?.cancel()
             queue.close()
             worker.cancel(); worker.join()
             engine.setPicture(uri, null, id)

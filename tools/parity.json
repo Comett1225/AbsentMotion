@@ -1750,6 +1750,14 @@
     "app/absentmotion/platform/DeskKeys.kt": {
       "desktop": "pc/src/standins/kotlin/app/absentmotion/desk/DeskApp.kt",
       "reason": "keyboard shortcuts while the phone shows the computer layout in Samsung DeX; the desktop app handles its shortcuts in its own window"
+    },
+    "app/absentmotion/ui/home/DeviceSendPlatform.kt": {
+      "desktop": "pc/src/standins/kotlin/app/absentmotion/ui/home/DeviceSendPlatform.kt",
+      "reason": "Send between devices platform parts (device and Wi-Fi name, permissions, QR scanner, Wi-Fi lock); the desktop file has the same functions"
+    },
+    "app/absentmotion/ui/home/ProjectQrPicture.kt": {
+      "desktop": "pc/src/standins/kotlin/app/absentmotion/ui/home/ProjectQrPicture.kt",
+      "reason": "QR codes from pictures: Android Gallery and Files pickers; the desktop picks picture files"
     }
   }
 }

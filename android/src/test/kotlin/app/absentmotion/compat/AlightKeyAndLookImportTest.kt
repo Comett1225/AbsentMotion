@@ -45,7 +45,7 @@ class AlightKeyAndLookImportTest {
             <property name="clipHigh" type="float" value="0.25" /><property name="gamma" type="float" value="4" /><property name="invert" type="bool" value="true" /></effect>""")
         assertEquals("absent.lumastamp", stamp["id"])
         assertEquals("#FF3366CC", stamp.value("color"))
-        assertEquals(listOf(0.25f, 0.75f, 2f), listOf("low", "high", "gamma").map { stamp.floats(it)[0] })
+        assertEquals(listOf(0.25f, 0.75f, 4f), listOf("low", "high", "gamma").map { stamp.floats(it)[0] })
         assertEquals("true", stamp.value("invert"))
         assertTrue(dropped.isEmpty())
     }

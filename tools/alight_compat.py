@@ -24,7 +24,7 @@ def build():
     foreign = json.loads(FOREIGN.read_text(encoding="utf-8"))
     by_id = {}
     for full, rule in foreign.items():
-        for prefix in ("com.alightcreative.effects.", "com.alightcreative."):
+        for prefix in ("com.alightcreative.effects.", "com.alightcreative.effect.", "com.alightcreative."):
             if full.startswith(prefix):
                 by_id.setdefault(full[len(prefix):], rule["to"])
                 break
@@ -56,7 +56,7 @@ def build():
         "- **%d** Alight effects look the same and **%d** are very close." % (counts["same"], counts["close"]),
         "- **%d** are converted to a similar effect that does not look identical." % counts["similar"],
         "- **%d** are converted but have not been compared side by side yet." % counts["unmeasured"],
-        "- **%d** are not converted yet (mostly very old effect versions, VR and some 3D solids)." % counts["none"],
+        "- Not converted yet: **%d**." % counts["none"],
         "- **Blending modes:** all of Alight's blending modes come across. Multiply and Subtract get their opacity converted so they look the same.",
         "",
         "Something imports wrong? [Send the project as an Import problem](%s): the XML and a screenshot of the same moment in Alight Motion. That is the fastest way to get it fixed." % ISSUE,

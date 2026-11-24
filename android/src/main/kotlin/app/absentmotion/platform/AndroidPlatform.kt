@@ -77,7 +77,7 @@ typealias Toast = android.widget.Toast
 fun fontFamily(library: app.absentmotion.fonts.FontLibrary, name: String) = androidx.compose.ui.text.font.FontFamily(library.typeface(name))
 
 
-fun androidx.compose.ui.graphics.drawscope.DrawScope.drawLiveStroke(path: DrawPath, filled: Boolean, color: Int, width: Float, opacity: Float, matrix: Matrix, eraser: Boolean) {
+fun androidx.compose.ui.graphics.drawscope.DrawScope.drawLiveStroke(path: DrawPath, filled: Boolean, color: Int, width: Float, opacity: Float, matrix: Matrix, eraser: Boolean, softness: Float = 0f) {
     drawIntoCanvas { canvas ->
         val c = canvas.nativeCanvas
         val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG)
@@ -87,6 +87,7 @@ fun androidx.compose.ui.graphics.drawscope.DrawScope.drawLiveStroke(path: DrawPa
             paint.style = android.graphics.Paint.Style.STROKE; paint.strokeWidth = width
             paint.strokeCap = android.graphics.Paint.Cap.ROUND; paint.strokeJoin = android.graphics.Paint.Join.ROUND
         }
+        if (softness > 0f) paint.maskFilter = android.graphics.BlurMaskFilter(softness / 0.57735f, android.graphics.BlurMaskFilter.Blur.NORMAL)
         c.save(); c.concat(matrix); c.drawPath(path.path.asAndroidPath(), paint); c.restore()
     }
 }
@@ -222,6 +223,10 @@ fun exportScope(own: kotlinx.coroutines.CoroutineScope): kotlinx.coroutines.Coro
 fun exportEngine(engine: app.absentmotion.engine.EngineThread): app.absentmotion.engine.EngineThread = engine.also(app.absentmotion.export.ExportEngine::exporting)
 
 fun exportDone(result: app.absentmotion.export.ExportResult) {}
+
+fun stagedExportDir(context: Context): java.io.File? = context.getExternalFilesDir(null)?.let { java.io.File(it, "export-staged") }
+
+fun stagedExportUri(context: Context, file: java.io.File): Uri = androidx.core.content.FileProvider.getUriForFile(context, context.packageName + ".files", file)
 
 suspend fun compressVideoOnDesktop(uri: String, job: app.absentmotion.tools.VideoJob, audio: Boolean, durationUs: Long, out: java.io.File, progress: (Float) -> Unit, startUs: Long = 0, endUs: Long = 0) = Unit
 

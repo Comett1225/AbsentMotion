@@ -11,6 +11,8 @@ import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URI
 
+internal class ProjectLinkImportFailure(val detail: String) : IOException(detail)
+
 private const val MaxProjectDownload = 256L shl 20
 internal const val AlightStorageHost = "firebasestorage.googleapis.com"
 private const val AlightStorageRoot = "/v0/b/alight-creative.appspot.com/o/"

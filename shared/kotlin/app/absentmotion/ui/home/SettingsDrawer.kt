@@ -62,7 +62,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -126,6 +125,7 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
     var language by remember { mutableStateOf(false) }
     var demoNote by remember { mutableStateOf(false) }
     var whatsNew by remember { mutableStateOf(false) }
+    var tools by remember { mutableStateOf(false) }
     ModalDrawerSheet(
         drawer, Modifier.width(280.dp), drawerShape = RectangleShape, drawerContainerColor = Am.HomeDrawer,
         windowInsets = WindowInsets(0),
@@ -143,6 +143,8 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
             Category(R.string.settings_group_backup, ChromeIcons.SavePreset) {
                 BackupRows(settings, onRestored)
             }
+            LinkRow(stringResource(R.string.home_tab_tools)) { tools = true }
+            Spacer(Modifier.height(CardGap))
             LinkRow(stringResource(R.string.settings_language), currentLanguage(LocalContext.current).nativeName) { language = true }
             Spacer(Modifier.height(CardGap))
             LinkRow(stringResource(R.string.settings_help)) { help = true }
@@ -166,6 +168,7 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
         }
     }
     if (language) LanguageDialog { language = false }
+    if (tools) CustomizeToolsSheet(settings) { tools = false }
     if (help) HelpScreen { help = false }
     if (about) AboutScreen(settings) { about = false }
     if (crashLogs) CrashLogsScreen { crashLogs = false }
@@ -174,7 +177,7 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
         onDismissRequest = { demoNote = false },
         title = { Text(stringResource(R.string.demo_mode_is_on), color = Am.Navy) },
         text = { Text(stringResource(R.string.the_media_picker_lists_only_albums), color = Am.Navy) },
-        confirmButton = { TextButton({ demoNote = false }) { Text(stringResource(R.string.ok), color = Am.Navy) } },
+        confirmButton = { DialogPill(stringResource(R.string.ok)) { demoNote = false } },
         containerColor = Am.Card,
     )
 }
@@ -314,8 +317,8 @@ private fun PreviewCopiesRow() {
         onDismissRequest = { ask = false },
         title = { Text(stringResource(R.string.settings_clear_preview_title), color = Am.Navy) },
         text = { Text(stringResource(R.string.settings_clear_preview_text), color = Am.Navy) },
-        confirmButton = { TextButton({ ask = false; VideoProxies.clear(context) }) { Text(stringResource(R.string.settings_clear_preview_copies), color = Am.Navy) } },
-        dismissButton = { TextButton({ ask = false }) { Text(stringResource(R.string.cancel), color = Am.Navy) } },
+        confirmButton = { DialogPill(stringResource(R.string.settings_clear_preview_copies)) { ask = false; VideoProxies.clear(context) } },
+        dismissButton = { DialogPill(stringResource(R.string.cancel), primary = false) { ask = false } },
         containerColor = Am.Card,
     )
 }
@@ -332,8 +335,8 @@ private fun CaptionModelRow() {
         onDismissRequest = { ask = false },
         title = { Text(stringResource(R.string.settings_delete_model_title, stringResource(R.string.caption_model)), color = Am.Navy) },
         text = { Text(stringResource(R.string.settings_delete_model_text), color = Am.Navy) },
-        confirmButton = { TextButton({ ask = false; CaptionModel.remove(context); bytes = CaptionModel.storedBytes(context) }) { Text(stringResource(R.string.delete), color = Am.Navy) } },
-        dismissButton = { TextButton({ ask = false }) { Text(stringResource(R.string.cancel), color = Am.Navy) } },
+        confirmButton = { DialogPill(stringResource(R.string.delete)) { ask = false; CaptionModel.remove(context); bytes = CaptionModel.storedBytes(context) } },
+        dismissButton = { DialogPill(stringResource(R.string.cancel), primary = false) { ask = false } },
         containerColor = Am.Card,
     )
 }
@@ -398,13 +401,13 @@ private fun DownloaderRow() {
         title = { Text(stringResource(R.string.settings_delete_model_title, name), color = Am.Navy) },
         text = { Text(stringResource(R.string.settings_delete_model_text), color = Am.Navy) },
         confirmButton = {
-            TextButton({
+            DialogPill(stringResource(R.string.delete)) {
                 ask = false
                 app.absentmotion.platform.videoDownloader().remove(context)
                 present = false
-            }) { Text(stringResource(R.string.delete), color = Am.Navy) }
+            }
         },
-        dismissButton = { TextButton({ ask = false }) { Text(stringResource(R.string.cancel), color = Am.Navy) } },
+        dismissButton = { DialogPill(stringResource(R.string.cancel), primary = false) { ask = false } },
         containerColor = Am.Card,
     )
 }
@@ -426,13 +429,13 @@ private fun AiModelRows() {
             title = { Text(stringResource(R.string.settings_delete_model_title, stringResource(target.title)), color = Am.Navy) },
             text = { Text(stringResource(R.string.settings_delete_model_text), color = Am.Navy) },
             confirmButton = {
-                TextButton({
+                DialogPill(stringResource(R.string.delete)) {
                     askFor = null
                     target.delete(context)
                     models = deletable()
-                }) { Text(stringResource(R.string.delete), color = Am.Navy) }
+                }
             },
-            dismissButton = { TextButton({ askFor = null }) { Text(stringResource(R.string.cancel), color = Am.Navy) } },
+            dismissButton = { DialogPill(stringResource(R.string.cancel), primary = false) { askFor = null } },
             containerColor = Am.Card,
         )
     }
@@ -463,15 +466,15 @@ private fun CutoutRows() {
         title = { Text(stringResource(R.string.settings_delete_model_title, stringResource(model.title)), color = Am.Navy) },
         text = { Text(stringResource(R.string.settings_delete_model_text), color = Am.Navy) },
         confirmButton = {
-            TextButton({
+            DialogPill(stringResource(R.string.delete)) {
                 ask = false
                 model.delete(context)
                 bytes = model.onDisk(context)
                 choice.choose(app.absentmotion.ai.CutoutQuality.Standard)
                 chosen = app.absentmotion.ai.CutoutQuality.Standard
-            }) { Text(stringResource(R.string.delete), color = Am.Navy) }
+            }
         },
-        dismissButton = { TextButton({ ask = false }) { Text(stringResource(R.string.cancel), color = Am.Navy) } },
+        dismissButton = { DialogPill(stringResource(R.string.cancel), primary = false) { ask = false } },
         containerColor = Am.Card,
     )
 }
@@ -504,8 +507,8 @@ private fun AiGpuRow() {
         onDismissRequest = { ask = false },
         title = { Text(stringResource(R.string.settings_ai_gpu), color = Am.Navy) },
         text = { Text(stringResource(R.string.ai_gpu_warning), color = Am.Navy) },
-        confirmButton = { TextButton({ ask = false; choose(true) }) { Text(stringResource(R.string.audiofx_turn_on), color = Am.Navy) } },
-        dismissButton = { TextButton({ ask = false }) { Text(stringResource(R.string.cancel), color = Am.Navy) } },
+        confirmButton = { DialogPill(stringResource(R.string.audiofx_turn_on)) { ask = false; choose(true) } },
+        dismissButton = { DialogPill(stringResource(R.string.cancel), primary = false) { ask = false } },
         containerColor = Am.Card,
     )
 }

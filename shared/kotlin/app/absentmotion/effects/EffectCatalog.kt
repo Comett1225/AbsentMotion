@@ -126,9 +126,7 @@ data class EffectCatalog(
                 runCatching { EffectDefinition.parse(JSONObject(text("$key.json"))) }.getOrNull()
             }
             val releases = runCatching { JSONArray(text("releases.json")).let { a -> List(a.length()) { a.getString(it) } } }.getOrDefault(emptyList())
-            val versions = releases + definitions.mapNotNull { it.since }
-            val major = versions.mapNotNull { it.substringBefore('.').toIntOrNull() }.maxOrNull()
-            val catalog = EffectCatalog(definitions, open = open, newest = versions.filter { it.substringBefore('.').toIntOrNull() == major }.toSet())
+            val catalog = EffectCatalog(definitions, open = open, newest = newestLine(releases + definitions.mapNotNull { it.since }))
             if (language == "en") catalog else runCatching { catalog.translated(JSONObject(text("i18n/$language.json"))) }.getOrDefault(catalog)
         }.getOrElse { EffectCatalog(message = "The effects could not be loaded") }
     }
@@ -176,4 +174,10 @@ internal fun searchRank(query: String, name: String): Int {
         n.split(' ', '-', '/', '(').any { it.startsWith(q) } -> 2
         else -> 3
     }
+}
+
+internal fun newestLine(versions: List<String>): Set<String> {
+    fun line(version: String) = version.split('.').let { (it.getOrNull(0)?.toIntOrNull() ?: -1) to (it.getOrNull(1)?.toIntOrNull() ?: 0) }
+    val top = versions.map(::line).maxWithOrNull(compareBy({ it.first }, { it.second })) ?: return emptySet()
+    return versions.filterTo(HashSet()) { line(it) == top }
 }

@@ -282,7 +282,7 @@ Placement Effective(const std::vector<Layer>& siblings, const Layer& l, double t
     const SkPath path = below.text ? TextGlyphPath(below, t, Fps()) : Cropped(below, t, ShapePath(below, t));
     const bool legacy = UsesLegacyPathCoordinates(l, timeMs);
     const Placement guide = parent == &below && !legacy ? p : Effective(siblings, below, timeMs, depth + 1, !legacy);
-    FollowPath(l, timeMs, path.makeTransform(MatrixOf(guide, below, t)), &own);
+    FollowPath(l, timeMs, PathFromTop(l, timeMs, path).makeTransform(MatrixOf(guide, below, t)), &own);
     return own;
 }
 
@@ -722,7 +722,14 @@ Drawn DrawBody(SkCanvas* canvas, const Layer& l, double timeMs, float t, const S
     canvas->save();
     canvas->concat(m);
     if (l.kind == "embedScene") {
+        const bool tinted = l.fillType == "color";
+        if (tinted) {
+            SkPaint tint;
+            tint.setColorFilter(SkColorFilters::Blend(ColorAt(l.fillColor, t, kWhite), nullptr, SkBlendMode::kSrcATop));
+            canvas->saveLayer(nullptr, &tint);
+        }
         DrawGroup(canvas, l, timeMs, pictures);
+        if (tinted) canvas->restore();
         canvas->restore();
         if (edged) canvas->restore();
         return drawn;
@@ -1529,7 +1536,15 @@ void DrawShuttered(SkCanvas* canvas, const std::vector<Layer>& siblings, const L
         canvas->restore();
         return;
     }
-    const auto at = [&](double u) { return std::clamp(timeMs + lead - open * (1 - u), (double)l.startTime, (double)l.endTime); };
+    const auto at = [&](double u) {
+        const double when = timeMs + lead - open * (1 - u);
+        return shutter.anyTime ? when : std::clamp(when, (double)l.startTime, (double)l.endTime);
+    };
+    struct AnyTimeScope {
+        bool was;
+        explicit AnyTimeScope(bool on) : was(ShutterAnyTime()) { SetShutterAnyTime(on || was); }
+        ~AnyTimeScope() { SetShutterAnyTime(was); }
+    } anyTimeScope(shutter.anyTime);
     const bool steady = Steady(siblings, l, at(0), at(1));
     int samples = shutter.samples;
     if (shutter.adaptive && !steady) samples = std::clamp((int)std::ceil(Reach(siblings, l, timeMs + lead - open / 2, open) / 2), samples, 64);
@@ -1593,9 +1608,17 @@ void DrawShuttered(SkCanvas* canvas, const std::vector<Layer>& siblings, const L
     canvas->restore();
 }
 
+static SkVector LeadOffset(const Layer& l, double ms) {
+    const std::vector<Keyframe>& k = l.location.keys;
+    if (k.size() < 2 || k[0].t > 0 || !(k[1].t > k[0].t) || l.endTime <= l.startTime || !(ms < 0)) return {0, 0};
+    const double per = ms / ((k[1].t - k[0].t) * (l.endTime - l.startTime));
+    const auto step = [&](size_t i) { return i < k[0].v.size() && i < k[1].v.size() ? (float)((k[1].v[i] - k[0].v[i]) * per) : 0.0f; };
+    return {step(0), step(1)};
+}
+
 void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& l, double timeMs,
              const MediaPictures& pictures, const Override& ov) {
-    if (!l.activeAt(timeMs) || l.kind == "nullobj" || l.kind == "camera" || l.kind == "light") return;
+    if ((!l.activeAt(timeMs) && !(ov.shuttered && ShutterAnyTime())) || l.kind == "nullobj" || l.kind == "camera" || l.kind == "light") return;
     if (l.fillType == "media" && !pictures(l.mediaUri, l.id)) return;
     if (!ov.feedback) for (const LayerEffect& e : l.effects) {
         if (e.hidden || e.id != "absent.videofeedback") continue;
@@ -1702,8 +1725,20 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
         auto past = [&](int i) {
             Override faded = plain;
             faded.alpha = ov.alpha * (1 + (echo.alpha - 1) * i / echo.count);
-            const double at = std::clamp(timeMs - 1000.0 * echo.seconds * i / echo.count, (double)l.startTime, (double)l.endTime);
+            const double want = timeMs - 1000.0 * echo.seconds * i / echo.count;
+            const double at = std::clamp(want, (double)l.startTime, (double)l.endTime);
+            SkVector early = echo.standard && want < at ? LeadOffset(l, std::max(want, at - 2000.0 / Fps()) - at) : SkVector{0, 0};
+            for (const Layer& s : siblings) {
+                if (l.parent == 0 || s.id != l.parent || &s == &l || early.isZero()) continue;
+                const Placement p = Effective(siblings, s, at, 1);
+                const SkV4 o = Turn(p.rotation) * p.tilt * SkV4{early.fX * p.scale.fX, early.fY * p.scale.fY, 0, 0};
+                early = {o.x, o.y};
+                break;
+            }
+            canvas->save();
+            canvas->translate(early.fX, early.fY);
             DrawOne(canvas, siblings, l, at, pictures, faded);
+            canvas->restore();
             if (gBreak) (*gBreak)();
         };
         if (!echo.atop) for (int i = echo.count; i >= 1; i--) past(i);
@@ -2007,18 +2042,22 @@ static bool ContentRect(const Layer& l, double timeMs, const SkMatrix& matrix, S
     const double innerTime = NestedTime(l, timeMs);
     if (innerTime >= 0 && (l.innerBackground >> 24) != 0) return true;
     const SkMatrix origin = SkMatrix::Concat(matrix, SkMatrix::Translate(-l.innerWidth / 2.0f, -l.innerHeight / 2.0f));
-    float left = INFINITY, top = INFINITY, right = -INFINITY, bottom = -INFINITY;
+    SkRect content = SkRect::MakeEmpty();
+    bool any = false;
     SkRect child;
     for (const Layer& c : l.inner()) {
         if (innerTime < 0 || !c.activeAt(innerTime) || c.kind == "nullobj" || c.kind == "camera" || c.kind == "light") continue;
         if (!ContentRect(c, innerTime, SkMatrix::Concat(origin, SiblingMatrix(l.inner(), c, innerTime)), &child, drawn, cropped)) continue;
-        left = std::min(left, child.fLeft);
-        top = std::min(top, child.fTop);
-        right = std::max(right, child.fRight);
-        bottom = std::max(bottom, child.fBottom);
+        if (c.blending == "mask") {
+            if (any && !content.intersect(child)) any = false;
+            continue;
+        }
+        if (c.blending == "exclude") continue;
+        if (any) content.join(child);
+        else content = child;
+        any = true;
     }
-    SkRect content = SkRect::MakeLTRB(left, top, right, bottom);
-    if (left <= right && top <= bottom && (!cut || content.intersect(*out))) *out = content;
+    if (any && (!cut || content.intersect(*out))) *out = content;
     return true;
 }
 

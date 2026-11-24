@@ -4,7 +4,6 @@ import android.app.ActivityManager
 import android.content.Context
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,7 +36,7 @@ internal fun LowMemoryNotice() {
         onDismissRequest = ::close,
         title = { Text(stringResource(R.string.low_memory_title), color = Am.Navy) },
         text = { Text(stringResource(R.string.low_memory_body, String.format(LocalConfiguration.current.locales[0], "%.1f", total / 1e9)), color = Am.Navy) },
-        confirmButton = { TextButton(::close) { Text(stringResource(R.string.ok), color = Am.Navy) } },
+        confirmButton = { DialogPill(stringResource(R.string.ok), onClick = ::close) },
         containerColor = Am.Card,
     )
 }

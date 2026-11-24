@@ -88,7 +88,8 @@
    "default": 0.6,
    "min": 0,
    "max": 1,
-   "step": 0.01
+   "step": 0.01,
+   "section": "light"
   },
   {
    "id": "light",
@@ -97,7 +98,8 @@
    "default": 135,
    "min": -3600,
    "max": 3600,
-   "step": 0.1
+   "step": 0.1,
+   "section": "light"
   },
   {
    "id": "shine",
@@ -106,7 +108,8 @@
    "default": 0.3,
    "min": 0,
    "max": 1,
-   "step": 0.01
+   "step": 0.01,
+   "section": "light"
   },
   {
    "id": "lighting",
@@ -117,7 +120,8 @@
     "Classic",
     "Soft",
     "Direct"
-   ]
+   ],
+   "section": "light"
   },
   {
    "id": "ambient",
@@ -132,7 +136,8 @@
      1,
      2
     ]
-   }
+   },
+   "section": "light"
   },
   {
    "id": "lightHeight",
@@ -147,7 +152,8 @@
      1,
      2
     ]
-   }
+   },
+   "section": "light"
   },
   {
    "id": "lightColor",
@@ -159,7 +165,8 @@
      1,
      2
     ]
-   }
+   },
+   "section": "light"
   },
   {
    "id": "glossiness",
@@ -174,7 +181,8 @@
      1,
      2
     ]
-   }
+   },
+   "section": "light"
   },
   {
    "id": "texMode",
@@ -185,7 +193,8 @@
     "Fit",
     "Tile",
     "Stretch"
-   ]
+   ],
+   "section": "texture"
   },
   {
    "id": "texRepeatX",
@@ -200,7 +209,8 @@
      1,
      2
     ]
-   }
+   },
+   "section": "texture"
   },
   {
    "id": "texRepeatY",
@@ -215,7 +225,8 @@
      1,
      2
     ]
-   }
+   },
+   "section": "texture"
   },
   {
    "id": "texMirror",
@@ -227,7 +238,8 @@
      1,
      2
     ]
-   }
+   },
+   "section": "texture"
   },
   {
    "id": "texAngle",
@@ -242,7 +254,8 @@
      1,
      2
     ]
-   }
+   },
+   "section": "texture"
   },
   {
    "id": "texOffset",
@@ -260,7 +273,8 @@
      1,
      2
     ]
-   }
+   },
+   "section": "texture"
   },
   {
    "id": "texCrop",
@@ -275,7 +289,8 @@
      1,
      2
     ]
-   }
+   },
+   "section": "texture"
   },
   {
    "id": "texAnchor",
@@ -291,8 +306,9 @@
      1,
      2
     ]
-   }
+   },
+   "section": "texture"
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float3x3 orient;\nuniform float rotX;\nuniform float rotY;\nuniform float rotZ;\nuniform float radius;\nuniform float thickness;\nuniform float2 position;\nuniform float scale;\nuniform float perspective;\nuniform float shading;\nuniform float light;\nuniform float shine;\nuniform float lighting;\nuniform float ambient;\nuniform float lightHeight;\nlayout(color) uniform half4 lightColor;\nuniform float glossiness;\nuniform float texMode;\nuniform float texRepeatX;\nuniform float texRepeatY;\nuniform float texMirror;\nuniform float texAngle;\nuniform float2 texOffset;\nuniform float texCrop;\nuniform float texAnchor;\n\nconst float PI = 3.14159265;\n\nfloat3x3 turn() {\n    float3 a = radians(float3(rotX, rotY, rotZ));\n    float cx = cos(a.x), sx = sin(a.x), cy = cos(a.y), sy = sin(a.y), cz = cos(a.z), sz = sin(a.z);\n    return float3x3(cz, -sz, 0.0, sz, cz, 0.0, 0.0, 0.0, 1.0) * float3x3(cy, 0.0, sy, 0.0, 1.0, 0.0, -sy, 0.0, cy) *\n        float3x3(1.0, 0.0, 0.0, 0.0, cx, -sx, 0.0, sx, cx);\n}\n\nfloat4 pic(float2 uv) {\n    return float4(image.eval(clamp(uv * size, float2(0.5), max(size - 0.5, float2(0.5)))));\n}\n\nfloat2 cover(float2 uv, float2 face) {\n    float r = (face.x / max(face.y, 0.0001)) / (size.x / max(size.y, 0.0001));\n    return (uv - 0.5) * (r > 1.0 ? float2(1.0, 1.0 / r) : float2(r, 1.0)) + 0.5;\n}\n\nfloat4 shade(float4 c, float3 n, float3 v) {\n    float a = radians(light);\n    if (lighting > 0.5) {\n        float d = max(dot(n, normalize(float3(cos(a), -sin(a), -lightHeight))), 0.0);\n        float3 lit = c.rgb * ((lighting > 1.5 ? 0.0 : 0.38) + (ambient + shading * d) * float3(lightColor.rgb));\n        float g = shine * pow(d, glossiness);\n        return float4(min(lit + g * (1.0 - lit), float3(1.0)), c.a);\n    }\n    float3 l = normalize(float3(cos(a), -sin(a), -1.2));\n    float k = 1.0 - shading + shading * (0.3 + 0.85 * max(dot(n, l), 0.0));\n    float s = shine * pow(max(dot(n, normalize(l + v)), 0.0), 40.0);\n    return float4(min(c.rgb * k + s * c.a, float3(c.a)), c.a);\n}\n\nfloat4 tiled(float2 uv, float2 face) {\n    float2 q = uv - 0.5;\n    if (texMode < 1.5) q *= face / max(min(face.x, face.y), 0.0001);\n    float t = radians(texAngle);\n    q = float2(cos(t) * q.x + sin(t) * q.y, cos(t) * q.y - sin(t) * q.x) * float2(texRepeatX, texRepeatY) + 0.5 - texOffset - texAnchor * (0.5 * float2(texRepeatX, texRepeatY) + 0.5);\n    float2 f = fract(q);\n    if (texMirror > 0.5) f = mix(f, 1.0 - f, mod(floor(q), 2.0));\n    f = (f - 0.5) * texCrop + 0.5;\n    if (f.x < 0.0 || f.y < 0.0 || f.x > 1.0 || f.y > 1.0) return float4(0.0);\n    return pic(f);\n}\n\nfloat4 tex(float2 uv, float2 face) { return texMode < 0.5 ? pic(cover(uv, face)) : tiled(uv, face); }\n\nfloat4 wrap(float2 uv) { return texMode < 0.5 ? pic(uv) : tiled(uv, float2(1.0)); }\n\nfloat sdBox(float3 p, float3 h) {\n    float3 q = abs(p) - h;\n    return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);\n}\n\nfloat sdRoundBox(float3 p, float3 h, float r) {\n    return sdBox(p, h - r) - r;\n}\n\nfloat extrude(float d, float z, float h, float r) {\n    float2 w = float2(d + r, abs(z) - h + r);\n    return min(max(w.x, w.y), 0.0) + length(max(w, 0.0)) - r;\n}\n\nfloat4 boxFace(float3 p, float3 n, float3 h) {\n    float3 a = abs(n);\n    float2 uv;\n    float2 face;\n    if (a.z >= a.x && a.z >= a.y) {\n        uv = float2(n.z < 0.0 ? p.x : -p.x, p.y) / h.xy;\n        face = h.xy;\n    } else if (a.x >= a.y) {\n        uv = float2(n.x > 0.0 ? p.z : -p.z, p.y) / h.zy;\n        face = h.zy;\n    } else {\n        uv = float2(p.x, n.y < 0.0 ? -p.z : p.z) / h.xz;\n        face = h.xz;\n    }\n    return tex(uv * 0.5 + 0.5, face);\n}\n\nfloat4 front(float3 p, float3 n, float r) {\n    return tex(float2(n.z > 0.0 ? -p.x : p.x, p.y) / r * 0.5 + 0.5, float2(1.0));\n}\n\nfloat4 facet(float3 p, float3 n, float r) {\n    float3 f = normalize(sign(n));\n    float3 w = float3(-f.z, 0.0, f.x);\n    float3 u = dot(w, w) > 0.0 ? normalize(w) : float3(1.0, 0.0, 0.0);\n    return tex(float2(dot(p, u), dot(p, cross(u, f))) / r * 0.5 + 0.5, float2(1.0));\n}\n\nfloat bound() { return radius + thickness; }\nfloat map(float3 p) { return length(float2(length(p.xy) - radius, p.z)) - thickness; }\nfloat4 surface(float3 p, float3 n) {\n    return wrap(float2(atan(p.x, -p.y) / (2.0 * PI) + 0.5, atan(p.z, length(p.xy) - radius) / (2.0 * PI) + 0.5));\n}\n\nfloat3 normal(float3 p, float e) {\n    float2 k = float2(1.0, -1.0);\n    return normalize(k.xyy * map(p + k.xyy * e) + k.yyx * map(p + k.yyx * e) + k.yxy * map(p + k.yxy * e) + k.xxx * map(p + k.xxx * e));\n}\n\nfloat4 paint(float3 p, float3 n, float3x3 m, float3 rw) {\n    return shade(surface(p, n), normalize(m * n), -rw);\n}\n\nhalf4 main(float2 coord) {\n    float unit = max(min(size.x, size.y) * 0.5 * scale, 0.5);\n    float rb = bound();\n    float dist = max(2.0 + 40.0 * pow(1.0 - clamp(perspective, 0.0, 1.0), 3.0), rb + 0.5);\n    float3 rw = normalize(float3((coord - size * 0.5 - position) / unit, dist));\n    float3 ow = float3(0.0, 0.0, -dist);\n    float reach = rb + 2.0 * dist / (unit * max(dist - rb, 0.1));\n    float b = dot(ow, rw);\n    float disc = b * b - dot(ow, ow) + reach * reach;\n    if (disc <= 0.0) return half4(0.0);\n    float3x3 m = orient * turn();\n    float3 ro = ow * m;\n    float3 rd = rw * m;\n    float far = -b + sqrt(disc);\n    float t = max(-b - sqrt(disc), 0.0);\n    float px = unit * dist / rw.z;\n    float best = 1e9;\n    float tb = t;\n    bool hit = false;\n    for (int i = 0; i < 96; i++) {\n        float h = map(ro + rd * t);\n        float g = h * px / max(t, 0.0001);\n        if (g < best) { best = g; tb = t; }\n        if (g < 0.2) { hit = true; break; }\n        t += h * 0.9;\n        if (t > far) break;\n    }\n    if (!hit && best >= 1.0) return half4(0.0);\n    if (!hit) t = tb;\n    float e = max(0.5 * t / px, 0.0005);\n    float3 p = ro + rd * t;\n    float3 n = normal(p, e);\n    if (!hit) p -= n * map(p);\n    float4 c = paint(p, n, m, rw);\n    if (hit && c.a < 0.996 && lighting < 0.5) {\n        float s = far;\n        bool back = false;\n        for (int i = 0; i < 64; i++) {\n            float h = map(ro + rd * s);\n            if (h * px / max(s, 0.0001) < 0.2) { back = true; break; }\n            s -= h * 0.9;\n            if (s < t) break;\n        }\n        if (back) {\n            float3 q = ro + rd * s;\n            c += paint(q, -normal(q, e), m, rw) * (1.0 - c.a);\n        }\n    }\n    return half4(hit ? c : c * (1.0 - best));\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float3x3 orient;\nuniform float rotX;\nuniform float rotY;\nuniform float rotZ;\nuniform float radius;\nuniform float thickness;\nuniform float2 position;\nuniform float scale;\nuniform float perspective;\nuniform float shading;\nuniform float light;\nuniform float shine;\nuniform float lighting;\nuniform float ambient;\nuniform float lightHeight;\nlayout(color) uniform half4 lightColor;\nuniform float glossiness;\nuniform float texMode;\nuniform float texRepeatX;\nuniform float texRepeatY;\nuniform float texMirror;\nuniform float texAngle;\nuniform float2 texOffset;\nuniform float texCrop;\nuniform float texAnchor;\n\nconst float PI = 3.14159265;\n\nfloat3x3 turn() {\n    float3 a = radians(float3(rotX, rotY, rotZ));\n    float cx = cos(a.x), sx = sin(a.x), cy = cos(a.y), sy = sin(a.y), cz = cos(a.z), sz = sin(a.z);\n    return float3x3(cz, -sz, 0.0, sz, cz, 0.0, 0.0, 0.0, 1.0) * float3x3(cy, 0.0, sy, 0.0, 1.0, 0.0, -sy, 0.0, cy) *\n        float3x3(1.0, 0.0, 0.0, 0.0, cx, -sx, 0.0, sx, cx);\n}\n\nfloat4 pic(float2 uv) {\n    return float4(image.eval(clamp(uv * size, float2(0.5), max(size - 0.5, float2(0.5)))));\n}\n\nfloat2 cover(float2 uv, float2 face) {\n    float r = (face.x / max(face.y, 0.0001)) / (size.x / max(size.y, 0.0001));\n    return (uv - 0.5) * (r > 1.0 ? float2(1.0, 1.0 / r) : float2(r, 1.0)) + 0.5;\n}\n\nfloat4 shade(float4 c, float3 n, float3 v) {\n    float a = radians(light);\n    if (lighting > 0.5) {\n        float d = max(dot(n, normalize(float3(cos(a), -sin(a), -lightHeight))), 0.0);\n        float3 lit = c.rgb * ((lighting > 1.5 ? 0.0 : 0.38) + (ambient + shading * d) * float3(lightColor.rgb));\n        float g = shine * pow(d, glossiness);\n        return float4(min(lit + g * (c.a - lit), float3(c.a)), c.a);\n    }\n    float3 l = normalize(float3(cos(a), -sin(a), -1.2));\n    float k = 1.0 - shading + shading * (0.3 + 0.85 * max(dot(n, l), 0.0));\n    float s = shine * pow(max(dot(n, normalize(l + v)), 0.0), 40.0);\n    return float4(min(c.rgb * k + s * c.a, float3(c.a)), c.a);\n}\n\nfloat4 tiled(float2 uv, float2 face) {\n    float2 q = uv - 0.5;\n    if (texMode < 1.5) q *= face / max(min(face.x, face.y), 0.0001);\n    float t = radians(texAngle);\n    q = float2(cos(t) * q.x + sin(t) * q.y, cos(t) * q.y - sin(t) * q.x) * float2(texRepeatX, texRepeatY) + 0.5 - texOffset - texAnchor * (0.5 * float2(texRepeatX, texRepeatY) + 0.5);\n    float2 f = fract(q);\n    if (texMirror > 0.5) f = mix(f, 1.0 - f, mod(floor(q), 2.0));\n    f = (f - 0.5) * texCrop + 0.5;\n    if (f.x < 0.0 || f.y < 0.0 || f.x > 1.0 || f.y > 1.0) return float4(0.0);\n    return pic(f);\n}\n\nfloat4 tex(float2 uv, float2 face) { return texMode < 0.5 ? pic(cover(uv, face)) : tiled(uv, face); }\n\nfloat4 wrap(float2 uv) { return texMode < 0.5 ? pic(uv) : tiled(uv, float2(1.0)); }\n\nfloat sdBox(float3 p, float3 h) {\n    float3 q = abs(p) - h;\n    return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);\n}\n\nfloat sdRoundBox(float3 p, float3 h, float r) {\n    return sdBox(p, h - r) - r;\n}\n\nfloat extrude(float d, float z, float h, float r) {\n    float2 w = float2(d + r, abs(z) - h + r);\n    return min(max(w.x, w.y), 0.0) + length(max(w, 0.0)) - r;\n}\n\nfloat4 boxFace(float3 p, float3 n, float3 h) {\n    float3 a = abs(n);\n    float2 uv;\n    float2 face;\n    if (a.z >= a.x && a.z >= a.y) {\n        uv = float2(n.z < 0.0 ? p.x : -p.x, p.y) / h.xy;\n        face = h.xy;\n    } else if (a.x >= a.y) {\n        uv = float2(n.x > 0.0 ? p.z : -p.z, p.y) / h.zy;\n        face = h.zy;\n    } else {\n        uv = float2(p.x, n.y < 0.0 ? -p.z : p.z) / h.xz;\n        face = h.xz;\n    }\n    return tex(uv * 0.5 + 0.5, face);\n}\n\nfloat4 front(float3 p, float3 n, float r) {\n    return tex(float2(n.z > 0.0 ? -p.x : p.x, p.y) / r * 0.5 + 0.5, float2(1.0));\n}\n\nfloat4 facet(float3 p, float3 n, float r) {\n    float3 f = normalize(sign(n));\n    float3 w = float3(-f.z, 0.0, f.x);\n    float3 u = dot(w, w) > 0.0 ? normalize(w) : float3(1.0, 0.0, 0.0);\n    return tex(float2(dot(p, u), dot(p, cross(u, f))) / r * 0.5 + 0.5, float2(1.0));\n}\n\nfloat bound() { return radius + thickness; }\nfloat map(float3 p) { return length(float2(length(p.xy) - radius, p.z)) - thickness; }\nfloat4 surface(float3 p, float3 n) {\n    return wrap(float2(atan(p.x, -p.y) / (2.0 * PI) + 0.5, atan(p.z, length(p.xy) - radius) / (2.0 * PI) + 0.5));\n}\n\nfloat3 normal(float3 p, float e) {\n    float2 k = float2(1.0, -1.0);\n    return normalize(k.xyy * map(p + k.xyy * e) + k.yyx * map(p + k.yyx * e) + k.yxy * map(p + k.yxy * e) + k.xxx * map(p + k.xxx * e));\n}\n\nfloat4 paint(float3 p, float3 n, float3x3 m, float3 rw) {\n    return shade(surface(p, n), normalize(m * n), -rw);\n}\n\nhalf4 main(float2 coord) {\n    float unit = max(min(size.x, size.y) * 0.5 * scale, 0.5);\n    float rb = bound();\n    float dist = max(2.0 + 40.0 * pow(1.0 - clamp(perspective, 0.0, 1.0), 3.0), rb + 0.5);\n    float3 rw = normalize(float3((coord - size * 0.5 - position) / unit, dist));\n    float3 ow = float3(0.0, 0.0, -dist);\n    float reach = rb + 2.0 * dist / (unit * max(dist - rb, 0.1));\n    float b = dot(ow, rw);\n    float disc = b * b - dot(ow, ow) + reach * reach;\n    if (disc <= 0.0) return half4(0.0);\n    float3x3 m = orient * turn();\n    float3 ro = ow * m;\n    float3 rd = rw * m;\n    float far = -b + sqrt(disc);\n    float t = max(-b - sqrt(disc), 0.0);\n    float px = unit * dist / rw.z;\n    float best = 1e9;\n    float tb = t;\n    bool hit = false;\n    for (int i = 0; i < 96; i++) {\n        float h = map(ro + rd * t);\n        float g = h * px / max(t, 0.0001);\n        if (g < best) { best = g; tb = t; }\n        if (g < 0.2) { hit = true; break; }\n        t += h * 0.9;\n        if (t > far) break;\n    }\n    if (!hit && best >= 1.0) return half4(0.0);\n    if (!hit) t = tb;\n    float e = max(0.5 * t / px, 0.0005);\n    float3 p = ro + rd * t;\n    float3 n = normal(p, e);\n    if (!hit) p -= n * map(p);\n    float4 c = paint(p, n, m, rw);\n    if (hit && c.a < 0.996 && lighting < 0.5) {\n        float s = far;\n        bool back = false;\n        for (int i = 0; i < 64; i++) {\n            float h = map(ro + rd * s);\n            if (h * px / max(s, 0.0001) < 0.2) { back = true; break; }\n            s -= h * 0.9;\n            if (s < t) break;\n        }\n        if (back) {\n            float3 q = ro + rd * s;\n            c += paint(q, -normal(q, e), m, rw) * (1.0 - c.a);\n        }\n    }\n    return half4(hit ? c : c * (1.0 - best));\n}\n"
 }

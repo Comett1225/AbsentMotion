@@ -52,7 +52,22 @@
    "label": "Color 2",
    "type": "color",
    "default": "#ffeedd"
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "when": {
+    "style": [
+     1
+    ]
+   }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float amount;\nuniform float strength;\nuniform float angle;\nuniform float phase;\nlayout(color) uniform half4 color1;\nlayout(color) uniform half4 color2;\nfloat luma(float3 c) { return dot(c, float3(0.2126, 0.7152, 0.0722)); }\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float period = size.x / max(amount, 0.5);\n    float a = radians(angle);\n    float u = dot(coord - size * 0.5, float2(-sin(a), cos(a))) / period + phase;\n    float s = clamp(strength, 0.001, 0.999);\n    float ink = pow(clamp(1.0 - luma(float3(src.rgb) / float(src.a)), 0.0, 1.0), (1.0 - s) / s);\n    float e = abs(fract(u) - 0.5) * period;\n    float line = clamp(ink * period * 0.5 - e + 0.5, 0.0, 1.0);\n    float3 rgb = mix(float3(color2.rgb), float3(color1.rgb), line);\n    return half4(half3(rgb) * src.a, src.a);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float amount;\nuniform float strength;\nuniform float angle;\nuniform float phase;\nlayout(color) uniform half4 color1;\nlayout(color) uniform half4 color2;\nuniform float style;\nfloat luma(float3 c) { return dot(c, float3(0.2126, 0.7152, 0.0722)); }\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float period = size.x / max(amount, 0.5);\n    float a = radians(angle);\n    float u = dot(coord - size * 0.5, float2(-sin(a), cos(a))) / period + phase + (style > 0.5 ? 0.5 : 0.0);\n    float s = clamp(strength, 0.001, 0.999);\n    float dark = clamp(1.0 - luma(float3(src.rgb) / float(src.a)), 0.0, 1.0);\n    float ink = style > 0.5 ? clamp(1.815 * dark - 1.757 * strength + 0.022, 0.0, 1.0) : pow(dark, (1.0 - s) / s);\n    float e = abs(fract(u) - 0.5) * period;\n    float line = clamp(ink * period * 0.5 - e + 0.5, 0.0, 1.0);\n    float3 rgb = mix(float3(color2.rgb), float3(color1.rgb), line);\n    return half4(half3(rgb) * src.a, src.a);\n}\n"
 }

@@ -20,7 +20,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -56,6 +55,7 @@ import kotlinx.coroutines.withContext
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 import app.absentmotion.ui.HoldName
+import app.absentmotion.ui.home.DialogPill
 
 internal val PrecomposeOptions = listOf("dynamicResolution" to R.string.element_adaptive_resolution, "fixedResolution" to R.string.element_locked_resolution)
 internal val RetimingOptions = listOf(
@@ -164,20 +164,18 @@ internal fun ElementProperties(state: EditorState, onBack: () -> Unit, modifier:
         onDismissRequest = { missing = false },
         text = { Text(stringResource(R.string.this_asset_pointed_to_a_project)) },
         confirmButton = {
-            TextButton({
+            DialogPill(stringResource(R.string.rebuild_source_project)) {
                 missing = false
                 val nested = layer.nested
                 scope.launch {
                     val saved = withContext(Dispatchers.IO) { nested != null && runCatching { store.save(store.linkOf(link), nested) }.isSuccess }
                     Toast.makeText(context, context.getString(if (saved) R.string.element_saved_to_my_assets else R.string.element_save_failed), if (saved) Toast.LENGTH_SHORT else Toast.LENGTH_LONG).show()
                 }
-            }) { Text(stringResource(R.string.rebuild_source_project), color = Am.Accent) }
+            }
         },
         dismissButton = {
-            Row {
-                TextButton({ missing = false }) { Text(stringResource(R.string.cancel), color = Am.Accent) }
-                TextButton({ missing = false; unlink() }) { Text(stringResource(R.string.element_unlink), color = Am.Accent) }
-            }
+            DialogPill(stringResource(R.string.cancel), primary = false, editor = true) { missing = false }
+            DialogPill(stringResource(R.string.element_unlink), primary = false, editor = true) { missing = false; unlink() }
         },
         containerColor = Am.Field, textContentColor = Am.OnDark,
     )

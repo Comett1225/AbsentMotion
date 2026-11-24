@@ -71,7 +71,22 @@
     "Nearest",
     "Linear"
    ]
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "when": {
+    "style": [
+     1
+    ]
+   }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float scale;\nuniform float angle;\nuniform float2 offset;\nuniform float mask;\nuniform float alpha;\nuniform float fill;\nuniform float sampling;\nhalf4 main(float2 coord) {\n    float2 c = size * 0.5;\n    float a = radians(angle);\n    float2 v = coord - c - offset;\n    float2 p = c + float2(cos(a) * v.x + sin(a) * v.y, cos(a) * v.y - sin(a) * v.x) / max(scale, 0.01);\n    if (sampling < 0.5) p = floor(p) + 0.5;\n    half4 own = image.eval(coord);\n    half4 moved = image.eval(p) * half(clamp(alpha, 0.0, 1.0));\n    half4 color = moved + own * half(clamp(fill, 0.0, 1.0)) * (1.0 - moved.a);\n    if (mask > 0.5) color *= own.a;\n    return color;\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float scale;\nuniform float angle;\nuniform float2 offset;\nuniform float mask;\nuniform float alpha;\nuniform float fill;\nuniform float sampling;\nuniform float style;\nuniform float4 screen;\nhalf4 main(float2 coord) {\n    float2 c = size * 0.5;\n    float a = radians(angle);\n    float2 v = coord - c - offset;\n    float2 p = c + float2(cos(a) * v.x + sin(a) * v.y, cos(a) * v.y - sin(a) * v.x) / max(scale, 0.01);\n    if (style > 0.5) {\n        if (scale <= 0.0) return half4(0.0);\n        p = clamp(p, screen.xy + 0.5, screen.xy + screen.zw - 0.5);\n    }\n    if (sampling < 0.5) p = floor(p) + 0.5;\n    half4 own = image.eval(coord);\n    half4 moved = image.eval(p) * half(clamp(alpha, 0.0, 1.0));\n    half4 color = moved + own * half(clamp(fill, 0.0, 1.0)) * (1.0 - moved.a);\n    if (mask > 0.5) color *= own.a;\n    return color;\n}\n"
 }

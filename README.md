@@ -146,9 +146,9 @@ Automatic version history, crash recovery, crash logs that say in one sentence w
 </details>
 
 <details>
-<summary><strong>25 languages</strong></summary>
+<summary><strong>26 languages</strong></summary>
 
-English, Indonesian, Hindi, Portuguese (Brazil), Spanish (Latin America), Spanish (Spain), Filipino, Vietnamese, Thai, Malay, Arabic, Persian, Urdu, Turkish, Russian, Bengali, Japanese, Korean, Chinese (Traditional), Chinese (Simplified), French, German, Italian, Polish and Ukrainian, chosen on first start.
+English, Indonesian, Hindi, Portuguese (Brazil), Spanish (Latin America), Spanish (Spain), Filipino, Vietnamese, Thai, Malay, Arabic, Persian, Urdu, Turkish, Russian, Bengali, Japanese, Korean, Chinese (Traditional), Chinese (Simplified), French, German, Italian, Polish, Dutch and Ukrainian, chosen on first start.
 
 </details>
 
@@ -179,6 +179,12 @@ a Mac with an Intel chip, open it and drag AbsentMotion into Applications.
 
 The app is not notarised by Apple, so the first time macOS says it cannot check it. Click **Done**, open **System
 Settings** > **Privacy & Security**, scroll down to the message about AbsentMotion, click **Open Anyway** and confirm.
+Or, after moving the app into Applications, run this once in Terminal instead of going through Settings:
+
+```sh
+sudo xattr -dr com.apple.quarantine "/Applications/AbsentMotion.app"
+```
+
 After that it starts like any other app. Updates are offered inside the app: **Settings** > **Updates** > **Download update** > **Install and restart** replaces the app in place and opens it again (the app has to sit in a folder you can write to, such as Applications; otherwise the disk image opens as before).
 
 ## Install on Windows
@@ -250,15 +256,6 @@ On another chip or an older system, build it from source ([`docs/BUILD.md`](docs
 ## Roadmap
 
 [Go here for the full roadmap.](https://absentmotion.com/roadmap.html)
-
-### 5.2
-
-- A community library, hosted on GitHub, where people share what they make with AbsentMotion, under the
-  [Community Guidelines](COMMUNITY_GUIDELINES.md).
-
-### 5.3
-
-- Share projects between your own devices nearby: send the project you're editing from your phone to your computer, or back, and keep editing there.
 
 ### 6.0
 

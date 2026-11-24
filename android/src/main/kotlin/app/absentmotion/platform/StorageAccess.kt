@@ -9,7 +9,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -18,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 import app.absentmotion.ui.theme.Am
+import app.absentmotion.ui.home.DialogPill
 
 internal class StorageAccess(private val sdk: Int, private val granted: () -> Boolean, private val ask: () -> Unit, private val denied: () -> Unit = {}) {
     private var again: (() -> Unit)? = null
@@ -54,12 +54,12 @@ internal fun rememberStorageAccess(): StorageAccess {
         onDismissRequest = { explain = false },
         text = { Text(stringResource(R.string.storage_permission_explain), color = Am.Navy) },
         confirmButton = {
-            TextButton({
+            DialogPill(stringResource(R.string.camera_open_settings)) {
                 explain = false
                 runCatching { context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null))) }
-            }) { Text(stringResource(R.string.camera_open_settings), color = Am.Navy) }
+            }
         },
-        dismissButton = { TextButton({ explain = false }) { Text(stringResource(R.string.cancel), color = Am.Navy) } },
+        dismissButton = { DialogPill(stringResource(R.string.cancel), primary = false) { explain = false } },
         containerColor = Am.Card,
     )
     return access

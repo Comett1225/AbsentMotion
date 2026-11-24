@@ -374,7 +374,8 @@ data class Layer(val node: XmlNode, val t: Float = 0f, val snap: ClosedFloatingP
         val index = element.stretchAt(snap)
         if (index < 0) return null
         val keys = element.keyframes
-        return (t - keys[index - 1].t) / (keys[index].t - keys[index - 1].t)
+        val span = keys[index].t - keys[index - 1].t
+        return if (span > 0f) (t - keys[index - 1].t) / span else null
     }
 
     fun withEasing(ref: PropRef, easing: Easing): Layer {

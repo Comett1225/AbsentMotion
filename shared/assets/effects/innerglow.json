@@ -58,7 +58,22 @@
     "Round",
     "Square"
    ]
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "when": {
+    "style": [
+     1
+    ]
+   }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform shader blurred;\nuniform float blur;\nuniform float intensity;\nlayout(color) uniform half4 color;\nuniform float blend;\nuniform float opacity;\nuniform float corners;\nfloat exitAt(float2 p, float2 u, float r) {\n    float lo = 0.0;\n    float hi = -1.0;\n    for (int i = 1; i <= 12; i++) {\n        float s = r * float(i) / 12.0;\n        if (float(image.eval(p + u * s).a) < 0.5) {\n            hi = s;\n            break;\n        }\n        lo = s;\n    }\n    if (hi < 0.0) return r;\n    for (int i = 0; i < 5; i++) {\n        float m = 0.5 * (lo + hi);\n        if (float(image.eval(p + u * m).a) < 0.5) hi = m; else lo = m;\n    }\n    return 0.5 * (lo + hi);\n}\nfloat squareDistance(float2 p, float r) {\n    float d = r;\n    d = min(d, exitAt(p, float2(1.0, 0.0), d));\n    d = min(d, exitAt(p, float2(-1.0, 0.0), d));\n    d = min(d, exitAt(p, float2(0.0, 1.0), d));\n    d = min(d, exitAt(p, float2(0.0, -1.0), d));\n    d = min(d, exitAt(p, float2(0.70710678, 0.70710678), d * 1.41421356) * 0.70710678);\n    d = min(d, exitAt(p, float2(-0.70710678, 0.70710678), d * 1.41421356) * 0.70710678);\n    d = min(d, exitAt(p, float2(0.70710678, -0.70710678), d * 1.41421356) * 0.70710678);\n    d = min(d, exitAt(p, float2(-0.70710678, -0.70710678), d * 1.41421356) * 0.70710678);\n    return d;\n}\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0 || blur <= 0.0) return src;\n    float g = corners > 0.5 ? clamp(intensity * (1.0 - smoothstep(0.0, blur, squareDistance(coord, blur))), 0.0, 1.0)\n                            : clamp((1.0 - float(blurred.eval(coord).a)) * 2.0 * intensity, 0.0, 1.0);\n    g *= float(color.a) * clamp(opacity, 0.0, 1.0);\n    float3 base = float3(src.rgb) / float(src.a);\n    float3 rgb = blend > 0.5 ? mix(base, float3(color.rgb), g) : base + float3(color.rgb) * g - base * float3(color.rgb) * g;\n    return half4(half3(rgb) * src.a, src.a);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform shader blurred;\nuniform float blur;\nuniform float intensity;\nlayout(color) uniform half4 color;\nuniform float blend;\nuniform float opacity;\nuniform float corners;\nuniform float style;\nuniform float4 screen;\nfloat4 inFrame(float2 q) {\n    return image.eval(style > 0.5 ? clamp(q, screen.xy + 0.5, screen.xy + screen.zw - 0.5) : q);\n}\nfloat exitAt(float2 p, float2 u, float r) {\n    float lo = 0.0;\n    float hi = -1.0;\n    for (int i = 1; i <= 12; i++) {\n        float s = r * float(i) / 12.0;\n        if (float(inFrame(p + u * s).a) < 0.5) {\n            hi = s;\n            break;\n        }\n        lo = s;\n    }\n    if (hi < 0.0) return r;\n    for (int i = 0; i < 5; i++) {\n        float m = 0.5 * (lo + hi);\n        if (float(inFrame(p + u * m).a) < 0.5) hi = m; else lo = m;\n    }\n    return 0.5 * (lo + hi);\n}\nfloat squareDistance(float2 p, float r) {\n    float d = r;\n    d = min(d, exitAt(p, float2(1.0, 0.0), d));\n    d = min(d, exitAt(p, float2(-1.0, 0.0), d));\n    d = min(d, exitAt(p, float2(0.0, 1.0), d));\n    d = min(d, exitAt(p, float2(0.0, -1.0), d));\n    d = min(d, exitAt(p, float2(0.70710678, 0.70710678), d * 1.41421356) * 0.70710678);\n    d = min(d, exitAt(p, float2(-0.70710678, 0.70710678), d * 1.41421356) * 0.70710678);\n    d = min(d, exitAt(p, float2(0.70710678, -0.70710678), d * 1.41421356) * 0.70710678);\n    d = min(d, exitAt(p, float2(-0.70710678, -0.70710678), d * 1.41421356) * 0.70710678);\n    return d;\n}\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0 || blur <= 0.0) return src;\n    float g = corners > 0.5 ? clamp(intensity * (1.0 - smoothstep(0.0, blur, squareDistance(coord, blur))), 0.0, 1.0)\n                            : clamp((1.0 - float(blurred.eval(coord).a)) * 2.0 * intensity, 0.0, 1.0);\n    g *= float(color.a) * clamp(opacity, 0.0, 1.0);\n    float3 base = float3(src.rgb) / float(src.a);\n    float3 rgb = blend > 0.5 ? mix(base, float3(color.rgb), g) : base + float3(color.rgb) * g - base * float3(color.rgb) * g;\n    return half4(half3(rgb) * src.a, src.a);\n}\n"
 }

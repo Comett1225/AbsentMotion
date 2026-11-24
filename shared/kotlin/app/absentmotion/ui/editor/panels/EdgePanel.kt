@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,6 +26,7 @@ import app.absentmotion.model.Layer
 import app.absentmotion.ui.editor.DimAlpha
 import app.absentmotion.ui.theme.Am
 import kotlin.math.roundToInt
+import app.absentmotion.ui.home.DialogPill
 
 @Composable
 internal fun EdgeSlider(label: String, value: Int, range: IntRange, onDone: () -> Unit = {}, onChange: (Int) -> Unit) {
@@ -51,9 +51,7 @@ internal fun EdgePanel(state: EditorState, layer: Layer, modifier: Modifier = Mo
         Row(Modifier.padding(top = 4.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(R.string.cutout_edge_hint), Modifier.weight(1f), color = Am.Caption, fontSize = 12.sp, lineHeight = 16.sp)
             val changed = edge != MatteEdge()
-            TextButton({ set(MatteEdge(), null) }, enabled = changed) {
-                Text(stringResource(R.string.cutout_edge_reset), color = Am.Accent.copy(alpha = if (changed) 1f else DimAlpha), fontSize = 14.sp, maxLines = 1)
-            }
+            DialogPill(stringResource(R.string.cutout_edge_reset), Modifier.padding(start = 8.dp), primary = false, enabled = changed, editor = true) { set(MatteEdge(), null) }
         }
     }
 }

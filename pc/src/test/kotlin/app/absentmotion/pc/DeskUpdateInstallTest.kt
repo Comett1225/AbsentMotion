@@ -13,6 +13,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.After
 import org.junit.Assume
 import org.junit.Test
 import java.io.File
@@ -21,7 +22,11 @@ import java.nio.file.Files
 class DeskUpdateInstallTest {
     private val posix = !System.getProperty("os.name").lowercase().startsWith("windows")
 
-    private fun folder(): File = Files.createTempDirectory("am-update").toFile().also { it.deleteOnExit() }
+    private val made = mutableListOf<File>()
+
+    private fun folder(): File = Files.createTempDirectory("am-update").toFile().also { made += it }
+
+    @After fun clean() = made.forEach { it.deleteRecursively() }
 
     private fun script(dir: File) = File(dir, "swap.sh").apply { writeText(POSIX_SWAP); setExecutable(true) }
 
@@ -190,6 +195,12 @@ class DeskUpdateInstallTest {
         assertTrue(UpdateInstall.supports(File("AbsentMotion-5.0.3-macos-arm64-update.zip"), app.absentmotion.ui.home.InstallSite(InstallKind.MacApp, folderOnly)))
         assertFalse(UpdateInstall.supports(File("AbsentMotion-5.0.3-macos-arm64.dmg"), app.absentmotion.ui.home.InstallSite(InstallKind.MacApp, folderOnly)))
         assertFalse(UpdateInstall.supports(File("a.msi"), null))
+        val msi = app.absentmotion.ui.home.InstallSite(InstallKind.Msi, File(folderOnly, "AbsentMotion.exe"))
+        assertTrue(UpdateInstall.supports(File("AbsentMotion-5.3.0-windows-x64-setup.exe"), msi))
+        assertTrue(UpdateInstall.supports(File("AbsentMotion-5.3.0-windows-x64.msi"), msi))
+        assertFalse(UpdateInstall.supports(File("AbsentMotion-5.3.0-windows-x64.ampack"), msi))
+        assertEquals(listOf(".exe", ".msi"), app.absentmotion.ui.home.installerExtensions("Windows 11", msi))
+        assertEquals(listOf(".ampack", ".msi"), app.absentmotion.ui.home.installerExtensions("Windows 11", app.absentmotion.ui.home.InstallSite(InstallKind.Setup, File(folderOnly, "AbsentMotion.exe"))))
     }
 
     @Test fun theLastResultIsReportedOnceAndOnlyWhenItFailed() {

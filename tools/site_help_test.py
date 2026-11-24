@@ -195,7 +195,8 @@ class HelpLocaleTest(unittest.TestCase):
     def test_supported_tags_match_the_app(self):
         tags = sb.supported_tags()
         self.assertEqual(tags[0], "en")
-        self.assertEqual(len(tags), 25)
+        self.assertEqual(len(tags), 26)
+        self.assertIn("nl", tags)
         self.assertTrue({"ar", "fa"} <= set(tags))
         self.assertEqual(sb.RTL, {"ar", "fa", "ur"})
 
@@ -230,8 +231,9 @@ class WebsiteSearchTest(unittest.TestCase):
             self.assertIn('<link rel="canonical" href="%s">' % url, html)
             self.assertIn('<meta property="og:url" content="%s">' % url, html)
             self.assertIn('og:image" content="%sassets/og.png"' % sb.SITE_URL, html)
-        data = json.loads(re.search(r'<script type="application/ld\+json">(.*?)</script>', self.files["index.html"].decode()).group(1))
-        app = data["@graph"][1]
+        blocks = [json.loads(b) for b in re.findall(r'<script type="application/ld\+json">(.*?)</script>', self.files["index.html"].decode())]
+        self.assertEqual(("WebSite", "AbsentMotion"), (blocks[0]["@type"], blocks[0]["name"]))
+        app = blocks[1]["@graph"][0]
         self.assertEqual(("SoftwareApplication", "0"), (app["@type"], app["offers"]["price"]))
         self.assertNotIn("ld+json", self.files["getting-started.html"].decode())
         self.assertIn("assets/og.png", self.files)

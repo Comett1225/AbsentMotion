@@ -51,12 +51,12 @@ object DeskFiles {
 
     val imageExtensions = setOf("png", "jpg", "jpeg", "webp", "gif", "bmp", "heic", "svg")
 
-    fun chooseFiles(media: Boolean, multiple: Boolean, videoOnly: Boolean = false, imageOnly: Boolean = false, title: String = when { videoOnly -> app.absentmotion.i18n.AppText.get(R.string.tools_choose_video); media -> app.absentmotion.i18n.AppText.get(R.string.desk_choose_media); else -> app.absentmotion.i18n.AppText.get(R.string.desk_choose_file) }): List<File> {
+    fun chooseFiles(media: Boolean, multiple: Boolean, videoOnly: Boolean = false, imageOnly: Boolean = false, title: String = when { videoOnly -> app.absentmotion.i18n.AppText.get(R.string.tools_choose_video); media -> app.absentmotion.i18n.AppText.get(R.string.desk_choose_media); else -> app.absentmotion.i18n.AppText.get(R.string.desk_choose_file) }, pictureExtensions: Set<String> = imageExtensions): List<File> {
         System.getProperty("am.pick")?.let { return listOf(File(it)) }
         val filters = when {
             !media -> emptyList()
             videoOnly -> listOf(DeskPicker.Filter(Strings.byName("export_kind_video") ?: "Video", videoExtensions))
-            imageOnly -> listOf(DeskPicker.Filter(Strings.byName("model_layer_image") ?: "Image", imageExtensions))
+            imageOnly -> listOf(DeskPicker.Filter(Strings.byName("model_layer_image") ?: "Image", pictureExtensions))
             else -> listOf(DeskPicker.Filter(Strings.byName("add_tab_media") ?: "Media", mediaExtensions))
         }
         return DeskPicker.openFiles(title, filters, multiple).also { DeskLibrary.remember(it) }

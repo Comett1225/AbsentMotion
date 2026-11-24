@@ -26,7 +26,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -89,6 +88,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 import app.absentmotion.ui.HoldName
+import app.absentmotion.ui.home.DialogPill
 
 @Composable
 internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
@@ -98,7 +98,7 @@ internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
     val instance = layer.effects.getOrNull(index)
     val definition = instance?.let { catalog.find(it["id"] ?: "") }
     LaunchedEffect(instance == null) { if (instance == null && index >= 0) state.effectIndex = -1 }
-    var active by remember(layer.id, index, definition?.id) { mutableStateOf(definition?.params?.firstOrNull { it.kind != "color" && it.kind != "switch" && it.kind != "choice" && it.kind != "text" && definition.shown(it, instance, layer.t) }) }
+    var active by remember(layer.id, index, definition?.id) { mutableStateOf(definition?.params?.firstOrNull { it.kind != "color" && it.kind != "switch" && it.kind != "choice" && it.kind != "text" && definition.shown(it, instance, layer.t) && EffectSections.isOpen(definition.key, it.section) }) }
     LaunchedEffect(definition) { active = definition?.params?.firstOrNull { it.id == active?.id } }
     var menu by remember { mutableStateOf(false) }
     var choosing by remember { mutableStateOf(false) }
@@ -201,8 +201,9 @@ internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
                 val shownDefinition = if (current) definition else catalog.find(shown["id"] ?: "")
                 Column(Modifier.fillMaxSize().padding(6.5.dp).cardBounds(cards, cardKey(at, shown)).clip(RowShape).background(Am.Field)) {
                     EffectHeader(state, at, shown, shownDefinition)
-                    Column(Modifier.weight(1f).fillMaxWidth().deskVerticalScroll()) {
-                        if (shownDefinition != null) EffectSettings(state, layer, shown, shownDefinition, if (current) active else null, { active = it; pin = null })
+                    val settingsScroll = androidx.compose.foundation.rememberScrollState()
+                    Column(Modifier.weight(1f).fillMaxWidth().deskVerticalScroll(settingsScroll)) {
+                        if (shownDefinition != null) EffectSettings(state, layer, shown, shownDefinition, if (current) active else null, { active = it; pin = null }, settingsScroll)
                         else Text(shown["id"] ?: "", Modifier.padding(12.dp).dimmed(), color = Am.OnDark, fontSize = 12.sp)
                         if (current && puppet) PuppetSection(state, layer, index, shown, pin, pinField, { pinField = it }, adding, { pin = it; pinField = "position"; if (it != null) active = null }) { adding = it }
                         if (current && pathText) TextPathHint(state, layer, shown)
@@ -235,11 +236,9 @@ private fun CopyEffectsDialog(names: List<String>, onDismiss: () -> Unit, onCopy
             }
         },
         confirmButton = {
-            TextButton({ onCopy(ticked) }, enabled = ticked.isNotEmpty()) {
-                Text(stringResource(R.string.effects_copy_confirm), color = Am.Accent.copy(alpha = if (ticked.isEmpty()) DimAlpha else 1f))
-            }
+            DialogPill(stringResource(R.string.effects_copy_confirm), enabled = ticked.isNotEmpty()) { onCopy(ticked) }
         },
-        dismissButton = { TextButton(onDismiss) { Text(stringResource(R.string.cancel), color = Am.Accent) } },
+        dismissButton = { DialogPill(stringResource(R.string.cancel), primary = false, editor = true, onClick = onDismiss) },
         containerColor = Am.Field, titleContentColor = Am.OnDark, textContentColor = Am.OnDark,
     )
 }

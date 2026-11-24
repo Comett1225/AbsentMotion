@@ -8,7 +8,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
@@ -21,11 +20,13 @@ import app.absentmotion.RiskAsk
 import app.absentmotion.i18n.UiText
 import app.absentmotion.i18n.text
 import app.absentmotion.ui.export.ExportIcons
+import app.absentmotion.ui.home.DialogPill
+import app.absentmotion.ui.theme.Am
 
 internal val LocalRiskAsk = staticCompositionLocalOf<(UiText, () -> Unit) -> Unit> { { _, go -> go() } }
 
 @Composable
-internal fun RiskDialog(ask: RiskAsk?, text: Color, button: Color, warning: Color, container: Color, onClose: (RiskAsk?) -> Unit) {
+internal fun RiskDialog(ask: RiskAsk?, text: Color, warning: Color, container: Color, onClose: (RiskAsk?) -> Unit) {
     ask ?: return
     AlertDialog(
         onDismissRequest = { onClose(null) },
@@ -39,8 +40,8 @@ internal fun RiskDialog(ask: RiskAsk?, text: Color, button: Color, warning: Colo
             Text((ask.risks.map { it.reason.text() }.distinct() + stringResource(R.string.unlock_text)).joinToString("\n\n"),
                 Modifier.verticalScroll(rememberScrollState()), color = text)
         },
-        confirmButton = { TextButton({ onClose(ask) }) { Text(stringResource(R.string.unlock_use_anyway), color = button) } },
-        dismissButton = { TextButton({ onClose(null) }) { Text(stringResource(R.string.cancel), color = button) } },
+        confirmButton = { DialogPill(stringResource(R.string.unlock_use_anyway)) { onClose(ask) } },
+        dismissButton = { DialogPill(stringResource(R.string.cancel), primary = false, editor = container != Am.Card) { onClose(null) } },
         containerColor = container,
     )
 }

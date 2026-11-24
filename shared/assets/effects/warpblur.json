@@ -1,0 +1,129 @@
+{
+ "id": "warpblur",
+ "name": "Warp Blur",
+ "category": "blur",
+ "since": "5.3.0",
+ "description": "Smears the layer along smooth fractal noise, so each spot streaks a different length and way. Direction picks the way the streaks run, Single Axis keeps them to that way only, and Bias pushes every streak the same way.",
+ "params": [
+  {
+   "id": "parallax",
+   "label": "Parallax",
+   "type": "point",
+   "default": [
+    0,
+    0
+   ],
+   "min": -5000,
+   "max": 5000,
+   "step": 1,
+   "pixels": true
+  },
+  {
+   "id": "offset",
+   "label": "Offset",
+   "type": "point",
+   "default": [
+    0,
+    0
+   ],
+   "min": -5000,
+   "max": 5000,
+   "step": 1,
+   "pixels": true
+  },
+  {
+   "id": "strength",
+   "label": "Strength",
+   "type": "float",
+   "default": 0.25,
+   "min": 0,
+   "max": 2,
+   "step": 0.001
+  },
+  {
+   "id": "evolution",
+   "label": "Evolution",
+   "type": "float",
+   "default": 0,
+   "min": -50,
+   "max": 50,
+   "step": 0.01
+  },
+  {
+   "id": "direction",
+   "label": "Direction",
+   "type": "choice",
+   "default": 4,
+   "options": [
+    "Horizontal",
+    "Vertical",
+    "Both",
+    "Radial",
+    "Spiral",
+    "Twist"
+   ]
+  },
+  {
+   "id": "scale",
+   "label": "Scale",
+   "type": "float",
+   "default": 1,
+   "min": 0.01,
+   "max": 50,
+   "step": 0.01
+  },
+  {
+   "id": "stretch",
+   "label": "Stretch",
+   "type": "point",
+   "default": [
+    1,
+    1
+   ],
+   "min": 0.01,
+   "max": 10,
+   "step": 0.01
+  },
+  {
+   "id": "seed",
+   "label": "Seed",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 5,
+   "step": 0.01
+  },
+  {
+   "id": "singleAxis",
+   "label": "Single Axis",
+   "type": "switch",
+   "default": true
+  },
+  {
+   "id": "screenSpace",
+   "label": "Screen Space",
+   "type": "switch",
+   "default": false
+  },
+  {
+   "id": "octaves",
+   "label": "Octaves",
+   "type": "float",
+   "default": 6,
+   "min": 1,
+   "max": 9,
+   "step": 1,
+   "slider": true
+  },
+  {
+   "id": "bias",
+   "label": "Bias",
+   "type": "float",
+   "default": 0,
+   "min": -1,
+   "max": 1,
+   "step": 0.001
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float4 screen;\nuniform float time;\nuniform float2 parallax;\nuniform float2 offset;\nuniform float strength;\nuniform float evolution;\nuniform float direction;\nuniform float scale;\nuniform float2 stretch;\nuniform float seed;\nuniform float singleAxis;\nuniform float screenSpace;\nuniform float octaves;\nuniform float bias;\nfloat4 permute4(float4 x) {\n    x = (x * 34.0 + 1.0) * x;\n    return x - floor(x * (1.0 / 289.0)) * 289.0;\n}\nfloat snoise(float3 v) {\n    float3 i = floor(v + dot(v, float3(1.0 / 3.0)));\n    float3 x0 = v - i + dot(i, float3(1.0 / 6.0));\n    float3 g = step(x0.yzx, x0.xyz);\n    float3 l = 1.0 - g;\n    float3 i1 = min(g.xyz, l.zxy);\n    float3 i2 = max(g.xyz, l.zxy);\n    float3 x1 = x0 - i1 + 1.0 / 6.0;\n    float3 x2 = x0 - i2 + 1.0 / 3.0;\n    float3 x3 = x0 - 0.5;\n    i = i - floor(i * (1.0 / 289.0)) * 289.0;\n    float4 p = permute4(permute4(permute4(i.z + float4(0.0, i1.z, i2.z, 1.0)) + i.y + float4(0.0, i1.y, i2.y, 1.0)) + i.x + float4(0.0, i1.x, i2.x, 1.0));\n    float n7 = 0.142857142857;\n    float4 j = p - 49.0 * floor(p * n7 * n7);\n    float4 gx = floor(j * n7);\n    float4 gy = floor(j - 7.0 * gx);\n    float4 x = gx * (2.0 * n7) + (0.5 * n7 - 1.0);\n    float4 y = gy * (2.0 * n7) + (0.5 * n7 - 1.0);\n    float4 h = 1.0 - abs(x) - abs(y);\n    float4 b0 = float4(x.xy, y.xy);\n    float4 b1 = float4(x.zw, y.zw);\n    float4 s0 = floor(b0) * 2.0 + 1.0;\n    float4 s1 = floor(b1) * 2.0 + 1.0;\n    float4 sh = -step(h, float4(0.0));\n    float4 a0 = b0.xzyw + s0.xzyw * sh.xxyy;\n    float4 a1 = b1.xzyw + s1.xzyw * sh.zzww;\n    float3 p0 = float3(a0.xy, h.x);\n    float3 p1 = float3(a0.zw, h.y);\n    float3 p2 = float3(a1.xy, h.z);\n    float3 p3 = float3(a1.zw, h.w);\n    float4 norm = 1.79284291400159 - 0.85373472095314 * float4(dot(p0, p0), dot(p1, p1), dot(p2, p2), dot(p3, p3));\n    float4 m = max(0.6 - float4(dot(x0, x0), dot(x1, x1), dot(x2, x2), dot(x3, x3)), 0.0);\n    m = m * m;\n    return 42.0 * dot(m * m, float4(dot(p0, x0) * norm.x, dot(p1, x1) * norm.y, dot(p2, x2) * norm.z, dot(p3, x3) * norm.w));\n}\nfloat turb(float2 q, float z, float octaves, float2 drift) {\n    float t = 0.0;\n    float amp = 1.0;\n    float f = 1.0;\n    for (int i = 0; i < 9; i++) {\n        if (float(i) >= floor(octaves)) break;\n        t += amp * abs(snoise(float3(q * f + drift * float(i), z)));\n        amp *= 0.5;\n        f *= 2.0;\n    }\n    return t;\n}\nfloat2 flow(float2 coord, float2 dims, float mode, float2 sc, float z, float octaves, float amount, float lift, float2 shift, float2 drift) {\n    float2 c = float2(coord.x - dims.x * 0.5 - shift.x, dims.y * 0.5 - coord.y + shift.y) / dims.y;\n    float r = length(c);\n    float2 uvc = float2(c.x * dims.y / dims.x, c.y);\n    float2 d = float2(0.0);\n    if (mode < 0.5) {\n        d = float2(amount * (turb(0.5 + (float2(0.0, c.y) - 0.5) / sc, z, octaves, drift) - 0.5 + lift), 0.0);\n    } else if (mode < 1.5) {\n        d = float2(0.0, amount * (turb(0.5 + (float2(c.x, 0.0) - 0.5) / sc, z, octaves, drift) - 0.5 + lift));\n    } else if (mode < 2.5) {\n        d = amount * (float2(turb(0.5 + (c - 0.5) / sc, z, octaves, drift), turb(0.5 + (c.yx - 0.5) / sc, z, octaves, drift)) - 0.5 + lift);\n    } else if (mode < 3.5) {\n        float a = r > 0.0 ? acos(clamp(c.y / r, -1.0, 1.0)) / 3.14159265 : 0.0;\n        d = (length(uvc) > 0.0 ? normalize(uvc) : float2(0.0, 1.0)) * amount * (turb(0.5 + (float2(a, 0.0) - 0.5) / sc, z, octaves, drift) - 0.5 + lift);\n    } else {\n        float spin = amount * (turb(0.5 + (float2(0.0, r) - 0.5) / sc, z, octaves, drift) - 0.5 + lift);\n        float2 turned = float2(c.x * cos(spin) - c.y * sin(spin), c.x * sin(spin) + c.y * cos(spin)) - c;\n        d = float2(turned.x * dims.y / dims.x, turned.y);\n    }\n    return d * float2(dims.x, -dims.y);\n}\nhalf4 main(float2 coord) {\n    float2 dims = screenSpace > 0.5 ? screen.zw : size;\n    float2 at = screenSpace > 0.5 ? coord - screen.xy : coord;\n    float2 d = flow(at, dims, direction, max(scale, 0.01) / max(abs(stretch), float2(0.01)), evolution + seed * 11.9, octaves, strength, bias, offset, float2(-parallax.x, parallax.y) / (dims.y * max(scale, 0.01)));\n    float2 lo = screen.xy + 0.5;\n    float2 hi = screen.xy + screen.zw - 0.5;\n    half4 sum = half4(0.0);\n    for (int i = 0; i < 48; i++) {\n        sum += image.eval(clamp(coord + d * ((float(i) + 0.5) / 48.0), lo, hi));\n    }\n    return sum / 48.0;\n}\n"
+}

@@ -8,6 +8,7 @@ class SkTypeface;
 namespace am {
 enum class TextPart { kAll, kPlain, kColor };
 std::shared_ptr<TextLayout> ParseText(const XmlNode& node);
+void AlightText(TextLayout& text, bool transformed);
 SkPath TextPath(const Layer& layer, float t);
 SkPath TextHitPath(const Layer& layer, float t);
 SkPath TextGlyphPath(const Layer& layer, float t = 0, int fps = 30);

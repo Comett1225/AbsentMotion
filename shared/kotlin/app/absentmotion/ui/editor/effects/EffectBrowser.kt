@@ -136,9 +136,9 @@ private const val CreatorCategoryPrefix = "creator:"
 
 private val AnimatedTransforms = setOf("location", "rotation", "scale", "tilt", "skew")
 
-private fun Layer.recommendationTarget(look: app.absentmotion.effects.MediaLook, beats: Boolean, totalTime: Int): EffectRecommendationTarget {
+private fun Layer.effectTargetKind(): EffectTargetKind {
     val media = mediaFill
-    val target = when {
+    return when {
         kind == "text" -> EffectTargetKind.Text
         kind == "embedScene" -> EffectTargetKind.Group
         kind == "model" -> EffectTargetKind.Model
@@ -146,6 +146,10 @@ private fun Layer.recommendationTarget(look: app.absentmotion.effects.MediaLook,
         media != null -> EffectTargetKind.Photo
         else -> EffectTargetKind.Shape
     }
+}
+
+private fun Layer.recommendationTarget(look: app.absentmotion.effects.MediaLook, beats: Boolean, totalTime: Int): EffectRecommendationTarget {
+    val target = effectTargetKind()
     val animated = node.child("transform")?.children.orEmpty().any {
         it.name in AnimatedTransforms && it.isKeyframed
     }
@@ -175,6 +179,8 @@ private fun BrowserBody(state: EditorState, pickFile: () -> Unit) {
     val history = remember { context.getSharedPreferences("effects", 0) }
     var recent by remember { mutableStateOf(history.getString("recent", "")!!.split('|').filter { it.isNotEmpty() }) }
     var favourites by remember { mutableStateOf(history.getStringSet("favourites", emptySet())!!.toSet()) }
+    var habits by remember { mutableStateOf(app.absentmotion.effects.EffectHabits.decode(history.getString("habits", null))) }
+    val shownRecommended = remember { arrayOf(emptyList<String>()) }
     val presetFavourites = remember { PresetFavouriteStore.get(context) }
     var favPage by remember { mutableStateOf(false) }
     val layer = state.selected
@@ -226,17 +232,24 @@ private fun BrowserBody(state: EditorState, pickFile: () -> Unit) {
         favourites = if (effect.id in favourites) favourites - effect.id else favourites + effect.id
         history.edit().putStringSet("favourites", favourites).apply()
     }
+    fun learn(effect: EffectDefinition) {
+        val kinds = (state.effectTargets?.let { state.scene.effectTargets(it) } ?: listOfNotNull(state.selected)).map { it.effectTargetKind() }
+        if (kinds.isEmpty()) return
+        habits = habits.used(kinds, effect.id, System.currentTimeMillis()).ignored(kinds, shownRecommended[0] - effect.id)
+        history.edit().putString("habits", habits.encode()).apply()
+    }
     fun add(effect: EffectDefinition, preset: EffectPreset? = null) {
         if (!effect.usable(blocked)) return
         val targets = state.effectTargets
         if (targets != null) {
             val added = state.addEffectToChosen(targets, skip = { !effect.usable(blockedCategory(it)) }) { layer: app.absentmotion.model.Layer -> effect.instance(preset, layer.endTime - layer.startTime) }
-            if (added == 0) app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.effects_paste_no_target), app.absentmotion.platform.Toast.LENGTH_LONG).show()
+            if (added == 0) app.absentmotion.platform.Toast.makeText(context, context.getString(R.string.effects_paste_no_target), app.absentmotion.platform.Toast.LENGTH_LONG).show() else learn(effect)
             recent = (listOf(effect.id) + recent.filterNot { it == effect.id }).take(40)
             history.edit().putString("recent", recent.joinToString("|")).apply()
             close()
             return
         }
+        learn(effect)
         state.editSelected { layer -> layer.addEffect(effect.instance(preset, layer.endTime - layer.startTime)) }
         recent = (listOf(effect.id) + recent.filterNot { it == effect.id }).take(40)
         history.edit().putString("recent", recent.joinToString("|")).apply()
@@ -349,10 +362,11 @@ private fun BrowserBody(state: EditorState, pickFile: () -> Unit) {
         val beats = state.scene.bookmarks.size >= 4
         val targets = selected.map { it.recommendationTarget(it.mediaFill?.let(looks::get) ?: app.absentmotion.effects.MediaLook(), beats, state.scene.totalTime) }
         val blockedCategories = selected.mapNotNull(::blockedCategory).toSet()
-        remember(catalog, targets, blockedCategories, recent, favourites) {
-            recommendedEffects(catalog.definitions.filter { !it.isAdded && it.category !in blockedCategories }, targets, recent, favourites)
+        remember(catalog, targets, blockedCategories, recent, favourites, habits) {
+            recommendedEffects(catalog.definitions.filter { !it.isAdded && it.category !in blockedCategories }, targets, recent, favourites, habits, System.currentTimeMillis())
         }
     } else emptyList()
+    if (recommended.isNotEmpty()) shownRecommended[0] = recommended.map { it.id }
     Column(Modifier.fillMaxSize().background(BrowserBg).systemBarsPadding().then(if (deskLayout) Modifier.focusRequester(rootFocus).onKeyEvent(::browserKey).focusable() else Modifier)) {
         helpPage?.let { page -> HelpScreen(page) { helpPage = null } }
         if (deskLayout) Row(Modifier.fillMaxWidth().height(52.dp).padding(start = 8.dp, end = 6.dp), verticalAlignment = Alignment.CenterVertically) {

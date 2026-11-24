@@ -33,14 +33,30 @@ class PatternMigrationTest {
         assertEquals("0.000000", catalog.find("absent.tiles")!!.params.single { it.id == "sizing" }.default)
     }
 
-    @Test fun stripesUseAlightsCountWidthAndPhase() {
+    @Test fun stripesKeepAlightsCountWidthAndPhase() {
         val d = migrate("stripes")
-        assertEquals(6f / 2.475f, d.number("count"), 1e-4f)
-        assertEquals(-0.25f, d.number("phase"), 1e-6f)
+        assertEquals(6f, d.number("count"), 1e-6f)
+        assertEquals(null, d.value("phase"))
+        assertEquals(1f, d.number("style"), 0f)
         val v = migrate("stripes", "amount" to "57.5", "width" to "0.625", "smoothing" to "0.1325", "phase" to "250")
-        assertEquals(57.5f / 2.475f, v.number("count"), 1e-3f)
-        assertEquals(1f - 0.625f + 0.1325f, v.number("width"), 1e-5f)
-        assertEquals(249.75f, v.number("phase"), 1e-4f)
+        assertEquals(57.5f, v.number("count"), 1e-4f)
+        assertEquals(0.625f, v.number("width"), 1e-6f)
+        assertEquals(0.1325f, v.number("smoothing"), 1e-6f)
+        assertEquals(250f, v.number("phase"), 1e-4f)
+    }
+
+    @Test fun savedStripesAndWipesKeepTheClassicLook() {
+        for (key in listOf("stripes", "wipe", "fade", "smoothbevel", "rgbsplit", "sharpen")) {
+            val style = catalog.find("absent.$key")!!.params.single { it.id == "style" }
+            assertEquals("1.000000", style.default)
+            assertEquals("0.000000", style.missingDefault)
+            assertEquals(listOf("Classic", "Standard"), style.options)
+        }
+        val saved = Scene.parse("""<scene title="p" width="1080" height="1080" fps="30" totalTime="1000"><shape id="1" startTime="0" endTime="1000" fillType="color" s=".rect">
+            <effect id="absent.stripes"><property name="count" value="4" /></effect><property name="size" type="vec2" value="110,82.5" /></shape></scene>""")
+        assertEquals(saved.node, migration.migrate(saved).scene.node)
+        assertEquals(1f, migrate("wipe2", "angle" to "30").number("style"), 0f)
+        assertEquals("20.000000", catalog.find("absent.smoothbevel")!!.params.single { it.id == "blur" }.missingDefault)
     }
 
     @Test fun checkersUseAlightsCellSizeAndKeepNegativeStretch() {
@@ -55,12 +71,14 @@ class PatternMigrationTest {
     @Test fun gridsStartAtTheCornerWithAlightsDefaults() {
         for (id in listOf("grid", "grid2")) {
             val d = migrate(id)
-            assertEquals(10f / 2.475f, d.number("count"), 1e-4f)
+            assertEquals(0.1f, d.number("spacing"), 1e-6f)
             assertEquals(0.05f, d.number("width"), 1e-6f)
             assertEquals("#ff2d1ef6", d.value("color"))
             assertEquals(1f, d.number("origin"), 1e-6f)
-            val v = migrate(id, "spacing" to "0.575", "screenSpace" to "true")
-            assertEquals(1f / (0.575f * 2.475f), v.number("count"), 1e-3f)
+            assertEquals(1f, d.number("style"), 1e-6f)
+            val v = migrate(id, "spacing" to "0.575", "screenSpace" to "true", "smoothing" to "0.05")
+            assertEquals(0.575f, v.number("spacing"), 1e-6f)
+            assertEquals(0.05f, v.number("smoothing"), 1e-6f)
             assertEquals(2f, v.number("origin"), 1e-6f)
         }
         val origin = catalog.find("absent.grid")!!.params.single { it.id == "origin" }
@@ -94,7 +112,7 @@ class PatternMigrationTest {
         val v = migrate("pixelate2", "size" to "140", "stretch" to "41,-24", "screenSpace" to "true")
         assertEquals("41.000000,-24.000000", v.value("stretch"))
         assertEquals(1f, v.number("edges"), 1e-6f)
-        assertEquals("500.000000,1.000000", migrate("pixelate", "stretch" to "500").value("stretch"))
+        assertEquals("501.000000,1.000000", migrate("pixelate", "stretch" to "500").value("stretch"))
         assertEquals("3.250000,1.000000", migrate("checker", "stretch" to "3.25").value("stretch"))
     }
 

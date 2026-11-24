@@ -142,7 +142,7 @@ internal object UpdateInstall {
     fun supports(file: File, site: InstallSite? = installSite()): Boolean {
         val name = file.name.lowercase()
         return when (site?.kind) {
-            InstallKind.Msi -> name.endsWith(".msi")
+            InstallKind.Msi -> name.endsWith(".msi") || name.endsWith("-setup.exe")
             InstallKind.Setup -> name.endsWith(".ampack")
             InstallKind.MacApp -> name.endsWith("-update.zip")
             InstallKind.Tarball -> name.endsWith(".tar.gz")
@@ -156,7 +156,11 @@ internal object UpdateInstall {
         result.delete()
         work.mkdirs()
         return when (site.kind) {
-            InstallKind.Msi -> PendingInstall(windowsCommand(windowsScript(pid, file.path, site.target.path, result.path, File(work, INSTALL_LOG).path)), result)
+            InstallKind.Msi -> if (file.name.lowercase().endsWith("-setup.exe")) {
+                run(listOf(file.path, "--probe"))
+                PendingInstall(listOf(file.path, "--update", "--payload", file.path, "--wait-pid", pid.toString(), "--dir", site.target.parentFile.path,
+                    "--result", result.path, "--log", File(work, INSTALL_LOG).path), result)
+            } else PendingInstall(windowsCommand(windowsScript(pid, file.path, site.target.path, result.path, File(work, INSTALL_LOG).path)), result)
             InstallKind.Setup -> {
                 val setup = File(work, SETUP_EXE)
                 File(site.target.parentFile, SETUP_EXE).copyTo(setup, overwrite = true)

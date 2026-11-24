@@ -25,7 +25,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -89,15 +88,15 @@ private fun CrashList(onClose: () -> Unit, onOpen: (CrashEntry) -> Unit) {
         onDismissRequest = { asking = false },
         title = { Text(stringResource(R.string.crash_logs_delete_all), color = Am.Navy) },
         confirmButton = {
-            TextButton({
+            DialogPill(stringResource(R.string.delete)) {
                 asking = false
                 scope.launch {
                     withContext(Dispatchers.IO) { CrashLogs.clear(context) }
                     cleared++
                 }
-            }) { Text(stringResource(R.string.delete), color = Am.Navy) }
+            }
         },
-        dismissButton = { TextButton({ asking = false }) { Text(stringResource(R.string.cancel), color = Am.Navy) } },
+        dismissButton = { DialogPill(stringResource(R.string.cancel), primary = false) { asking = false } },
         containerColor = Am.Card,
     )
     Column(Modifier.fillMaxSize().navigationBarsPadding()) {

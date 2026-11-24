@@ -25,7 +25,26 @@
    "default": 10,
    "min": 0.5,
    "max": 200,
-   "step": 0.1
+   "step": 0.1,
+   "when": {
+    "style": [
+     0
+    ]
+   }
+  },
+  {
+   "id": "spacing",
+   "label": "Spacing",
+   "type": "float",
+   "default": 0.1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "when": {
+    "style": [
+     1
+    ]
+   }
   },
   {
    "id": "stretch",
@@ -79,7 +98,36 @@
     "Layer Corner",
     "Screen Corner"
    ]
+  },
+  {
+   "id": "smoothing",
+   "label": "Smoothing",
+   "type": "float",
+   "default": 0.05,
+   "min": 0,
+   "max": 0.5,
+   "step": 0.001,
+   "when": {
+    "style": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "when": {
+    "style": [
+     1
+    ]
+   }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float4 screen;\nuniform float time;\nuniform float2 offset;\nuniform float count;\nuniform float2 stretch;\nuniform float width;\nlayout(color) uniform half4 color;\nuniform float punch;\nuniform float angle;\nuniform float origin;\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float cell = (origin > 1.5 ? screen.w : size.y) / (2.475 * max(count, 0.5));\n    float a = radians(angle);\n    float2 dims = max(abs(stretch), float2(0.01)) * cell;\n    float2 start = origin > 1.5 ? screen.xy + 0.5 * dims : origin > 0.5 ? 0.5 * dims : size * 0.5;\n    float2 p = coord - start - offset;\n    p = float2(cos(a) * p.x + sin(a) * p.y, -sin(a) * p.x + cos(a) * p.y) / dims;\n    float2 e = abs(fract(p + 0.5) - 0.5) * dims;\n    float half_ = width * 0.5 * cell;\n    float s = width > 0.0 ? clamp(half_ - min(e.x, e.y) + 0.5, 0.0, 1.0) : 0.0;\n    if (punch > 0.5) return src * half(1.0 - s);\n    float3 base = float3(src.rgb) / float(src.a);\n    float3 rgb = mix(base, float3(color.rgb), s * float(color.a));\n    return half4(half3(rgb) * src.a, src.a);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float4 screen;\nuniform float time;\nuniform float2 offset;\nuniform float count;\nuniform float2 stretch;\nuniform float width;\nlayout(color) uniform half4 color;\nuniform float punch;\nuniform float angle;\nuniform float origin;\nuniform float smoothing;\nuniform float spacing;\nuniform float style;\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float tall = origin > 1.5 ? screen.w : size.y;\n    if (style > 0.5 && spacing <= 0.0) return src;\n    float cell = style > 0.5 ? spacing * tall : tall / (2.475 * max(count, 0.5));\n    float a = radians(angle);\n    float2 dims = max(abs(stretch), float2(0.01)) * cell;\n    float2 start = origin > 1.5 ? screen.xy + 0.5 * dims : origin > 0.5 ? 0.5 * dims : size * 0.5;\n    if (style > 0.5 && origin > 0.5) start += 0.5 * tall;\n    float2 p = coord - start - offset;\n    p = float2(cos(a) * p.x + sin(a) * p.y, -sin(a) * p.x + cos(a) * p.y) / dims;\n    float2 e = abs(fract(p + 0.5) - 0.5) * dims;\n    float half_ = width * 0.5 * (style > 0.5 ? tall : cell);\n    float soft = max(smoothing, 0.0) * 0.05 * tall;\n    float s = width <= 0.0 ? 0.0 : style > 0.5 && soft > 0.0 ? 1.0 - smoothstep(half_ - soft, half_ + soft, min(e.x, e.y)) : clamp(half_ - min(e.x, e.y) + 0.5, 0.0, 1.0);\n    if (punch > 0.5) return src * half(1.0 - s);\n    float3 base = float3(src.rgb) / float(src.a);\n    float w = s * float(color.a);\n    float3 rgb = style > 0.5 ? base * (1.0 - w) + float3(color.rgb) * w * w : mix(base, float3(color.rgb), w);\n    return half4(half3(rgb) * src.a, src.a);\n}\n"
 }

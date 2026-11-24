@@ -66,13 +66,14 @@ class AppLanguageTest {
     }
 
     @Test fun unsupportedLanguagesFallBackToTheNextPhoneLanguageThenEnglish() {
-        assertEquals(AppLanguage.English, pick("nl-NL"))
+        assertEquals(AppLanguage.Dutch, pick("nl-NL"))
+        assertEquals(AppLanguage.English, pick("sv-SE"))
         assertEquals(AppLanguage.English, pick("cs-CZ", "sw-KE"))
         assertEquals(AppLanguage.Japanese, pick("cs-CZ", "ja-JP"))
-        assertEquals(AppLanguage.Russian, pick("nl-NL", "ru-RU", "en-US"))
+        assertEquals(AppLanguage.Russian, pick("sv-SE", "ru-RU", "en-US"))
         assertEquals(AppLanguage.English, pick())
         assertEquals(AppLanguage.English, pick(""))
-        assertNull(AppLanguage.match(listOf("nl-NL", "sw-KE")))
+        assertNull(AppLanguage.match(listOf("sv-SE", "sw-KE")))
     }
 
     @Test fun theSuggestedLanguageComesFirstAndEveryLanguageOnce() {
@@ -86,8 +87,8 @@ class AppLanguageTest {
     }
 
     @Test fun fourteenLanguagesEachKnowTheirOwnName() {
-        assertEquals(25, AppLanguage.entries.size)
-        assertEquals(25, AppLanguage.entries.map { it.nativeName }.toSet().size)
+        assertEquals(26, AppLanguage.entries.size)
+        assertEquals(26, AppLanguage.entries.map { it.nativeName }.toSet().size)
         assertEquals("বাংলা", AppLanguage.Bengali.nativeName)
         assertEquals("العربية", AppLanguage.Arabic.nativeName)
         assertEquals("فارسی", AppLanguage.Persian.nativeName)

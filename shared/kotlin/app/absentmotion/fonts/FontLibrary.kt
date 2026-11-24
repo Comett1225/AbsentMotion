@@ -3,6 +3,8 @@ package app.absentmotion.fonts
 import android.os.Build
 import app.absentmotion.R
 import app.absentmotion.i18n.AppText
+import app.absentmotion.model.Scene
+import app.absentmotion.model.fontNames
 import android.content.Context
 import android.graphics.Typeface
 import android.graphics.fonts.Font
@@ -233,6 +235,8 @@ class FontLibrary(context: Context) {
             }.onSuccess { failed.remove(name) }.getOrElse { failed[name] = System.currentTimeMillis(); null }
         }
     }
+    suspend fun fetchMissing(scene: Scene): List<String> =
+        scene.fontNames().filter { FontName.parse(it).source == "googlefonts" && resolve(it, download = true) == null }
     private fun <T> request(url: String, read: (java.io.InputStream) -> T): T {
         val target = URL(url)
         require(target.protocol == "https" && target.host in listOf("fonts.googleapis.com", "fonts.gstatic.com", "fonts.google.com"))

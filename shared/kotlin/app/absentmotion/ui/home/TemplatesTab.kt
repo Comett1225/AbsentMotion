@@ -30,7 +30,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -179,8 +178,8 @@ fun TemplatesTab(version: Int, onTemplate: (String) -> Unit, onProject: (Scene) 
         AlertDialog(
             onDismissRequest = { confirm = null },
             title = { Text(stringResource(title), color = Am.Navy) },
-            dismissButton = { TextButton({ confirm = null }) { Text(stringResource(R.string.cancel), color = Am.Navy) } },
-            confirmButton = { TextButton({ confirm = null; action() }) { Text(stringResource(R.string.delete), color = Am.Navy) } },
+            dismissButton = { DialogPill(stringResource(R.string.cancel), primary = false) { confirm = null } },
+            confirmButton = { DialogPill(stringResource(R.string.delete)) { confirm = null; action() } },
             containerColor = Am.Card,
         )
     }
@@ -320,8 +319,8 @@ private fun RenameDialog(title: String, onDone: (String) -> Unit, onDismiss: () 
                 textStyle = TextStyle(color = Am.Navy, fontSize = 16.sp).withUiFont(), singleLine = true, cursorBrush = SolidColor(Am.Navy),
             )
         },
-        confirmButton = { TextButton({ onDone(text.ifBlank { title }) }) { Text(stringResource(R.string.done), color = Am.Navy) } },
-        dismissButton = { TextButton(onDismiss) { Text(stringResource(R.string.cancel), color = Am.Navy) } },
+        confirmButton = { DialogPill(stringResource(R.string.done)) { onDone(text.ifBlank { title }) } },
+        dismissButton = { DialogPill(stringResource(R.string.cancel), primary = false, onClick = onDismiss) },
         containerColor = Am.Card,
     )
 }

@@ -207,9 +207,9 @@ class TextSpaceWrapTest {
             val rows = (shot(xml("x$run", font = font)).height - one) / step
             assertEquals("$font: rows of $step", Math.round(rows).toFloat(), rows, 0.01f)
         }
-        val prepared = { content: String, first: String -> shot(xml(content, extra = "<_layout height=\"81\" step=\"84\">${line(first, 64, from = 0)}</_layout>")) }
+        val prepared = { content: String, first: String -> shot(xml(content, extra = "<_layout>${line(first, 64, from = 0)}</_layout>")) }
         val grown = prepared("x$run", "x" + run.drop(1)).height - prepared("x", "x").height
-        assertEquals("$grown", Math.round(grown / 84).toFloat(), grown / 84, 0.001f)
+        assertEquals("$grown", Math.round(grown / pitch).toFloat(), grown / pitch, 0.001f)
     }
 
     @Test fun aJustifiedLineWhoseSpacesAllMoveDownStaysJustified() {

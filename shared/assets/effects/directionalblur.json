@@ -18,8 +18,8 @@
    "label": "Angle",
    "type": "angle",
    "default": 0,
-   "min": 0,
-   "max": 360,
+   "min": -3600,
+   "max": 3600,
    "step": 1
   },
   {

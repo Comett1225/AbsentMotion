@@ -11,7 +11,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -28,6 +27,7 @@ import java.util.Locale
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 import app.absentmotion.library.openableUri
+import app.absentmotion.ui.home.DialogPill
 
 @Composable
 internal fun MediaInfoDialog(record: MediaDeclaration, video: Boolean, onReplace: (suspend (MediaDeclaration) -> Unit)? = null, onDismiss: () -> Unit) {
@@ -78,7 +78,7 @@ internal fun MediaInfoDialog(record: MediaDeclaration, video: Boolean, onReplace
                     color = Am.Accent, fontSize = 14.sp,
                 )
             }
-        }, confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.ok), color = Am.Accent) } }, containerColor = Am.Field, titleContentColor = Am.OnDark, textContentColor = Am.OnDark)
+        }, confirmButton = { DialogPill(stringResource(R.string.ok), onClick = onDismiss) }, containerColor = Am.Field, titleContentColor = Am.OnDark, textContentColor = Am.OnDark)
 }
 
 private fun sizeText(bytes: Long): String {

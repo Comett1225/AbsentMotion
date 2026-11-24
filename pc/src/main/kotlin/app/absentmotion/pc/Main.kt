@@ -41,6 +41,7 @@ import java.io.File
 import javax.imageio.ImageIO
 import kotlin.math.roundToInt
 
+@OptIn(androidx.compose.ui.ExperimentalComposeUiApi::class)
 fun main(args: Array<String>) {
     System.setProperty("apple.awt.application.appearance", "system")
     app.absentmotion.ui.home.localFeed()?.let { app.absentmotion.ui.home.Updates.source = it }
@@ -100,7 +101,7 @@ fun main(args: Array<String>) {
             remember(window) { DeskWindow.secondary(window) }
             DeskExportMini(desk)
         }
-        Window(onCloseRequest = desk::requestQuit, visible = !desk.hidden, title = "AbsentMotion", state = state,
+        androidx.compose.runtime.CompositionLocalProvider(androidx.compose.ui.window.LocalWindowExceptionHandlerFactory provides app.absentmotion.pc.engine.NativeLoad.errors) { Window(onCloseRequest = desk::requestQuit, visible = !desk.hidden, title = "AbsentMotion", state = state,
             onPreviewKeyEvent = { it.type == KeyEventType.KeyDown && it.key == Key.Escape && DeskTyping.active == 0 && DeskBack.back() || DeskKeys.handle(desk, it) },
             onKeyEvent = { it.type == KeyEventType.KeyDown && it.key == Key.Escape && DeskTyping.active > 0 && DeskBack.back() || app.absentmotion.desk.DeskGlobalKeys.handle(desk, it) }) {
             DeskFiles.window = window
@@ -124,6 +125,6 @@ fun main(args: Array<String>) {
                 onDispose { window.removeComponentListener(listener); window.removeWindowStateListener(maximized) }
             }
             app.absentmotion.ui.theme.ThemeFadeHost { app.absentmotion.ui.theme.FollowSystemTheme(desk.settings); app.absentmotion.ui.theme.UiFontHost(desk.settings) { DeskApp(desk) } }
-        }
+        } }
     }
 }

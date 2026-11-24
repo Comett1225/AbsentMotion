@@ -55,6 +55,10 @@ The three-dot button on a card (named **More**) has these entries. Tap it to ope
 
 A project whose file is damaged shows **Damaged — restore a version** instead of its facts. Tap it to restore an earlier version, or delete it.
 
+### Selecting several
+
+Hold a card to select it, then tap other cards to add or remove them. The bar at the top shows how many are selected, with **Select all**, **Export**, **Duplicate**, **Send to another device** and **Delete**. **Export** and **Send to another device** work on one project at a time. The X or the back button stops selecting.
+
 ## Search
 
 One search box serves the whole home screen. On the Projects page it looks through project and asset names ("Search projects and assets"); on the Templates page it looks through templates and presets. It ignores capital letters and accents, and every word you type has to appear in the name, in any order.
@@ -69,7 +73,7 @@ The **Templates** page has two chips, **My Templates** and **My Presets**. They 
 
 ## Tools
 
-The **Tools** page has five cards that work on files, outside any project: **Compress**, **Trim**, **Extract Audio**, **Make a GIF** and **Video Downloader**. Tap a card to open it. On a tablet the cards sit side by side, and a tool opens full screen; held sideways, its settings sit in a second column next to the file.
+The **Tools** page has cards that work on files, outside any project: **Compress**, **Trim**, **Extract Audio**, **Make a GIF**, **Video Downloader**, **Enhance Image**, the importer for project links and QR codes, and **Send between devices**. Tap a card to open it. The sliders button at the top right opens **Customize tools**, where you choose which tools show and in which order, on the Tools page and inside a project. On a tablet the cards sit side by side, and a tool opens full screen; held sideways, its settings sit in a second column next to the file.
 
 ![The Tools page: Compress (1) and Video Downloader (2), and the Tools button of the bottom bar (3).](img/tools-tab.webp)
 

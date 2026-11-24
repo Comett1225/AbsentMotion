@@ -15,9 +15,10 @@ internal interface UpdateSource {
     fun allows(url: URI, first: Boolean): Boolean
 }
 
+internal val GitHubReleaseAssetHosts = setOf("objects.githubusercontent.com", "release-assets.githubusercontent.com")
+
 internal object GitHubSource : UpdateSource {
     private val repository = HOME_PAGE.removePrefix("https://github.com/").lowercase(Locale.ROOT)
-    private val cdn = setOf("objects.githubusercontent.com", "release-assets.githubusercontent.com")
     override val releases = "https://api.github.com/repos/" + HOME_PAGE.removePrefix("https://github.com/") + "/releases?per_page=30"
     override val signers = setOf(RELEASE_SIGNER)
 
@@ -31,7 +32,7 @@ internal object GitHubSource : UpdateSource {
         if (path.split('/').any { it == ".." || it == "." } || path.contains('\\')) return false
         val releaseFile = host == "github.com" && path.startsWith("/$repository/releases/download/")
         val listing = host == "api.github.com" && (path == "/repos/$repository/releases" || (!first && path.matches(Regex("/repositories/[0-9]+/releases"))))
-        return releaseFile || listing || (!first && host in cdn)
+        return releaseFile || listing || (!first && host in GitHubReleaseAssetHosts)
     }
 }
 

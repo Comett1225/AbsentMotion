@@ -33,7 +33,7 @@ class GlowEdgeShadowImportTest {
     @Test fun longShadowTakesOneSamplePerPixelOfLength() {
         for (id in listOf("effects.longshadow", "effects.longshadow2")) {
             val set = migrate(id, "size" to "0.3625")
-            close(362.5f, set.number("reach"))
+            close(391.5f, set.number("reach"))
             close(362.5f, set.number("samples"))
             close(64f, migrate(id, "size" to "0.01").number("samples"))
             close(512f, migrate(id, "size" to "2").number("samples"))
@@ -59,15 +59,23 @@ class GlowEdgeShadowImportTest {
         close(1f, plain.number("corners"))
         assertEquals("#ffbfe680", plain.text("color"))
         val set = migrate("inner-glow", "radius" to "137.5", "alpha" to "0.8125", "hardness" to "0.4", "blendMode" to "0")
-        close(206.25f, set.number("blur"))
+        close(137.5f, set.number("blur"))
+        close(1f, set.number("style"))
         close(0.8125f, set.number("opacity"))
         close(1f / 0.6f, set.number("intensity"))
         close(1f, set.number("blend"))
         close(0f, migrate("inner-glow", "blendMode" to "2").number("blend"))
     }
 
-    @Test fun edgeGlowStaysOnTheLayer() {
-        assertEquals("true", migrate("effects.edgeglow").text("mask"))
+    @Test fun edgeGlowImportsAlightsSettingsOneToOne() {
+        val glow = migrate("effects.edgeglow", "smoothing" to "7.5", "strength" to "0.25", "spread" to "4", "blend" to "0.5", "threshold" to "0.7")
+        close(1f, glow.number("style"))
+        close(7.5f, glow.number("smoothing"))
+        close(0.25f, glow.number("strength"))
+        close(4f, glow.number("spread"))
+        close(0.5f, glow.number("blend"))
+        close(0.7f, glow.number("threshold"))
+        assertEquals(null, glow.text("mask"))
     }
 
     @Test fun contoursAreMeasuredAsADistanceFromTheLayer() {
@@ -80,8 +88,8 @@ class GlowEdgeShadowImportTest {
         assertEquals("#ff2d1ef6", line.text("color"))
         val lines = migrate("contour", "offset" to "45", "width" to "28.75")
         close(48.015f, lines.number("offset"))
-        close(1.733f * 73.75f, lines.number("blur"))
-        close(5.75f, lines.number("width"))
+        close(1.333f * 28.75f + 1.667f * 45f, lines.number("blur"))
+        close(0.9f * 28.75f, lines.number("width"))
         val gradient = migrate("contourgrad")
         close(1f, gradient.number("spread"))
         close(42.5f, gradient.number("blur"))
@@ -90,7 +98,7 @@ class GlowEdgeShadowImportTest {
         assertEquals("#fff16b52", gradient.text("color2"))
         val band = migrate("contourgrad", "offset" to "37.5", "width" to "43.75")
         close(40.0125f, band.number("offset"))
-        close(1.733f * 81.25f, band.number("blur"))
+        close(1.69f * 81.25f, band.number("blur"))
     }
 
     @Test fun lightGlowHaloSoftensThePictureAndTheGlowStaysOnTheLayer() {
@@ -102,8 +110,9 @@ class GlowEdgeShadowImportTest {
     @Test fun softGlowFadesWithTheLayer() {
         val plain = migrate("effects.softglow")
         close(1f, plain.number("falloff"))
-        close(0.64f, plain.number("brightness"))
-        close(1.6f, migrate("effects.softglow", "brightness" to "1.25").number("brightness"))
+        close(1f, plain.number("style"))
+        close(0.5f, plain.number("brightness"))
+        close(1.25f, migrate("effects.softglow", "brightness" to "1.25").number("brightness"))
     }
 
     @Test fun contourStripsStackFromHalfAGapLower() {

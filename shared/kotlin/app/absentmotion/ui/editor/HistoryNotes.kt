@@ -48,7 +48,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -66,6 +65,7 @@ import app.absentmotion.ui.theme.Am
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import app.absentmotion.ui.home.DialogPill
 
 private const val SHOWN_MS = 2200L
 private const val FADE_MS = 300L
@@ -92,11 +92,11 @@ private fun SmoothUpdates(state: EditorState) {
             title = { Text(stringResource(R.string.smooth_stale_title), color = Am.OnDark) },
             text = { Text(stringResource(R.string.smooth_stale_body), color = Am.OnDark, fontSize = 14.sp) },
             confirmButton = {
-                Column(horizontalAlignment = Alignment.End) {
-                    TextButton({ keeper.asking = null; keeper.redo(change) }) { Text(stringResource(R.string.smooth_redo), color = Am.Accent) }
-                    TextButton({ keeper.asking = null; state.edit { it.withoutAiMark(change.id, AiKind.Smooth) } }) { Text(stringResource(R.string.smooth_remove), color = Am.Accent) }
-                    if (state.canUndo) TextButton({ keeper.asking = null; if (state.scene.layer(change.id)?.node === change.node) state.undo() }) {
-                        Text(stringResource(R.string.smooth_undo_change), color = Am.Accent)
+                Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    DialogPill(stringResource(R.string.smooth_redo)) { keeper.asking = null; keeper.redo(change) }
+                    DialogPill(stringResource(R.string.smooth_remove), primary = false, editor = true) { keeper.asking = null; state.edit { it.withoutAiMark(change.id, AiKind.Smooth) } }
+                    if (state.canUndo) DialogPill(stringResource(R.string.smooth_undo_change), primary = false, editor = true) {
+                        keeper.asking = null; if (state.scene.layer(change.id)?.node === change.node) state.undo()
                     }
                 }
             },

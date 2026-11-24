@@ -27,9 +27,18 @@ data class EffectParam(
     val showWhen: Pair<String, Set<Int>>? = null,
     val palette: Boolean = false,
     val slow: Int = 1,
+    val section: String? = null,
+    val header: Boolean = false,
+    val slider: Pair<Float, Float>? = null,
+    val drag: Float = 0f,
 ) {
     val type: String get() = when (kind) { "point" -> "vec2"; "color" -> "color"; "switch" -> "bool"; "text" -> "string"; else -> "float" }
     val missingDefault: String get() = legacyDefault ?: default
+    val rulerStep: Float get() = when {
+        drag > 0f -> drag
+        kind == "angle" -> maxOf(step, 1f)
+        else -> step / slow
+    }
 
     fun format(value: Any?): String = format(id, kind, value)
 
@@ -57,16 +66,23 @@ data class EffectParam(
             val showWhen = json.optJSONObject("when")?.let { o ->
                 o.keys().asSequence().firstOrNull()?.let { key -> key to o.getJSONArray(key).let { a -> List(a.length()) { a.getInt(it) }.toSet() } }
             }
+            val section = json.optString("section").takeIf { it.isNotBlank() }
+            val header = json.optBoolean("header") && kind == "switch" && section != null
             if (kind == "choice") {
                 val options = json.getJSONArray("options").let { a -> List(a.length()) { a.getString(it) } }
                 require(options.isNotEmpty() && (d as Number).toInt() in options.indices) { "$id: choice $d" }
-                return EffectParam(id, json.optString("label", id), kind, default, 0f, options.size - 1f, 1f, options = options, legacyDefault = legacyDefault, showWhen = showWhen)
+                return EffectParam(id, json.optString("label", id), kind, default, 0f, options.size - 1f, 1f, options = options, legacyDefault = legacyDefault, showWhen = showWhen, section = section)
             }
-            return EffectParam(id, json.optString("label", id), kind, default,
-                json.optDouble("min", -Float.MAX_VALUE.toDouble()).toFloat(), json.optDouble("max", Float.MAX_VALUE.toDouble()).toFloat(),
+            val min = json.optDouble("min", -Float.MAX_VALUE.toDouble()).toFloat()
+            val max = json.optDouble("max", Float.MAX_VALUE.toDouble()).toFloat()
+            val s = json.opt("slider")
+            val slider = (if (s is JSONArray) s.optDouble(0, Double.NaN).toFloat() to s.optDouble(1, Double.NaN).toFloat() else if (s == true) min to max else null)
+                ?.takeIf { (lo, hi) -> (kind == "float" || kind == "angle") && lo > -Float.MAX_VALUE / 2 && hi < Float.MAX_VALUE / 2 && lo < hi }
+            return EffectParam(id, json.optString("label", id), kind, default, min, max,
                 json.optDouble("step", 0.01).toFloat(), percent = json.optBoolean("percent"), pixels = json.optBoolean("pixels"), unit = json.optString("unit"),
                 layerTime = json.optBoolean("layerTime"), after = json.optString("after").takeIf { it.isNotEmpty() }, legacyDefault = legacyDefault,
-                showWhen = showWhen, palette = palette, slow = json.optInt("slow", 1).coerceIn(1, 20))
+                showWhen = showWhen, palette = palette, slow = json.optInt("slow", 1).coerceIn(1, 20), section = section, header = header, slider = slider,
+                drag = json.optDouble("drag", 0.0).toFloat().takeIf { it.isFinite() && it > 0f } ?: 0f)
         }
     }
 }

@@ -45,7 +45,23 @@
     "Luma",
     "Average"
    ]
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 1,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "legacyDefault": 0,
+   "when": {
+    "style": [
+     0
+    ]
+   }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float strength;\nuniform float angle;\nuniform float center;\nuniform float mode;\n\nhalf4 main(float2 coord) {\n    float a = radians(angle);\n    float2 o = float2(cos(a), sin(a)) * size * (strength / 8.0);\n    float k = floor(center + 0.5);\n    float2 sr = k < 0.5 ? float2(0.0) : o;\n    float2 sg = k < 0.5 ? o : (k < 1.5 ? float2(0.0) : -o);\n    float2 sb = k < 1.5 ? -o : float2(0.0);\n    half4 r = image.eval(coord - sr);\n    half4 g = image.eval(coord - sg);\n    half4 b = image.eval(coord - sb);\n    half ac = k < 0.5 ? r.a : (k < 1.5 ? g.a : b.a);\n    half3 rgb = half3(r.r, g.g, b.b);\n    float m = floor(mode + 0.5);\n    if (m < 0.5) return half4(rgb, ac);\n    if (m < 1.5) return half4(rgb, max(r.a, max(g.a, b.a)));\n    if (m < 2.5) {\n        half lo = min(r.a, min(g.a, b.a));\n        half3 un = half3(r.a > 0.001 ? r.r / r.a : 0.0, g.a > 0.001 ? g.g / g.a : 0.0, b.a > 0.001 ? b.b / b.a : 0.0);\n        return half4(un * lo, lo);\n    }\n    if (m < 3.5) return half4(rgb, clamp(max(ac, dot(rgb, half3(0.2126, 0.7152, 0.0722))), 0.0, 1.0));\n    half share = (r.a + g.a + b.a) / 3.0;\n    half3 un = half3(r.a > 0.001 ? r.r / r.a : 0.0, g.a > 0.001 ? g.g / g.a : 0.0, b.a > 0.001 ? b.b / b.a : 0.0);\n    return half4(un * share, share);\n}"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float strength;\nuniform float angle;\nuniform float center;\nuniform float mode;\nuniform float4 screen;\nuniform float style;\nhalf4 tap(float2 p) {\n    return image.eval(style > 0.5 ? clamp(p, screen.xy + 0.5, screen.xy + screen.zw - 0.5) : p);\n}\n\nhalf4 main(float2 coord) {\n    float a = radians(angle);\n    float2 o = float2(cos(a), sin(a)) * size * (strength / 8.0);\n    float k = floor(center + 0.5);\n    float2 sr = k < 0.5 ? float2(0.0) : o;\n    float2 sg = k < 0.5 ? o : (k < 1.5 ? float2(0.0) : -o);\n    float2 sb = k < 1.5 ? -o : float2(0.0);\n    half4 r = tap(coord - sr);\n    half4 g = tap(coord - sg);\n    half4 b = tap(coord - sb);\n    half ac = k < 0.5 ? r.a : (k < 1.5 ? g.a : b.a);\n    half3 rgb = half3(r.r, g.g, b.b);\n    float m = floor(mode + 0.5);\n    if (m < 0.5) return half4(rgb, ac);\n    if (m < 1.5) {\n        half top = max(r.a, max(g.a, b.a));\n        if (style < 0.5 || top <= 0.001) return half4(rgb, top);\n        half4 c = k < 0.5 ? r : (k < 1.5 ? g : b);\n        half y = c.a > 0.001 ? dot(c.rgb / c.a, half3(0.2126, 0.7152, 0.0722)) : 0.0;\n        return half4((1.0 - (1.0 - rgb / top / 3.0) * (1.0 - y)) * top, top);\n    }\n    if (m < 2.5) {\n        if (style > 0.5) return half4(rgb, ac);\n        half lo = min(r.a, min(g.a, b.a));\n        half3 un = half3(r.a > 0.001 ? r.r / r.a : 0.0, g.a > 0.001 ? g.g / g.a : 0.0, b.a > 0.001 ? b.b / b.a : 0.0);\n        return half4(un * lo, lo);\n    }\n    if (m < 3.5) return half4(rgb, clamp(max(ac, dot(rgb, half3(0.2126, 0.7152, 0.0722))), 0.0, 1.0));\n    half share = (r.a + g.a + b.a) / 3.0;\n    half3 un = half3(r.a > 0.001 ? r.r / r.a : 0.0, g.a > 0.001 ? g.g / g.a : 0.0, b.a > 0.001 ? b.b / b.a : 0.0);\n    return half4(un * share, share);\n}"
 }

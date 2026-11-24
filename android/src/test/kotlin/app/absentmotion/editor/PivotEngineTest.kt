@@ -136,7 +136,7 @@ class PivotEngineTest {
 
     @Test fun motionEffectsAreTakenIntoAccount() {
         val s = sceneOf(
-            layer(1, prop("location", 0f to "200,200,0"), effect("absent.spin", "rpm" to "45"), effect("absent.pulsesize", "frequency" to "1.3"), effect("absent.swing", "frequency" to "0.7")),
+            layer(1, prop("location", 0f to "200,200,0"), effect("absent.spin", "rpm" to "45"), effect("absent.pulsesize", "frequency" to "1.3"), effect("absent.swing", "freq" to "0.7")),
             layer(2, prop("location", 0f to "40,0,0"), parent = 1),
         )
         val out = s.withPivotMoved(1, 517, 10f, 0f, 500)

@@ -158,7 +158,7 @@ def motion_cases():
     yield 'oscillate phase', engine.scene(dot(fx('oscillate', angle=0, frequency=0, magnitude=50, phase=1.5))), [((50, 100), red), ((100, 100), black)], 0
     yield 'spin clockwise', engine.scene(dot(fx('spin', rpm=15), 60, 8)), [((130, 130), red), ((130, 70), black), ((160, 100), black)], 15
     yield 'spin counterclockwise', engine.scene(dot(fx('spin', rpm=-15), 60, 8)), [((130, 70), red), ((130, 130), black)], 15
-    yield 'swing', engine.scene(dot(fx('swing', angle1=-45, angle2=45, frequency=0.5), 60, 8)), [((130, 130), red), ((160, 100), black)], 15
+    yield 'swing', engine.scene(dot(fx('swing', angle1=-45, angle2=45, freq=1), 60, 8)), [((130, 130), red), ((160, 100), black)], 15
     yield 'pulse size', engine.scene(dot(fx('pulsesize', shrink=0.5, grow=1.5, frequency=0.5), 40, 40)), [((155, 100), red), ((165, 100), black)], 15
     yield 'pulse opacity phase 0.5 starts opaque', engine.scene(dot(fx('pulseopacity', frequency=0.5, phase=0.5), argb=0xffffffff)), [((100, 100), (255, 255, 255))], 0
     yield 'pulse opacity half way', engine.scene(dot(fx('pulseopacity', frequency=0.5, phase=0.5), argb=0xffffffff)), [((100, 100), half)], 15
@@ -169,7 +169,7 @@ def motion_cases():
     yield 'stretch axis masked to the layer', engine.scene(dot(fx('stretchaxis', angle=0, scale=2, mask=1), 30, 30)), [((115, 100), red), ((145, 100), black)], 0
     yield 'oscillate orbit starts along the angle', engine.scene(dot(fx('oscillate', direction=2, angle=0, frequency=0.5, magnitude=50))), [((150, 100), red), ((100, 100), black)], 0
     yield 'oscillate orbit turns clockwise', engine.scene(dot(fx('oscillate', direction=2, angle=0, frequency=0.5, magnitude=50))), [((100, 150), red), ((150, 100), black)], 15
-    yield 'swing phase 0.5 starts at angle 2', engine.scene(dot(fx('swing', angle1=0, angle2=90, frequency=0, phase=0.5), 60, 8)), [((100, 150), red), ((150, 100), black)], 0
+    yield 'swing phase 0.5 starts at angle 2', engine.scene(dot(fx('swing', angle1=0, angle2=90, freq=0, phase=0.5), 60, 8)), [((100, 150), red), ((150, 100), black)], 0
     yield 'pulse size phase 0.5 starts at grow', engine.scene(dot(fx('pulsesize', shrink=0.5, grow=1.5, frequency=0, phase=0.5), 40, 40)), [((155, 100), red), ((165, 100), black)], 0
     blue = engine.BLUE
     halves = lambda extra: engine.scene('<embedScene id="1" startTime="0" endTime="1000">' + engine.transform('100,100,0') + extra

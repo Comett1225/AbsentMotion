@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -122,8 +121,8 @@ internal fun BackupRows(settings: AppSettings, onRestored: () -> Unit) {
                 }
             },
             confirmButton = {
-                if (current.result == null) TextButton({ current.stopped = true }) { Text(stringResource(R.string.stop), color = Am.Navy) }
-                else TextButton({ task = null }) { Text(stringResource(R.string.ok), color = Am.Navy) }
+                if (current.result == null) DialogPill(stringResource(R.string.stop), primary = false) { current.stopped = true }
+                else DialogPill(stringResource(R.string.ok)) { task = null }
             },
             containerColor = Am.Card,
         )

@@ -70,6 +70,10 @@ internal object DrawingIcons {
         fill("M7.2 11A3.8 3.8 0 1 0 14.8 11A3.8 3.8 0 1 0 7.2 11Z", 0.45f)
     }
 
+    val Tune = vec("Tune", 24f, 24f, 24f, 24f) {
+        stroke("M4 7H10M14 7H20M4 17H6M10 17H20M12 4.5V9.5M8 14.5V19.5", 1.7f)
+    }
+
     val Contours = vec("Contours", 24f, 24f, 24f, 24f) {
         stroke("M2.5 12A9.5 9.5 0 1 0 21.5 12A9.5 9.5 0 1 0 2.5 12ZM7.2 12A4.8 4.8 0 1 0 16.8 12A4.8 4.8 0 1 0 7.2 12Z", 1.6f)
     }

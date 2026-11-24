@@ -52,6 +52,23 @@
     "Sine",
     "Triangle"
    ]
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Classic",
+    "Standard",
+    "Standard"
+   ],
+   "when": {
+    "style": [
+     1,
+     2
+    ]
+   }
   }
  ]
 }

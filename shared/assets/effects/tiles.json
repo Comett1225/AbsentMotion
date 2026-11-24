@@ -21,7 +21,8 @@
    "default": 0,
    "min": -100,
    "max": 100,
-   "step": 0.01
+   "step": 0.001,
+   "drag": 0.005
   },
   {
    "id": "mirror",

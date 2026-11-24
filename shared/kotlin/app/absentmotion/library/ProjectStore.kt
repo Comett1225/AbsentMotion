@@ -193,6 +193,25 @@ class ProjectStore(private val root: File) {
         return copy
     }
 
+    fun replaceWith(id: String, from: String) {
+        val incoming = text(from) ?: throw java.io.IOException("Missing project $from")
+        text(id)?.let { if (projectScene(it) != null) versions.snapshot(id, it) else versions.keepDamaged(id, it) }
+        val source = mediaDir(from)
+        var xml = incoming
+        if (source.isDirectory) {
+            val moved = mediaDir(id).apply { mkdirs() }.child("from-$from")
+            if (!source.renameTo(moved)) { source.copyRecursively(moved, overwrite = true); source.deleteRecursively() }
+            val old = folderUri(source)
+            val new = folderUri(moved)
+            xml = Scene(Scene.parse(incoming).node.mapMediaUris { uri -> fileForm(uri).let { if (it.startsWith(old)) new + it.substring(old.length) else uri } }).toXml()
+        }
+        save(id, xml)
+        thumbnailFile(from).takeIf { it.exists() }?.let { it.copyTo(thumbnailFile(id), overwrite = true); it.delete() }
+        sceneFile(from).delete()
+        recoveryFile(from).delete()
+        versions.delete(from)
+    }
+
     fun delete(id: String, aiDir: File? = null) {
         val own = listOfNotNull(text(id)) + versions.list(id).mapNotNull { runCatching { it.file.readText() }.getOrNull() }
         val owners = (listOf(id) + own.flatMap { runCatching { Scene.parse(it).node.keptUris() }.getOrDefault(emptySet()) }.mapNotNull(::ownerOf)).distinct()

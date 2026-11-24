@@ -327,15 +327,16 @@ internal fun EyedropperLoupe(state: EditorState, modifier: Modifier = Modifier) 
                 sample(true)
             }
         },
-    ) {
-        val u = 1.dp.toPx()
-        val c = at()
-        val under = Color.Black.copy(alpha = 0.5f)
-        drawCircle(under, 23 * u, c, style = Stroke(3f * u))
-        drawLine(under, c - Offset(6 * u, 0f), c + Offset(6 * u, 0f), 2.5f * u)
-        drawLine(under, c - Offset(0f, 6 * u), c + Offset(0f, 6 * u), 2.5f * u)
-        drawCircle(Color.White.copy(alpha = 0.9f), 23 * u, c, style = Stroke(1.5f * u))
-        drawLine(Color.White, c - Offset(5 * u, 0f), c + Offset(5 * u, 0f), 1 * u)
-        drawLine(Color.White, c - Offset(0f, 5 * u), c + Offset(0f, 5 * u), 1 * u)
-    }
+    ) { drawLoupe(at()) }
+}
+
+internal fun DrawScope.drawLoupe(c: Offset) {
+    val u = 1.dp.toPx()
+    val under = Color.Black.copy(alpha = 0.5f)
+    drawCircle(under, 23 * u, c, style = Stroke(3f * u))
+    drawLine(under, c - Offset(6 * u, 0f), c + Offset(6 * u, 0f), 2.5f * u)
+    drawLine(under, c - Offset(0f, 6 * u), c + Offset(0f, 6 * u), 2.5f * u)
+    drawCircle(Color.White.copy(alpha = 0.9f), 23 * u, c, style = Stroke(1.5f * u))
+    drawLine(Color.White, c - Offset(5 * u, 0f), c + Offset(5 * u, 0f), 1 * u)
+    drawLine(Color.White, c - Offset(0f, 5 * u), c + Offset(0f, 5 * u), 1 * u)
 }

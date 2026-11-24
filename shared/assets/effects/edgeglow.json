@@ -21,7 +21,26 @@
    "default": 12,
    "min": 0,
    "max": 300,
-   "step": 0.1
+   "step": 0.1,
+   "when": {
+    "style": [
+     0
+    ]
+   }
+  },
+  {
+   "id": "smoothing",
+   "label": "Smoothing",
+   "type": "float",
+   "default": 5,
+   "min": 0,
+   "max": 100,
+   "step": 0.1,
+   "when": {
+    "style": [
+     1
+    ]
+   }
   },
   {
    "id": "spread",
@@ -29,7 +48,7 @@
    "type": "float",
    "default": 1.5,
    "min": 0,
-   "max": 3,
+   "max": 10,
    "step": 0.01
   },
   {
@@ -39,7 +58,26 @@
    "default": 1.0,
    "min": 0,
    "max": 10,
-   "step": 0.01
+   "step": 0.01,
+   "when": {
+    "style": [
+     0
+    ]
+   }
+  },
+  {
+   "id": "strength",
+   "label": "Strength",
+   "type": "float",
+   "default": 0.1,
+   "min": 0,
+   "max": 10,
+   "step": 0.01,
+   "when": {
+    "style": [
+     1
+    ]
+   }
   },
   {
    "id": "color",
@@ -54,7 +92,12 @@
    "default": 0.0,
    "min": 0,
    "max": 1,
-   "step": 0.01
+   "step": 0.01,
+   "when": {
+    "style": [
+     0
+    ]
+   }
   },
   {
    "id": "blend",
@@ -109,8 +152,29 @@
    "id": "mask",
    "label": "Mask To Layer",
    "type": "switch",
-   "default": false
+   "default": false,
+   "when": {
+    "style": [
+     0
+    ]
+   }
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 1,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "legacyDefault": 0,
+   "when": {
+    "style": [
+     0
+    ]
+   }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform shader blurred;\nuniform float threshold;\nuniform float blur;\nuniform float spread;\nlayout(color) uniform half4 color;\nuniform float blend;\nuniform float invert;\nuniform float edges;\nuniform float own;\nuniform float tint;\nlayout(color) uniform half4 tintColor;\nuniform float gamma;\nuniform float brightness;\nuniform float mask;\nfloat luma(float3 c) { return dot(c, float3(0.2126, 0.7152, 0.0722)); }\nfloat edgesImage( float2 at, float step_, float aw) {\n    float l = luma(float3(image.eval(at + float2(-step_, 0.0)).rgb));\n    float r = luma(float3(image.eval(at + float2(step_, 0.0)).rgb));\n    float u = luma(float3(image.eval(at + float2(0.0, -step_)).rgb));\n    float d = luma(float3(image.eval(at + float2(0.0, step_)).rgb));\n    float al = float(image.eval(at + float2(-step_, 0.0)).a);\n    float ar = float(image.eval(at + float2(step_, 0.0)).a);\n    float au = float(image.eval(at + float2(0.0, -step_)).a);\n    float ad = float(image.eval(at + float2(0.0, step_)).a);\n    return length(float2(r - l, d - u)) + length(float2(ar - al, ad - au)) * aw;\n}\nfloat edgesBlurred( float2 at, float step_, float aw) {\n    float l = luma(float3(blurred.eval(at + float2(-step_, 0.0)).rgb));\n    float r = luma(float3(blurred.eval(at + float2(step_, 0.0)).rgb));\n    float u = luma(float3(blurred.eval(at + float2(0.0, -step_)).rgb));\n    float d = luma(float3(blurred.eval(at + float2(0.0, step_)).rgb));\n    float al = float(blurred.eval(at + float2(-step_, 0.0)).a);\n    float ar = float(blurred.eval(at + float2(step_, 0.0)).a);\n    float au = float(blurred.eval(at + float2(0.0, -step_)).a);\n    float ad = float(blurred.eval(at + float2(0.0, step_)).a);\n    return length(float2(r - l, d - u)) + length(float2(ar - al, ad - au)) * aw;\n}\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    float sharp = edgesImage(coord, 1.0, 1.0 - 0.8 * clamp(own, 0.0, 1.0));\n    float soft = edgesBlurred(coord, max(blur * 0.25, 1.0), 1.0 - 0.8 * clamp(own, 0.0, 1.0)) * max(blur * 0.25, 1.0) * 0.5;\n    float e = max(sharp - threshold, 0.0) * 2.0 * (1.0 - clamp(own, 0.0, 1.0)) + max(soft - threshold * 0.5, 0.0) * spread;\n    e *= max(edges, 0.0);\n    if (invert > 0.5) e = 1.0 - clamp(e, 0.0, 1.0);\n    e = clamp(e, 0.0, 1.0);\n    float a = float(src.a);\n    if (mask > 0.5) e *= a;\n    float3 base = a > 0.0 ? float3(src.rgb) / a : float3(0.0);\n    float3 under = base * clamp(blend, 0.0, 2.0) * 0.5;\n    half4 haze = blurred.eval(coord);\n    float3 picture = haze.a > 0.0 ? float3(haze.rgb) / float(haze.a) : base;\n    float3 glow = mix(float3(color.rgb) * float(color.a), picture, clamp(own, 0.0, 1.0)) * e;\n    float3 rgb = clamp(under + glow, 0.0, 1.0) * a + glow * (1.0 - a);\n    float outA = a + e * (1.0 - a);\n    if (tint > 0.0 || gamma != 1.0 || brightness != 0.0) {\n        float3 straight = outA > 0.0 ? rgb / outA : float3(0.0);\n        straight = mix(straight, dot(straight, float3(0.2126, 0.7152, 0.0722)) * float3(tintColor.rgb), clamp(tint, 0.0, 1.0));\n        straight = clamp(pow(clamp(straight, 0.0, 1.0), float3(1.0 / max(gamma, 0.01))) + brightness, 0.0, 1.0);\n        rgb = straight * outA;\n    }\n    return half4(half3(rgb), half(outA));\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform shader blurred;\nuniform float threshold;\nuniform float blur;\nuniform float spread;\nlayout(color) uniform half4 color;\nuniform float blend;\nuniform float invert;\nuniform float edges;\nuniform float own;\nuniform float tint;\nlayout(color) uniform half4 tintColor;\nuniform float gamma;\nuniform float brightness;\nuniform float mask;\nuniform float smoothing;\nuniform float strength;\nuniform float style;\nfloat luma(float3 c) { return dot(c, float3(0.2126, 0.7152, 0.0722)); }\nfloat edgesImage( float2 at, float step_, float aw) {\n    float l = luma(float3(image.eval(at + float2(-step_, 0.0)).rgb));\n    float r = luma(float3(image.eval(at + float2(step_, 0.0)).rgb));\n    float u = luma(float3(image.eval(at + float2(0.0, -step_)).rgb));\n    float d = luma(float3(image.eval(at + float2(0.0, step_)).rgb));\n    float al = float(image.eval(at + float2(-step_, 0.0)).a);\n    float ar = float(image.eval(at + float2(step_, 0.0)).a);\n    float au = float(image.eval(at + float2(0.0, -step_)).a);\n    float ad = float(image.eval(at + float2(0.0, step_)).a);\n    return length(float2(r - l, d - u)) + length(float2(ar - al, ad - au)) * aw;\n}\nfloat edgesBlurred( float2 at, float step_, float aw) {\n    float l = luma(float3(blurred.eval(at + float2(-step_, 0.0)).rgb));\n    float r = luma(float3(blurred.eval(at + float2(step_, 0.0)).rgb));\n    float u = luma(float3(blurred.eval(at + float2(0.0, -step_)).rgb));\n    float d = luma(float3(blurred.eval(at + float2(0.0, step_)).rgb));\n    float al = float(blurred.eval(at + float2(-step_, 0.0)).a);\n    float ar = float(blurred.eval(at + float2(step_, 0.0)).a);\n    float au = float(blurred.eval(at + float2(0.0, -step_)).a);\n    float ad = float(blurred.eval(at + float2(0.0, step_)).a);\n    return length(float2(r - l, d - u)) + length(float2(ar - al, ad - au)) * aw;\n}\nhalf4 standard(float2 coord) {\n    half4 src = image.eval(coord);\n    half4 e = blurred.eval(coord);\n    float ea = floor(float(e.a) * 255.0 + 0.5) / 255.0;\n    float3 glow = float3(0.0);\n    if (ea > 0.0) {\n        float3 s = floor(float3(e.rgb) * 255.0 + 0.5) / 255.0 / ea;\n        float p = 3.0 - spread;\n        float l = dot(s, float3(0.2126, 0.7152, 0.0722));\n        float3 mine = float3(s.r > 0.0 ? min(pow(s.r, p), 1.0) : 0.0, s.g > 0.0 ? min(pow(s.g, p), 1.0) : 0.0, s.b > 0.0 ? min(pow(s.b, p), 1.0) : 0.0);\n        float lit = l > 0.0 ? min(pow(l, p), 1.0) : 0.0;\n        float k = clamp(blend, 0.0, 1.0);\n        glow = (mine * (1.0 - k) + lit * float3(color.rgb) * float(color.a) * k) * ea;\n    }\n    float a = float(src.a);\n    float3 base = a > 0.0 ? float3(src.rgb) / a : float3(0.0);\n    base *= mix(float3(1.0), float3(tintColor.rgb), clamp(tint, 0.0, 1.0));\n    base = clamp(pow(clamp(base, 0.0, 1.0), float3(1.0 / max(gamma, 0.01))) + brightness, 0.0, 1.0);\n    float outA = clamp(a + max(glow.r, max(glow.g, glow.b)) * (1.0 - a), 0.0, 1.0);\n    return half4(half3(min(base * a + glow, float3(outA))), half(outA));\n}\nhalf4 main(float2 coord) {\n    if (style > 0.5) return standard(coord);\n    half4 src = image.eval(coord);\n    float sharp = edgesImage(coord, 1.0, 1.0 - 0.8 * clamp(own, 0.0, 1.0));\n    float soft = edgesBlurred(coord, max(blur * 0.25, 1.0), 1.0 - 0.8 * clamp(own, 0.0, 1.0)) * max(blur * 0.25, 1.0) * 0.5;\n    float e = max(sharp - threshold, 0.0) * 2.0 * (1.0 - clamp(own, 0.0, 1.0)) + max(soft - threshold * 0.5, 0.0) * spread;\n    e *= max(edges, 0.0);\n    if (invert > 0.5) e = 1.0 - clamp(e, 0.0, 1.0);\n    e = clamp(e, 0.0, 1.0);\n    float a = float(src.a);\n    if (mask > 0.5) e *= a;\n    float3 base = a > 0.0 ? float3(src.rgb) / a : float3(0.0);\n    float3 under = base * clamp(blend, 0.0, 2.0) * 0.5;\n    half4 haze = blurred.eval(coord);\n    float3 picture = haze.a > 0.0 ? float3(haze.rgb) / float(haze.a) : base;\n    float3 glow = mix(float3(color.rgb) * float(color.a), picture, clamp(own, 0.0, 1.0)) * e;\n    float3 rgb = clamp(under + glow, 0.0, 1.0) * a + glow * (1.0 - a);\n    float outA = a + e * (1.0 - a);\n    if (tint > 0.0 || gamma != 1.0 || brightness != 0.0) {\n        float3 straight = outA > 0.0 ? rgb / outA : float3(0.0);\n        straight = mix(straight, dot(straight, float3(0.2126, 0.7152, 0.0722)) * float3(tintColor.rgb), clamp(tint, 0.0, 1.0));\n        straight = clamp(pow(clamp(straight, 0.0, 1.0), float3(1.0 / max(gamma, 0.01))) + brightness, 0.0, 1.0);\n        rgb = straight * outA;\n    }\n    return half4(half3(rgb), half(outA));\n}\n"
 }

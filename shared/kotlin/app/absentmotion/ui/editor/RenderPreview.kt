@@ -19,7 +19,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -63,6 +62,8 @@ import app.absentmotion.ui.theme.presence
 import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import app.absentmotion.ui.home.DialogPill
+import app.absentmotion.ui.home.AccentPill
 
 const val RENDER_PREVIEW_TAG = "render_preview"
 
@@ -201,9 +202,7 @@ internal fun RenderPreviewNotes(state: EditorState, cachedPlaying: State<Boolean
         Presence(stale && !rendering) {
             Note(Modifier.presence(rise = (-8).dp)) {
                 Text(stringResource(R.string.prerender_outdated), Modifier.weight(1f), color = Am.OnDark, fontSize = 13.sp, lineHeight = 16.sp, maxLines = 2)
-                TextButton({ stale = false; PreviewCache.render(state, context, scope) }) {
-                    Text(stringResource(R.string.prerender_again), color = Am.Accent, fontSize = 13.sp, maxLines = 1)
-                }
+                DialogPill(stringResource(R.string.prerender_again), Modifier.padding(start = 8.dp)) { stale = false; PreviewCache.render(state, context, scope) }
             }
         }
         Presence(rendering) {
@@ -217,7 +216,7 @@ internal fun RenderPreviewNotes(state: EditorState, cachedPlaying: State<Boolean
                         Box(Modifier.fillMaxWidth(PreviewCache.progress.coerceIn(0f, 1f)).height(3.dp).background(Am.Accent))
                     }
                 }
-                TextButton({ PreviewCache.cancel() }) { Text(stringResource(R.string.cancel), color = Am.Accent, fontSize = 13.sp, maxLines = 1) }
+                AccentPill(stringResource(R.string.cancel), Modifier.padding(start = 8.dp), primary = false) { PreviewCache.cancel() }
             }
         }
     }

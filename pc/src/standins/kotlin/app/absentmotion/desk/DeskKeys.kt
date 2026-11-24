@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.PlatformTextInputSession
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.PointMode
 import app.absentmotion.ui.editor.DeskDrop
+import app.absentmotion.ui.editor.DrawingKeys
 import app.absentmotion.ui.home.DeskModals
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -80,6 +81,7 @@ object DeskKeys {
 
     fun handle(app: DeskAppState, event: KeyEvent): Boolean {
         if (event.type == KeyEventType.KeyDown && viewer?.invoke(event) == true) return true
+        app.editor?.let { if (DeskTyping.active == 0 && DrawingKeys.handle(it, event)) { released(event); return true } }
         if (event.type == KeyEventType.KeyUp) {
             released(event)
             if (viewer != null && event.key == Key.Spacebar) return true

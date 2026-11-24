@@ -58,14 +58,17 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerId
+import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.isAltPressed
 import androidx.compose.ui.input.pointer.isTertiaryPressed
+import androidx.compose.ui.input.pointer.isPrimaryPressed
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChanged
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.platform.LocalDensity
@@ -141,7 +144,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
     val scene = state.scene
     val editingText = state.livePanel == EditorPanel.EditText
     val mediaRevision by state.engine.mediaRevision.collectAsState()
-    val fixedView = state.drawing != null
+    val fixedView = state.drawing is app.absentmotion.editor.TrackMode
     val viewZoom = if (fixedView) 1f else state.canvasZoom
     val viewPan = if (fixedView) Offset.Zero else state.canvasPan
     val (scale, dx, dy) = previewFrame(size.width.toFloat(), size.height.toFloat(), with(LocalDensity.current) { reserveEnd.toPx() }, scene.width.toFloat(), scene.height.toFloat(), viewZoom, viewPan)
@@ -352,7 +355,8 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                     val turning = state.turner
                     val points = state.layerPoints.takeIf { startLayer != null && !state.playing && !state.panZoomMode }
                     val worldView = world?.takeUnless { state.playing }?.let { v -> Matrix().apply { setValues(v) } }?.takeIf { it.invert(Matrix()) }
-                    fun onScreen(p: Pt): Offset? = world?.takeIf { worldView != null }?.projected(p)?.let { Offset(it.x, it.y) * currentScale + currentOffset }
+                    fun onScreen(p: Pt): Offset? = if (points?.scene == true) Offset(p.x, p.y).takeIf { it.x.isFinite() && it.y.isFinite() }?.let { it * currentScale + currentOffset }
+                        else world?.takeIf { worldView != null }?.projected(p)?.let { Offset(it.x, it.y) * currentScale + currentOffset }
                     fun inLayer(at: Offset): Pt? = worldView?.inverseMap(((at - currentOffset) / currentScale).let { Pt(it.x, it.y) })
                     val adjustBox = if (adjusting != null && worldView != null) world?.let { pivotFrame(it, frameQuad).box } else null
                     val gradientMode = startLayer != null && startQuad != null && !state.panZoomMode && state.livePanel == EditorPanel.ColorFill && startLayer.fillType == "gradient"
@@ -572,7 +576,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
             MultiSelectionBox(b, scale, Offset(dx, dy), if (refPx > 0f) refPx else size.width / 1080f)
         }
         Presence(hint) { SwipeHint(hintLabel, Modifier.align(Alignment.Center).presence()) }
-        if (!fixedView) CanvasZoomHud(state, Modifier.align(Alignment.TopStart))
+        if (state.drawing == null) CanvasZoomHud(state, Modifier.align(Alignment.TopStart))
         if (state.drawing == null && !editingText) {
             RenderPreviewNotes(state, cachedPlaying, Modifier.align(Alignment.TopCenter))
             PreRenderBadge(cachedPlaying, Modifier.align(Alignment.TopEnd))
@@ -583,7 +587,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
         GradientHandles(state, frame, scale, Offset(dx, dy))
         CropOverlay(state, quad.takeUnless { state.playing }, scale, Offset(dx, dy))
         CropAutoView(state, quad.takeUnless { state.playing }, size, with(LocalDensity.current) { reserveEnd.toPx() }, touching)
-        state.layerPoints?.let { points -> world?.takeUnless { state.playing }?.let { LayerPointsOverlay(points, it, scale, Offset(dx, dy)) } }
+        state.layerPoints?.let { points -> (world ?: FlatPlane.takeIf { points.scene })?.takeUnless { state.playing }?.let { LayerPointsOverlay(points, it, scale, Offset(dx, dy)) } }
         if (editingText) Canvas(Modifier.fillMaxSize()) {
             val q = frame ?: return@Canvas
             val points = List(4) { Offset(q[2 * it] * scale + dx, q[2 * it + 1] * scale + dy) }
@@ -736,6 +740,60 @@ private fun wheelScaleLayer(state: EditorState, at: Offset, factor: Float, plane
 
 internal fun pinchedPan(pan: Offset, about: Offset, factor: Float): Offset = pan / factor + about * (1 / factor - 1)
 
+internal fun EditorState.zoomCanvasAbout(at: Offset, factor: Float, move: Offset, scale: Float, offset: Offset) {
+    val next = (canvasZoom * factor).coerceIn(0.01f, 64f)
+    val about = (at - offset) / scale - Offset(scene.width / 2f, scene.height / 2f)
+    canvasPan = pinchedPan(canvasPan + move / scale, about, next / canvasZoom)
+    canvasZoom = next
+    zoomShown++
+}
+
+internal fun Modifier.canvasNavigation(state: EditorState, frame: () -> Triple<Float, Float, Float>, onTap: ((Int) -> Unit)? = null): Modifier = composed {
+    val view by rememberUpdatedState(frame)
+    val tap by rememberUpdatedState(onTap)
+    (if (deskLayout) app.absentmotion.platform.previewWheel { delta, at, zoom, alt, _ ->
+        val (s, ox, oy) = view()
+        if (zoom || alt) state.zoomCanvasAbout(at, kotlin.math.exp(-delta.y * 0.1f), Offset.Zero, s, Offset(ox, oy))
+        else { state.canvasPan -= delta * (40f / s); state.zoomShown++ }
+    } else Modifier).pointerInput(state) {
+        awaitEachGesture {
+            var first = awaitPointerEvent(PointerEventPass.Initial)
+            while (first.type != PointerEventType.Press) first = awaitPointerEvent(PointerEventPass.Initial)
+            var navigating = first.buttons.isTertiaryPressed || DrawingKeys.space && first.buttons.isPrimaryPressed
+            if (navigating) first.changes.forEach { it.consume() }
+            val began = first.changes.first().uptimeMillis
+            val origins = HashMap<PointerId, Offset>()
+            first.changes.forEach { origins[it.id] = it.position }
+            var before: Pair<Float, Offset>? = null
+            var fingers = 0
+            var moved = false
+            var ended = began
+            do {
+                val event = awaitPointerEvent(PointerEventPass.Initial)
+                val pressed = event.changes.filter { it.pressed }
+                val was = navigating
+                navigating = navigating || event.buttons.isTertiaryPressed ||
+                    pressed.none { it.type == PointerType.Stylus } && pressed.count { it.type == PointerType.Touch } > 1
+                if (navigating && !was) before = state.canvasZoom to state.canvasPan
+                fingers = maxOf(fingers, pressed.count { it.type == PointerType.Touch })
+                event.changes.forEach { c -> if ((c.position - origins.getOrPut(c.id) { c.position }).getDistance() > viewConfiguration.touchSlop) moved = true }
+                ended = event.changes.maxOf { it.uptimeMillis }
+                if (navigating) {
+                    val (s, ox, oy) = view()
+                    val centroid = event.calculateCentroid(useCurrent = false)
+                    if (centroid.isSpecified) state.zoomCanvasAbout(centroid, event.calculateZoom(), event.calculatePan(), s, Offset(ox, oy))
+                    event.changes.forEach { it.consume() }
+                }
+            } while (pressed.isNotEmpty())
+            val onTap = tap
+            if (onTap != null && fingers >= 2 && !moved && ended - began < 350) {
+                before?.let { (zoom, pan) -> state.canvasZoom = zoom; state.canvasPan = pan }
+                onTap(fingers)
+            }
+        }
+    }
+}
+
 internal suspend fun EditorState.tapTarget(x: Float, y: Float): Long {
     val time = timeMs
     val hit = engine.hitTest(x, y, time)
@@ -765,7 +823,7 @@ private fun inside(quad: List<Offset>, at: Offset): Boolean {
 @Composable
 private fun LayerPointsOverlay(points: LayerPoints, world: FloatArray, scale: Float, offset: Offset) {
     Canvas(Modifier.fillMaxSize()) {
-        val shown = points.points.map { p -> world.projected(p)?.let { Offset(it.x, it.y) * scale + offset } }
+        val shown = points.points.map { p -> (if (points.scene) Offset(p.x, p.y).takeIf { it.x.isFinite() && it.y.isFinite() } else world.projected(p)?.let { Offset(it.x, it.y) })?.let { it * scale + offset } }
         val line = 1.2.dp.toPx()
         val guide = points.guide.map { p -> world.projected(p)?.let { Offset(it.x, it.y) * scale + offset } }
         for (i in 1 until guide.size) {

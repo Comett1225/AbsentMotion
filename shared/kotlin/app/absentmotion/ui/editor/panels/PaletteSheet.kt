@@ -27,7 +27,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -76,6 +75,7 @@ import kotlinx.coroutines.delay
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import app.absentmotion.ui.home.DialogPill
 
 @Composable
 internal fun rememberPaletteLibrary(): PaletteLibrary {
@@ -287,8 +287,8 @@ private fun PaletteEditor(library: PaletteLibrary, palette: ColourPalette, curre
     if (askDelete) AlertDialog(
         onDismissRequest = { askDelete = false }, containerColor = Am.Panel,
         title = { Text(stringResource(R.string.palette_delete_ask), color = Am.OnDark) },
-        confirmButton = { TextButton({ askDelete = false; if (library.remove(palette.id)) onBack() }) { Text(stringResource(R.string.delete), color = Am.Accent) } },
-        dismissButton = { TextButton({ askDelete = false }) { Text(stringResource(R.string.cancel), color = Am.OnDark) } },
+        confirmButton = { DialogPill(stringResource(R.string.delete)) { askDelete = false; if (library.remove(palette.id)) onBack() } },
+        dismissButton = { DialogPill(stringResource(R.string.cancel), primary = false, editor = true) { askDelete = false } },
     )
 }
 

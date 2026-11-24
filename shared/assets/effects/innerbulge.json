@@ -3,8 +3,25 @@
  "name": "Inner Pinch/Bulge",
  "category": "distort",
  "since": "3.0.0",
- "description": "Bulges the middle of the layer out or pinches it in, while the edges of the layer stay where they are.",
+ "description": "Bulges the layer out or pinches it in inside a circle of Radius around Center, while the edges of the layer stay where they are. Feather is how far in from the edges the layer starts to move; Gaussian keeps the middle evenly magnified with a shorter falloff.",
  "params": [
+  {
+   "id": "center",
+   "label": "Center",
+   "type": "point",
+   "default": [
+    0.5,
+    0.5
+   ],
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "when": {
+    "style": [
+     1
+    ]
+   }
+  },
   {
    "id": "strength",
    "label": "Strength",
@@ -13,7 +30,62 @@
    "min": -1,
    "max": 1,
    "step": 0.001
+  },
+  {
+   "id": "radius",
+   "label": "Radius",
+   "type": "float",
+   "default": 0.3,
+   "min": 0,
+   "max": 2.5,
+   "step": 0.001,
+   "when": {
+    "style": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "feather",
+   "label": "Feather",
+   "type": "float",
+   "default": 0.1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "when": {
+    "style": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "gaussian",
+   "label": "Gaussian",
+   "type": "switch",
+   "default": false,
+   "when": {
+    "style": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 1,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "legacyDefault": 0,
+   "when": {
+    "style": [
+     0
+    ]
+   }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float strength;\nhalf4 main(float2 coord) {\n    float2 h = size * 0.5;\n    float2 p = (coord - h) / h;\n    if (abs(p.x) >= 1.0 || abs(p.y) >= 1.0) return image.eval(coord);\n    float2 e = 1.0 - p * p;\n    float w = e.x * e.y;\n    return image.eval(h + p * (1.0 - strength * 0.6 * w) * h);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 center;\nuniform float strength;\nuniform float radius;\nuniform float feather;\nuniform float gaussian;\nuniform float style;\nfloat edge(float x) {\n    return feather > 0.0 ? smoothstep(0.0, feather, x) : 1.0;\n}\nhalf4 main(float2 coord) {\n    float2 h = size * 0.5;\n    if (style < 0.5) {\n        float2 p = (coord - h) / h;\n        if (abs(p.x) >= 1.0 || abs(p.y) >= 1.0) return image.eval(coord);\n        float2 e = 1.0 - p * p;\n        float w = e.x * e.y;\n        return image.eval(h + p * (1.0 - strength * 0.6 * w) * h);\n    }\n    float2 c = center * size;\n    float2 d = coord - c;\n    float len = length(d);\n    float r = max(radius * min(size.x, size.y), 0.0001);\n    float u = len / r;\n    if (u >= 1.0) return image.eval(coord);\n    float a = clamp(strength, -1.0, 1.0);\n    float2 to;\n    if (a < 0.0) {\n        to = c + d / max(len, 0.0001) * (r * (u * u + (1.0 - u) * pow(max(u, 0.0001), 1.0 + 0.75 * a)));\n    } else {\n        float q = min(gaussian > 0.5 ? pow(u, 4.4) / 0.93 : u * u, 1.0);\n        to = c + d * (1.0 - 0.75 * a * (1.0 - q * q * (3.0 - 2.0 * q)));\n    }\n    float2 p = coord / size;\n    return image.eval(coord + (to - coord) * edge(p.x) * edge(1.0 - p.x) * edge(p.y) * edge(1.0 - p.y));\n}\n"
 }

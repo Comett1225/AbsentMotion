@@ -82,7 +82,22 @@
    "max": 1,
    "step": 0.001,
    "percent": true
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "when": {
+    "style": [
+     1
+    ]
+   }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float4 screen;\nuniform float time;\nuniform float blockSize;\nuniform float2 stretch;\nuniform float2 offset;\nuniform float angle;\nuniform float vignette;\nuniform float screenSpace;\nuniform float edges;\nuniform float threshold;\n\nhalf4 main(float2 coord) {\n    float2 origin = (screenSpace > 0.5 ? screen.xy + screen.zw * 0.5 : size * 0.5) + offset;\n    float2 cell = max(blockSize * abs(stretch), float2(1.0));\n    float a = radians(angle);\n    float c = cos(a);\n    float s = sin(a);\n    float2 d = coord - origin;\n    float2 p = float2(c * d.x + s * d.y, c * d.y - s * d.x) / cell;\n    float2 b = floor(p);\n    float2 m = (b + 0.5) * cell;\n    float2 q = origin + float2(c * m.x - s * m.y, s * m.x + c * m.y);\n    if (edges > 0.5 && (q.x < 0.0 || q.y < 0.0 || q.x > size.x || q.y > size.y)) return half4(0.0);\n    half4 col = image.eval(q);\n    if (col.a < threshold) return half4(0.0);\n    if (vignette > 0.0 && col.a > 0.001) {\n        float2 e = abs(p - b - 0.5) * 2.0;\n        half3 un = col.rgb / col.a;\n        col.rgb = max(un - half(vignette * (0.04 + 0.08 * dot(e, e))), half3(0.0)) * col.a;\n    }\n    return col;\n}"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float4 screen;\nuniform float time;\nuniform float blockSize;\nuniform float2 stretch;\nuniform float2 offset;\nuniform float angle;\nuniform float vignette;\nuniform float screenSpace;\nuniform float edges;\nuniform float threshold;\nuniform float style;\n\nhalf4 main(float2 coord) {\n    float2 origin = (screenSpace > 0.5 ? screen.xy + screen.zw * 0.5 : size * 0.5) + offset;\n    if (style > 0.5 && blockSize <= 0.0) return half4(0.0);\n    float2 cell = max(blockSize * abs(stretch), float2(1.0));\n    float a = radians(angle);\n    float c = cos(a);\n    float s = sin(a);\n    float2 d = coord - origin;\n    float2 p = float2(c * d.x + s * d.y, c * d.y - s * d.x) / cell;\n    float2 b = floor(p);\n    float2 m = (b + 0.5) * cell;\n    float2 q = origin + float2(c * m.x - s * m.y, s * m.x + c * m.y);\n    float slack = style > 0.5 ? 0.5 : 0.0;\n    if (edges > 0.5 && (q.x < -slack || q.y < -slack || q.x > size.x + slack || q.y > size.y + slack)) return half4(0.0);\n    if (style > 0.5) q = clamp(q, float2(0.5), size - 0.5);\n    half4 col = image.eval(q);\n    if (col.a < threshold) return half4(0.0);\n    if (vignette > 0.0 && col.a > 0.001) {\n        float2 e = abs(p - b - 0.5) * 2.0;\n        half3 un = col.rgb / col.a;\n        col.rgb = max(un - half(vignette * (0.04 + 0.08 * dot(e, e))), half3(0.0)) * col.a;\n    }\n    return col;\n}"
 }

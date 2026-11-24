@@ -40,31 +40,31 @@ class ThreeDLookImportTest {
     @Test fun untouchedSolidsGetAlightsSoftLightAndTiledPicture() {
         for (id in listOf("box", "cube2", "cylinder", "hexprism", "octahedron", "torus", "spherize2")) {
             val e = migrate(alight(id))
-            assertEquals(id, 1f, e.floats("lighting")[0])
+            assertEquals(id, 2f, e.floats("lighting")[0])
             assertEquals(id, 0.027f, e.floats("ambient")[0], 1e-6f)
-            assertEquals(id, 0.525f, e.floats("shading")[0], 1e-6f)
+            assertEquals(id, 0.8f, e.floats("shading")[0], 1e-6f)
             assertEquals(id, 0.8f, e.floats("shine")[0], 1e-6f)
-            assertEquals(id, 15f, e.floats("glossiness")[0], 1e-6f)
-            assertEquals(id, 3.06f, e.floats("lightHeight")[0], 1e-6f)
+            assertEquals(id, 44.1f, e.floats("glossiness")[0], 1e-4f)
+            assertEquals(id, 4.714f, e.floats("lightHeight")[0], 1e-4f)
             assertEquals(id, 45f, e.floats("light")[0], 1e-6f)
             assertEquals(id, 1f, e.floats("texMode")[0])
         }
-        assertEquals(1f, migrate(alight("extrude")).floats("lighting")[0])
+        assertEquals(2f, migrate(alight("extrude")).floats("lighting")[0])
         val star = migrate(alight("starprism"))
-        assertEquals(listOf(0f, 0.42f), listOf("shine", "shading").map { star.floats(it)[0] })
+        assertEquals(listOf(0f, 0.64f), listOf("shine", "shading").map { star.floats(it)[0] })
     }
 
     @Test fun alightsLightSettingsBecomeTheSoftLight() {
         val r = result(alight("cylinder", p("shadingType", "int", "1") + p("lightIntensity", "float", "1.25") + p("ambient", "float", "0.325") +
             p("spec", "float", "60") + p("shine", "float", "0.85") + p("lightColor", "color", "#FF3366CC") + p("lightDir", "vec2", "115,-100") + p("lightDepth", "float", "275")))
         val e = r.scene.node.children.single { it.name == "shape" }.children.single { it.name == "effect" }
-        assertEquals(1.25f * 0.525f, e.floats("shading")[0], 1e-5f)
+        assertEquals(1f, e.floats("shading")[0], 1e-5f)
         assertEquals(0.325f * 0.27f, e.floats("ambient")[0], 1e-5f)
-        assertEquals(30f, e.floats("glossiness")[0], 1e-5f)
+        assertEquals(88.2f, e.floats("glossiness")[0], 1e-4f)
         assertEquals(0.85f, e.floats("shine")[0], 1e-6f)
         assertEquals("#ff3366cc", e.text("lightColor").lowercase())
         assertEquals(Math.toDegrees(atan2(100.0, 115.0)).toFloat(), e.floats("light")[0], 1e-3f)
-        assertEquals(1.672f * 275f / hypot(115f, 100f) + 1.483f, e.floats("lightHeight")[0], 1e-3f)
+        assertEquals(5f * 275f / hypot(115f, 100f), e.floats("lightHeight")[0], 1e-3f)
         assertTrue(r.dropped.toString(), r.dropped.isEmpty())
         val plain = migrate(alight("box", p("lightDir", "vec2", "75,-75") + p("lightDepth", "float", "100")))
         assertEquals(migrate(alight("box")).floats("lightHeight")[0], plain.floats("lightHeight")[0], 0.01f)
@@ -102,9 +102,9 @@ class ThreeDLookImportTest {
         assertEquals(1.3333f, zoomed.floats("frame")[0], 1e-4f)
     }
 
-    @Test fun untouchedPlusKeepsTheLayerBehindASmallLowCross() {
+    @Test fun untouchedPlusIsASmallLowCrossWithoutTheLayer() {
         val e = migrate(alight("plus"))
-        assertEquals("true", e.text("keep"))
+        assertEquals("false", e.text("keep"))
         assertEquals(listOf(0f, 13.5f), e.floats("position"))
         assertEquals(0.36f, e.floats("reach")[0], 1e-6f)
         assertEquals(0.18f, e.floats("thickness")[0], 1e-6f)
@@ -122,7 +122,7 @@ class ThreeDLookImportTest {
     @Test fun starPolyhedronBecomesAPointedStar() {
         val e = migrate(alight("starpoly"))
         assertEquals("absent.starprism", e["id"])
-        assertEquals(listOf(1f, 5f, 0.89f, 0.69f), listOf("starStyle", "points", "radius", "inner").map { e.floats(it)[0] })
+        assertEquals(listOf(1f, 5f, 0.89f, 0.5f), listOf("starStyle", "points", "radius", "inner").map { e.floats(it)[0] })
         val seven = migrate(alight("starpoly", p("pointCount", "float", "7") + p("pointLength", "float", "2")))
         assertEquals(7f, seven.floats("points")[0], 1e-6f)
         assertEquals(1.78f, seven.floats("radius")[0], 1e-5f)
@@ -145,7 +145,7 @@ class ThreeDLookImportTest {
         near(listOf(0f, 90f, 0f), listOf("rotX", "rotY", "rotZ").map { plain.floats(it)[0] })
         val r = result(alight("spherize", p("repeatx", "float", "5.75") + p("repeaty", "float", "4") + p("mirror", "bool", "true") + p("zdist", "float", "2.5")))
         val e = r.scene.node.children.single { it.name == "shape" }.children.single { it.name == "effect" }
-        near(listOf(5.75f, 4f, 1.25f), listOf("texRepeatX", "texRepeatY", "scale").map { e.floats(it)[0] })
+        near(listOf(5.75f, 4f, 1f), listOf("texRepeatX", "texRepeatY", "scale").map { e.floats(it)[0] })
         assertEquals("true", e.text("texMirror"))
         assertTrue(r.dropped.toString(), r.dropped.isEmpty())
     }

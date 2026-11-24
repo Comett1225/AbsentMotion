@@ -300,6 +300,23 @@ class AppSettings(private val context: Context) {
             prefs.edit().putString("toolOrder", normalized.joinToString(",")).apply()
         }
 
+    private fun savedTools(key: String) = prefs.getString(key, null)?.split(',').orEmpty()
+    private var toolsHiddenState by mutableStateOf(app.absentmotion.ui.home.toolSet(savedTools("toolsHidden")))
+    private var projectToolOrderState by mutableStateOf(app.absentmotion.ui.home.toolOrder(savedTools("projectToolOrder")))
+    private var projectToolsHiddenState by mutableStateOf(app.absentmotion.ui.home.toolSet(savedTools("projectToolsHidden")))
+
+    var toolsHidden: Set<String>
+        get() = toolsHiddenState
+        set(value) { toolsHiddenState = app.absentmotion.ui.home.toolSet(value); prefs.edit().putString("toolsHidden", toolsHiddenState.joinToString(",")).apply() }
+
+    var projectToolOrder: List<String>
+        get() = projectToolOrderState
+        set(value) { projectToolOrderState = app.absentmotion.ui.home.toolOrder(value); prefs.edit().putString("projectToolOrder", projectToolOrderState.joinToString(",")).apply() }
+
+    var projectToolsHidden: Set<String>
+        get() = projectToolsHiddenState
+        set(value) { projectToolsHiddenState = app.absentmotion.ui.home.toolSet(value); prefs.edit().putString("projectToolsHidden", projectToolsHiddenState.joinToString(",")).apply() }
+
     var templateHints: Int
         get() = prefs.getInt("templateHints", 0)
         set(value) { prefs.edit().putInt("templateHints", value).apply() }

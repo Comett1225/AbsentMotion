@@ -25,6 +25,7 @@ import app.absentmotion.platform.readAtMost
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -146,19 +147,61 @@ internal fun modelFiles(resolver: ContentResolver, uri: String): Pair<ByteArray,
     require(file.length() <= MAX_MODEL_BYTES) { "the model file is too large" }
     val folder = file.parentFile!!.canonicalFile
     return file.readBytes() to { name ->
-        java.io.File(folder, name.substringAfterLast('/').substringAfterLast('\\')).canonicalFile.takeIf { it.parentFile == folder && it.isFile && it.length() <= MAX_MODEL_BYTES }?.readBytes()
+        companionName(name, folder.list()?.toList().orEmpty())?.let { java.io.File(folder, it).canonicalFile }
+            ?.takeIf { it.parentFile == folder && it.isFile && it.length() <= MAX_MODEL_BYTES }?.readBytes()
     }
 }
 
+class ModelFacts(val materials: List<ModelMaterial>, val bones: List<ModelBone>, val pictures: List<Bitmap?>)
+
+object ModelFactsCache {
+    val known = kotlinx.coroutines.flow.MutableStateFlow<Map<String, ModelFacts>>(emptyMap())
+
+    fun put(key: String, facts: ModelFacts) = known.update { old -> (old - key + (key to facts)).entries.toList().takeLast(24).associate { it.key to it.value } }
+}
+
+private const val MODEL_THUMB = 96
+
 internal fun loadModel(resolver: ContentResolver, uri: String, limit: Int, budget: Int = ModelDetail.budget.value): Pair<Mesh, List<Bitmap?>>? = try {
-    val (bytes, open) = modelFiles(resolver, modelSource(uri))
-    val mesh = decimated(parseModel(uri.substringAfterLast('/'), bytes, open, modelSkinned(uri)), budget)
+    val source = modelSource(uri)
+    val (bytes, open) = modelFiles(resolver, source)
+    val mesh = decimated(parseModel(source.substringAfterLast('/'), bytes, open, modelSkinned(uri), modelLooks(uri)), budget)
     Log.i("AMMedia", "model $uri ${mesh.triangleCount} triangles ${mesh.textures.size} pictures")
-    mesh to mesh.textures.map { decodeBytes(it, limit) }
+    val pictures = mesh.textures.map { decodeBytes(it, limit) }
+    ModelFactsCache.put(uri, ModelFacts(mesh.materials, mesh.skin?.bones.orEmpty(), pictures.map { picture ->
+        picture?.let { val k = minOf(1f, MODEL_THUMB.toFloat() / maxOf(it.width, it.height)); Bitmap.createScaledBitmap(it, (it.width * k).toInt().coerceAtLeast(1), (it.height * k).toInt().coerceAtLeast(1), true).let { thumb -> if (thumb === it) it.copy(Bitmap.Config.ARGB_8888, false) else thumb } }
+    }))
+    mesh to pictures
 } catch (e: Exception) {
     Log.w("AMMedia", "cannot read model $uri", e)
     null
 } catch (_: OutOfMemoryError) { null }
+
+internal const val MODEL_PICTURE_PREFIX = "texture-"
+
+internal fun modelPictureName(picked: String, taken: Collection<String>): String {
+    val clean = modelFileName(picked).replace(Regex("[^A-Za-z0-9._-]"), "_").takeLast(80).trimStart('.').ifEmpty { "picture.png" }
+    val name = if ('.' in clean) clean else "$clean.png"
+    val lower = taken.mapTo(HashSet()) { it.lowercase() }
+    return generateSequence(1) { it + 1 }.map { if (it == 1) MODEL_PICTURE_PREFIX + name else "$MODEL_PICTURE_PREFIX$it~$name" }.first { it.lowercase() !in lower }
+}
+
+internal fun modelPictureShown(stored: String): String = Regex("^${MODEL_PICTURE_PREFIX}(\\d+~)?").replace(stored, "")
+
+internal fun copyModelPicture(resolver: ContentResolver, folder: java.io.File, uri: Uri, picked: String): String? {
+    val name = modelPictureName(picked, folder.list()?.toList().orEmpty())
+    val target = java.io.File(folder, name)
+    return try {
+        val size = resolver.openInputStream(uri)?.use { input -> target.outputStream().use { input.copyTo(it) } } ?: return null
+        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        BitmapFactory.decodeFile(target.path, bounds)
+        if (size <= MAX_MODEL_BYTES && bounds.outWidth > 0 && bounds.outHeight > 0) name else { target.delete(); null }
+    } catch (e: Exception) {
+        Log.w("AMMedia", "cannot copy picture $uri", e)
+        target.delete()
+        null
+    }
+}
 
 private fun decodeBytes(bytes: ByteArray, limit: Int): Bitmap? = try {
     val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }

@@ -126,7 +126,7 @@ internal fun EnhanceImageScreen(onClose: () -> Unit) {
     }) {
         Spacer(Modifier.height(20.dp))
         PickCard(picked, unreadable, !work.running, R.string.tools_enhance_pick) { picker.launch() }
-        RiskDialog(risk, Am.Navy, Am.Navy, Am.Warning, Am.Card) { risk = null; it?.proceed?.invoke() }
+        RiskDialog(risk, Am.Navy, Am.Warning, Am.Card) { risk = null; it?.proceed?.invoke() }
         if (done != null && picked != null) {
             SectionTitle(stringResource(R.string.ai_compare))
             EnhanceCompare(CompareImages(picked!!.uri.toString(), android.net.Uri.fromFile(done.result.file).toString(), picked!!.rotation, 0))

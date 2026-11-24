@@ -35,4 +35,11 @@ class OldAlightImportTest {
         assertTrue(tiles("1.000000").oldAlightImport())
         assertFalse(tiles("2.000000").oldAlightImport())
     }
+
+    @Test fun alightImportsWithClassicStripesGetTheTip() {
+        fun stripes(style: String) = Scene.parse("""<scene width="100" height="100" amver="1028425" am="app.absentmotion"><shape id="1" s=".rect">""" +
+            """<effect id="absent.stripes"><property name="count" type="float" value="4" />$style</effect></shape></scene>""")
+        assertTrue(stripes("").oldAlightImport())
+        assertFalse(stripes("""<property name="style" type="float" value="1" />""").oldAlightImport())
+    }
 }

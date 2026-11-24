@@ -10,7 +10,7 @@
    "label": "Highlights",
    "type": "float",
    "default": 1.0,
-   "min": 0.0,
+   "min": -1.0,
    "max": 2.0,
    "step": 0.01
   },
@@ -19,7 +19,7 @@
    "label": "Shadows",
    "type": "float",
    "default": 1.0,
-   "min": 0.0,
+   "min": -1.0,
    "max": 2.0,
    "step": 0.01
   },
@@ -34,5 +34,5 @@
    ]
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float highlights;\nuniform float shadows;\nuniform float style;\nhalf4 main(float2 coord)\n{\n    half4 c = image.eval(coord);\n    if (c.a <= 0.001) return half4(0.0);\n    half3 col = c.rgb / c.a;\n    half l = saturate(dot(col, half3(0.2126, 0.7152, 0.0722)));\n    half hi = 1.89 * pow(l, 3.5) * (1.0 - l);\n    half lo = 1.89 * pow(1.0 - l, 3.5) * l;\n    half3 outc = clamp(col + (highlights - 1.0) * hi + (shadows - 1.0) * lo, 0.0, 1.0);\n    if (style > 0.5) {\n        float y = dot(float3(col), float3(0.299, 0.587, 0.114));\n        float o = y + min(highlights - 1.0, 0.0) * 1.397 * smoothstep(0.5, 1.0, y) * (1.0 - y) - (1.0 - shadows) * 1.873 * (1.0 - smoothstep(0.0, 0.5, y)) * y;\n        float3 kept = clamp(float3(col) * max(o, 0.0) / max(y, 0.0001), 0.0, 1.0);\n        float w = clamp(max(highlights - 1.0, 0.0) * 1.2 * pow(clamp((dot(kept, float3(0.299, 0.587, 0.114)) - 0.3) / 0.55, 0.0, 1.0), 2.5), 0.0, 1.0);\n        outc = half3(kept + (1.0 - kept) * w);\n    }\n    return half4(outc * c.a, c.a);\n}"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float highlights;\nuniform float shadows;\nuniform float style;\nhalf4 main(float2 coord)\n{\n    half4 c = image.eval(coord);\n    if (c.a <= 0.001) return half4(0.0);\n    half3 col = c.rgb / c.a;\n    half l = saturate(dot(col, half3(0.2126, 0.7152, 0.0722)));\n    half hi = 1.89 * pow(l, 3.5) * (1.0 - l);\n    half lo = 1.89 * pow(1.0 - l, 3.5) * l;\n    half3 outc = clamp(col + (highlights - 1.0) * hi + (shadows - 1.0) * lo, 0.0, 1.0);\n    if (style > 0.5) {\n        float y = clamp(dot(float3(col), float3(0.2126, 0.7152, 0.0722)), 0.0, 1.0);\n        float p = 1.0 / max(2.0 - min(highlights, 1.0), 0.001);\n        float om = max(1.0 - y, 0.0);\n        float dh = clamp((1.0 - (pow(om, p) - 0.78 * pow(om, 2.0 * p))) - y, -1.0, 0.0);\n        float s = clamp(shadows, 0.0, 2.0);\n        float ds = (s - 1.0) * 1.85 * pow(clamp(1.0 - y / 0.76, 0.0, 1.0), 2.6) * y;\n        float o = y + dh + ds;\n        float3 kept = y > 0.0001 ? clamp(float3(col) * max(o, 0.0) / y, 0.0, 1.0) : float3(0.0);\n        float w = clamp(max(highlights - 1.0, 0.0) * 1.2 * pow(clamp((dot(kept, float3(0.2126, 0.7152, 0.0722)) - 0.3) / 0.55, 0.0, 1.0), 2.5), 0.0, 1.0);\n        outc = half3(kept + (1.0 - kept) * w);\n    }\n    return half4(outc * c.a, c.a);\n}"
 }

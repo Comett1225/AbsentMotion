@@ -139,13 +139,14 @@ internal fun DeskHome(
     newTick: Int,
     onCollect: ((String) -> Unit)? = null,
     engine: (() -> app.absentmotion.engine.EngineThread)? = null,
+    onImportLink: () -> Unit = {},
 ) {
     var projects by remember { mutableStateOf<List<ProjectInfo>>(emptyList()) }
     var loaded by remember { mutableStateOf(false) }
     var version by remember { mutableIntStateOf(0) }
     var section by remember { mutableStateOf(DeskSection.Projects) }
-    var arrangingTools by remember { mutableStateOf(false) }
-    LaunchedEffect(section) { if (section != DeskSection.Tools) arrangingTools = false }
+    var customizingTools by remember { mutableStateOf(false) }
+    LaunchedEffect(section) { if (section != DeskSection.Tools) customizingTools = false }
     var search by remember { mutableStateOf("") }
     val query = debounced(search)
     var creating by remember { mutableStateOf(false) }
@@ -188,12 +189,12 @@ internal fun DeskHome(
 
     Box(Modifier.fillMaxSize().background(Am.HomeBg)) {
         Column(Modifier.fillMaxSize()) {
-            DeskHeader(section, { section = it; if (it == DeskSection.Templates) selected = null; if (it != DeskSection.Tools) arrangingTools = false }, search, { search = it }, templates = section == DeskSection.Templates, newProject, import, onSettings, settings)
+            DeskHeader(section, { section = it; if (it == DeskSection.Templates) selected = null; if (it != DeskSection.Tools) customizingTools = false }, search, { search = it }, templates = section == DeskSection.Templates, newProject, import, onSettings, settings, onImportLink)
             Box(Modifier.weight(1f).fillMaxWidth(), Alignment.TopCenter) {
                 Box(Modifier.widthIn(max = ContentMax).fillMaxSize()) {
                     when (section) {
                         DeskSection.Templates -> DeskTemplates(version + changes, query, onTemplate, onTemplateProject, engine)
-                        DeskSection.Tools -> ToolsTab(Modifier, store, settings, arrangingTools, { arrangingTools = it }) { id -> version++; onOpen(id) }
+                        DeskSection.Tools -> ToolsTab(Modifier, store, settings, customizingTools, { customizingTools = it }, onImportLink = onImportLink) { id -> version++; onOpen(id) }
                         DeskSection.Community -> CommunityTab(Modifier.fillMaxSize(), engine) { onImportFiles(listOf(Uri.fromFile(it))) }
                         else -> ProjectsPane(
                             shown, loaded, section == DeskSection.Assets, query, settings, version, selected, { selected = it },
@@ -225,7 +226,7 @@ internal fun DeskHome(
 @Composable
 private fun DeskHeader(
     section: DeskSection, onSection: (DeskSection) -> Unit, search: String, onSearch: (String) -> Unit, templates: Boolean,
-    onNew: () -> Unit, onImport: () -> Unit, onSettings: () -> Unit, settings: AppSettings,
+    onNew: () -> Unit, onImport: () -> Unit, onSettings: () -> Unit, settings: AppSettings, onImportLink: () -> Unit,
 ) = SizedBox(Modifier.fillMaxWidth()) { maxWidth, _ ->
     val context = LocalContext.current
     val notes = remember { WhatsNewNotes.currentName(context) != null }
@@ -233,7 +234,7 @@ private fun DeskHeader(
     val compact = maxWidth < 1180.dp
     val iconNew = maxWidth < 900.dp
     val tight = maxWidth < 780.dp
-    val fixed = (if (tight) 600.dp else 566.dp + (if (compact) 72.dp else 216.dp) + (if (iconNew) 36.dp else 150.dp) + 32.dp) + (if (notes) 44.dp else 0.dp)
+    val fixed = (if (tight) 600.dp else 566.dp + (if (compact) 72.dp else 216.dp) + (if (iconNew) 36.dp else 150.dp) + 32.dp) + (if (notes) 44.dp else 0.dp) + 30.dp
     val searchWidth = (maxWidth - fixed).coerceIn(if (tight) 110.dp else 140.dp, 300.dp)
     Box(Modifier.fillMaxWidth(), Alignment.TopCenter) {
         Row(Modifier.widthIn(max = ContentMax).fillMaxWidth().height(68.dp).padding(horizontal = if (tight) 16.dp else GridPad), Arrangement.spacedBy(if (tight) 6.dp else 8.dp), Alignment.CenterVertically) {
@@ -253,8 +254,11 @@ private fun DeskHeader(
                 hint = stringResource(if (searchWidth < 210.dp) R.string.home_search else if (templates) R.string.home_search_templates_hint else R.string.home_search_hint),
                 background = Am.Card, content = Am.Navy, faint = Am.HomeDim,
             )
-            if (compact) DeskIconButton(HomeIcons.Upload, stringResource(R.string.desk_import), onImport)
-            else DeskButton(stringResource(R.string.desk_import), onImport, icon = HomeIcons.Upload)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (compact) DeskIconButton(HomeIcons.Upload, stringResource(R.string.desk_import), onImport)
+                else DeskButton(stringResource(R.string.desk_import), onImport, icon = HomeIcons.Upload)
+                ImportMore(onImport, onImportLink)
+            }
             Hint("${stringResource(R.string.home_new_project)} (${deskKey("N")})") {
                 if (iconNew) DeskIconButton(HomeIcons.Plus, stringResource(R.string.home_new_project), onNew, tooltip = null, tint = Am.OnAccent, modifier = Modifier.background(Am.Accent, RoundedCornerShape(10.dp)))
                 else DeskButton(stringResource(R.string.home_new_project), onNew, primary = true, icon = HomeIcons.Plus)
@@ -266,6 +270,20 @@ private fun DeskHeader(
         }
     }
     if (changelog) CurrentWhatsNew(settings) { changelog = false }
+}
+
+@Composable
+private fun ImportMore(onImport: () -> Unit, onImportLink: () -> Unit) {
+    val context = LocalContext.current
+    var open by remember { mutableStateOf(false) }
+    Box {
+        DeskIconButton(HomeIcons.ChevronDown, stringResource(R.string.desk_import), { open = true }, size = 28.dp)
+        if (open) DeskPopupMenu(BelowAnchor(true), { open = false }, width = 250.dp) {
+            DeskMenuItem(stringResource(R.string.import_a_project_file), { open = false; onImport() }, HomeIcons.Upload)
+            DeskMenuItem(stringResource(R.string.project_link_import), { open = false; onImportLink() }, HomeIcons.Link)
+            DeskMenuItem(stringResource(R.string.send_receive_from_phone), { open = false; DeviceSend.showCode(context, null) }, HomeIcons.Devices)
+        }
+    }
 }
 
 @Composable
@@ -285,6 +303,7 @@ private fun ProjectsPane(
     onOpen: (ProjectInfo) -> Unit, onExport: (String) -> Unit, onDuplicate: (String) -> Unit, onHistory: (ProjectInfo) -> Unit, onDelete: (ProjectInfo) -> Unit,
     onNew: () -> Unit, onImport: () -> Unit, onCollect: ((String) -> Unit)?,
 ) {
+    val context = LocalContext.current
     val byName = settings.sortBy == "name"
     val locale = androidx.compose.ui.platform.LocalConfiguration.current.locales[0]
     val rows = remember(shown, byName, locale) { listRows(shown, byName, dateHeader(locale)) }
@@ -389,6 +408,7 @@ private fun ProjectsPane(
                                         if (onCollect != null) DeskMenuItem(stringResource(R.string.home_collect_media), { close(); onCollect(info.id) }, HomeIcons.Folder)
                                     }
                                     DeskMenuItem(stringResource(R.string.version_history), { close(); onHistory(info) }, ChromeIcons.Undo)
+                                    if (!info.damaged) DeskMenuItem(stringResource(R.string.send_to_phone), { close(); DeviceSend.showCode(context, info) }, HomeIcons.Devices)
                                     DeskMenuDivider()
                                     DeskMenuItem(stringResource(if (info.isElement) R.string.home_delete_asset else R.string.delete), { close(); onDelete(info) }, HomeIcons.Delete, danger = true, hint = "⌫")
                                 }

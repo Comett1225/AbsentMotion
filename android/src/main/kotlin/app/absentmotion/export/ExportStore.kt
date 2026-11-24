@@ -251,8 +251,10 @@ class TreeExport(context: Context, private val tree: Uri) : ExportStore {
             ?: run { runCatching { discard() }; throw ExportError(txt(R.string.export_error_create, name, location(""))) }
         return OpenExport(file.fileDescriptor, file::close, {
             if (part == null) document else {
+                val renamed = runCatching { DocumentsContract.renameDocument(resolver, part, name) }.getOrNull()
+                    ?: throw ExportError(txt(R.string.export_error_create, name, location("")))
                 pending.remove(part.toString())
-                runCatching { DocumentsContract.renameDocument(resolver, part, name) }.getOrNull() ?: part
+                renamed
             }
         }, ::discard)
     }

@@ -78,42 +78,48 @@
    "id": "color1",
    "label": "Color 1",
    "type": "color",
-   "default": "#000000"
+   "default": "#000000",
+   "section": "palette"
   },
   {
    "id": "color2",
    "label": "Color 2",
    "type": "color",
    "default": "#5555ff",
-   "legacyDefault": "#ffffff"
+   "legacyDefault": "#ffffff",
+   "section": "palette"
   },
   {
    "id": "color3",
    "label": "Color 3",
    "type": "color",
    "default": "#55ff55",
-   "legacyDefault": "#ff3c3c"
+   "legacyDefault": "#ff3c3c",
+   "section": "palette"
   },
   {
    "id": "color4",
    "label": "Color 4",
    "type": "color",
    "default": "#55ffff",
-   "legacyDefault": "#3cff6e"
+   "legacyDefault": "#3cff6e",
+   "section": "palette"
   },
   {
    "id": "color5",
    "label": "Color 5",
    "type": "color",
    "default": "#ff5555",
-   "legacyDefault": "#3c78ff"
+   "legacyDefault": "#3c78ff",
+   "section": "palette"
   },
   {
    "id": "color6",
    "label": "Color 6",
    "type": "color",
    "default": "#ff55ff",
-   "legacyDefault": "#ffd23c"
+   "legacyDefault": "#ffd23c",
+   "section": "palette"
   },
   {
    "id": "alpha",

@@ -15,7 +15,56 @@ class EffectRecommendationsTest {
         recent: List<String> = emptyList(),
         favourites: Set<String> = emptySet(),
         definitions: List<EffectDefinition> = catalog.definitions,
-    ) = recommendedEffects(definitions, targets.toList(), recent, favourites).map { it.key }
+        habits: EffectHabits = EffectHabits(),
+        now: Long = Day * 100,
+    ) = recommendedEffects(definitions, targets.toList(), recent, favourites, habits, now).map { it.key }
+
+    private val Day = 24L * 60 * 60 * 1000
+    private fun EffectHabits.use(kind: EffectTargetKind, id: String, times: Int, at: Long = Day * 100) =
+        (1..times).fold(this) { h, _ -> h.used(listOf(kind), "absent.$id", at) }
+
+    @Test fun whatYouUseOnAKindOfLayerComesFirstButOnlyForThatKind() {
+        val habits = EffectHabits().use(EffectTargetKind.Text, "rgbsplit", 4)
+        assertEquals("rgbsplit", rank(text, habits = habits).first())
+        assertTrue("rgbsplit" !in rank(photo, habits = habits))
+        assertEquals(listOf("glow", "texttransform", "pulseopacity"), rank(text, habits = EffectHabits().use(EffectTargetKind.Text, "rgbsplit", 1)))
+        assertTrue("rgbsplit" !in rank(text.copy(effects = setOf("absent.rgbsplit")), habits = habits))
+    }
+
+    @Test fun habitsTakeAtMostTwoPlacesAndTheClipStillGetsWhatFitsIt() {
+        val habits = EffectHabits().use(EffectTargetKind.Video, "rgbsplit", 6).use(EffectTargetKind.Video, "pixelate", 5).use(EffectTargetKind.Video, "mirror", 4)
+        val green = EffectRecommendationTarget(EffectTargetKind.Video, look = MediaLook(screen = ScreenColor.Green))
+        val row = rank(green, habits = habits)
+        assertEquals(3, row.size)
+        assertEquals(2, row.count { it in setOf("rgbsplit", "pixelate", "mirror") })
+        assertTrue("chromakey" in row)
+    }
+
+    @Test fun oldHabitsFadeAndSkippedSuggestionsGiveOthersAChance() {
+        val old = EffectHabits().use(EffectTargetKind.Photo, "rgbsplit", 4, at = 0L)
+        assertTrue("rgbsplit" !in rank(photo, habits = old, now = Day * 300))
+        val fresh = EffectHabits().use(EffectTargetKind.Photo, "rgbsplit", 3)
+        assertEquals("rgbsplit", rank(photo, habits = fresh).first())
+        val ignored = (1..3).fold(fresh) { h, _ -> h.ignored(listOf(EffectTargetKind.Photo), listOf("absent.rgbsplit")) }
+        assertTrue("rgbsplit" !in rank(photo, habits = ignored).take(1))
+        assertEquals("rgbsplit", rank(photo, habits = ignored.used(listOf(EffectTargetKind.Photo), "absent.rgbsplit", Day * 100)).first())
+    }
+
+    @Test fun habitsSurviveSavingAndBadDataIsIgnored() {
+        val habits = EffectHabits().use(EffectTargetKind.Shape, "mirror", 2).ignored(listOf(EffectTargetKind.Shape), listOf("absent.mirror"))
+        val back = EffectHabits.decode(habits.encode())
+        assertEquals(habits.uses, back.uses)
+        assertTrue(EffectHabits.decode("not json").uses.isEmpty())
+        assertTrue(EffectHabits.decode(null).uses.isEmpty())
+    }
+
+    @Test fun newShowsOnlyTheLatestMinorLine() {
+        assertEquals(setOf("5.3.0", "5.3.1"), newestLine(listOf("5.0.0", "5.2.3", "5.3.0", "5.3.1", "4.4.0")))
+        assertEquals(setOf("5.4.0"), newestLine(listOf("5.3.0", "5.3.2", "5.4.0")))
+        assertEquals(setOf("5.10.0"), newestLine(listOf("5.9.0", "5.10.0")))
+        assertEquals(setOf("cartoon", "channelmixer", "coloradjust", "difference", "differencematte", "outline", "vortexblur", "warpblur"),
+            catalog.definitions.filter(catalog::isNew).mapTo(HashSet()) { it.key })
+    }
 
     @Test fun threeDifferentSuggestionsFitTheLayerWithNoHistory() {
         assertEquals(listOf("exposure", "sharpen", "vignette"), rank(photo))

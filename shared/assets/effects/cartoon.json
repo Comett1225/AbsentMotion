@@ -1,0 +1,25 @@
+{
+ "id": "cartoon",
+ "name": "Cartoon",
+ "category": "stylize",
+ "since": "5.3.0",
+ "description": "Flattens the colors into a few bands and draws outlines where the picture changes sharply. Strength sets how many edges get an outline.",
+ "params": [
+  {
+   "id": "strength",
+   "label": "Strength",
+   "type": "float",
+   "default": 20,
+   "min": 0,
+   "max": 100,
+   "step": 0.1
+  },
+  {
+   "id": "color",
+   "label": "Outline Color",
+   "type": "color",
+   "default": "#000000"
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float strength;\nlayout(color) uniform half4 color;\nfloat4 px(float2 p) { return float4(image.eval(p)); }\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    float a = float(c.a);\n    float4 l = 4.0 * float4(c) - px(coord + float2(1, 0)) - px(coord + float2(-1, 0)) - px(coord + float2(0, 1)) - px(coord + float2(0, -1));\n    float g = max(max(abs(l.r), abs(l.g)), max(abs(l.b), abs(l.a)));\n    if (g * strength > 2.0) return half4(color.rgb * color.a, color.a);\n    if (a <= 0.0) return half4(0.0);\n    float3 p = min(floor(float3(c.rgb) / a * 7.0) / 6.0, float3(1.0));\n    return half4(half3(p) * c.a, c.a);\n}"
+}

@@ -477,6 +477,7 @@ class EngineThread(private val background: Int, private val context: Context? = 
     suspend fun propertyNumbers(layerId: Long, effect: Int, name: String, timeMs: Int): FloatArray? = query(timeMs) { it.propertyNumbers(layerId, effect, name, timeMs.toDouble()) }
     suspend fun layerMatrix(layerId: Long, timeMs: Int): FloatArray? = query(timeMs) { it.layerMatrix(layerId, timeMs.toDouble()) }
     suspend fun layerBounds(layerId: Long, timeMs: Int): FloatArray? = query(timeMs) { it.layerBounds(layerId, timeMs.toDouble()) }
+    suspend fun modelJoints(layerId: Long, timeMs: Int): FloatArray? = query(timeMs) { it.modelJoints(layerId, timeMs.toDouble()) }
     suspend fun layerOutline(layerId: Long, timeMs: Int): String? = query(timeMs) { it.layerOutline(layerId, timeMs.toDouble()) }
     suspend fun hitTest(x: Float, y: Float, timeMs: Int): Long = query(timeMs) { it.hitTest(x, y, timeMs.toDouble()) }
 
