@@ -162,7 +162,7 @@
  {
   "name": "Pixelate",
   "id": "pixelate2",
-  "measured": "same"
+  "measured": "close"
  },
  {
   "name": "Polar Displacement Map",
@@ -577,7 +577,7 @@
  {
   "name": "findedges",
   "id": "findedges",
-  "measured": "close"
+  "measured": "same"
  },
  {
   "name": "Fractal Warp",
@@ -702,7 +702,7 @@
  {
   "name": "polar",
   "id": "polar",
-  "measured": "same"
+  "measured": "similar"
  },
  {
   "name": "Precise/Fast Box Blur",
@@ -787,7 +787,7 @@
  {
   "name": "Swirl",
   "id": "swirl4",
-  "measured": "same"
+  "measured": "similar"
  },
  {
   "name": "swirl2",
@@ -842,7 +842,7 @@
  {
   "name": "Unsharp Mask",
   "id": "unsharpmask",
-  "measured": "same"
+  "measured": "close"
  },
  {
   "name": "Wave Warp",
@@ -867,22 +867,22 @@
  {
   "name": "Grid Repeat",
   "id": "repeat.grid",
-  "measured": "same"
+  "measured": "similar"
  },
  {
   "name": "Linear Repeat",
   "id": "repeat.line",
-  "measured": "same"
+  "measured": "close"
  },
  {
   "name": "Move Along Path",
   "id": "movealongpath3",
-  "measured": "similar"
+  "measured": "same"
  },
  {
   "name": "Radial Repeat",
   "id": "repeat.radial",
-  "measured": "same"
+  "measured": "similar"
  },
  {
   "name": "Repeat",
@@ -892,7 +892,7 @@
  {
   "name": "Repeat Along Path",
   "id": "repeat.path",
-  "measured": "similar"
+  "measured": "close"
  },
  {
   "name": "Scatter Field",
@@ -902,7 +902,7 @@
  {
   "name": "Time Quantization",
   "id": "timequant",
-  "measured": "similar"
+  "measured": "same"
  },
  {
   "name": "360-reorient-sphere",
@@ -962,7 +962,7 @@
  {
   "name": "chromaticzoomblur",
   "id": "chromaticzoomblur",
-  "measured": "similar"
+  "measured": "same"
  },
  {
   "name": "clouds",
@@ -1152,12 +1152,12 @@
  {
   "name": "lensblur",
   "id": "lensblur",
-  "measured": "close"
+  "measured": "same"
  },
  {
   "name": "lensblur2",
   "id": "lensblur2",
-  "measured": "close"
+  "measured": "same"
  },
  {
   "name": "lumastamper",

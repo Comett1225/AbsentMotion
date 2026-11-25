@@ -93,6 +93,12 @@
    "step": 0.01
   },
   {
+   "id": "screenSpace",
+   "label": "Screen Space",
+   "type": "switch",
+   "default": false
+  },
+  {
    "id": "octaves",
    "label": "Octaves",
    "type": "float",
@@ -110,12 +116,6 @@
    "min": -1,
    "max": 1,
    "step": 0.001
-  },
-  {
-   "id": "screenSpace",
-   "label": "Screen Space",
-   "type": "switch",
-   "default": false
   },
   {
    "id": "style",

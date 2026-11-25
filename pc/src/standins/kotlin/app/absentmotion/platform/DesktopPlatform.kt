@@ -155,6 +155,12 @@ internal fun webpFormat(lossless: Boolean) = if (lossless) android.graphics.Bitm
 class MediaPicker(private val launchBlock: () -> Unit) { fun launch() = launchBlock() }
 
 @Composable
+fun rememberVideosPicker(onResult: (List<Uri>) -> Unit): MediaPicker {
+    val latest by rememberUpdatedState(onResult)
+    return remember { MediaPicker { latest(DeskFiles.chooseFiles(media = true, multiple = true, videoOnly = true).map(Uri::fromFile)) } }
+}
+
+@Composable
 fun rememberMediaPicker(videoOnly: Boolean = false, imageOnly: Boolean = false, onResult: (Uri?) -> Unit): MediaPicker {
     val latest by rememberUpdatedState(onResult)
     return remember { MediaPicker { latest(DeskFiles.chooseOne(media = true, videoOnly = videoOnly, imageOnly = imageOnly)) } }
@@ -312,13 +318,13 @@ fun revealLibraryFolder(path: String) { app.absentmotion.desk.DeskOs.reveal(java
 
 fun revealFolderLabel(): String = app.absentmotion.desk.DeskOs.revealLabel
 
-internal const val CAPTION_MODEL_NAME = "ggml-base-q5_1.bin"
-internal const val CAPTION_MODEL_BYTES = 59_707_625L
+internal const val CAPTION_MODEL_NAME = "ggml-small-q8_0.bin"
+internal const val CAPTION_MODEL_BYTES = 264_464_607L
 internal fun loadCaptionLibrary() {
     app.absentmotion.pc.engine.DesktopNative.hashCode()
     if (!app.absentmotion.ai.DeskAiNative.captionCpu()) throw UnsatisfiedLinkError("Auto Captions needs a processor with AVX2")
 }
-internal fun fastCaptionCpu(cpuinfo: String): Boolean = false
+internal fun captionCpuLevel(cpuinfo: String): Int = 0
 
 internal fun captionTextHeight(fonts: app.absentmotion.fonts.FontLibrary, text: String, font: String, size: Float, wrap: Int): Float {
     val measurer = androidx.compose.ui.text.TextMeasurer(androidx.compose.ui.text.font.createFontFamilyResolver(), androidx.compose.ui.unit.Density(1f), androidx.compose.ui.unit.LayoutDirection.Ltr)
@@ -451,8 +457,7 @@ fun folderReachable(context: android.content.Context, folder: String): Boolean =
 fun forgetFolder(context: android.content.Context, folder: String) = Unit
 
 @androidx.compose.runtime.Composable
-fun rememberFolderPicker(start: String?, onPicked: (String) -> Unit): () -> Unit {
-    val title = app.absentmotion.i18n.AppText.get(app.absentmotion.R.string.settings_bundles_folder)
+fun rememberFolderPicker(start: String?, title: String, onPicked: (String) -> Unit): () -> Unit {
     return { app.absentmotion.desk.DeskPicker.openFolder(title)?.let { onPicked(it.absolutePath) } }
 }
 

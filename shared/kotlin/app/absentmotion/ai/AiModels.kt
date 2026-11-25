@@ -131,6 +131,7 @@ internal enum class AiModel(val folder: String, @StringRes val title: Int, val l
 
         fun dropReplaced(context: Context) {
             File(context.filesDir, "models/ai/cutout-1").deleteRecursively()
+            CaptionModel.removeOld(context)
         }
     }
 }

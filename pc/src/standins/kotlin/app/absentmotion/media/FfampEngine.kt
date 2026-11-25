@@ -459,6 +459,9 @@ object FfampEngine : MediaEngine {
         told(problem, { ExportError(txt(R.string.tools_engine_stopped)) }, alive)
     }
 
+    override fun merge(inputs: List<File>, clips: List<app.absentmotion.tools.MergeFacts>, job: app.absentmotion.tools.MergeJob, out: File, progress: (Float) -> Unit, alive: () -> Boolean) =
+        FfmpegEngine.merge(inputs, clips, job, out, progress, alive)
+
     override fun reverse(parts: ReverseParts, progress: (Float) -> Unit, alive: () -> Boolean): Pair<Int, Int>? {
         val made = FfampNative.reverse(parts.input.path, parts.output.path, parts.firstUs, parts.lastUs) {
             progress(it.toFloat().coerceIn(0f, 0.99f))

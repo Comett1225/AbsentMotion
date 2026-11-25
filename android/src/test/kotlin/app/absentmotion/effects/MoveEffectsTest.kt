@@ -68,12 +68,12 @@ class MoveEffectsTest {
         assertEquals(listOf(row("Scale", "float", "1.000000", "0.01..50.0"), row("Angle", "angle", "0.000000", "-3600.0..3600.0"),
             row("Mask To Layer", "switch", "false"), row("Style", "choice", "0.000000", "Classic/Standard")), params("stretchaxis"))
         assertEquals(listOf(row("Offset", "point", "0.000000,0.000000", "-5000.0..5000.0"), row("Feather", "float", "0.000000", "0.0..1.0"),
-            row("Mask To Layer", "switch", "false")), params("offset"))
+            row("Mask To Layer", "switch", "false"), row("Style", "choice", "1.000000", "Classic/Standard")), params("offset"))
         assertEquals(listOf(row("Progress", "float", "0.000000", "0.0..1.0", "%"), row("Orientation", "angle", "0.000000", "-3600.0..3600.0"),
             row("Rotate Automatically", "switch", "true"), row("Inset/Outset", "float", "0.000000", "-500.0..500.0"),
             row("Offset", "point", "0.000000,0.000000", "-5000.0..5000.0"), row("Legacy Coordinates", "switch", "false"),
             row("Style", "choice", "1.000000", "Classic/Standard")), params("movealongpath"))
-        assertEquals(listOf(row("Frames/sec", "float", "5.000000", "0.1..120.0")), params("timequant"))
+        assertEquals(listOf(row("Steps/sec", "float", "5.000000", "0.1..120.0"), row("Style", "choice", "1.000000", "Classic/Standard")), params("timequant"))
     }
 
     private fun older(effect: String, vararg values: Pair<String, String>) = XmlNode("effect", mapOf("id" to "absent.$effect", "hidden" to "false"),
@@ -150,7 +150,8 @@ class MoveEffectsTest {
         val echo = catalog.find("absent.echo")!!.params.associateBy { it.id }
         assertEquals(Triple(-60f, 60f, 0.5f), echo.getValue("seconds").range())
         assertEquals(Triple(0f, 20f, 1f), echo.getValue("count").range())
-        assertEquals(listOf("Behind", "Atop"), echo.getValue("composite").options)
+        assertEquals(listOf("Atop", "Behind"), echo.getValue("mode").options)
+        assertEquals("1.000000", echo.getValue("mode").default)
     }
 
     @Test fun trueMotionBlurDefaultsToAHalfOpenShutterAndEightSamples() {
@@ -174,6 +175,18 @@ class MoveEffectsTest {
         assertEquals(2500.0, stepped(keyed).steppedMs(2550.0), 1e-9)
     }
 
+    @Test fun standardTimeQuantizationShowsTheMiddleOfEachStepLikeAlight() {
+        val style = XmlNode("property", mapOf("name" to "style", "type" to "float", "value" to "1"))
+        fun standard(fps: String) = Layer(stepped(fps(fps)).node.let { n ->
+            n.copy(children = n.children.map { e -> e.copy(children = e.children + style) })
+        })
+        val five = standard("5")
+        assertEquals(listOf(1100.0, 1100.0, 1100.0, 1300.0, 1300.0, 2900.0), listOf(1000.0, 1033.0, 1200.0, 1233.0, 1400.0, 2999.0).map(five::steppedMs))
+        val twelve = standard("12")
+        assertEquals(1000.0 + 17.5 * 1000 / 12, twelve.steppedMs(2500.0), 1e-9)
+        assertEquals(1000.0 + 0.5 * 1000 / 12, twelve.steppedMs(1000.0), 1e-9)
+    }
+
     @Test fun timeQuantizationImportsKeyframesAndKeepsTheLegacyFallback() {
         val migration = EffectMigration.parse(File("../shared/assets/effects/foreign.json").readText(), catalog)
         val keyed = XmlNode("property", mapOf("name" to "stepsPerSecond", "type" to "float"), listOf(
@@ -186,11 +199,13 @@ class MoveEffectsTest {
         val result = migration.migrate(scene)
         val effects = result.scene.node.children.single().children
         assertEquals("absent.timequant", effects[0]["id"])
-        val converted = effects[0].children.single()
+        val converted = effects[0].children.first()
         assertEquals("fps", converted["name"])
+        assertEquals(listOf("fps", "style"), effects[0].children.map { it["name"] })
+        assertEquals(1f, effects[0].children[1]["value"]!!.toFloat(), 0f)
         assertEquals(keyed.children.map { it["t"] }, converted.children.map { it["t"] })
         assertEquals(listOf(5f, 10f), converted.children.map { it["v"]!!.toFloat() })
-        assertEquals(5f, effects[1].children.single()["value"]!!.toFloat(), 0f)
+        assertEquals(5f, effects[1].children.first { it["name"] == "fps" }["value"]!!.toFloat(), 0f)
         assertEquals(legacy, effects[2])
         assertEquals(1375.0, Layer(shape.copy(children = listOf(effects[2]))).steppedMs(1399.0), 0.0)
         assertTrue(result.dropped.isEmpty())

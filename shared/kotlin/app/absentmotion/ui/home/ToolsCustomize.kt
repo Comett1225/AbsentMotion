@@ -179,10 +179,11 @@ internal fun CustomizeToolsSheet(settings: AppSettings, onClose: () -> Unit) {
         val next = movedToolOrder(board.order, board.order.indexOf(board.dragging), to)
         if (next != board.order) { board.order = next; write(next + order.filterNot { it in next }, hidden) }
     }
-    val canReset = order != DefaultToolOrder || hidden.isNotEmpty()
+    val defaultHidden = if (project) emptySet() else DefaultHiddenTools
+    val canReset = order != DefaultToolOrder || hidden != defaultHidden
     ToolSheet(stringResource(R.string.tools_customize), onClose, bottom = {
         Row(Modifier.fillMaxWidth().background(Am.Card).padding(16.dp), Arrangement.spacedBy(12.dp)) {
-            BigButton(stringResource(R.string.audiofx_reset), Modifier.weight(1f), primary = false, enabled = canReset) { write(DefaultToolOrder, emptySet()) }
+            BigButton(stringResource(R.string.audiofx_reset), Modifier.weight(1f), primary = false, enabled = canReset) { write(DefaultToolOrder, defaultHidden) }
             BigButton(stringResource(R.string.done), Modifier.weight(1f), onClick = onClose)
         }
     }) {

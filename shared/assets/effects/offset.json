@@ -19,7 +19,7 @@
    "pixels": true
   },
   {
-   "id": "feather",
+   "id": "seamFeather",
    "label": "Feather",
    "type": "float",
    "default": 0,
@@ -32,7 +32,23 @@
    "label": "Mask To Layer",
    "type": "switch",
    "default": false
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 1,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "legacyDefault": 0,
+   "when": {
+    "style": [
+     0
+    ]
+   }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 offset;\nuniform float feather;\nuniform float mask;\nhalf4 main(float2 coord) {\n    float2 box = max(size, float2(1));\n    if (coord.x < 0 || coord.y < 0 || coord.x >= box.x || coord.y >= box.y) return image.eval(coord);\n    half4 color = image.eval(mod(coord - offset, box));\n    if (feather > 0) {\n        float2 seam = mod(offset, box);\n        float2 d = abs(coord - seam);\n        d = min(d, box - d);\n        float2 w = smoothstep(float2(0), max(feather * box * 0.5, float2(0.001)), d);\n        if (min(seam.x, box.x - seam.x) < 0.5) w.x = 1;\n        if (min(seam.y, box.y - seam.y) < 0.5) w.y = 1;\n        color = mix(image.eval(coord), color, half(w.x * w.y));\n    }\n    if (mask > 0.5) color *= image.eval(coord).a;\n    return color;\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 offset;\nuniform float seamFeather;\nuniform float mask;\nuniform float style;\nhalf4 main(float2 coord) {\n    float2 box = max(size, float2(1));\n    if (coord.x < 0 || coord.y < 0 || coord.x >= box.x || coord.y >= box.y) return image.eval(coord);\n    half4 color = image.eval(mod(coord - offset, box));\n    if (seamFeather > 0) {\n        float2 seam = mod(offset, box);\n        float2 d = abs(coord - seam);\n        d = min(d, box - d);\n        float2 w = smoothstep(float2(0), max(style > 0.5 ? 2.0 * seamFeather * abs(offset) : seamFeather * 0.075 * box, float2(0.001)), d);\n        if (min(seam.x, box.x - seam.x) < 0.5) w.x = 1;\n        if (min(seam.y, box.y - seam.y) < 0.5) w.y = 1;\n        color = mix(image.eval(coord), color, half(w.x * w.y));\n    }\n    if (mask > 0.5) color *= image.eval(coord).a;\n    return color;\n}\n"
 }

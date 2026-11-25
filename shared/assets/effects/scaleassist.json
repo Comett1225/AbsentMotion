@@ -24,8 +24,8 @@
    "type": "float",
    "default": 1,
    "min": 0,
-   "max": 100,
-   "step": 0.01,
+   "max": 999.99,
+   "step": 0.001,
    "percent": true
   },
   {
@@ -34,15 +34,9 @@
    "type": "float",
    "default": 1,
    "min": 0,
-   "max": 100,
+   "max": 999.99,
    "step": 0.01,
-   "percent": true,
-   "when": {
-    "axis": [
-     2,
-     3
-    ]
-   }
+   "percent": true
   }
  ]
 }

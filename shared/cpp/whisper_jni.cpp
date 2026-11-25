@@ -29,13 +29,13 @@ Job *job(jlong handle) { return reinterpret_cast<Job *>(handle); }
 }
 
 extern "C" JNIEXPORT jlong JNICALL
-Java_app_absentmotion_ai_Whisper_nativeOpen(JNIEnv *env, jobject, jstring path) {
+Java_app_absentmotion_ai_Whisper_nativeOpen(JNIEnv *env, jobject, jstring path, jint heads) {
     const char *chars = path ? env->GetStringUTFChars(path, nullptr) : nullptr;
     if (!chars) return 0;
     whisper_context_params params = whisper_context_default_params();
     params.flash_attn = false;
     params.dtw_token_timestamps = true;
-    params.dtw_aheads_preset = WHISPER_AHEADS_BASE;
+    params.dtw_aheads_preset = heads == 2 ? WHISPER_AHEADS_LARGE_V3_TURBO : heads == 1 ? WHISPER_AHEADS_SMALL : WHISPER_AHEADS_BASE;
 #ifdef __APPLE__
     params.use_gpu = true;
 #else

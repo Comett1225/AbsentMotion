@@ -198,6 +198,10 @@
     <string name="bundle_pick_folder">Ordner zum Speichern auswählen</string>
     <string name="bundle_for_now">Vorerst: %1$s</string>
     <string name="bundle_folder_lost">Dieser Ordner ist nicht erreichbar. Tippe, um ihn erneut auszuwählen; bis dahin werden Pakete in %1$s gespeichert.</string>
+    <string name="settings_video_folder">Ordner für Videos und GIFs</string>
+    <string name="settings_sound_folder">Ordner für Sounds</string>
+    <string name="settings_folder_default">Standardordner verwenden</string>
+    <string name="export_folder_lost">Dieser Ordner ist nicht erreichbar. Tippe, um ihn erneut auszuwählen; bis dahin werden Exporte in %1$s gespeichert.</string>
     <string name="settings_about">Über</string>
     <string name="settings_report_issue">Problem melden</string>
     <string name="settings_suggest_feature">Funktion vorschlagen</string>
@@ -358,6 +362,7 @@
     <string name="theme_light">Hell</string>
     <string name="theme_dark">Dunkel</string>
     <string name="theme_daylight">Tageslicht</string>
+    <string name="theme_light_green">Hellgrün</string>
     <string name="theme_custom">Benutzerdefiniert</string>
     <string name="theme_custom_named">Benutzerdefiniert (%1$s)</string>
     <string name="theme_error_bad_colour">Ungültige Farbe für %1$s</string>
@@ -806,6 +811,7 @@
     <string name="export_quality">Qualität</string>
     <string name="export_quality_low">Niedrig</string>
     <string name="export_quality_high">Hoch</string>
+    <string name="export_same_as_source">Wie Quelle</string>
     <string name="export_format">Format</string>
     <string name="export_transparent_becomes">Transparente Bereiche werden</string>
     <string name="export_white">Weiß</string>
@@ -1048,6 +1054,8 @@
     <string name="caption_position_bottom">Unten</string>
     <string name="caption_words_per_caption">Wörter pro Untertitel</string>
     <string name="caption_generate">Erstellen</string>
+    <string name="caption_import_srt">SRT importieren</string>
+    <string name="caption_srt_empty">Keine Untertitel in der Datei gefunden</string>
     <string name="caption_not_now">Jetzt nicht</string>
     <string name="caption_download">Herunterladen</string>
     <string name="draw_back">Zurück</string>
@@ -2197,8 +2205,8 @@
     <string name="caption_remaining">Noch etwa %1$s</string>
     <string name="caption_progress">%1$s%%</string>
     <string name="caption_model">Sprachmodell</string>
-    <string name="caption_model_standard">Standard · 60 MB</string>
-    <string name="caption_model_precision">Höhere Genauigkeit · 82 MB</string>
+    <string name="caption_model_standard">Standard · 264 MB</string>
+    <string name="caption_model_precision">Höhere Genauigkeit · 874 MB</string>
     <string name="model_err_no_triangles">Das Modell hat keine Dreiecke</string>
     <string name="model_err_too_complex">Das Modell ist zu komplex</string>
     <string name="model_err_missing_vertex">Eine Fläche verwendet einen nicht vorhandenen Eckpunkt</string>
@@ -2258,6 +2266,7 @@
     <string name="effect_section_palette">Eigene Palette</string>
     <string name="effect_section_back">Rückseite der Ebene</string>
     <string name="effect_section_colorblend">Farbe &amp; Mischen</string>
+    <string name="effect_section_randomization">Zufall</string>
     <string name="palettes">Paletten</string>
     <string name="palette_untitled">Unbenannt</string>
     <string name="palette_new">Neu</string>
@@ -2511,6 +2520,7 @@
     <string name="tools_failed">Konnte nicht abgeschlossen werden: %1$s</string>
     <string name="tools_save">Speichern</string>
     <string name="tools_add_to_project">Zum Projekt hinzufügen</string>
+    <string name="tools_add_more">Weitere Werkzeuge hinzufügen</string>
     <string name="tools_part">Beizubehaltender Abschnitt</string>
     <string name="tools_start">Anfang</string>
     <string name="tools_end">Ende</string>
@@ -2542,6 +2552,15 @@
     <string name="tools_finding_cuts">Schnittpunkte werden gesucht…</string>
     <string name="tools_trim_few_cuts">Dieses Video hat kaum Schnittpunkte. Daher kann „Schnell“ nur am Anfang beginnen. Wähle „Genau“, um an einer beliebigen Stelle zu beginnen.</string>
     <string name="tools_trim_no_fast">Ein schneller Schnitt ist hier nicht möglich. Daher wird genau geschnitten.</string>
+    <string name="tools_merge">Zusammenfügen</string>
+    <string name="tools_merge_about">Fügt Videos zu einem zusammen.</string>
+    <string name="tools_merge_add">Videos hinzufügen</string>
+    <string name="tools_merge_start">Zusammenfügen</string>
+    <string name="tools_merging">Wird zusammengefügt… %1$d%%</string>
+    <string name="tools_merge_need_two">Füge mindestens zwei Videos hinzu.</string>
+    <string name="tools_merge_no_fast">Diese Videos unterscheiden sich, daher werden sie neu codiert.</string>
+    <string name="tools_merge_up">Nach oben</string>
+    <string name="tools_merge_down">Nach unten</string>
     <string name="shape_param_round_corners">Ecken abrunden</string>
     <string name="shape_param_notch">Kerbe</string>
     <string name="shape_param_point">Spitze</string>
@@ -2699,6 +2718,13 @@
     <string name="tools_enhance_image_about">Fügt einem Foto oder einer Zeichnung mit AI Details hinzu.</string>
     <string name="tools_enhance_pick">Foto auswählen</string>
     <string name="tools_enhance_running">Bild wird verbessert: %1$d%%</string>
+    <string name="tools_convert_image">Bild konvertieren</string>
+    <string name="tools_convert_image_about">Wandelt ein Bild oder eine Animation in PNG, JPG, WebP oder GIF um.</string>
+    <string name="tools_convert_pick">Bild auswählen</string>
+    <string name="tools_convert_to">Konvertieren in</string>
+    <string name="tools_convert_start">Konvertieren</string>
+    <string name="tools_converting">Konvertiere… %1$d%%</string>
+    <string name="tools_convert_too_large">Animationen bis 2048 × 2048 Pixel und 3000 Bildern können konvertiert werden.</string>
     <string name="ai_model_detail_max">AI-Verbesserung, Realistisch, Max-Modell</string>
     <string name="ai_model_cartoon_max">AI-Verbesserung, Anime und Zeichentrick, Max-Modell</string>
     <string name="ai_enhance_image_upscale2_hint">Doppelte Breite und Höhe</string>

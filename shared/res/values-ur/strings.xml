@@ -198,6 +198,10 @@
     <string name="bundle_pick_folder">محفوظ کرنے کے لیے فولڈر منتخب کریں</string>
     <string name="bundle_for_now">فی الحال: %1$s</string>
     <string name="bundle_folder_lost">اس فولڈر تک رسائی نہیں ہو رہی۔ اسے دوبارہ منتخب کرنے کے لیے تھپتھپائیں؛ تب تک بنڈلز %1$s میں محفوظ ہوں گے۔</string>
+    <string name="settings_video_folder">ویڈیوز اور GIFs فولڈر</string>
+    <string name="settings_sound_folder">ساؤنڈز فولڈر</string>
+    <string name="settings_folder_default">ڈیفالٹ فولڈر استعمال کریں</string>
+    <string name="export_folder_lost">اس فولڈر تک رسائی نہیں ہو رہی۔ اسے دوبارہ منتخب کرنے کے لیے تھپتھپائیں؛ تب تک ایکسپورٹس %1$s میں محفوظ ہوں گی۔</string>
     <string name="settings_about">ایپ کے بارے میں</string>
     <string name="settings_report_issue">مسئلہ رپورٹ کریں</string>
     <string name="settings_suggest_feature">کوئی فیچر تجویز کریں</string>
@@ -358,6 +362,7 @@
     <string name="theme_light">لائٹ</string>
     <string name="theme_dark">ڈارک</string>
     <string name="theme_daylight">ڈے لائٹ</string>
+    <string name="theme_light_green">لائٹ گرین</string>
     <string name="theme_custom">کسٹم</string>
     <string name="theme_custom_named">کسٹم (%1$s)</string>
     <string name="theme_error_bad_colour">‏%1$s کے لیے غلط رنگ</string>
@@ -806,6 +811,7 @@
     <string name="export_quality">کوالٹی</string>
     <string name="export_quality_low">کم</string>
     <string name="export_quality_high">زیادہ</string>
+    <string name="export_same_as_source">ماخذ کے مطابق</string>
     <string name="export_format">فارمیٹ</string>
     <string name="export_transparent_becomes">شفاف حصے بن جائیں</string>
     <string name="export_white">سفید</string>
@@ -1048,6 +1054,8 @@
     <string name="caption_position_bottom">نیچے</string>
     <string name="caption_words_per_caption">فی کیپشن الفاظ</string>
     <string name="caption_generate">بنائیں</string>
+    <string name="caption_import_srt">‏SRT امپورٹ کریں</string>
+    <string name="caption_srt_empty">فائل میں کوئی کیپشن نہیں ملا</string>
     <string name="caption_not_now">ابھی نہیں</string>
     <string name="caption_download">ڈاؤن لوڈ</string>
     <string name="draw_back">واپس</string>
@@ -2197,8 +2205,8 @@
     <string name="caption_remaining">تقریباً %1$s باقی ہے</string>
     <string name="caption_progress">%1$s%%</string>
     <string name="caption_model">اسپیچ ماڈل</string>
-    <string name="caption_model_standard">اسٹینڈرڈ · 60 MB</string>
-    <string name="caption_model_precision">زیادہ درستگی · 82 MB</string>
+    <string name="caption_model_standard">اسٹینڈرڈ · 264 MB</string>
+    <string name="caption_model_precision">زیادہ درستگی · 874 MB</string>
     <string name="model_err_no_triangles">ماڈل میں کوئی مثلث نہیں ہے</string>
     <string name="model_err_too_complex">ماڈل بہت پیچیدہ ہے</string>
     <string name="model_err_missing_vertex">ایک فیس ایسا ورٹیکس استعمال کر رہی ہے جو موجود نہیں ہے</string>
@@ -2258,6 +2266,7 @@
     <string name="effect_section_palette">اپنی پیلیٹ</string>
     <string name="effect_section_back">لیئر کا پچھلا حصہ</string>
     <string name="effect_section_colorblend">رنگ اور بلینڈنگ</string>
+    <string name="effect_section_randomization">بے ترتیبی</string>
     <string name="palettes">پیلیٹس</string>
     <string name="palette_untitled">بے نام</string>
     <string name="palette_new">نیا</string>
@@ -2511,6 +2520,7 @@
     <string name="tools_failed">مکمل نہیں ہو سکا: %1$s</string>
     <string name="tools_save">محفوظ کریں</string>
     <string name="tools_add_to_project">پروجیکٹ میں شامل کریں</string>
+    <string name="tools_add_more">مزید ٹولز شامل کریں</string>
     <string name="tools_part">رکھنے والا حصہ</string>
     <string name="tools_start">شروع</string>
     <string name="tools_end">اختتام</string>
@@ -2542,6 +2552,15 @@
     <string name="tools_finding_cuts">کٹ پوائنٹس تلاش ہو رہے ہیں…</string>
     <string name="tools_trim_few_cuts">اس ویڈیو میں کٹ پوائنٹس تقریباً نہیں ہیں، اس لیے «تیز» صرف شروع سے آغاز کر سکتا ہے۔ کہیں سے بھی شروع کرنے کے لیے «درست» منتخب کریں۔</string>
     <string name="tools_trim_no_fast">یہاں تیز کٹ ممکن نہیں، اس لیے اسے درست طریقے سے کاٹا جائے گا۔</string>
+    <string name="tools_merge">مرج</string>
+    <string name="tools_merge_about">ویڈیوز کو ایک میں جوڑتا ہے۔</string>
+    <string name="tools_merge_add">ویڈیوز شامل کریں</string>
+    <string name="tools_merge_start">مرج کریں</string>
+    <string name="tools_merging">مرج ہو رہا ہے… %1$d%%</string>
+    <string name="tools_merge_need_two">کم از کم دو ویڈیوز شامل کریں۔</string>
+    <string name="tools_merge_no_fast">یہ ویڈیوز مختلف ہیں، اس لیے دوبارہ انکوڈ ہوں گی۔</string>
+    <string name="tools_merge_up">اوپر لے جائیں</string>
+    <string name="tools_merge_down">نیچے لے جائیں</string>
     <string name="shape_param_round_corners">کونے گول کریں</string>
     <string name="shape_param_notch">نشان</string>
     <string name="shape_param_point">نوک</string>
@@ -2699,6 +2718,13 @@
     <string name="tools_enhance_image_about">‏AI سے تصویر یا ڈرائنگ میں تفصیل شامل کریں۔</string>
     <string name="tools_enhance_pick">تصویر منتخب کریں</string>
     <string name="tools_enhance_running">تصویر اینہانس ہو رہی ہے: %1$d%%</string>
+    <string name="tools_convert_image">تصویر تبدیل کریں</string>
+    <string name="tools_convert_image_about">تصویر یا اینیمیشن کو PNG، JPG، WebP یا GIF میں بدلتا ہے۔</string>
+    <string name="tools_convert_pick">تصویر منتخب کریں</string>
+    <string name="tools_convert_to">اس میں تبدیل کریں</string>
+    <string name="tools_convert_start">تبدیل کریں</string>
+    <string name="tools_converting">تبدیل ہو رہی ہے… %1$d%%</string>
+    <string name="tools_convert_too_large">‏2048 × 2048 پکسل اور 3000 فریمز تک کی اینیمیشنز تبدیل کی جا سکتی ہیں۔</string>
     <string name="ai_model_detail_max">‏AI اینہانس حقیقت پسندانہ زیادہ سے زیادہ ماڈل</string>
     <string name="ai_model_cartoon_max">‏AI اینہانس اینیمے اور کارٹون زیادہ سے زیادہ ماڈل</string>
     <string name="ai_enhance_image_upscale2_hint">چوڑائی اور اونچائی دگنی</string>

@@ -1,0 +1,6 @@
+Much more accurate auto captions, faster on newer phones.
+Export sizes measured from your project; videos keep the bit rate you chose.
+New Merge and Convert Image tools; Import SRT captions.
+Light Green theme.
+Same as source bit rate and export folders.
+More Alight Motion projects look the same after import.

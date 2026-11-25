@@ -175,8 +175,7 @@ object FfmpegEngine : MediaEngine {
     override fun compress(input: File, job: VideoJob, audio: Boolean, durationUs: Long, out: File, startUs: Long, endUs: Long, progress: (Float) -> Unit, alive: () -> Boolean) {
         val settings = ExportSettings(min(job.width, job.height), job.fps)
         val encoder = DeskEncoders.video(Codec.H264).firstOrNull { DeskEncoders.works(it, settings, job.width, job.height) } ?: throw ExportError(txt(R.string.library_text_value, "no video encoder"))
-        val args = DeskEncoders.videoArgs(encoder, settings, job.width, job.height).toMutableList()
-        args[args.indexOf("-b:v") + 1] = "${job.bitrate}"
+        val args = DeskEncoders.videoArgs(encoder, settings, job.width, job.height, job.bitrate).toMutableList()
         val color = runCatching { app.absentmotion.desk.DeskProbe.of(input).video }.getOrNull()
         for ((flag, value) in listOf("-colorspace" to color?.space, "-color_primaries" to color?.primaries, "-color_trc" to color?.transfer, "-color_range" to color?.range)) {
             if (!value.isNullOrBlank() && value != "unknown" && value != "gbr" && !value.startsWith("reserved") && flag in args) args[args.indexOf(flag) + 1] = value
@@ -215,6 +214,31 @@ object FfmpegEngine : MediaEngine {
     override fun trim(input: File, startUs: Long, endUs: Long, out: File, progress: (Float) -> Unit, alive: () -> Boolean) {
         val range = (if (startUs > 0) listOf("-ss", seconds(startUs)) else emptyList()) + listOf("-i", input.path, "-t", seconds(endUs - startUs))
         tool(range + listOf("-map", "0:v:0", "-map", "0:a:0?", "-c", "copy", "-avoid_negative_ts", "make_zero", "-movflags", "+faststart", out.path), endUs - startUs, progress, alive)
+    }
+
+    override fun merge(inputs: List<File>, clips: List<app.absentmotion.tools.MergeFacts>, job: app.absentmotion.tools.MergeJob, out: File, progress: (Float) -> Unit, alive: () -> Boolean) {
+        val spanUs = clips.sumOf { it.source.durationUs }
+        if (job.copy) {
+            val list = File(out.parentFile, "merge-list.txt")
+            try {
+                list.writeText(inputs.joinToString("") { "file '" + it.absolutePath.replace("'", "'\\''") + "'\n" })
+                tool(listOf("-f", "concat", "-safe", "0", "-i", list.path, "-map", "0:v:0", "-map", "0:a:0?", "-c", "copy", "-movflags", "+faststart", out.path), spanUs, progress, alive)
+            } finally { list.delete() }
+            return
+        }
+        val settings = ExportSettings(min(job.width, job.height), job.fps)
+        val encoder = DeskEncoders.video(Codec.H264).firstOrNull { DeskEncoders.works(it, settings, job.width, job.height) } ?: throw ExportError(txt(R.string.tools_engine_stopped))
+        val heard = job.audioKbps > 0
+        val upload = if (encoder.endsWith("_vaapi")) ",format=nv12,hwupload" else ""
+        val graph = clips.indices.joinToString("") { i ->
+            "[$i:v:0]scale=${job.width}:${job.height}:force_original_aspect_ratio=decrease,pad=${job.width}:${job.height}:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=${job.fps},format=yuv420p[v$i];" +
+                if (!heard) "" else if (clips[i].source.audio) "[$i:a:0]aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo[a$i];"
+                else "anullsrc=r=48000:cl=stereo,atrim=duration=${seconds(clips[i].source.durationUs)}[a$i];"
+        } + clips.indices.joinToString("") { if (heard) "[v$it][a$it]" else "[v$it]" } + "concat=n=${clips.size}:v=1:a=${if (heard) 1 else 0}[${if (upload.isEmpty()) "v" else "c"}]" +
+            (if (heard) "[a]" else "") + (if (upload.isEmpty()) "" else ";[c]${upload.drop(1)}[v]")
+        val sound = if (!heard) listOf("-an") else listOf("-map", "[a]", "-c:a", DeskEncoders.audio(AudioCodec.Aac, job.audioKbps).firstOrNull() ?: "aac", "-b:a", "${job.audioKbps}k")
+        tool(DeskEncoders.device(encoder) + inputs.flatMap { listOf("-i", it.path) } + listOf("-filter_complex", graph, "-map", "[v]") +
+            DeskEncoders.videoArgs(encoder, settings, job.width, job.height, job.bitrate) + sound + listOf("-movflags", "+faststart", out.path), spanUs, progress, alive)
     }
 
     private fun waited(args: List<String>, alive: () -> Boolean, problem: String) {

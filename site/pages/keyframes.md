@@ -30,10 +30,10 @@ Hold **Play** to choose a count-in of one, two or three seconds and a preview sp
 
 ## Keyframes on the timeline
 
-Keyframes show as small diamonds on a layer's bar. On the selected layer they are larger, and the one under the playhead has a ring. While a property or an effect is open, only its diamonds show; with the tool grid showing, all the layer's diamonds show.
+Keyframes show as small diamonds on a layer's bar. On the selected layer they are larger, and the one under the playhead has a ring. While a property or an effect is open, only its diamonds show; with the tool grid showing, all the layer's diamonds show. While an effect or a transition effect is open, the keyframes of the layer's other effects and of its transform show as small dim diamonds, so you can line a new keyframe up with them; they cannot be dragged.
 
 - **Jump between them.** **Skip back** and **Skip forward** in the play bar stop at the keyframes of the selected layer (only the open property's or effect's when one is open).
-- **Move a keyframe (retime).** Press and hold a diamond on the selected layer until it lifts, then drag sideways. It snaps to the playhead, bookmarks, other layers' ends and other keyframes, and stays inside the clip. One move is one undo step. If no property or effect is open, all of the layer's keyframes at that frame move together; if one is open, only its keyframes move. Adding a second finger cancels the move.
+- **Move a keyframe (retime).** Press and hold a diamond on the selected layer until it lifts, then drag sideways. It snaps to the playhead, bookmarks, other layers' ends and other keyframes (with an effect open, also the dim diamonds of the same layer), and stays inside the clip. One move is one undo step. If no property or effect is open, all of the layer's keyframes at that frame move together; if one is open, only its keyframes move. Adding a second finger cancels the move.
 - **Speed** has no keyframes of its own. Change it over time with a speed curve: see [Photos, video and speed](@media).
 
 There is no copy and paste for a single keyframe. To reuse keyframes, copy the whole layer (they travel with it), copy an effect, or save a [preset](@assets-templates).

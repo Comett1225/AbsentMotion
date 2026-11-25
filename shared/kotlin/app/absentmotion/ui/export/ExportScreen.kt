@@ -103,7 +103,7 @@ import app.absentmotion.export.GifSample
 import app.absentmotion.export.frameCount
 import app.absentmotion.export.gifTimeMs
 import app.absentmotion.export.measureGif
-import app.absentmotion.export.measureSequenceFrame
+import app.absentmotion.export.measureSequence
 import app.absentmotion.export.measureVideoDraw
 import app.absentmotion.export.withMissing
 import app.absentmotion.export.fixedFormat
@@ -304,7 +304,9 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val bundles = remember(appSettings.bundlesFolder) { app.absentmotion.platform.bundleStore(context, appSettings.bundlesFolder) }
-    val exporter = remember(bundles) { Exporter(context, engine, MediaStoreExport(context), bundles = bundles) }
+    val videos = remember(appSettings.videoFolder) { app.absentmotion.platform.bundleStore(context, appSettings.videoFolder) }
+    val sounds = remember(appSettings.soundFolder) { app.absentmotion.platform.bundleStore(context, appSettings.soundFolder) }
+    val exporter = remember(bundles, videos, sounds) { Exporter(context, engine, MediaStoreExport(context), bundles = bundles, videos = videos, sounds = sounds) }
     val kinds = remember { if (preset != null) listOf(ExportKind.Package) else listOf(ExportKind.Video, ExportKind.Audio, ExportKind.Package, ExportKind.Frame, ExportKind.FrameAs, ExportKind.Sequence, ExportKind.Gif) + if (fromProjectList) listOf(ExportKind.Xml) else emptyList() }
     var kind by remember { mutableStateOf(if (preset != null) ExportKind.Package else ExportKind.Video) }
     val exportName = remember(scene.title) { ExportName(scene.title) }
@@ -363,6 +365,16 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
         }
     }
     val videoSettings = settings.getValue(ExportKind.Video)
+    var videoSizeFailed by remember { mutableStateOf(false) }
+    val videoBytes by produceState<Long?>(null, kind, scene, videoSettings, hasAudio, phase is Phase.Idle) {
+        value = null
+        videoSizeFailed = false
+        if (kind == ExportKind.Video && phase is Phase.Idle) {
+            try { delay(MeasureDelayMs * 2); value = app.absentmotion.export.measureVideoBytes(engine, scene, videoSettings, context.cacheDir, hasAudio) }
+            catch (e: CancellationException) { throw e }
+            catch (e: Exception) { Log.w("AMExport", "Cannot sample the video size", e); videoSizeFailed = true }
+        }
+    }
     val drawMs by produceState<Double?>(null, kind, scene, videoSettings.shortSide, videoSettings.smoothing, videoSettings.fps, phase is Phase.Idle) {
         value = null
         if (kind == ExportKind.Video && phase is Phase.Idle) {
@@ -372,12 +384,23 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
         }
     }
     val sequenceSettings = settings.getValue(ExportKind.Sequence)
-    val sequenceMs by produceState<Double?>(null, kind, scene, sequenceSettings.shortSide, sequenceSettings.smoothing, sequenceSettings.fps, sequenceSettings.image, phase is Phase.Idle) {
+    val sequenceSample by produceState<app.absentmotion.export.SequenceSample?>(null, kind, scene, sequenceSettings, phase is Phase.Idle) {
         value = null
         if (kind == ExportKind.Sequence && phase is Phase.Idle) {
-            try { delay(MeasureDelayMs); value = measureSequenceFrame(engine, scene, sequenceSettings) }
+            try { delay(MeasureDelayMs); value = measureSequence(engine, scene, sequenceSettings) }
             catch (e: CancellationException) { throw e }
-            catch (e: Exception) { Log.w("AMExport", "Cannot sample the drawing time", e); value = Double.NaN }
+            catch (e: Exception) { Log.w("AMExport", "Cannot sample the drawing time", e); value = app.absentmotion.export.SequenceSample(Double.NaN, null) }
+        }
+    }
+    val sequenceMs = sequenceSample?.frameMs
+    var sizeFailed by remember { mutableStateOf(false) }
+    val measuredBytes by produceState<Long?>(null, kind, scene, settings.getValue(kind), frame, hasAudio, includeAddedEffects, community, phase is Phase.Idle) {
+        value = null
+        sizeFailed = false
+        if (kind in MeasuredKinds && phase is Phase.Idle) {
+            try { delay(MeasureDelayMs); value = exporter.measureBytes(kind, scene, settings.getValue(kind), frame, community, includeAddedEffects) }
+            catch (e: CancellationException) { throw e }
+            catch (e: Exception) { Log.w("AMExport", "Cannot measure the ${kind.name.lowercase()} size", e); sizeFailed = true }
         }
     }
     var free by remember { mutableLongStateOf(freeSpace()) }
@@ -403,12 +426,22 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
     val videoSize = exportSize(scene, settings.getValue(ExportKind.Video).shortSide, even = true)
     LaunchedEffect(report != null, videoSize) { if (report != null) caps.confirmSize(videoSize.first, videoSize.second) }
     val sizes = remember { ExportSizes(context) }
-    val rawEstimate = if (kind == ExportKind.Gif) gifSample?.bytes ?: -1L else remember(kind, scene, settings.getValue(kind), hasAudio, report) {
+    val sampled = when (kind) {
+        ExportKind.Gif -> true
+        ExportKind.Video -> !videoSizeFailed
+        ExportKind.Sequence -> sequenceSample?.let { it.bytes != null } ?: true
+        else -> kind in MeasuredKinds && !sizeFailed
+    }
+    val rawEstimate = if (kind == ExportKind.Gif) gifSample?.bytes ?: -1L
+    else if (kind == ExportKind.Video && sampled) videoBytes ?: -1L
+    else if (kind == ExportKind.Sequence && sampled) sequenceSample?.bytes ?: -1L
+    else if (sampled) measuredBytes ?: -1L
+    else remember(kind, scene, settings.getValue(kind), hasAudio, report) {
         val s = settings.getValue(kind)
         val bitrates = if (kind == ExportKind.Video) exportSize(scene, s.shortSide, even = true).let { (w, h) -> report?.bitrates(s, w, h) } else null
         estimateBytes(kind, scene, s, hasAudio, bitrates)
     }
-    val sizeKey = ExportSizes.key(kind, settings.getValue(kind))
+    val sizeKey = ExportSizes.key(kind, settings.getValue(kind), sampled)
     val estimate = remember(rawEstimate, sizeKey, phase is Phase.Idle) { if (rawEstimate < 0 || sizeKey == null) rawEstimate else (rawEstimate * sizes.ratio(sizeKey)).toLong() }
     val room = if (DESK && (kind == ExportKind.Video || kind == ExportKind.Audio)) estimate * 2 else estimate
     val check: (ExportSettings) -> Support = remember(report, scene, hasAudio) { { caps.check(it, scene, hasAudio) } }
@@ -554,6 +587,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
         }
         val chosen = kind
         val estimated = rawEstimate
+        val learnKey = sizeKey
         val modelled = modelMs
         val ratio = ratioKey(chosen, s)
         persist()
@@ -627,8 +661,8 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
                 val began = System.nanoTime()
                 unlock.spend()
                 val result = Tier.unlocking(risks.mapNotNull { it.key as? Feature }) {
-                    (if (background) Exporter(context.applicationContext, app.absentmotion.platform.exportEngine(engine), MediaStoreExport(context.applicationContext), bundles = bundles, stage = stage)
-                        else if (stage != null) Exporter(context, engine, MediaStoreExport(context), bundles = bundles, stage = stage) else exporter).export(chosen, exported, s, frame, name, { note = it }, community.takeIf { chosen == ExportKind.Package }, includeAddedEffects, report)
+                    (if (background) Exporter(context.applicationContext, app.absentmotion.platform.exportEngine(engine), MediaStoreExport(context.applicationContext), bundles = bundles, stage = stage, videos = videos, sounds = sounds)
+                        else if (stage != null) Exporter(context, engine, MediaStoreExport(context), bundles = bundles, stage = stage, videos = videos, sounds = sounds) else exporter).export(chosen, exported, s, frame, name, { note = it }, community.takeIf { chosen == ExportKind.Package }, includeAddedEffects, report)
                 }
                 outcome = true
                 if (background) app.absentmotion.platform.exportDone(result)
@@ -640,7 +674,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
                     PresetSharing.revision++
                 }
                 ratio?.let { key -> modelled?.let { sizes.record(key, it, (System.nanoTime() - began) / 1_000_000) } }
-                ExportSizes.key(chosen, s)?.let { key ->
+                learnKey?.let { key ->
                     withContext(Dispatchers.IO) {
                         val written = result.uris.sumOf { uri ->
                             runCatching { context.contentResolver.query(uri, arrayOf(OpenableColumns.SIZE), null, null, null)?.use { if (it.moveToFirst()) it.getLong(0) else 0L } }.getOrNull() ?: 0L
@@ -696,8 +730,10 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
         saving = true
         app.absentmotion.platform.exportScope(scope).launch {
             try {
-                val target = MediaStoreExport(context.applicationContext)
-                val uri = withContext(Dispatchers.IO) { app.absentmotion.export.StagedExports.save(context, staged, target) }
+                val chosen = videos.takeIf { done.kind == ExportKind.Video || done.kind == ExportKind.Gif }
+                val (uri, target) = withContext(Dispatchers.IO) {
+                    app.absentmotion.export.savedIn(chosen, MediaStoreExport(context.applicationContext)) { app.absentmotion.export.StagedExports.save(context, staged, it) }
+                }
                 val folder = if (done.kind == ExportKind.Video) "Movies" else "Pictures"
                 val where = target.location("$folder/${app.absentmotion.export.AppFolder}")
                 if (phase === done) phase = Phase.Done(done.kind, ExportResult(listOf(uri), staged.mime, where, done.result.verification), staged, saved = true)
@@ -1088,9 +1124,19 @@ private fun VideoFields(
     Field(stringResource(R.string.export_codec)) { Segments(codecChoices(s, check), s.codec, { it.shortName }, onReason) { onChange(s.copy(codec = it)) } }
     FrameRateField(rates, s, onChange)
     SmoothingFields(scene, s, w, h, onChange, onReason, onHelp)
-    val report by DeviceCapabilities.of(LocalContext.current).report.collectAsState()
+    val context = LocalContext.current
+    val report by DeviceCapabilities.of(context).report.collectAsState()
+    val sole = remember(scene) { app.absentmotion.export.soleVideo(scene) }
+    val source by produceState<Int?>(null, sole) {
+        value = sole?.let { uri ->
+            app.absentmotion.tools.readPicked(context, android.net.Uri.parse(app.absentmotion.library.openableUri(uri)))?.source
+                ?.takeIf { it.video && it.durationUs > 0 }?.let { app.absentmotion.tools.sourceVideoBitrate(it) }?.takeIf { it < Int.MAX_VALUE }
+        }
+    }
     Field(stringResource(R.string.export_quality), "%.1f Mbps".format(Locale.ROOT, videoBitrate(w, h, s, report?.bitrates(s, w, h)) / 1e6)) {
-        ExportSlider(s.quality) { onChange(s.copy(quality = it)) }
+        if (sole != null) Segments(listOf(Choice(false), Choice(true, if (source == null) txt(R.string.compress_unreadable) else null)), s.bitrate > 0,
+            { stringResource(if (it) R.string.export_same_as_source else R.string.compress_level_custom) }, onReason) { same -> onChange(s.copy(bitrate = if (same) source ?: 0 else 0)) }
+        ExportSlider(s.quality) { onChange(s.copy(quality = it, bitrate = 0)) }
         Ends(stringResource(R.string.export_quality_low), stringResource(R.string.export_quality_high))
     }
     Field(stringResource(R.string.export_kind_audio)) { audio() }
@@ -1456,6 +1502,7 @@ private fun timeKey(kind: ExportKind, s: ExportSettings): String? = when (kind) 
 
 private const val SaveDelayMs = 400L
 private const val MeasureDelayMs = 300L
+private val MeasuredKinds = setOf(ExportKind.Frame, ExportKind.FrameAs, ExportKind.Audio, ExportKind.Package, ExportKind.Xml)
 
 @Composable
 private fun rememberNotifyAsk(): NotifyAsk {

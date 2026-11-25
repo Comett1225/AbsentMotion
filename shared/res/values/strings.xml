@@ -198,6 +198,10 @@
     <string name="bundle_pick_folder">Pick a folder to save in</string>
     <string name="bundle_for_now">For now: %1$s</string>
     <string name="bundle_folder_lost">Can\'t reach this folder. Tap to pick it again; until then bundles save to %1$s.</string>
+    <string name="settings_video_folder">Videos and GIFs folder</string>
+    <string name="settings_sound_folder">Sounds folder</string>
+    <string name="settings_folder_default">Use the default folder</string>
+    <string name="export_folder_lost">Can\'t reach this folder. Tap to pick it again; until then exports save to %1$s.</string>
     <string name="settings_about">About</string>
     <string name="settings_report_issue">Report issue</string>
     <string name="settings_suggest_feature">Suggest a feature</string>
@@ -358,6 +362,7 @@
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
     <string name="theme_daylight">Daylight</string>
+    <string name="theme_light_green">Light Green</string>
     <string name="theme_custom">Custom</string>
     <string name="theme_custom_named">Custom (%1$s)</string>
     <string name="theme_error_bad_colour">Bad color for %1$s</string>
@@ -807,6 +812,7 @@
     <string name="export_quality">Quality</string>
     <string name="export_quality_low">Low</string>
     <string name="export_quality_high">High</string>
+    <string name="export_same_as_source">Same as source</string>
     <string name="export_format">Format</string>
     <string name="export_transparent_becomes">Transparent areas become</string>
     <string name="export_white">White</string>
@@ -1066,6 +1072,8 @@
     <string name="caption_position_bottom">Bottom</string>
     <string name="caption_words_per_caption">Words per caption</string>
     <string name="caption_generate">Generate</string>
+    <string name="caption_import_srt">Import SRT</string>
+    <string name="caption_srt_empty">No captions found in the file</string>
     <string name="caption_not_now">Not now</string>
     <string name="caption_download">Download</string>
 
@@ -2223,8 +2231,8 @@
     <string name="caption_remaining">About %1$s remaining</string>
     <string name="caption_progress">%1$s%%</string>
     <string name="caption_model">Speech model</string>
-    <string name="caption_model_standard">Standard · 60 MB</string>
-    <string name="caption_model_precision">Higher precision · 82 MB</string>
+    <string name="caption_model_standard">Standard · 264 MB</string>
+    <string name="caption_model_precision">Higher precision · 874 MB</string>
     <string name="model_err_no_triangles">The model has no triangles</string>
     <string name="model_err_too_complex">The model is too complex</string>
     <string name="model_err_missing_vertex">A face uses a vertex that does not exist</string>
@@ -2284,6 +2292,7 @@
     <string name="effect_section_palette">Custom Palette</string>
     <string name="effect_section_back">Back of Layer</string>
     <string name="effect_section_colorblend">Color &amp; Blending</string>
+    <string name="effect_section_randomization">Randomization</string>
     <string name="palettes">Palettes</string>
     <string name="palette_untitled">Untitled</string>
     <string name="palette_new">New</string>
@@ -2537,6 +2546,7 @@
     <string name="tools_failed">Could not finish: %1$s</string>
     <string name="tools_save">Save</string>
     <string name="tools_add_to_project">Add to project</string>
+    <string name="tools_add_more">Add more tools</string>
     <string name="tools_part">Part to keep</string>
     <string name="tools_start">Start</string>
     <string name="tools_end">End</string>
@@ -2568,6 +2578,15 @@
     <string name="tools_finding_cuts">Finding the cut points…</string>
     <string name="tools_trim_few_cuts">This video has hardly any cut points, so Fast can only start at the beginning. Choose Exact to start anywhere.</string>
     <string name="tools_trim_no_fast">A fast cut is not possible here, so this will be cut exactly.</string>
+    <string name="tools_merge">Merge</string>
+    <string name="tools_merge_about">Joins videos into one.</string>
+    <string name="tools_merge_add">Add videos</string>
+    <string name="tools_merge_start">Merge</string>
+    <string name="tools_merging">Merging… %1$d%%</string>
+    <string name="tools_merge_need_two">Add at least two videos.</string>
+    <string name="tools_merge_no_fast">These videos differ, so they will be re-encoded.</string>
+    <string name="tools_merge_up">Move up</string>
+    <string name="tools_merge_down">Move down</string>
     <string name="shape_param_round_corners">Round Corners</string>
     <string name="shape_param_notch">Notch</string>
     <string name="shape_param_point">Point</string>
@@ -2725,6 +2744,13 @@
     <string name="tools_enhance_image_about">Add detail to a photo or drawing with AI.</string>
     <string name="tools_enhance_pick">Choose a photo</string>
     <string name="tools_enhance_running">Enhancing image: %1$d%%</string>
+    <string name="tools_convert_image">Convert Image</string>
+    <string name="tools_convert_image_about">Turns a picture or animation into PNG, JPG, WebP or GIF.</string>
+    <string name="tools_convert_pick">Choose a picture</string>
+    <string name="tools_convert_to">Convert to</string>
+    <string name="tools_convert_start">Convert</string>
+    <string name="tools_converting">Converting… %1$d%%</string>
+    <string name="tools_convert_too_large">Animations up to 2048 × 2048 pixels and 3000 frames can be converted.</string>
     <string name="ai_model_detail_max">AI Enhance Realistic Max model</string>
     <string name="ai_model_cartoon_max">AI Enhance Anime and cartoon Max model</string>
     <string name="ai_enhance_image_upscale2_hint">Twice the width and height</string>

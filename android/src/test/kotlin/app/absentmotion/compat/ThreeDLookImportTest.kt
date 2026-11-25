@@ -130,12 +130,12 @@ class ThreeDLookImportTest {
 
     @Test fun oldSpherizeSwitchesItsDirectLightWithAlightsLightSwitch() {
         val lit = migrate(alight("spherize"))
-        near(listOf(2f, 0.984f, 0.008f, 1.886f, 45f, 0f), listOf("lighting", "shading", "ambient", "lightHeight", "light", "shine").map { lit.floats(it)[0] })
+        near(listOf(2f, 0.975f, 0.025f, 1.886f, 45f, 0f), listOf("lighting", "shading", "ambient", "lightHeight", "light", "shine").map { lit.floats(it)[0] })
         val flat = migrate(alight("spherize", p("enableLight", "bool", "false")))
         near(listOf(0f, 0f), listOf("lighting", "shading").map { flat.floats(it)[0] })
         val aimed = migrate(alight("spherize", p("lightDir", "vec2", "115,-100") + p("lightDepth", "float", "225") + p("lightColor", "color", "#FF3366CC")))
         assertEquals(Math.toDegrees(atan2(100.0, 115.0)).toFloat(), aimed.floats("light")[0], 1e-3f)
-        assertEquals(2f * 225f / hypot(115f, 100f), aimed.floats("lightHeight")[0], 1e-3f)
+        assertEquals(225f / hypot(115f, 100f), aimed.floats("lightHeight")[0], 1e-3f)
         assertEquals("#ff3366cc", aimed.text("lightColor").lowercase())
     }
 
@@ -196,6 +196,6 @@ class ThreeDLookImportTest {
 
     @Test fun untouchedPageCurlRollsTheBottomRightCorner() {
         val e = migrate(alight("pagecurl"))
-        near(listOf(0.31f, 0.24f, 56f, 0f), listOf("progress", "radius", "angle", "backAlpha").map { e.floats(it)[0] })
+        near(listOf(0.3647f, 0.15f, 56f, 0f, 1f), listOf("progress", "radius", "angle", "backAlpha", "roll").map { e.floats(it)[0] })
     }
 }

@@ -187,6 +187,8 @@ class AppSettings(private val context: Context) {
 
     private var keepMediaCopiesState by mutableStateOf(prefs.getBoolean("keepMediaCopies", true))
     private var bundlesFolderState by mutableStateOf(prefs.getString("bundlesFolder", null))
+    private var videoFolderState by mutableStateOf(prefs.getString("videoFolder", null))
+    private var soundFolderState by mutableStateOf(prefs.getString("soundFolder", null))
 
     var communityCreator: String
         get() = prefs.getString("communityCreator", "").orEmpty()
@@ -195,6 +197,14 @@ class AppSettings(private val context: Context) {
     var bundlesFolder: String?
         get() = bundlesFolderState
         set(value) { bundlesFolderState = value; prefs.edit().putString("bundlesFolder", value).apply() }
+
+    var videoFolder: String?
+        get() = videoFolderState
+        set(value) { videoFolderState = value; prefs.edit().putString("videoFolder", value).apply() }
+
+    var soundFolder: String?
+        get() = soundFolderState
+        set(value) { soundFolderState = value; prefs.edit().putString("soundFolder", value).apply() }
 
     var keepMediaCopies: Boolean
         get() = keepMediaCopiesState
@@ -271,6 +281,7 @@ class AppSettings(private val context: Context) {
 
     private fun builtInThemeName(id: String) = when (id) {
         "Daylight" -> txt(R.string.theme_daylight)
+        "LightGreen" -> txt(R.string.theme_light_green)
         "Dark" -> txt(R.string.theme_dark)
         else -> txt(R.string.theme_light)
     }
@@ -301,13 +312,20 @@ class AppSettings(private val context: Context) {
         }
 
     private fun savedTools(key: String) = prefs.getString(key, null)?.split(',').orEmpty()
-    private var toolsHiddenState by mutableStateOf(app.absentmotion.ui.home.toolSet(savedTools("toolsHidden")))
+    private fun knownTools(): Set<String> = if (prefs.contains("toolsKnown")) savedTools("toolsKnown").toSet() else app.absentmotion.ui.home.DefaultToolOrder.toSet() - "merge"
+    private var toolsHiddenState by mutableStateOf(
+        if (prefs.contains("toolsHidden")) app.absentmotion.ui.home.toolSet(savedTools("toolsHidden") + (app.absentmotion.ui.home.DefaultHiddenTools - knownTools()))
+        else app.absentmotion.ui.home.DefaultHiddenTools,
+    )
     private var projectToolOrderState by mutableStateOf(app.absentmotion.ui.home.toolOrder(savedTools("projectToolOrder")))
     private var projectToolsHiddenState by mutableStateOf(app.absentmotion.ui.home.toolSet(savedTools("projectToolsHidden")))
 
     var toolsHidden: Set<String>
         get() = toolsHiddenState
-        set(value) { toolsHiddenState = app.absentmotion.ui.home.toolSet(value); prefs.edit().putString("toolsHidden", toolsHiddenState.joinToString(",")).apply() }
+        set(value) {
+            toolsHiddenState = app.absentmotion.ui.home.toolSet(value)
+            prefs.edit().putString("toolsHidden", toolsHiddenState.joinToString(",")).putString("toolsKnown", app.absentmotion.ui.home.DefaultToolOrder.joinToString(",")).apply()
+        }
 
     var projectToolOrder: List<String>
         get() = projectToolOrderState

@@ -52,7 +52,7 @@ class EffectPackTest {
                     p.id to when (p.kind) { "point" -> "float2" to false; "color" -> "half4" to true; else -> "float" to false }
                 }
             assertEquals(effect.key, expected, uniforms)
-            assertTrue("${effect.key} takes a blurred copy, so it needs a 'blur' size", !blurred || effect.key == "unsharpmask" || effect.params.any { it.id == "blur" && it.kind == "float" })
+            assertTrue("${effect.key} takes a blurred copy, so it needs a 'blur' size", !blurred || effect.key in setOf("unsharpmask", "softglow", "feather", "ominoglass") || effect.params.any { it.id == "blur" && it.kind == "float" })
             assertTrue("${effect.key} measures its reach along 'angle', so it needs one", uniforms["extent"]?.first != "shader" || effect.params.any { it.id == "angle" })
             assertTrue(effect.key, Regex("""half4\s+main\s*\(\s*float2\s+\w+\s*\)""").containsMatchIn(effect.sksl))
             assertTrue("${effect.key} declares 'pos', the name the GPU backend gives main's argument",

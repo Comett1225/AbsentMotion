@@ -198,6 +198,10 @@
     <string name="bundle_pick_folder">Виберіть теку для збереження</string>
     <string name="bundle_for_now">Поки що: %1$s</string>
     <string name="bundle_folder_lost">Не вдається відкрити цю теку. Торкніться, щоб вибрати її знову; до того часу пакети зберігатимуться в %1$s.</string>
+    <string name="settings_video_folder">Тека для відео та GIF</string>
+    <string name="settings_sound_folder">Тека для звуків</string>
+    <string name="settings_folder_default">Використовувати стандартну теку</string>
+    <string name="export_folder_lost">Не вдається відкрити цю теку. Торкніться, щоб вибрати її знову; до того часу експорт зберігатиметься в %1$s.</string>
     <string name="settings_about">Про застосунок</string>
     <string name="settings_report_issue">Повідомити про проблему</string>
     <string name="settings_suggest_feature">Запропонувати функцію</string>
@@ -358,6 +362,7 @@
     <string name="theme_light">Світла</string>
     <string name="theme_dark">Темна</string>
     <string name="theme_daylight">Денна</string>
+    <string name="theme_light_green">Світло-зелена</string>
     <string name="theme_custom">Власна</string>
     <string name="theme_custom_named">Власна (%1$s)</string>
     <string name="theme_error_bad_colour">Неправильний колір для %1$s</string>
@@ -826,6 +831,7 @@
     <string name="export_quality">Якість</string>
     <string name="export_quality_low">Низька</string>
     <string name="export_quality_high">Висока</string>
+    <string name="export_same_as_source">Як в оригіналі</string>
     <string name="export_format">Формат</string>
     <string name="export_transparent_becomes">Прозорі ділянки стають</string>
     <string name="export_white">Білими</string>
@@ -1076,6 +1082,8 @@
     <string name="caption_position_bottom">Унизу</string>
     <string name="caption_words_per_caption">Слів у субтитрі</string>
     <string name="caption_generate">Створити</string>
+    <string name="caption_import_srt">Імпорт SRT</string>
+    <string name="caption_srt_empty">У файлі не знайдено субтитрів</string>
     <string name="caption_not_now">Не зараз</string>
     <string name="caption_download">Завантажити</string>
     <string name="draw_back">Назад</string>
@@ -2257,8 +2265,8 @@
     <string name="caption_remaining">Залишилось приблизно %1$s</string>
     <string name="caption_progress">%1$s%%</string>
     <string name="caption_model">Модель мовлення</string>
-    <string name="caption_model_standard">Стандартна · 60 МБ</string>
-    <string name="caption_model_precision">Вища точність · 82 МБ</string>
+    <string name="caption_model_standard">Стандартна · 264 МБ</string>
+    <string name="caption_model_precision">Вища точність · 874 МБ</string>
     <string name="model_err_no_triangles">У моделі немає трикутників</string>
     <string name="model_err_too_complex">Модель надто складна</string>
     <string name="model_err_missing_vertex">Грань використовує вершину, якої не існує</string>
@@ -2320,6 +2328,7 @@
     <string name="effect_section_palette">Власна палітра</string>
     <string name="effect_section_back">Зворотний бік шару</string>
     <string name="effect_section_colorblend">Колір і змішування</string>
+    <string name="effect_section_randomization">Випадковість</string>
     <string name="palettes">Палітри</string>
     <string name="palette_untitled">Без назви</string>
     <string name="palette_new">Нова</string>
@@ -2581,6 +2590,7 @@
     <string name="tools_failed">Не вдалося завершити: %1$s</string>
     <string name="tools_save">Зберегти</string>
     <string name="tools_add_to_project">Додати до проєкту</string>
+    <string name="tools_add_more">Додати інструменти</string>
     <string name="tools_part">Частина, яку залишити</string>
     <string name="tools_start">Початок</string>
     <string name="tools_end">Кінець</string>
@@ -2612,6 +2622,15 @@
     <string name="tools_finding_cuts">Пошук точок розрізу…</string>
     <string name="tools_trim_few_cuts">У цьому відео майже немає точок розрізу, тому режим «Швидко» може починатися лише з початку. Виберіть «Точно», щоб почати де завгодно.</string>
     <string name="tools_trim_no_fast">Швидке обрізання тут неможливе, тож буде обрізано точно.</string>
+    <string name="tools_merge">Об’єднання</string>
+    <string name="tools_merge_about">Об’єднує відео в одне.</string>
+    <string name="tools_merge_add">Додати відео</string>
+    <string name="tools_merge_start">Об’єднати</string>
+    <string name="tools_merging">Об’єднання… %1$d%%</string>
+    <string name="tools_merge_need_two">Додайте щонайменше два відео.</string>
+    <string name="tools_merge_no_fast">Відео відрізняються, тому їх буде перекодовано.</string>
+    <string name="tools_merge_up">Вгору</string>
+    <string name="tools_merge_down">Вниз</string>
     <string name="shape_param_round_corners">Заокруглення кутів</string>
     <string name="shape_param_notch">Виріз</string>
     <string name="shape_param_point">Вістря</string>
@@ -2769,6 +2788,13 @@
     <string name="tools_enhance_image_about">Додає деталей фото або малюнку за допомогою ШІ.</string>
     <string name="tools_enhance_pick">Виберіть фото</string>
     <string name="tools_enhance_running">Покращення зображення: %1$d%%</string>
+    <string name="tools_convert_image">Перетворення зображення</string>
+    <string name="tools_convert_image_about">Перетворює зображення або анімацію на PNG, JPG, WebP чи GIF.</string>
+    <string name="tools_convert_pick">Виберіть зображення</string>
+    <string name="tools_convert_to">Перетворити на</string>
+    <string name="tools_convert_start">Перетворити</string>
+    <string name="tools_converting">Перетворення… %1$d%%</string>
+    <string name="tools_convert_too_large">Можна перетворювати анімації до 2048 × 2048 пікселів і 3000 кадрів.</string>
     <string name="ai_model_detail_max">Модель ШІ-покращення реалістичних зображень, Макс.</string>
     <string name="ai_model_cartoon_max">Модель ШІ-покращення аніме та мультфільмів, Макс.</string>
     <string name="ai_enhance_image_upscale2_hint">Удвічі більша ширина й висота</string>

@@ -120,7 +120,7 @@
      "label": "Mask sa layer"
     },
     "mix": {
-     "label": "Halo"
+     "label": "Fill"
     },
     "spill": {
      "label": "Umaabot sa labas ang mga epekto"
@@ -743,49 +743,49 @@
     "a": {
      "label": "A",
      "options": [
-      "Pula",
-      "Berde",
-      "Asul",
-      "Alpha",
-      "Luminance",
-      "Zero",
-      "Full"
+      "R",
+      "G",
+      "B",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     },
     "b": {
      "label": "B",
      "options": [
-      "Pula",
-      "Berde",
-      "Asul",
-      "Alpha",
-      "Luminance",
-      "Zero",
-      "Full"
+      "R",
+      "G",
+      "B",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     },
     "g": {
      "label": "G",
      "options": [
-      "Pula",
-      "Berde",
-      "Asul",
-      "Alpha",
-      "Luminance",
-      "Zero",
-      "Full"
+      "R",
+      "G",
+      "B",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     },
     "r": {
      "label": "R",
      "options": [
-      "Pula",
-      "Berde",
-      "Asul",
-      "Alpha",
-      "Luminance",
-      "Zero",
-      "Full"
+      "R",
+      "G",
+      "B",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     }
    }
@@ -797,49 +797,49 @@
     "a": {
      "label": "A",
      "options": [
-      "Hue",
-      "Saturation",
-      "Value",
-      "Alpha",
-      "Luminance",
-      "Zero",
-      "Full"
+      "H",
+      "S",
+      "V",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     },
     "h": {
      "label": "H",
      "options": [
-      "Hue",
-      "Saturation",
-      "Value",
-      "Alpha",
-      "Luminance",
-      "Zero",
-      "Full"
+      "H",
+      "S",
+      "V",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     },
     "s": {
      "label": "S",
      "options": [
-      "Hue",
-      "Saturation",
-      "Value",
-      "Alpha",
-      "Luminance",
-      "Zero",
-      "Full"
+      "H",
+      "S",
+      "V",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     },
     "v": {
      "label": "V",
      "options": [
-      "Hue",
-      "Saturation",
-      "Value",
-      "Alpha",
-      "Luminance",
-      "Zero",
-      "Full"
+      "H",
+      "S",
+      "V",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     }
    }
@@ -854,7 +854,7 @@
     "color": {
      "label": "Kulay"
     },
-    "count": {
+    "cells": {
      "label": "Bilang"
     },
     "offset": {
@@ -918,6 +918,13 @@
       "Linear",
       "Mga Sinag"
      ]
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
     }
    }
   },
@@ -948,6 +955,13 @@
      "options": [
       "Layer",
       "Screen"
+     ]
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
      ]
     }
    }
@@ -1905,10 +1919,10 @@
     "phase": {
      "label": "Phase"
     },
-    "radius": {
+    "dotRadius": {
      "label": "Radius"
     },
-    "scale": {
+    "zoom": {
      "label": "Iskala"
     },
     "seed": {
@@ -1928,6 +1942,13 @@
     },
     "start": {
      "label": "Simula"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
     }
    }
   },
@@ -1980,11 +2001,11 @@
     "alpha": {
      "label": "Alpha"
     },
-    "composite": {
+    "mode": {
      "label": "Composite",
      "options": [
-      "Sa likod",
-      "Sa ibabaw"
+      "Sa ibabaw",
+      "Sa likod"
      ]
     },
     "count": {
@@ -2369,7 +2390,7 @@
    "description": "Pinapalambot ang alpha na gilid ng layer, unti-unting pinapalitaw mula sa outline. Mas maraming Mga pag-ulit, mas makinis at mas malalim ang fade. Estilong Klasiko: ang Papasok ay nagfa-fade papasok sa kasalukuyang outline; ang Blur alpha ay nagpapalawak din ng pinapalambot na gilid sa labas nito.",
    "name": "Feather",
    "params": {
-    "blur": {
+    "strength": {
      "label": "Lakas"
     },
     "mode": {
@@ -2994,6 +3015,9 @@
       "Gradient",
       "Spectrum"
      ]
+    },
+    "squeeze": {
+     "label": "Squeeze"
     }
    }
   },
@@ -4061,6 +4085,13 @@
     },
     "sweep": {
      "label": "Anggulo"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
     }
    }
   },
@@ -4685,7 +4716,7 @@
    "description": "Inililipat ang larawan ng layer, pinaiikot ito sa mga gilid ng kahon ng layer.",
    "name": "Offset",
    "params": {
-    "feather": {
+    "seamFeather": {
      "label": "Feather"
     },
     "mask": {
@@ -4693,6 +4724,13 @@
     },
     "offset": {
      "label": "Offset"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
     }
    }
   },
@@ -4777,12 +4815,12 @@
      "label": "Ambient"
     },
     "amount": {
-     "label": "Roughness"
+     "label": "Dami"
     },
     "blend": {
      "label": "Blend"
     },
-    "blur": {
+    "bevel": {
      "label": "Bevel"
     },
     "color": {
@@ -4804,7 +4842,7 @@
      "label": "Tindi"
     },
     "light": {
-     "label": "Kulay ng ilaw"
+     "label": "Kulay"
     },
     "refraction": {
      "label": "Refraction"
@@ -4813,7 +4851,7 @@
      "label": "Mga sample ng smoothing"
     },
     "scale": {
-     "label": "Roughness Scale"
+     "label": "Scale"
     },
     "seed": {
      "label": "Seed"
@@ -4919,6 +4957,13 @@
      "label": "Kintab"
     },
     "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
+    },
+    "roll": {
      "label": "Estilo",
      "options": [
       "Klasiko",
@@ -5411,26 +5456,26 @@
     "angle": {
      "label": "Anggulo"
     },
-    "angleChannel": {
-     "label": "Anggulo Mula Sa",
+    "phi": {
+     "label": "φ",
      "options": [
+      "Lum",
       "R",
       "G",
       "B",
-      "Luminance",
       "Alpha"
      ]
     },
     "center": {
      "label": "Sentro"
     },
-    "distanceChannel": {
-     "label": "Distansya Mula Sa",
+    "rho": {
+     "label": "ρ",
      "options": [
+      "Lum",
       "R",
       "G",
       "B",
-      "Luminance",
       "Alpha"
      ]
     },
@@ -5697,7 +5742,7 @@
      "label": "Anggulo"
     },
     "center": {
-     "label": "Sentro"
+     "label": "Posisyon"
     },
     "color": {
      "label": "Kulay"
@@ -5815,7 +5860,7 @@
      "label": "Liwanag"
     },
     "reach": {
-     "label": "Haba"
+     "label": "Laki"
     },
     "fill": {
      "label": "Fill"
@@ -5842,8 +5887,8 @@
     "direction": {
      "label": "Direksyon",
      "options": [
-      "Clockwise",
-      "Counterclockwise",
+      "CW",
+      "CCW",
       "Both"
      ]
     },
@@ -6202,7 +6247,7 @@
     "choke": {
      "label": "Choke"
     },
-    "feather": {
+    "softness": {
      "label": "Feather"
     },
     "lockLuminance": {
@@ -6214,7 +6259,7 @@
     "target": {
      "label": "Bagong kulay"
     },
-    "threshold": {
+    "tolerance": {
      "label": "Threshold"
     },
     "match": {
@@ -6287,14 +6332,14 @@
       "B"
      ]
     },
-    "mode": {
+    "split": {
      "label": "Mode",
      "options": [
       "Light",
       "Dark",
       "Mask",
       "Luma",
-      "Average"
+      "Luma Alpha"
      ]
     },
     "strength": {
@@ -6313,19 +6358,19 @@
    "description": "Gumuguhit ng pasukot-sukot na ribbon na nagbabago ang lapad sa mga opaque na bahagi ng layer; i-animate ang Phase para dumaloy ito, o i-punch out ito mula sa layer.",
    "name": "Ribbon",
    "params": {
-    "angle": {
+    "tilt": {
      "label": "Anggulo"
     },
     "color": {
      "label": "Kulay"
     },
-    "frequency": {
+    "waves": {
      "label": "Frequency"
     },
-    "magnitude": {
+    "amplitude": {
      "label": "Magnitude"
     },
-    "offset": {
+    "shift": {
      "label": "Offset"
     },
     "phase": {
@@ -6334,14 +6379,14 @@
     "punch": {
      "label": "Punch Out"
     },
-    "smoothing": {
+    "soften": {
      "label": "Smoothing"
     },
     "tint": {
      "label": "Tint"
     },
     "tintAmount": {
-     "label": "Tint Amount"
+     "label": "Kulay ng tint"
     },
     "width": {
      "label": "Lapad"
@@ -6379,11 +6424,11 @@
     "octaves": {
      "label": "Mga octave"
     },
-    "roughness": {
-     "label": "Pagkamagaspang"
+    "strength": {
+     "label": "Lakas"
     },
-    "scale": {
-     "label": "Scale"
+    "detail": {
+     "label": "Detalye"
     },
     "seed": {
      "label": "Seed"
@@ -6672,7 +6717,7 @@
    "description": "Naglalapat ng unsharp mask gamit ang 3x3 neighborhood para pagbutihin ang maliliit na detalye.",
    "name": "Pagpapatalas",
    "params": {
-    "amount": {
+    "sharpness": {
      "label": "Lakas"
     },
     "radius": {
@@ -6767,7 +6812,7 @@
      "label": "Anggulo ng specular"
     },
     "blur": {
-     "label": "Laki"
+     "label": "Radius"
     },
     "color_d": {
      "label": "Kulay ng diffuse"
@@ -6830,8 +6875,8 @@
     "blend": {
      "label": "Blend"
     },
-    "blur": {
-     "label": "Laki"
+    "diffusion": {
+     "label": "Diffusion"
     },
     "brightness": {
      "label": "Liwanag"
@@ -6846,7 +6891,7 @@
      "label": "Mga highlight"
     },
     "opacity": {
-     "label": "Opacity"
+     "label": "Alpha"
     },
     "outside": {
      "label": "Glow sa labas"
@@ -7166,7 +7211,7 @@
     "feather": {
      "label": "Feather"
     },
-    "saturation": {
+    "sat": {
      "label": "Saturation"
     },
     "threshold": {
@@ -7480,10 +7525,10 @@
    "description": "Hinihiwa ang layer sa isang linya at hinihila ang dalawang hati palayo, hinihila ang mga pixel sa linya papunta sa puwang.",
    "name": "Stretch ng Segment",
    "params": {
-    "angle": {
+    "cutAngle": {
      "label": "Anggulo"
     },
-    "offset": {
+    "shift": {
      "label": "Offset"
     },
     "relative": {
@@ -7492,7 +7537,7 @@
     "spread": {
      "label": "Spread"
     },
-    "stretch": {
+    "span": {
      "label": "Stretch"
     }
    }
@@ -7798,7 +7843,7 @@
      "label": "Custom"
     },
     "charset": {
-     "label": "Mga Character",
+     "label": "Set ng character",
      "options": [
       "Mga Letra",
       "Malalaking Titik",
@@ -7911,14 +7956,14 @@
    }
   },
   "texttransform": {
-   "description": "Ginagalaw, pinalalaki, pinapaikot, pinapakupas at kinukulayan ang mga letra, salita o linya sa loob ng isang range. Itinatakda ng Anchor kung bawat component o ang gitna ng layer ang gagamitin sa scaling at rotation. Ilipat ang range gamit ang Offset para gumalaw ang pagbabago sa buong teksto.",
+   "description": "Ginagalaw, pinalalaki, pinapaikot, pinapakupas at kinukulayan ang mga letra, salita o linya sa loob ng isang range. Itinatakda ng Anchor kung bawat component o ang gitna ng layer ang gagamitin sa scaling at rotation. Ilipat ang range gamit ang Phase para gumalaw ang pagbabago sa buong teksto.",
    "name": "Transform ng Teksto",
    "params": {
-    "anchor": {
+    "anchorTo": {
      "label": "Anchor",
      "options": [
-      "Component",
-      "Layer"
+      "Layer",
+      "Component"
      ]
     },
     "easeIn": {
@@ -7931,38 +7976,38 @@
      "label": "Wakas"
     },
     "offset": {
-     "label": "Offset"
+     "label": "Phase"
     },
-    "opacity": {
+    "alpha": {
      "label": "Opacity"
     },
     "overlap": {
      "label": "Overlap"
     },
     "position": {
-     "label": "Posisyon"
+     "label": "Offset"
     },
     "randomOrder": {
      "label": "Random na order"
     },
     "rotation": {
-     "label": "Rotasyon"
+     "label": "Anggulo"
     },
-    "scale": {
+    "scaleBy": {
      "label": "Scale"
     },
     "seed": {
      "label": "Seed"
     },
-    "shape": {
+    "curve": {
      "label": "Hugis",
      "options": [
       "Parisukat",
+      "Makinis",
+      "Tatsulok",
       "Pataas",
       "Pababa",
-      "Tatsulok",
-      "Bilog",
-      "Makinis"
+      "Bilog"
      ]
     },
     "smoothness": {
@@ -7978,7 +8023,7 @@
      "label": "Tint"
     },
     "unit": {
-     "label": "Batay sa",
+     "label": "Component",
      "options": [
       "Titik",
       "Salita",
@@ -7990,6 +8035,13 @@
      "label": "Saklaw",
      "options": [
       "Luma",
+      "Karaniwan"
+     ]
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
       "Karaniwan"
      ]
     }
@@ -8026,7 +8078,7 @@
     "level": {
      "label": "Threshold"
     },
-    "softness": {
+    "feather": {
      "label": "Feather"
     }
    }
@@ -8080,6 +8132,13 @@
     },
     "stretch": {
      "label": "Stretch"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
     }
    }
   },
@@ -8143,6 +8202,13 @@
     },
     "stretch": {
      "label": "Stretch"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
     }
    }
   },
@@ -8182,7 +8248,14 @@
    "name": "Frame Rate",
    "params": {
     "fps": {
-     "label": "Frame/seg"
+     "label": "Hakbang/seg"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
     }
    }
   },
@@ -8487,7 +8560,7 @@
     "amount": {
      "label": "Dami"
     },
-    "radius": {
+    "blurRadius": {
      "label": "Lakas"
     },
     "showMask": {
@@ -8666,7 +8739,7 @@
     "phase": {
      "label": "Phase"
     },
-    "scale": {
+    "cellScale": {
      "label": "Scale"
     },
     "seed": {
@@ -8769,7 +8842,7 @@
     "speed": {
      "label": "Bilis"
     },
-    "warpAngle": {
+    "warp": {
      "label": "Warp Angle"
     },
     "screenSpace": {
@@ -8803,6 +8876,13 @@
       "Klasiko",
       "Karaniwan"
      ]
+    },
+    "axes": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
     }
    }
   },
@@ -8817,10 +8897,10 @@
      "label": "Wakas"
     },
     "feather": {
-     "label": "Feather"
+     "label": "Lambot"
     },
     "softness": {
-     "label": "Lambot"
+     "label": "Feather"
     },
     "start": {
      "label": "Simula"
@@ -8883,7 +8963,7 @@
       "Naka-off"
      ]
     },
-    "strength": {
+    "zoom": {
      "label": "Lakas"
     }
    }

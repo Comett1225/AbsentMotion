@@ -71,6 +71,20 @@
    "step": 0.01
   },
   {
+   "id": "squeeze",
+   "label": "Squeeze",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "when": {
+    "style": [
+     1
+    ]
+   }
+  },
+  {
    "id": "style",
    "label": "Style",
    "type": "choice",
@@ -81,5 +95,5 @@
    ]
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nlayout(color) uniform half4 color1;\nlayout(color) uniform half4 color2;\nlayout(color) uniform half4 color3;\nuniform float repeat;\nuniform float phase;\nuniform float reverse;\nuniform float scaleBrightness;\nuniform float opacity;\nuniform float saturation;\nuniform float style;\nfloat luma(float3 c) { return dot(c, float3(0.2126, 0.7152, 0.0722)); }\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    if (c.a <= 0.0) return c;\n    float3 base = float3(c.rgb) / float(c.a);\n    float4 g;\n    if (style > 0.5) {\n        float x = (reverse > 0.5 ? 1.0 - luma(base) : luma(base)) * repeat + phase;\n        float3 d = abs(fract(float3(x, x - 1.0 / 3.0, x - 2.0 / 3.0) + 0.5) - 0.5);\n        float3 k = clamp(5.0 / 3.0 - 4.0 * d, 0.0, 1.0);\n        g = k.x * float4(color3) + k.y * float4(color2) + k.z * float4(color1);\n        g.a = min(g.a, 1.0);\n    } else {\n        float w = luma(base) * repeat + phase;\n        float u = 1.0 - abs(fract(w * 0.5) * 2.0 - 1.0);\n        if (reverse > 0.5) u = 1.0 - u;\n        g = u < 0.5 ? mix(float4(color1), float4(color2), u * 2.0) : mix(float4(color2), float4(color3), u * 2.0 - 1.0);\n    }\n    float3 mapped = scaleBrightness > 0.5 ? g.rgb * luma(base) * (style > 0.5 ? 16.0 / 15.0 : 1.0) : g.rgb;\n    float grey = luma(mapped);\n    mapped = grey + (mapped - grey) * (0.5 + 0.5 * max(saturation, 0.0));\n    if (style < 0.5) mapped = clamp(mapped, 0.0, 1.0);\n    float3 rgb = mix(base, mapped, clamp(opacity, 0.0, 1.0) * g.a);\n    return half4(half3(clamp(rgb, 0.0, 1.0)) * c.a, c.a);\n}"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nlayout(color) uniform half4 color1;\nlayout(color) uniform half4 color2;\nlayout(color) uniform half4 color3;\nuniform float repeat;\nuniform float phase;\nuniform float reverse;\nuniform float scaleBrightness;\nuniform float opacity;\nuniform float saturation;\nuniform float style;\nuniform float squeeze;\nfloat luma(float3 c) { return dot(c, float3(0.2126, 0.7152, 0.0722)); }\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    if (c.a <= 0.0) return c;\n    float3 base = float3(c.rgb) / float(c.a);\n    float4 g;\n    if (style > 0.5) {\n        float x = (reverse > 0.5 ? 1.0 - luma(base) : luma(base)) * repeat + phase;\n        float3 d = abs(fract(float3(x, x - 1.0 / 3.0, x - 2.0 / 3.0) + 0.5) - 0.5);\n        float3 k = clamp(5.0 / 3.0 + 0.235 * squeeze - 4.0 * d, 0.0, 1.0);\n        g = k.x * float4(color3) + k.y * float4(color2) + k.z * float4(color1);\n        g.a = min(g.a, 1.0);\n    } else {\n        float w = luma(base) * repeat + phase;\n        float u = 1.0 - abs(fract(w * 0.5) * 2.0 - 1.0);\n        if (reverse > 0.5) u = 1.0 - u;\n        g = u < 0.5 ? mix(float4(color1), float4(color2), u * 2.0) : mix(float4(color2), float4(color3), u * 2.0 - 1.0);\n    }\n    float3 mapped = scaleBrightness > 0.5 ? g.rgb * luma(base) * (style > 0.5 ? 16.0 / 15.0 : 1.0) : g.rgb;\n    float grey = luma(mapped);\n    mapped = grey + (mapped - grey) * (0.5 + 0.5 * max(saturation, 0.0));\n    if (style < 0.5) mapped = clamp(mapped, 0.0, 1.0);\n    float3 rgb = mix(base, mapped, clamp(opacity, 0.0, 1.0) * g.a);\n    return half4(half3(clamp(rgb, 0.0, 1.0)) * c.a, c.a);\n}"
 }

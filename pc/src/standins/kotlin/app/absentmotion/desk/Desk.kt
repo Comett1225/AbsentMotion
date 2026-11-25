@@ -52,7 +52,7 @@ object DeskFiles {
     val imageExtensions = setOf("png", "jpg", "jpeg", "webp", "gif", "bmp", "heic", "svg")
 
     fun chooseFiles(media: Boolean, multiple: Boolean, videoOnly: Boolean = false, imageOnly: Boolean = false, title: String = when { videoOnly -> app.absentmotion.i18n.AppText.get(R.string.tools_choose_video); media -> app.absentmotion.i18n.AppText.get(R.string.desk_choose_media); else -> app.absentmotion.i18n.AppText.get(R.string.desk_choose_file) }, pictureExtensions: Set<String> = imageExtensions): List<File> {
-        System.getProperty("am.pick")?.let { return listOf(File(it)) }
+        System.getProperty("am.pick")?.let { return it.split(File.pathSeparator).map(::File) }
         val filters = when {
             !media -> emptyList()
             videoOnly -> listOf(DeskPicker.Filter(Strings.byName("export_kind_video") ?: "Video", videoExtensions))

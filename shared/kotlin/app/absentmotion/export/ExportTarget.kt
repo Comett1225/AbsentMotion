@@ -20,6 +20,10 @@ interface ExportStore {
     fun sequenceFolder(name: String, mime: String): String
 }
 
+inline fun <T> savedIn(chosen: ExportStore?, store: ExportStore, save: (ExportStore) -> T): Pair<T, ExportStore> =
+    if (chosen == null || chosen === store) save(store) to store
+    else try { save(chosen) to chosen } catch (e: ExportError) { save(store) to store }
+
 internal fun freeFolder(parent: java.io.File, name: String): String =
     generateSequence(1) { it + 1 }.map { if (it == 1) name else "$name ($it)" }.first { !java.io.File(parent, it).exists() }
 

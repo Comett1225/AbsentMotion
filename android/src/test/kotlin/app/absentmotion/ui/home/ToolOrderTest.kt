@@ -11,36 +11,36 @@ class ToolOrderTest {
 
     @Test fun importerAppendsToAnOldSavedOrder() {
         val old = listOf("downloader", "enhance", "compress", "gif", "trim", "extract")
-        assertEquals(old + "importer" + "send", toolOrder(old))
-        val custom = listOf("importer", "send") + old
-        assertEquals(custom, toolOrder(custom))
+        assertEquals(old + "merge" + "convert" + "importer" + "send", toolOrder(old))
+        val custom = listOf("importer", "send", "convert") + old
+        assertEquals(custom + "merge", toolOrder(custom))
     }
 
     @Test fun unknownIdsAreDroppedAndMissingIdsAppendInDefaultOrder() {
         assertEquals(
-            listOf("downloader", "enhance", "compress", "trim", "extract", "gif", "importer", "send"),
+            listOf("downloader", "enhance", "compress", "trim", "extract", "gif", "merge", "convert", "importer", "send"),
             toolOrder(listOf("unknown", "downloader", "future_tool", "enhance", "")),
         )
     }
 
     @Test fun duplicateIdsKeepFirstOccurrence() {
         assertEquals(
-            listOf("gif", "trim", "compress", "extract", "downloader", "enhance", "importer", "send"),
+            listOf("gif", "trim", "compress", "extract", "merge", "downloader", "enhance", "convert", "importer", "send"),
             toolOrder(listOf("gif", "trim", "gif", "compress", "trim")),
         )
     }
 
     @Test fun movedToolOrderSwapsWithinBounds() {
         assertEquals(
-            listOf("trim", "compress", "extract", "gif", "downloader", "enhance", "importer", "send"),
+            listOf("trim", "compress", "extract", "gif", "merge", "downloader", "enhance", "convert", "importer", "send"),
             movedToolOrder(DefaultToolOrder, 0, 1),
         )
         assertEquals(
-            listOf("downloader", "compress", "trim", "extract", "gif", "enhance", "importer", "send"),
-            movedToolOrder(DefaultToolOrder, 4, 0),
+            listOf("downloader", "compress", "trim", "extract", "gif", "merge", "enhance", "convert", "importer", "send"),
+            movedToolOrder(DefaultToolOrder, 5, 0),
         )
         assertEquals(DefaultToolOrder, movedToolOrder(DefaultToolOrder, 0, -1))
-        assertEquals(DefaultToolOrder, movedToolOrder(DefaultToolOrder, 7, 8))
+        assertEquals(DefaultToolOrder, movedToolOrder(DefaultToolOrder, 9, 10))
         assertEquals(DefaultToolOrder, movedToolOrder(DefaultToolOrder, 2, 2))
     }
 }

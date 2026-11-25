@@ -89,7 +89,7 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
         val h = scene.node["height"]?.finiteFloat()?.takeIf { it > 0f } ?: 1080f
         var root = visit(scene.node, floatArrayOf(w, h, 0f, w, h, w, h))
         val foreign = root["am"]?.startsWith("com.alightcreative") == true
-        if (foreign) root = root.copy(attrs = root.attrs + ("am" to "app.absentmotion") + ("alightImport" to "true"), children = root.children.map { pixelText(squaredBlendOpacity(it)) })
+        if (foreign) root = root.copy(attrs = root.attrs + ("am" to "app.absentmotion") + ("alightImport" to "true") + ("alightPivots" to "true"), children = root.children.map { heldGroup(pixelText(premulBlend(squaredBlendOpacity(it)))) }).let(::pivotPlaced)
         return Result(if (converted.isEmpty() && !renamed && !foreign) scene else Scene(root), converted, dropped)
     }
 
@@ -112,16 +112,64 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
     private fun transformOf(layer: XmlNode, name: String): String? =
         layer.children.firstOrNull { it.name == "transform" }?.children?.firstOrNull { it.name == name }?.valueAt(0f)
 
+    private fun pivotPlaced(scene: XmlNode): XmlNode {
+        fun pivot(layer: XmlNode?) = layer?.child("transform")?.child("pivot")
+        fun xy(v: String?) = v?.split(',')?.map { it.trim().finiteFloat() ?: 0f }.orEmpty().let { floatArrayOf(it.getOrElse(0) { 0f }, it.getOrElse(1) { 0f }) }
+        val layers = scene.children.filter { it.name in Scene.LAYER_TAGS }.associateBy { it["id"] }
+        return scene.copy(children = scene.children.map { node ->
+            if (node.name !in Scene.LAYER_TAGS) return@map node
+            val layer = node.copy(children = node.children.map { if (it.name == "scene") pivotPlaced(it) else it })
+            val terms = listOfNotNull(pivot(layer)?.let { it to 1f }, pivot(node["parent"]?.let { layers[it] })?.let { it to -1f })
+            val moving = terms.filter { it.first.isKeyframed }
+            val transform = layer.child("transform") ?: XmlNode("transform")
+            val location = transform.child("location") ?: XmlNode("location", mapOf("value" to "0,0,0"))
+            if (moving.size > 1 || moving.isNotEmpty() && (location.isKeyframed || moving[0].second < 0)) return@map layer
+            val still = FloatArray(2).also { d -> for ((n, sign) in terms) if (!n.isKeyframed) xy(n["value"]).forEachIndexed { i, v -> d[i] += sign * v } }
+            fun shifted(v: String, by: FloatArray): String {
+                val parts = v.split(',').map { it.trim().finiteFloat() ?: 0f }.toFloatArray()
+                for (i in 0 until minOf(2, parts.size)) parts[i] += by[i]
+                return formatFloats(parts)
+            }
+            val placed = when {
+                moving.isNotEmpty() -> {
+                    val (n, sign) = moving[0]
+                    val base = location["value"] ?: return@map layer
+                    location.withKeyframes(n.keyframes.map { k -> k.copy(v = shifted(base, xy(k.v).let { floatArrayOf(sign * it[0] + still[0], sign * it[1] + still[1]) })) })
+                }
+                still[0] == 0f && still[1] == 0f -> return@map layer
+                location.isKeyframed -> location.withKeyframes(location.keyframes.map { it.copy(v = shifted(it.v, still)) })
+                else -> location.with("value", shifted(location["value"] ?: return@map layer, still))
+            }
+            layer.withChild("transform", transform.withChild("location", placed))
+        })
+    }
+
+    private fun heldGroup(node: XmlNode): XmlNode {
+        if (node.name != "embedScene") return node
+        val inner = node.children.firstOrNull { it.name == "scene" } ?: return node
+        val played = (node["inTime"]?.toIntOrNull() ?: 0).coerceAtLeast(0) + (node["endTime"]?.toIntOrNull() ?: 0) - (node["startTime"]?.toIntOrNull() ?: 0)
+        val hold = (inner["retime"] ?: "off") == "off" && (node["speed"]?.finiteFloat() ?: 1f) == 1f &&
+            node.children.none { it.name == "speedMap" || it.name == "frame" } && played > (inner["totalTime"]?.toIntOrNull() ?: Int.MAX_VALUE)
+        val scene = inner.copy(children = inner.children.map(::heldGroup)).let { if (hold) it.with("retime", "freeze") else it }
+        return node.copy(children = node.children.map { if (it === inner) scene else it })
+    }
+
     private fun pixelText(node: XmlNode): XmlNode = when {
         node.name == "text" -> node.with("textMetrics", "pixel")
         node.children.isEmpty() -> node
         else -> node.copy(children = node.children.map(::pixelText))
     }
 
+    private fun premulBlend(node: XmlNode): XmlNode {
+        if (node.name !in Scene.LAYER_TAGS) return node
+        val layer = if (node.name != "embedScene") node else node.copy(children = node.children.map { s -> if (s.name == "scene") s.copy(children = s.children.map(::premulBlend)) else s })
+        return if (layer["blending"] in setOf("hard-light", "soft-light") && layer.children.none { it.name == "effect" }) layer.with("blendSource", "premul") else layer
+    }
+
     private fun squaredBlendOpacity(node: XmlNode): XmlNode {
         if (node.name !in Scene.LAYER_TAGS) return node
         val layer = if (node.name != "embedScene") node else node.copy(children = node.children.map { s -> if (s.name == "scene") s.copy(children = s.children.map(::squaredBlendOpacity)) else s })
-        if (layer["blending"] !in setOf("multiply", "subtract")) return layer
+        if (layer["blending"] !in setOf("multiply", "subtract") && (layer["blending"] !in setOf("screen", "lighten", "darken") || layer.children.any { it.name == "effect" })) return layer
         if (layer.children.any { it.name == "effect" && it["id"] in setOf(LIFT, "absent.backdrop") }) return layer
         val square = { v: String -> v.trim().finiteFloat()?.let { formatFloats(floatArrayOf(it * it)) } ?: v }
         return layer.copy(children = layer.children.map { t ->
@@ -345,7 +393,8 @@ fun Scene.oldAlightImport(): Boolean {
     fun stale(n: XmlNode): Boolean = n.name == "effect" && (n["id"] == "absent.backdrop" && lacks(n, "spill") || n["id"] == "absent.exposure" && lacks(n, "soft") || n["id"] == "absent.stripes" && lacks(n, "style") ||
         n["id"] == "absent.tiles" && n.children.any { it.name == "property" && it["name"] == "sizing" && it["value"]?.trim()?.finiteFloat() == 1f }) ||
         n.children.any(::stale)
-    return stale(node)
+    fun pivoted(n: XmlNode): Boolean = n.name == "pivot" && (n.isKeyframed || n["value"]?.split(',')?.any { (it.trim().finiteFloat() ?: 0f) != 0f } == true) || n.children.any(::pivoted)
+    return stale(node) || node["alightPivots"] == null && pivoted(node)
 }
 
 fun Scene.withReimportTipShown(): Scene = Scene(node.with("reimportTip", "shown"))

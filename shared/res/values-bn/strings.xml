@@ -198,6 +198,10 @@
     <string name="bundle_pick_folder">সেভ করার জন্য একটি ফোল্ডার বাছুন</string>
     <string name="bundle_for_now">আপাতত: %1$s</string>
     <string name="bundle_folder_lost">এই ফোল্ডারে পৌঁছানো যাচ্ছে না। আবার বাছতে ট্যাপ করুন; ততক্ষণ বান্ডল %1$s-এ সেভ হবে।</string>
+    <string name="settings_video_folder">ভিডিও ও GIF ফোল্ডার</string>
+    <string name="settings_sound_folder">সাউন্ড ফোল্ডার</string>
+    <string name="settings_folder_default">ডিফল্ট ফোল্ডার ব্যবহার করুন</string>
+    <string name="export_folder_lost">এই ফোল্ডারে পৌঁছানো যাচ্ছে না। আবার বাছতে ট্যাপ করুন; ততক্ষণ এক্সপোর্ট %1$s-এ সেভ হবে।</string>
     <string name="settings_about">সম্পর্কে</string>
     <string name="settings_report_issue">সমস্যা জানান</string>
     <string name="settings_suggest_feature">একটি ফিচার প্রস্তাব করুন</string>
@@ -358,6 +362,7 @@
     <string name="theme_light">লাইট</string>
     <string name="theme_dark">ডার্ক</string>
     <string name="theme_daylight">ডেলাইট</string>
+    <string name="theme_light_green">লাইট গ্রিন</string>
     <string name="theme_custom">কাস্টম</string>
     <string name="theme_custom_named">কাস্টম (%1$s)</string>
     <string name="theme_error_bad_colour">%1$s-এর কালার সঠিক নয়</string>
@@ -806,6 +811,7 @@
     <string name="export_quality">কোয়ালিটি</string>
     <string name="export_quality_low">কম</string>
     <string name="export_quality_high">উচ্চ</string>
+    <string name="export_same_as_source">সোর্সের মতো</string>
     <string name="export_format">ফরম্যাট</string>
     <string name="export_transparent_becomes">স্বচ্ছ অংশ হবে</string>
     <string name="export_white">সাদা</string>
@@ -1048,6 +1054,8 @@
     <string name="caption_position_bottom">নিচে</string>
     <string name="caption_words_per_caption">প্রতি ক্যাপশনে শব্দ</string>
     <string name="caption_generate">জেনারেট</string>
+    <string name="caption_import_srt">SRT ইমপোর্ট করুন</string>
+    <string name="caption_srt_empty">ফাইলে কোনো ক্যাপশন পাওয়া যায়নি</string>
     <string name="caption_not_now">এখন নয়</string>
     <string name="caption_download">ডাউনলোড</string>
     <string name="draw_back">ফিরে যান</string>
@@ -2197,8 +2205,8 @@
     <string name="caption_remaining">আর প্রায় %1$s বাকি</string>
     <string name="caption_progress">%1$s%%</string>
     <string name="caption_model">স্পিচ মডেল</string>
-    <string name="caption_model_standard">স্ট্যান্ডার্ড · 60 MB</string>
-    <string name="caption_model_precision">বেশি নিখুঁত · 82 MB</string>
+    <string name="caption_model_standard">স্ট্যান্ডার্ড · 264 MB</string>
+    <string name="caption_model_precision">বেশি নিখুঁত · 874 MB</string>
     <string name="model_err_no_triangles">মডেলে কোনো ট্রায়াঙ্গল নেই</string>
     <string name="model_err_too_complex">মডেলটি খুব জটিল</string>
     <string name="model_err_missing_vertex">একটি ফেস এমন ভার্টেক্স ব্যবহার করছে যা নেই</string>
@@ -2258,6 +2266,7 @@
     <string name="effect_section_palette">নিজস্ব প্যালেট</string>
     <string name="effect_section_back">লেয়ারের পেছন</string>
     <string name="effect_section_colorblend">রং ও ব্লেন্ডিং</string>
+    <string name="effect_section_randomization">এলোমেলোকরণ</string>
     <string name="palettes">প্যালেট</string>
     <string name="palette_untitled">নামহীন</string>
     <string name="palette_new">নতুন</string>
@@ -2511,6 +2520,7 @@
     <string name="tools_failed">শেষ করা যায়নি: %1$s</string>
     <string name="tools_save">সেভ</string>
     <string name="tools_add_to_project">প্রজেক্টে যোগ করুন</string>
+    <string name="tools_add_more">আরও টুলস যোগ করুন</string>
     <string name="tools_part">যে অংশ রাখবেন</string>
     <string name="tools_start">শুরু</string>
     <string name="tools_end">শেষ</string>
@@ -2542,6 +2552,15 @@
     <string name="tools_finding_cuts">কাট পয়েন্ট খোঁজা হচ্ছে…</string>
     <string name="tools_trim_few_cuts">এই ভিডিওতে কাট পয়েন্ট প্রায় নেই, তাই দ্রুত মোডে শুধু শুরু থেকেই কাটা যাবে। যেকোনো জায়গা থেকে শুরু করতে নিখুঁত বেছে নিন।</string>
     <string name="tools_trim_no_fast">এখানে দ্রুত কাট সম্ভব নয়, তাই এটি নিখুঁতভাবে কাটা হবে।</string>
+    <string name="tools_merge">মার্জ</string>
+    <string name="tools_merge_about">ভিডিওগুলো জুড়ে একটি ভিডিও বানায়।</string>
+    <string name="tools_merge_add">ভিডিও যোগ করুন</string>
+    <string name="tools_merge_start">মার্জ করুন</string>
+    <string name="tools_merging">মার্জ হচ্ছে… %1$d%%</string>
+    <string name="tools_merge_need_two">কমপক্ষে দুটি ভিডিও যোগ করুন।</string>
+    <string name="tools_merge_no_fast">ভিডিওগুলো আলাদা, তাই সেগুলো আবার এনকোড করা হবে।</string>
+    <string name="tools_merge_up">ওপরে নিন</string>
+    <string name="tools_merge_down">নিচে নিন</string>
     <string name="shape_param_round_corners">কোণ গোল করুন</string>
     <string name="shape_param_notch">খাঁজ</string>
     <string name="shape_param_point">ডগা</string>
@@ -2699,6 +2718,13 @@
     <string name="tools_enhance_image_about">AI দিয়ে ছবি বা আঁকায় ডিটেইল যোগ করুন।</string>
     <string name="tools_enhance_pick">একটি ছবি বেছে নিন</string>
     <string name="tools_enhance_running">ইমেজ এনহ্যান্স হচ্ছে: %1$d%%</string>
+    <string name="tools_convert_image">ইমেজ কনভার্ট</string>
+    <string name="tools_convert_image_about">একটি ছবি বা অ্যানিমেশনকে PNG, JPG, WebP বা GIF-এ বদলে দেয়।</string>
+    <string name="tools_convert_pick">একটি ছবি বেছে নিন</string>
+    <string name="tools_convert_to">যেটিতে কনভার্ট করবেন</string>
+    <string name="tools_convert_start">কনভার্ট করুন</string>
+    <string name="tools_converting">কনভার্ট হচ্ছে… %1$d%%</string>
+    <string name="tools_convert_too_large">2048 × 2048 পিক্সেল ও 3000 ফ্রেম পর্যন্ত অ্যানিমেশন কনভার্ট করা যায়।</string>
     <string name="ai_model_detail_max">AI এনহ্যান্স রিয়ালিস্টিক ম্যাক্স মডেল</string>
     <string name="ai_model_cartoon_max">AI এনহ্যান্স অ্যানিমে ও কার্টুন ম্যাক্স মডেল</string>
     <string name="ai_enhance_image_upscale2_hint">প্রস্থ ও উচ্চতা দ্বিগুণ</string>

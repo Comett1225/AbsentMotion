@@ -163,6 +163,7 @@ struct Layer {
     Edge shadow;
     Gradient gradient;
     std::string blending;
+    bool premulBlend = false;
     bool clippingMask = false;
     int64_t parent = 0;
     int64_t pathLayer = 0;
@@ -181,6 +182,7 @@ struct Layer {
     std::string lightType;
     std::vector<std::pair<int, uint32_t>> tints;
     Anim steps;
+    bool stepMiddle = false;
     bool placed = false;
     bool projected = false;
     Sight sight;
@@ -196,7 +198,7 @@ struct Layer {
     }
     double steppedMs(double timeMs) const {
         const float fps = stepRate(timeMs);
-        return fps > 0 ? HeldMs(timeMs, startTime, fps) : timeMs;
+        return fps > 0 ? (stepMiddle ? MiddleMs(timeMs, startTime, fps) : HeldMs(timeMs, startTime, fps)) : timeMs;
     }
     float localTime(double timeMs) const {
         return endTime > startTime ? (float)((steppedMs(timeMs) - startTime) / (endTime - startTime)) : 0.0f;

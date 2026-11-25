@@ -198,6 +198,10 @@
     <string name="bundle_pick_folder">Kaydetmek için bir klasör seçin</string>
     <string name="bundle_for_now">Şimdilik: %1$s</string>
     <string name="bundle_folder_lost">Bu klasöre erişilemiyor. Yeniden seçmek için dokunun; o zamana kadar paketler %1$s konumuna kaydedilir.</string>
+    <string name="settings_video_folder">Video ve GIF klasörü</string>
+    <string name="settings_sound_folder">Ses klasörü</string>
+    <string name="settings_folder_default">Varsayılan klasörü kullan</string>
+    <string name="export_folder_lost">Bu klasöre erişilemiyor. Yeniden seçmek için dokunun; o zamana kadar dışa aktarımlar %1$s konumuna kaydedilir.</string>
     <string name="settings_about">Hakkında</string>
     <string name="settings_report_issue">Sorun bildir</string>
     <string name="settings_suggest_feature">Özellik öner</string>
@@ -358,6 +362,7 @@
     <string name="theme_light">Açık</string>
     <string name="theme_dark">Koyu</string>
     <string name="theme_daylight">Gün ışığı</string>
+    <string name="theme_light_green">Açık yeşil</string>
     <string name="theme_custom">Özel</string>
     <string name="theme_custom_named">Özel (%1$s)</string>
     <string name="theme_error_bad_colour">%1$s için geçersiz renk</string>
@@ -806,6 +811,7 @@
     <string name="export_quality">Kalite</string>
     <string name="export_quality_low">Düşük</string>
     <string name="export_quality_high">Yüksek</string>
+    <string name="export_same_as_source">Kaynakla aynı</string>
     <string name="export_format">Biçim</string>
     <string name="export_transparent_becomes">Saydam alanlar şuna dönüşür</string>
     <string name="export_white">Beyaz</string>
@@ -1048,6 +1054,8 @@
     <string name="caption_position_bottom">Alt</string>
     <string name="caption_words_per_caption">Altyazı başına kelime</string>
     <string name="caption_generate">Oluştur</string>
+    <string name="caption_import_srt">SRT içe aktar</string>
+    <string name="caption_srt_empty">Dosyada altyazı bulunamadı</string>
     <string name="caption_not_now">Şimdi değil</string>
     <string name="caption_download">İndir</string>
     <string name="draw_back">Geri</string>
@@ -2197,8 +2205,8 @@
     <string name="caption_remaining">Yaklaşık %1$s kaldı</string>
     <string name="caption_progress">%%%1$s</string>
     <string name="caption_model">Konuşma modeli</string>
-    <string name="caption_model_standard">Standart · 60 MB</string>
-    <string name="caption_model_precision">Daha yüksek doğruluk · 82 MB</string>
+    <string name="caption_model_standard">Standart · 264 MB</string>
+    <string name="caption_model_precision">Daha yüksek doğruluk · 874 MB</string>
     <string name="model_err_no_triangles">Modelde üçgen yok</string>
     <string name="model_err_too_complex">Model çok karmaşık</string>
     <string name="model_err_missing_vertex">Bir yüz, var olmayan bir köşe noktası kullanıyor</string>
@@ -2258,6 +2266,7 @@
     <string name="effect_section_palette">Özel Palet</string>
     <string name="effect_section_back">Katmanın Arkası</string>
     <string name="effect_section_colorblend">Renk ve Karıştırma</string>
+    <string name="effect_section_randomization">Rastgelelik</string>
     <string name="palettes">Paletler</string>
     <string name="palette_untitled">Adsız</string>
     <string name="palette_new">Yeni</string>
@@ -2511,6 +2520,7 @@
     <string name="tools_failed">Tamamlanamadı: %1$s</string>
     <string name="tools_save">Kaydet</string>
     <string name="tools_add_to_project">Projeye ekle</string>
+    <string name="tools_add_more">Daha fazla araç ekle</string>
     <string name="tools_part">Tutulacak bölüm</string>
     <string name="tools_start">Başlangıç</string>
     <string name="tools_end">Bitiş</string>
@@ -2542,6 +2552,15 @@
     <string name="tools_finding_cuts">Kesim noktaları bulunuyor…</string>
     <string name="tools_trim_few_cuts">Bu videoda neredeyse hiç kesim noktası yok, bu yüzden Hızlı yalnızca baştan başlayabilir. İstediğiniz yerden başlamak için Tam\'ı seçin.</string>
     <string name="tools_trim_no_fast">Burada hızlı kesim mümkün değil, bu yüzden tam olarak kesilecek.</string>
+    <string name="tools_merge">Birleştir</string>
+    <string name="tools_merge_about">Videoları tek videoda birleştirir.</string>
+    <string name="tools_merge_add">Video ekle</string>
+    <string name="tools_merge_start">Birleştir</string>
+    <string name="tools_merging">Birleştiriliyor… %1$d%%</string>
+    <string name="tools_merge_need_two">En az iki video ekleyin.</string>
+    <string name="tools_merge_no_fast">Bu videolar farklı olduğundan yeniden kodlanacak.</string>
+    <string name="tools_merge_up">Yukarı taşı</string>
+    <string name="tools_merge_down">Aşağı taşı</string>
     <string name="shape_param_round_corners">Köşeleri yuvarla</string>
     <string name="shape_param_notch">Çentik</string>
     <string name="shape_param_point">Uç</string>
@@ -2699,6 +2718,13 @@
     <string name="tools_enhance_image_about">AI ile bir fotoğrafa veya çizime ayrıntı ekler.</string>
     <string name="tools_enhance_pick">Bir fotoğraf seçin</string>
     <string name="tools_enhance_running">Görsel iyileştiriliyor: %%%1$d</string>
+    <string name="tools_convert_image">Görseli dönüştür</string>
+    <string name="tools_convert_image_about">Bir görseli veya animasyonu PNG, JPG, WebP ya da GIF\'e dönüştürür.</string>
+    <string name="tools_convert_pick">Bir görsel seçin</string>
+    <string name="tools_convert_to">Şuna dönüştür</string>
+    <string name="tools_convert_start">Dönüştür</string>
+    <string name="tools_converting">Dönüştürülüyor… %1$d%%</string>
+    <string name="tools_convert_too_large">2048 × 2048 piksele ve 3000 kareye kadar animasyonlar dönüştürülebilir.</string>
     <string name="ai_model_detail_max">AI İyileştirme Gerçekçi Maks. modeli</string>
     <string name="ai_model_cartoon_max">AI İyileştirme Anime ve çizgi film Maks. modeli</string>
     <string name="ai_enhance_image_upscale2_hint">Genişlik ve yükseklik iki katı</string>

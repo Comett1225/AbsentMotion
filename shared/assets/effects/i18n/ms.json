@@ -120,7 +120,7 @@
      "label": "Topeng Ke Lapisan"
     },
     "mix": {
-     "label": "Campur"
+     "label": "Isi"
     },
     "spill": {
      "label": "Kesan Menjangkau Keluar"
@@ -743,49 +743,49 @@
     "a": {
      "label": "A",
      "options": [
-      "Merah",
-      "Hijau",
-      "Biru",
-      "Alfa",
-      "Luminans",
-      "Sifar",
-      "Penuh"
+      "R",
+      "G",
+      "B",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     },
     "b": {
      "label": "B",
      "options": [
-      "Merah",
-      "Hijau",
-      "Biru",
-      "Alfa",
-      "Luminans",
-      "Sifar",
-      "Penuh"
+      "R",
+      "G",
+      "B",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     },
     "g": {
      "label": "G",
      "options": [
-      "Merah",
-      "Hijau",
-      "Biru",
-      "Alfa",
-      "Luminans",
-      "Sifar",
-      "Penuh"
+      "R",
+      "G",
+      "B",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     },
     "r": {
      "label": "R",
      "options": [
-      "Merah",
-      "Hijau",
-      "Biru",
-      "Alfa",
-      "Kecerahan",
-      "Sifar",
-      "Penuh"
+      "R",
+      "G",
+      "B",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     }
    }
@@ -797,49 +797,49 @@
     "a": {
      "label": "A",
      "options": [
-      "Rona",
-      "Ketepuan",
-      "Nilai",
-      "Alfa",
-      "Luminans",
-      "Sifar",
-      "Penuh"
+      "H",
+      "S",
+      "V",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     },
     "h": {
      "label": "H",
      "options": [
-      "Rona",
-      "Ketepuan",
-      "Nilai",
-      "Alfa",
-      "Luminans",
-      "Sifar",
-      "Penuh"
+      "H",
+      "S",
+      "V",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     },
     "s": {
      "label": "S",
      "options": [
-      "Rona",
-      "Ketepuan",
-      "Nilai",
-      "Alfa",
-      "Luminans",
-      "Sifar",
-      "Penuh"
+      "H",
+      "S",
+      "V",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     },
     "v": {
      "label": "V",
      "options": [
-      "Rona",
-      "Ketepuan",
-      "Nilai",
-      "Alfa",
-      "Luminans",
-      "Sifar",
-      "Penuh"
+      "H",
+      "S",
+      "V",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     }
    }
@@ -854,7 +854,7 @@
     "color": {
      "label": "Warna"
     },
-    "count": {
+    "cells": {
      "label": "Bilangan"
     },
     "offset": {
@@ -918,6 +918,13 @@
       "Linear",
       "Sinar"
      ]
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
     }
    }
   },
@@ -948,6 +955,13 @@
      "options": [
       "Lapisan",
       "Skrin"
+     ]
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
      ]
     }
    }
@@ -1905,10 +1919,10 @@
     "phase": {
      "label": "Fasa"
     },
-    "radius": {
+    "dotRadius": {
      "label": "Jejari"
     },
-    "scale": {
+    "zoom": {
      "label": "Skala"
     },
     "seed": {
@@ -1928,6 +1942,13 @@
     },
     "start": {
      "label": "Mula"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
     }
    }
   },
@@ -1980,11 +2001,11 @@
     "alpha": {
      "label": "Alfa"
     },
-    "composite": {
+    "mode": {
      "label": "Komposit",
      "options": [
-      "Di belakang",
-      "Di atas"
+      "Di atas",
+      "Di belakang"
      ]
     },
     "count": {
@@ -2369,7 +2390,7 @@
    "description": "Melembutkan tepi alfa lapisan, memudarkannya dari garis luar. Lebih banyak Lelaran menghasilkan pudaran yang lebih licin dan dalam. Gaya Klasik: Ke dalam memudar ke garis luar sedia ada; Kabur Alfa juga menyebarkan tepi lembut ke luarnya.",
    "name": "Lembutkan Tepi",
    "params": {
-    "blur": {
+    "strength": {
      "label": "Kekuatan"
     },
     "mode": {
@@ -2994,6 +3015,9 @@
       "Kecerunan",
       "Spektrum"
      ]
+    },
+    "squeeze": {
+     "label": "Himpit"
     }
    }
   },
@@ -4061,6 +4085,13 @@
     },
     "sweep": {
      "label": "Sudut"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
     }
    }
   },
@@ -4685,7 +4716,7 @@
    "description": "Menganjak gambar lapisan dan membalutnya semula pada tepi kotak lapisan.",
    "name": "Ofset",
    "params": {
-    "feather": {
+    "seamFeather": {
      "label": "Kelembutan"
     },
     "mask": {
@@ -4693,6 +4724,13 @@
     },
     "offset": {
      "label": "Ofset"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
     }
    }
   },
@@ -4777,12 +4815,12 @@
      "label": "Ambien"
     },
     "amount": {
-     "label": "Kekasaran"
+     "label": "Jumlah"
     },
     "blend": {
      "label": "Campuran"
     },
-    "blur": {
+    "bevel": {
      "label": "Serong"
     },
     "color": {
@@ -4804,7 +4842,7 @@
      "label": "Keamatan"
     },
     "light": {
-     "label": "Warna Cahaya"
+     "label": "Warna"
     },
     "refraction": {
      "label": "Pembiasan"
@@ -4813,7 +4851,7 @@
      "label": "Sampel Pelicinan"
     },
     "scale": {
-     "label": "Skala Kekasaran"
+     "label": "Skala"
     },
     "seed": {
      "label": "Benih"
@@ -4919,6 +4957,13 @@
      "label": "Kilauan"
     },
     "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
+    },
+    "roll": {
      "label": "Gaya",
      "options": [
       "Klasik",
@@ -5411,26 +5456,26 @@
     "angle": {
      "label": "Sudut"
     },
-    "angleChannel": {
-     "label": "Sudut Dari",
+    "phi": {
+     "label": "φ",
      "options": [
+      "Lum",
       "R",
       "G",
       "B",
-      "Luminans",
       "Alfa"
      ]
     },
     "center": {
      "label": "Pusat"
     },
-    "distanceChannel": {
-     "label": "Jarak Dari",
+    "rho": {
+     "label": "ρ",
      "options": [
+      "Lum",
       "R",
       "G",
       "B",
-      "Luminans",
       "Alfa"
      ]
     },
@@ -5697,7 +5742,7 @@
      "label": "Sudut"
     },
     "center": {
-     "label": "Pusat"
+     "label": "Kedudukan"
     },
     "color": {
      "label": "Warna"
@@ -5815,7 +5860,7 @@
      "label": "Cahaya"
     },
     "reach": {
-     "label": "Panjang"
+     "label": "Saiz"
     },
     "fill": {
      "label": "Isi"
@@ -5842,8 +5887,8 @@
     "direction": {
      "label": "Arah",
      "options": [
-      "Ikut Jam",
-      "Lawan Jam",
+      "CW",
+      "CCW",
       "Kedua-dua"
      ]
     },
@@ -6202,7 +6247,7 @@
     "choke": {
      "label": "Cekikan"
     },
-    "feather": {
+    "softness": {
      "label": "Kelembutan"
     },
     "lockLuminance": {
@@ -6214,7 +6259,7 @@
     "target": {
      "label": "Warna baharu"
     },
-    "threshold": {
+    "tolerance": {
      "label": "Ambang"
     },
     "match": {
@@ -6287,14 +6332,14 @@
       "B"
      ]
     },
-    "mode": {
+    "split": {
      "label": "Mod",
      "options": [
       "Cerah",
       "Gelap",
       "Topeng",
       "Luma",
-      "Purata"
+      "Alfa Luma"
      ]
     },
     "strength": {
@@ -6313,19 +6358,19 @@
    "description": "Melukis reben berpilin yang lebarnya berubah merentasi bahagian legap lapisan; animasikan Fasa supaya ia mengalir, atau tebuk keluar daripada lapisan.",
    "name": "Reben",
    "params": {
-    "angle": {
+    "tilt": {
      "label": "Sudut"
     },
     "color": {
      "label": "Warna"
     },
-    "frequency": {
+    "waves": {
      "label": "Frekuensi"
     },
-    "magnitude": {
+    "amplitude": {
      "label": "Magnitud"
     },
-    "offset": {
+    "shift": {
      "label": "Ofset"
     },
     "phase": {
@@ -6334,14 +6379,14 @@
     "punch": {
      "label": "Tebuk Keluar"
     },
-    "smoothing": {
+    "soften": {
      "label": "Pelicinan"
     },
     "tint": {
      "label": "Tona"
     },
     "tintAmount": {
-     "label": "Jumlah Tona"
+     "label": "Warna Tona"
     },
     "width": {
      "label": "Lebar"
@@ -6379,11 +6424,11 @@
     "octaves": {
      "label": "Oktav"
     },
-    "roughness": {
-     "label": "Kekasaran"
+    "strength": {
+     "label": "Kekuatan"
     },
-    "scale": {
-     "label": "Skala"
+    "detail": {
+     "label": "Butiran"
     },
     "seed": {
      "label": "Benih"
@@ -6672,7 +6717,7 @@
    "description": "Menajamkan butiran halus menggunakan topeng unsharp 3x3.",
    "name": "Pertajam",
    "params": {
-    "amount": {
+    "sharpness": {
      "label": "Kekuatan"
     },
     "radius": {
@@ -6767,7 +6812,7 @@
      "label": "Sudut Spekular"
     },
     "blur": {
-     "label": "Saiz"
+     "label": "Jejari"
     },
     "color_d": {
      "label": "Warna Resapan"
@@ -6830,8 +6875,8 @@
     "blend": {
      "label": "Campuran"
     },
-    "blur": {
-     "label": "Saiz"
+    "diffusion": {
+     "label": "Resapan"
     },
     "brightness": {
      "label": "Kecerahan"
@@ -6846,7 +6891,7 @@
      "label": "Sorotan"
     },
     "opacity": {
-     "label": "Kelegapan"
+     "label": "Alfa"
     },
     "outside": {
      "label": "Cahaya Luar"
@@ -7166,7 +7211,7 @@
     "feather": {
      "label": "Pelembutan"
     },
-    "saturation": {
+    "sat": {
      "label": "Ketepuan"
     },
     "threshold": {
@@ -7480,10 +7525,10 @@
    "description": "Memotong lapisan di sepanjang garis dan menarik kedua-dua belahnya berpisah, meregangkan piksel pada garis itu ke dalam ruang kosong.",
    "name": "Regang Segmen",
    "params": {
-    "angle": {
+    "cutAngle": {
      "label": "Sudut"
     },
-    "offset": {
+    "shift": {
      "label": "Ofset"
     },
     "relative": {
@@ -7492,7 +7537,7 @@
     "spread": {
      "label": "Sebaran"
     },
-    "stretch": {
+    "span": {
      "label": "Regang"
     }
    }
@@ -7798,7 +7843,7 @@
      "label": "Tersuai"
     },
     "charset": {
-     "label": "Aksara",
+     "label": "Set Aksara",
      "options": [
       "Huruf",
       "Huruf Besar",
@@ -7911,14 +7956,14 @@
    }
   },
   "texttransform": {
-   "description": "Menggerakkan, menskala, memutar, memudarkan dan mewarnakan huruf, perkataan atau baris dalam julat. Penambat menetapkan sama ada penskalaan dan putaran menggunakan setiap komponen atau pusat lapisan. Gerakkan julat dengan Ofset supaya perubahan merentasi teks.",
+   "description": "Menggerakkan, menskala, memutar, memudarkan dan mewarnakan huruf, perkataan atau baris dalam julat. Penambat menetapkan sama ada penskalaan dan putaran menggunakan setiap komponen atau pusat lapisan. Gerakkan julat dengan Fasa supaya perubahan merentasi teks.",
    "name": "Transformasi Teks",
    "params": {
-    "anchor": {
+    "anchorTo": {
      "label": "Penambat",
      "options": [
-      "Komponen",
-      "Lapisan"
+      "Lapisan",
+      "Komponen"
      ]
     },
     "easeIn": {
@@ -7931,38 +7976,38 @@
      "label": "Tamat"
     },
     "offset": {
-     "label": "Ofset"
+     "label": "Fasa"
     },
-    "opacity": {
+    "alpha": {
      "label": "Kelegapan"
     },
     "overlap": {
      "label": "Pertindihan"
     },
     "position": {
-     "label": "Kedudukan"
+     "label": "Ofset"
     },
     "randomOrder": {
      "label": "Susunan Rawak"
     },
     "rotation": {
-     "label": "Putaran"
+     "label": "Sudut"
     },
-    "scale": {
+    "scaleBy": {
      "label": "Skala"
     },
     "seed": {
      "label": "Benih"
     },
-    "shape": {
+    "curve": {
      "label": "Bentuk",
      "options": [
       "Segi empat sama",
+      "Licin",
+      "Segi tiga",
       "Cerun Naik",
       "Cerun Turun",
-      "Segi tiga",
-      "Bulat",
-      "Licin"
+      "Bulat"
      ]
     },
     "smoothness": {
@@ -7978,7 +8023,7 @@
      "label": "Warna"
     },
     "unit": {
-     "label": "Berdasarkan",
+     "label": "Komponen",
      "options": [
       "Aksara",
       "Perkataan",
@@ -7990,6 +8035,13 @@
      "label": "Julat",
      "options": [
       "Lama",
+      "Standard"
+     ]
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
       "Standard"
      ]
     }
@@ -8026,7 +8078,7 @@
     "level": {
      "label": "Ambang"
     },
-    "softness": {
+    "feather": {
      "label": "Kelembutan"
     }
    }
@@ -8080,6 +8132,13 @@
     },
     "stretch": {
      "label": "Regangan"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
     }
    }
   },
@@ -8143,6 +8202,13 @@
     },
     "stretch": {
      "label": "Regang"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
     }
    }
   },
@@ -8182,7 +8248,14 @@
    "name": "Kadar Bingkai",
    "params": {
     "fps": {
-     "label": "Bingkai/saat"
+     "label": "Langkah/saat"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
     }
    }
   },
@@ -8487,7 +8560,7 @@
     "amount": {
      "label": "Jumlah"
     },
-    "radius": {
+    "blurRadius": {
      "label": "Kekuatan"
     },
     "showMask": {
@@ -8666,7 +8739,7 @@
     "phase": {
      "label": "Fasa"
     },
-    "scale": {
+    "cellScale": {
      "label": "Skala"
     },
     "seed": {
@@ -8769,7 +8842,7 @@
     "speed": {
      "label": "Kelajuan"
     },
-    "warpAngle": {
+    "warp": {
      "label": "Sudut Pelengkungan"
     },
     "screenSpace": {
@@ -8803,6 +8876,13 @@
       "Klasik",
       "Standard"
      ]
+    },
+    "axes": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
     }
    }
   },
@@ -8817,10 +8897,10 @@
      "label": "Tamat"
     },
     "feather": {
-     "label": "Lembut tepi"
+     "label": "Kelembutan"
     },
     "softness": {
-     "label": "Kelembutan"
+     "label": "Lembut tepi"
     },
     "start": {
      "label": "Mula"
@@ -8883,7 +8963,7 @@
       "Mati"
      ]
     },
-    "strength": {
+    "zoom": {
      "label": "Kekuatan"
     }
    }

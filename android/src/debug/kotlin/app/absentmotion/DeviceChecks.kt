@@ -79,7 +79,7 @@ internal suspend fun checkDevice(context: Context) {
         names.forEach { fonts.deleteImported(it.xml) }
         check(fonts.importedFonts().none { it in names }) { "Imported fonts with spaces could not be deleted" }
         Log.i("AMDevice", "ok several fonts with spaces import, resolve and delete")
-        val refused = runCatching { app.absentmotion.ai.Whisper.transcribe(File(root, "missing.bin"), FloatArray(16000), true) {} }.exceptionOrNull()
+        val refused = runCatching { app.absentmotion.ai.Whisper.transcribe(File(root, "missing.bin"), 1, FloatArray(16000), true) {} }.exceptionOrNull()
         check(refused is IllegalStateException) { "Captions did not reject a missing model: $refused" }
         Log.i("AMDevice", "ok the caption library loads and rejects a missing model")
         Log.i("AMDevice", "done")

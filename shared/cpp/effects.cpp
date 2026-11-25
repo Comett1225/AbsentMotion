@@ -1510,11 +1510,15 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
                 const bool edgeLook = e.id == "absent.edgeglow" && Value(e, defaults, "style", 0, t, 0) > 0.5f;
                 const bool redMask = e.id == "absent.unsharpmask" && Value(e, defaults, "showMask", 0, t, 0) > 0.5f &&
                                      Value(e, defaults, "maskColor", 0, t, 0) > 0.5f;
+                const float blur = e.id == "absent.softglow" ? Value(e, defaults, "diffusion", 0, t, 0.1f) * 180 + 3
+                                   : e.id == "absent.feather" ? Value(e, defaults, "strength", 0, t, 0.15f) * 283.333f
+                                   : e.id == "absent.ominoglass" ? Value(e, defaults, "bevel", 0, t, 0.1f) * 100
+                                                              : Value(e, defaults, "blur", 0, t, 0);
                 const float sigma = e.id == "absent.unsharpmask"
-                                        ? redMask ? std::max(Value(e, defaults, "radius", 0, t, 0), 0.0f) * 25 * std::min(scene.width, scene.height) / 1080.0f : 0
+                                        ? redMask ? std::max(Value(e, defaults, "blurRadius", 0, t, 0), 0.0f) * 62.5f * std::min(scene.width, scene.height) / 1080.0f : 0
                                     : spread >= 0 ? std::max(spread, 0.02f) * kEdgeSpread * std::hypot((float)scene.width, (float)scene.height)
                                     : edgeLook    ? 40 * std::pow(std::max(Value(e, defaults, "strength", 0, t, 0.1f), 0.0f), 0.8f)
-                                                  : std::max(Value(e, defaults, "blur", 0, t, 0), 0.0f) / 3;
+                                                  : std::max(blur, 0.0f) / 3;
                 auto blurOf = [&](sk_sp<SkImageFilter> source) {
                     return sigma > 0 ? SkImageFilters::Blur(sigma, sigma, SkTileMode::kDecal, source) : source;
                 };
@@ -1543,7 +1547,7 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
                     } else if (e.id == "absent.fringeclean" && Value(e, defaults, "style", 0, t, 0) > 0.5f) {
                         inputs.push_back(blurOf(SkImageFilters::Crop(SkRect::MakeXYWH(-area.left(), -area.top(), scene.width, scene.height), SkTileMode::kClamp, f)));
                     } else if (e.id == "absent.feather" && Value(e, defaults, "style", 0, t, 0) > 0.5f) {
-                        inputs.push_back(FeatherAlpha(f, Value(e, defaults, "blur", 0, t, 0), Value(e, defaults, "iter", 0, t, 3),
+                        inputs.push_back(FeatherAlpha(f, blur, Value(e, defaults, "iter", 0, t, 3),
                                                       SkRect::MakeXYWH(-area.left(), -area.top(), scene.width, scene.height)));
                     } else inputs.push_back(blurOf(f));
                 }

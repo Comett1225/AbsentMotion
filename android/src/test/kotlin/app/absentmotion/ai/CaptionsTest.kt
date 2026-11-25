@@ -27,16 +27,23 @@ class CaptionsTest {
         Word("the", 4030, 4330), Word("phone.", 4330, 4950), Word("Does", 5600, 5800), Word("it", 5800, 5900), Word("work?", 5900, 6400),
     )
 
-    @Test fun wordsBecomeCaptionsOfAtMostNWordsEndingAtSentencesAndPauses() {
+    @Test fun wordsBecomeCaptionsOfAtMostNWordsEndingAtSentencesCommasAndPauses() {
         val chunks = chunkWords(spoken, 4)
         assertEquals(
-            listOf("Hello there, this is", "a quick test of", "automatic captions made on", "the phone.", "Does it work?"),
+            listOf("Hello there,", "this is a quick", "test of automatic captions", "made on the phone.", "Does it work?"),
             chunks.map { it.text },
         )
-        assertEquals(listOf(0 to 1490, 1490 to 2160, 2160 to 4030, 4030 to 4950, 5600 to 6400), chunks.map { it.startMs to it.endMs })
+        assertEquals(listOf(0 to 1110, 1110 to 1790, 1790 to 3770, 3770 to 5100, 5600 to 6550), chunks.map { it.startMs to it.endMs })
         assertEquals(spoken.size, chunkWords(spoken, 1).size)
-        assertEquals(listOf("Hello there, this is a quick test of automatic", "captions made on the phone.", "Does it work?"),
+        assertEquals(listOf("Hello there,", "this is a quick test", "of automatic captions made on the phone.", "Does it work?"),
             chunkWords(spoken, 10).map { it.text })
+    }
+
+    @Test fun longPhrasesAreSplitEvenlyAndNotAfterSmallWords() {
+        val words = "Oh, by the way, this is a friend of mine.".split(' ').mapIndexed { i, w -> Word(w, i * 200, i * 200 + 180) }
+        assertEquals(listOf("Oh, by the way,", "this is", "a friend of mine."), chunkWords(words, 4).map { it.text })
+        val pause = listOf(Word("I", 0, 150), Word("am", 160, 300), Word("Steve", 700, 950), Word("Rogers", 960, 1300), Word("today", 1310, 1600))
+        assertEquals(listOf("I am", "Steve Rogers today"), chunkWords(pause, 4).map { it.text })
     }
 
     @Test fun noCaptionIsLongerThanThreeSeconds() {
@@ -177,11 +184,11 @@ class CaptionsTest {
         assertEquals(null, app.absentmotion.ui.editor.captionRemainingSeconds(2000, 1f))
     }
 
-    @Test fun bothCaptionDownloadsStayBelowOneHundredMegabytes() {
-        assertTrue(CaptionModel.bytes(false) < 100_000_000)
-        assertTrue(CaptionModel.bytes(true) < 100_000_000)
+    @Test fun captionModelsAreWhisperSmallAndLargeTurbo() {
+        assertEquals("ggml-small-q8_0.bin", CaptionModel.name(false))
+        assertEquals("ggml-large-v3-turbo-q8_0.bin", CaptionModel.name(true))
         assertTrue(CaptionModel.bytes(true) > CaptionModel.bytes(false))
-        assertEquals("ggml-base-q8_0.bin", CaptionModel.name(true))
+        assertEquals(listOf(1, 2), listOf(CaptionModel.heads(false), CaptionModel.heads(true)))
     }
 
     @Test fun theCaptionModelIsKeptOnlyWhenItsSha256Matches() {

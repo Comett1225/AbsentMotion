@@ -28,13 +28,14 @@
   "to": "sharpen",
   "params": {
    "strength": {
-    "to": "amount",
-    "scale": 4,
+    "to": "sharpness",
     "min": 0,
-    "max": 80
+    "max": 20
    },
    "radius": {
-    "to": "radius"
+    "to": "radius",
+    "min": 1,
+    "max": 10
    }
   }
  },
@@ -335,9 +336,7 @@
   "to": "softglow",
   "params": {
    "strength": {
-    "to": "blur",
-    "scale": 180,
-    "offset": 3,
+    "to": "diffusion",
     "min": 0
    },
    "brightness": {
@@ -448,10 +447,9 @@
     "max": 1
    },
    "feather": {
-    "to": "softness",
-    "scale": 0.25,
+    "to": "feather",
     "min": 0,
-    "max": 1
+    "max": 4
    },
    "invert": {
     "to": "invert"
@@ -466,7 +464,7 @@
    }
   },
   "set": {
-   "softness": 0
+   "feather": 0
   }
  },
  "com.alightcreative.spectralmap": {
@@ -506,7 +504,7 @@
     "max": 2
    },
    "squeeze": {
-    "neutral": 0
+    "to": "squeeze"
    }
   },
   "set": {
@@ -564,18 +562,15 @@
   "to": "stretch",
   "params": {
    "angle": {
-    "to": "angle",
-    "scale": -1
+    "to": "cutAngle"
    },
    "stretch": {
-    "to": "stretch",
-    "scale": 4.32,
+    "to": "span",
     "min": 0,
     "absent": 10
    },
    "offset": {
-    "to": "offset",
-    "scale": -1.08
+    "to": "shift"
    },
    "smooth": {
     "to": "spread",
@@ -587,8 +582,7 @@
   "to": "unsharpmask",
   "params": {
    "strength": {
-    "to": "radius",
-    "scale": 2.5,
+    "to": "blurRadius",
     "min": 0
    },
    "amount": {
@@ -1034,8 +1028,7 @@
   "to": "offset",
   "params": {
    "feather": {
-    "to": "feather",
-    "scale": 0.15
+     "to": "seamFeather"
    },
    "mask": {
     "to": "mask"
@@ -1112,11 +1105,17 @@
      "component": 0
     },
     {
-     "to": "warpAngle",
+     "to": "warp",
      "component": 0,
+     "scale": 0,
      "offset": 90
     }
-   ]
+   ],
+   "warpAngle": {
+    "to": "warp",
+    "plus": "angle",
+    "plusScale": -1
+   }
   }
  },
  "absent.rgbsplit": {
@@ -1132,11 +1131,18 @@
     "to": "angle",
     "offset": 180,
     "wrap": 360
+   },
+   "mode": {
+    "to": "split",
+    "values": {
+     "3": 4,
+     "4": 3
+    }
    }
   },
   "set": {
    "center": 1,
-   "mode": 2
+   "split": 2
   }
  },
  "absent.radialblur": {
@@ -1175,10 +1181,14 @@
   "to": "unsharpmask",
   "params": {
    "strength": {
-    "to": "radius",
-    "scale": 0.112,
+    "to": "blurRadius",
+    "scale": 0.0448,
     "min": 0,
-    "max": 2
+    "max": 0.8
+   },
+   "radius": {
+    "to": "blurRadius",
+    "scale": 0.4
    }
   }
  },
@@ -1351,10 +1361,8 @@
   "to": "feather",
   "params": {
    "strength": {
-    "to": "blur",
-    "scale": 283.333,
-    "min": 0,
-    "max": 600
+    "to": "strength",
+    "min": 0
    },
    "iter": {
     "to": "iter",
@@ -1412,8 +1420,7 @@
     "max": 1
    },
    "mode": {
-    "to": "composite",
-    "values": {"0": 1, "1": 0}
+    "to": "mode"
    }
   }
  },
@@ -2090,7 +2097,11 @@
       "2": 1
      }
     }
-   ]
+   ],
+   "strength": {
+    "to": "zoom",
+    "scale": 0.3194888
+   }
   }
  },
  "absent.spinstreaks": {
@@ -2329,10 +2340,9 @@
     "to": "offset"
    },
    "amount": {
-    "to": "count",
-    "scale": 0.40404,
+    "to": "cells",
     "min": 0,
-    "max": 200
+    "max": 495
    },
    "stretch": {
     "to": "stretch"
@@ -2351,27 +2361,23 @@
    }
   },
   "set": {
-   "count": 4.0404
+   "cells": 10
   }
  },
  "com.alightcreative.effects.dots2": {
   "to": "dots",
   "params": {
    "scale": {
-    "to": "scale",
-    "power": -1,
-    "scale": 13,
-    "min": 0.01,
-    "max": 100
+    "to": "zoom",
+    "min": 0.0001
    },
    "phase": {
     "to": "phase"
    },
    "radius": {
-    "to": "radius",
-    "scale": 2,
+    "to": "dotRadius",
     "min": 0,
-    "max": 2
+    "max": 1
    },
    "feather": {
     "to": "feather"
@@ -2663,8 +2669,7 @@
     "relative": true
    },
    "strength": {
-    "to": "strength",
-    "scale": 3.13,
+    "to": "zoom",
     "min": 0,
     "max": 1,
     "absent": "0.15"
@@ -3009,10 +3014,10 @@
   },
   "set": {
    "angle": 270,
-   "warpAngle": 0,
    "speed": 0,
    "origin": 1,
-   "style": 1
+   "style": 1,
+   "warp": 90
   }
  },
  "com.alightcreative.effects.circularripple": {
@@ -3073,8 +3078,7 @@
     "max": 30
    },
    "a2d": {
-    "to": "warpAngle",
-    "plus": "a1d",
+    "to": "warp",
     "absent": 90
    },
    "damping": {
@@ -3097,7 +3101,8 @@
    }
   },
   "set": {
-   "speed": 0
+   "speed": 0,
+   "axes": 1
   }
  },
  "com.alightcreative.effects.turbulentdisplace3": {
@@ -3886,7 +3891,8 @@
    },
    "strength": {
     "to": "reach",
-    "scale": 0.065,
+    "scale": 0.18,
+    "power": 1.3,
     "min": 0,
     "max": 4
    },
@@ -4194,10 +4200,9 @@
   "to": "voronoicells",
   "params": {
    "scale": {
-    "to": "scale",
-    "min": 0.01,
-    "max": 100,
-    "scale": 0.85,
+    "to": "cellScale",
+    "min": 0.0117647,
+    "max": 117.64706,
     "absent": "1"
    },
    "phase": {
@@ -4342,16 +4347,14 @@
   "to": "ribbon",
   "params": {
    "amplitude": {
-    "to": "magnitude",
-    "scale": 0.5,
+    "to": "amplitude",
     "min": 0,
-    "max": 1
+    "max": 2
    },
    "frequency": {
-    "to": "frequency",
-    "scale": 0.55,
+    "to": "waves",
     "min": 0.1,
-    "max": 20
+    "max": 36.363636
    },
    "width": {
     "to": "width",
@@ -4362,8 +4365,7 @@
     "to": "phase"
    },
    "offset": {
-    "to": "offset",
-    "scale": -2,
+    "to": "shift",
     "min": -1,
     "max": 1
    },
@@ -4374,10 +4376,9 @@
     "to": "punch"
    },
    "smoothing": {
-    "to": "smoothing",
-    "scale": 0.1,
+    "to": "soften",
     "min": 0,
-    "max": 1
+    "max": 10
    },
    "tintColor": {
     "to": "tint"
@@ -4388,8 +4389,7 @@
     "max": 1
    },
    "angle": {
-    "to": "angle",
-    "scale": -1
+    "to": "tilt"
    }
   }
  },
@@ -4413,12 +4413,12 @@
     }
    },
    "mode": {
-    "to": "mode",
+    "to": "split",
     "values": {
      "0": 0,
      "1": 1,
      "2": 2,
-     "3": 4
+     "3": 3
     }
    }
   }
@@ -4524,22 +4524,10 @@
     "max": 1000
    },
    "typex": {
-    "to": "angleChannel",
-    "values": {
-     "0": 3,
-     "1": 0,
-     "2": 1,
-     "3": 2
-    }
+    "to": "phi"
    },
    "typey": {
-    "to": "distanceChannel",
-    "values": {
-     "0": 3,
-     "1": 0,
-     "2": 1,
-     "3": 2
-    }
+    "to": "rho"
    },
    "edges": {
     "to": "edges",
@@ -4612,7 +4600,6 @@
    },
    "amount": {
     "to": "count",
-    "scale": 0.40404,
     "min": 0.5,
     "max": 200
    },
@@ -4632,7 +4619,6 @@
    }
   },
   "set": {
-   "count": 2.42424,
    "edges": 1
   }
  },
@@ -4647,7 +4633,6 @@
    },
    "amount": {
     "to": "count",
-    "scale": 0.40404,
     "min": 0.5,
     "max": 200
    },
@@ -4672,7 +4657,6 @@
    }
   },
   "set": {
-   "count": 2.42424,
    "edges": 1
   }
  },
@@ -4779,10 +4763,9 @@
   "to": "ominoglass",
   "params": {
    "strength": {
-    "to": "blur",
-    "scale": 100,
+    "to": "bevel",
     "min": 0,
-    "max": 300
+    "max": 3
    },
    "refraction": {
     "to": "refraction",
@@ -5125,18 +5108,16 @@
   "to": "roughenedges",
   "params": {
    "strength": {
-    "to": "roughness",
+    "to": "strength",
     "min": 0,
-    "max": 1,
-    "absent": "0.2",
-    "scale": 0.4
+    "max": 2.5,
+    "absent": "0.2"
    },
    "evolution": {
     "to": "evolution"
    },
    "detail": {
-    "to": "scale",
-    "power": -1,
+    "to": "detail",
     "min": 0.05,
     "max": 20
    },
@@ -5169,8 +5150,7 @@
     "max": 2
    },
    "saturation": {
-    "to": "saturation",
-    "scale": 4,
+    "to": "sat",
     "min": 0,
     "max": 1
    },
@@ -5201,9 +5181,10 @@
     "max": 2
    },
    "saturation": {
-    "to": "saturation",
+    "to": "sat",
+    "scale": 0.25,
     "min": 0,
-    "max": 1
+    "max": 0.25
    }
   },
   "set": {
@@ -5221,16 +5202,14 @@
     "to": "target"
    },
    "threshold": {
-    "to": "threshold",
-    "scale": 0.4,
+    "to": "tolerance",
     "min": 0,
-    "max": 4
+    "max": 10
    },
    "feather": {
-    "to": "feather",
-    "scale": 0.5,
+    "to": "softness",
     "min": 0,
-    "max": 2
+    "max": 4
    },
    "alpha": {
     "to": "alpha",
@@ -5244,8 +5223,8 @@
   "set": {
    "match": 1,
    "choke": 2,
-   "threshold": 0,
-   "feather": 0
+   "tolerance": 0,
+   "softness": 0
   }
  },
  "com.alightcreative.effects.palettemap": {
@@ -5637,20 +5616,16 @@
   "to": "dots",
   "params": {
    "scale": {
-    "to": "scale",
-    "power": -1,
-    "scale": 13,
-    "min": 0.01,
-    "max": 100
+    "to": "zoom",
+    "min": 0.0001
    },
    "phase": {
     "to": "phase"
    },
    "radius": {
-    "to": "radius",
-    "scale": 2,
+    "to": "dotRadius",
     "min": 0,
-    "max": 2
+    "max": 1
    },
    "feather": {
     "to": "feather"
@@ -5691,10 +5666,10 @@
     "to": "offset"
    },
    "amount": {
-    "to": "count",
-    "scale": 0.242424,
+    "to": "cells",
+    "scale": 0.6,
     "min": 0,
-    "max": 200
+    "max": 495
    },
    "color": {
     "to": "color"
@@ -5717,7 +5692,7 @@
    }
   },
   "set": {
-   "count": 2.42424
+   "cells": 6
   }
  },
  "com.alightcreative.effects.clouds2": {
@@ -6163,7 +6138,6 @@
    },
    "amount": {
     "to": "count",
-    "scale": 0.40404,
     "min": 0.5,
     "max": 200
    },
@@ -6192,7 +6166,6 @@
    }
   },
   "set": {
-   "count": 2.42424,
    "edges": 1
   }
  },
@@ -6210,7 +6183,6 @@
    },
    "amount": {
     "to": "count",
-    "scale": 0.40404,
     "min": 0.5,
     "max": 200
    },
@@ -6234,7 +6206,6 @@
    }
   },
   "set": {
-   "count": 2.42424,
    "edges": 1
   }
  },
@@ -6242,11 +6213,11 @@
   "to": "voronoicells",
   "params": {
    "scale": {
-    "to": "scale",
+    "to": "cellScale",
     "power": -1,
-    "scale": 12,
-    "min": 0.01,
-    "max": 100,
+    "scale": 14.117647,
+    "min": 0.0117647,
+    "max": 117.64706,
     "absent": "16"
    },
    "phase": {
@@ -7078,13 +7049,12 @@
    },
    "centerPoint": {
     "to": "center",
-    "relative": true,
-    "scale": 0.45,
-    "offset": 0.275
+    "scale": 0.002,
+    "offset": 0.5
    }
   },
   "set": {
-   "amount": 0.0525,
+   "amount": 0.15,
    "sampling": 1,
    "center": "0.500000,0.500000"
   }
@@ -7093,7 +7063,7 @@
   "to": "texttransform",
   "params": {
    "offset": {
-     "to": "position"
+    "to": "position"
    },
    "start": {
     "to": "start",
@@ -7120,25 +7090,19 @@
     }
    },
    "anchor": {
-    "to": "anchor",
-    "values": {
-     "0": 1,
-     "1": 0
-    }
+    "to": "anchorTo"
    },
    "angle": {
     "to": "rotation"
    },
    "scale": {
-    "to": "scale",
-    "offset": 1,
-    "min": 0,
+    "to": "scaleBy",
+    "min": -1,
     "max": 10
    },
    "alpha": {
-    "to": "opacity",
-    "offset": 1,
-    "min": 0,
+    "to": "alpha",
+    "min": -1,
     "max": 1
    },
    "stretch": {
@@ -7161,11 +7125,11 @@
     "max": 10
    },
    "shape": {
-    "to": "shape",
+    "to": "curve",
     "values": {
      "0": 0,
-     "1": 5,
-     "2": 3
+     "1": 1,
+     "2": 2
     }
    },
    "fillColor": {
@@ -10304,13 +10268,11 @@
   "params": {
    "progress": {
     "to": "progress",
-    "scale": 0.85,
     "min": 0,
     "max": 1
    },
    "radius": {
     "to": "radius",
-    "scale": 1.6,
     "min": 0,
     "max": 1
    },
@@ -10371,11 +10333,12 @@
   },
   "set": {
    "follow": false,
-   "progress": 0.31,
-   "radius": 0.24,
+   "progress": 0.3647,
+   "radius": 0.15,
    "angle": 56,
    "backAlpha": 0,
-   "style": 1
+   "style": 1,
+   "roll": 1
   }
  },
  "com.alightcreative.effects.ring": {
@@ -10976,7 +10939,7 @@
      "to": "shading",
      "values": {
       "false": 0,
-      "true": 0.984
+      "true": 0.975
      }
     }
    ],
@@ -10992,7 +10955,7 @@
    },
    "lightDepth": {
     "to": "lightHeight",
-    "scale": 2,
+    "scale": 1,
     "over": "lightDir",
     "overDefault": "75,-75",
     "min": 0,
@@ -11014,12 +10977,12 @@
    "projection": 1,
    "perspective": 0,
    "scale": 1,
-   "shading": 0.984,
+   "shading": 0.975,
    "shine": 0,
    "light": 45,
    "position": "0,0",
    "lighting": 2,
-   "ambient": 0.008,
+   "ambient": 0.025,
    "glossiness": 15,
    "lightHeight": 1.886,
    "texMode": 1,
@@ -11811,17 +11774,8 @@
   "params": {
    "centerPoint": {
     "to": "center",
-    "relative": true,
-    "signs": [
-     1,
-     0.822
-    ],
-    "pre": [
-     0,
-     0.089
-    ],
-    "scale": 0.45,
-    "offset": 0.275
+    "scale": 0.002,
+    "offset": 0.5
    },
    "strength": {
     "to": "sweep",
@@ -11837,7 +11791,7 @@
    }
   },
   "set": {
-   "feather": 1.2,
+   "feather": 0.9,
    "blur": 1
   }
  },
@@ -11868,7 +11822,7 @@
    }
   },
   "set": {
-   "feather": 1.2,
+   "feather": 0.9,
    "blur": 1
   }
  },
@@ -13063,6 +13017,238 @@
    "vignette": 0,
    "screenSpace": "false",
    "threshold": 0
+  }
+ },
+ "absent.echo": {
+  "to": "echo",
+  "params": {
+   "composite": {
+    "to": "mode",
+    "values": {
+     "0": 1,
+     "1": 0
+    }
+   }
+  }
+ },
+ "absent.offset": {
+  "to": "offset",
+  "params": {
+   "feather": {
+    "to": "seamFeather",
+    "scale": 6.6666667
+   }
+  }
+ },
+ "absent.sharpen": {
+  "to": "sharpen",
+  "params": {
+   "amount": {
+    "to": "sharpness",
+    "scale": 0.25
+   }
+  }
+ },
+ "absent.softglow": {
+  "to": "softglow",
+  "params": {
+   "blur": {
+    "to": "diffusion",
+    "scale": 0.00555556,
+    "offset": -0.0166667
+   }
+  }
+ },
+ "absent.feather": {
+  "to": "feather",
+  "params": {
+   "blur": {
+    "to": "strength",
+    "scale": 0.00352941
+   }
+  }
+ },
+ "absent.threshold": {
+  "to": "threshold",
+  "params": {
+   "softness": {
+    "to": "feather",
+    "scale": 4
+   }
+  }
+ },
+ "absent.polardisplacement": {
+  "to": "polardisplacement",
+  "params": {
+   "angleChannel": {
+    "to": "phi",
+    "values": {
+     "0": 1,
+     "1": 2,
+     "2": 3,
+     "3": 0,
+     "4": 4
+    }
+   },
+   "distanceChannel": {
+    "to": "rho",
+    "values": {
+     "0": 1,
+     "1": 2,
+     "2": 3,
+     "3": 0,
+     "4": 4
+    }
+   }
+  }
+ },
+ "absent.spotcolor": {
+  "to": "spotcolor",
+  "params": {
+   "saturation": {
+    "to": "sat",
+    "scale": 0.25
+   }
+  }
+ },
+ "absent.replacecolor": {
+  "to": "replacecolor",
+  "params": {
+   "threshold": {
+    "to": "tolerance",
+    "scale": 2.5
+   },
+   "feather": {
+    "to": "softness",
+    "scale": 2
+   }
+  }
+ },
+ "absent.texttransform": {
+  "to": "texttransform",
+  "params": {
+   "scale": {
+    "to": "scaleBy",
+    "offset": -1
+   },
+   "opacity": {
+    "to": "alpha",
+    "offset": -1
+   },
+   "anchor": {
+    "to": "anchorTo",
+    "values": {
+     "0": 1,
+     "1": 0
+    }
+   },
+   "shape": {
+    "to": "curve",
+    "values": {
+     "0": 0,
+     "1": 3,
+     "2": 4,
+     "3": 2,
+     "4": 5,
+     "5": 1
+    }
+   }
+  }
+ },
+ "absent.checker": {
+  "to": "checker",
+  "params": {
+   "count": {
+    "to": "cells",
+    "scale": 2.475
+   }
+  }
+ },
+ "absent.dots": {
+  "to": "dots",
+  "params": {
+   "scale": {
+    "to": "zoom",
+    "power": -1,
+    "scale": 13
+   },
+   "radius": {
+    "to": "dotRadius",
+    "scale": 0.5
+   }
+  }
+ },
+ "absent.roughenedges": {
+  "to": "roughenedges",
+  "params": {
+   "roughness": {
+    "to": "strength",
+    "scale": 2.5
+   },
+   "scale": {
+    "to": "detail",
+    "power": -1
+   }
+  }
+ },
+ "absent.voronoicells": {
+  "to": "voronoicells",
+  "params": {
+   "scale": {
+    "to": "cellScale",
+    "scale": 1.1764706
+   }
+  }
+ },
+ "absent.ominoglass": {
+  "to": "ominoglass",
+  "params": {
+   "blur": {
+    "to": "bevel",
+    "scale": 0.01
+   }
+  }
+ },
+ "absent.stretch": {
+  "to": "stretch",
+  "params": {
+   "angle": {
+    "to": "cutAngle",
+    "scale": -1
+   },
+   "stretch": {
+    "to": "span",
+    "scale": 0.23148148
+   },
+   "offset": {
+    "to": "shift",
+    "scale": -0.92592593
+   }
+  }
+ },
+ "absent.ribbon": {
+  "to": "ribbon",
+  "params": {
+   "magnitude": {
+    "to": "amplitude",
+    "scale": 2
+   },
+   "frequency": {
+    "to": "waves",
+    "scale": 1.8181818
+   },
+   "offset": {
+    "to": "shift",
+    "scale": -0.5
+   },
+   "smoothing": {
+    "to": "soften",
+    "scale": 10
+   },
+   "angle": {
+    "to": "tilt",
+    "scale": -1
+   }
   }
  }
 }

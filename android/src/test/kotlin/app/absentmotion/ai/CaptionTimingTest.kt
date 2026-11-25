@@ -31,8 +31,38 @@ class CaptionTimingTest {
         val raw = listOf(RawWord("Welcome", 600, 900, 980), RawWord("back.", 900, 1200, 1250), RawWord("Today", 4000, 4300, 3880), RawWord("we", 4300, 4500, 4100))
         val words = alignWords(raw, SpeechEdges(listOf(710, 3670), listOf(1400)))
         assertEquals(listOf(710, 1070, 3670, 3920), words.map { it.startMs })
-        assertEquals(1400, words[1].endMs)
+        assertEquals(1350, words[1].endMs)
         assertEquals(3920, words[2].endMs)
+    }
+
+    @Test fun aWordEndsWhenItIsSpokenNotWhenTheNextWordStarts() {
+        val words = alignWords(listOf(RawWord("them!", 0, 0, 1180), RawWord("You", 0, 0, 30180)), SpeechEdges(emptyList(), emptyList()))
+        assertEquals(1000 + 70 * 4, words[0].endMs)
+    }
+
+    @Test fun aLoopOfTheSameLineSqueezedIntoAMomentIsDropped() {
+        val line = listOf("Oh,", "I'll", "get", "that", "arm.")
+        val spoken = line.mapIndexed { i, w -> RawWord(w, 0, 0, 116_940 + 220 * i) }
+        val loop = List(3) { line }.flatten().map { RawWord(it, 0, 0, 118_000) }
+        val next = RawWord("You're", 0, 0, 127_620)
+        val words = alignWords(spoken + loop + next, SpeechEdges(emptyList(), emptyList()))
+        assertEquals(line + "You're", words.map { it.text })
+    }
+
+    @Test fun aSqueezedLineThatIsSaidOnceIsSpreadOverItsTime() {
+        val line = listOf("By", "the", "way,", "this", "is", "a", "friend", "of", "mine.")
+        val words = alignWords(line.map { RawWord(it, 0, 0, 130_980) } + RawWord("Tree.", 0, 0, 134_820), SpeechEdges(emptyList(), emptyList()))
+        assertEquals(line + "Tree.", words.map { it.text })
+        val gaps = words.zipWithNext { a, b -> b.startMs - a.startMs }
+        assertTrue(gaps.all { it >= 100 })
+        assertTrue(words[8].startMs < words[9].startMs)
+    }
+
+    @Test fun lonePhantomLinesAreDroppedButRealOnesStay() {
+        fun said(vararg pieces: Pair<String, Int>) = alignWords(pieces.map { (w, at) -> RawWord(w, 0, 0, at) }, SpeechEdges(emptyList(), emptyList())).map { it.text }
+        assertEquals(listOf("I", "am", "Steve", "Rogers."), said("The" to 26_740, "End" to 26_880, "I" to 40_000, "am" to 40_200, "Steve" to 40_400, "Rogers." to 40_800, "Thank" to 58_000, "you." to 58_040))
+        assertEquals(listOf("Rogers.", "Thank", "you."), said("Rogers." to 1000, "Thank" to 1600, "you." to 1900))
+        assertEquals(listOf("Rogers."), said("Rogers." to 1000, "you" to 20_000))
     }
 
     @Test fun withoutPausesTheAccurateTimesAreMovedEarlier() {

@@ -406,6 +406,8 @@ data class Layer(val node: XmlNode, val t: Float = 0f, val snap: ClosedFloatingP
         return out.toList()
     }
 
+    fun otherKeyframeTimes(scope: KeyScope): List<Int> = keyframeTimes() - keyframeTimes(scope).toSet()
+
     private fun scopeNode(scope: KeyScope): XmlNode? = if (scope.ref != null) element(scope.ref) else effects.getOrNull(scope.effectIndex)
 
     companion object {

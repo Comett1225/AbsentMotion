@@ -25,3 +25,9 @@ suspend fun trimCopyOnDesktop(uri: String, startUs: Long, endUs: Long, out: File
     val context = currentCoroutineContext()
     MediaEngine.current.trim(input, startUs, endUs, out, progress) { context.isActive }
 }
+
+suspend fun mergeOnDesktop(uris: List<String>, clips: List<app.absentmotion.tools.MergeFacts>, job: app.absentmotion.tools.MergeJob, out: File, progress: (Float) -> Unit) = withContext(Dispatchers.IO) {
+    val inputs = uris.map { android.net.Uri.parse(it).toFile() ?: throw ExportError(txt(R.string.compress_unreadable)) }
+    val context = currentCoroutineContext()
+    MediaEngine.current.merge(inputs, clips, job, out, progress) { context.isActive }
+}

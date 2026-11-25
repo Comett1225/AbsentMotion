@@ -120,7 +120,7 @@ class NativeEngine(internal val backend: Backend) : AutoCloseable {
 
         fun ease(easing: String, u: Float): Float = if (easing.isEmpty()) u else nativeEase(easing, floatArrayOf(u))[0]
 
-        fun fastCaptionCpu(): Boolean = nativeFastCaptionCpu()
+        fun captionCpuLevel(): Int = nativeCaptionCpuLevel()
 
         fun shapeOutline(scene: String, t: Float, rounded: Boolean): String? = nativeShapeOutline(scene.toByteArray(), t, rounded)
 
@@ -175,7 +175,7 @@ class NativeEngine(internal val backend: Backend) : AutoCloseable {
         @JvmStatic private external fun nativeTrim(engine: Long)
         @JvmStatic private external fun nativeEase(easing: String, us: FloatArray): FloatArray
         @JvmStatic private external fun nativeBlipTimes(text: ByteArray, speed: Float, pause: Float, every: Int): FloatArray
-        @JvmStatic private external fun nativeFastCaptionCpu(): Boolean
+        @JvmStatic private external fun nativeCaptionCpuLevel(): Int
         @JvmStatic private external fun nativeVulkanDevice(): String?
         @JvmStatic private external fun nativeLayerBounds(engine: Long, layerId: Long, timeMs: Double): FloatArray?
         @JvmStatic private external fun nativeLayerQuad(engine: Long, layerId: Long, timeMs: Double): FloatArray?

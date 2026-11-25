@@ -120,7 +120,7 @@
      "label": "Maskeren op laag"
     },
     "mix": {
-     "label": "Mix"
+     "label": "Vulling"
     },
     "spill": {
      "label": "Effecten buiten laag"
@@ -743,49 +743,49 @@
     "a": {
      "label": "A",
      "options": [
-      "Rood",
-      "Groen",
-      "Blauw",
-      "Alfa",
-      "Luminantie",
-      "Nul",
-      "Vol"
+      "R",
+      "G",
+      "B",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     },
     "b": {
      "label": "B",
      "options": [
-      "Rood",
-      "Groen",
-      "Blauw",
-      "Alfa",
-      "Luminantie",
-      "Nul",
-      "Vol"
+      "R",
+      "G",
+      "B",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     },
     "g": {
      "label": "G",
      "options": [
-      "Rood",
-      "Groen",
-      "Blauw",
-      "Alfa",
-      "Luminantie",
-      "Nul",
-      "Vol"
+      "R",
+      "G",
+      "B",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     },
     "r": {
      "label": "R",
      "options": [
-      "Rood",
-      "Groen",
-      "Blauw",
-      "Alfa",
-      "Luminantie",
-      "Nul",
-      "Vol"
+      "R",
+      "G",
+      "B",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     }
    }
@@ -797,49 +797,49 @@
     "a": {
      "label": "A",
      "options": [
-      "Kleurtoon",
-      "Verzadiging",
-      "Waarde",
-      "Alfa",
-      "Luminantie",
-      "Nul",
-      "Vol"
+      "H",
+      "S",
+      "V",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     },
     "h": {
      "label": "H",
      "options": [
-      "Kleurtoon",
-      "Verzadiging",
-      "Waarde",
-      "Alfa",
-      "Luminantie",
-      "Nul",
-      "Vol"
+      "H",
+      "S",
+      "V",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     },
     "s": {
      "label": "S",
      "options": [
-      "Kleurtoon",
-      "Verzadiging",
-      "Waarde",
-      "Alfa",
-      "Luminantie",
-      "Nul",
-      "Vol"
+      "H",
+      "S",
+      "V",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     },
     "v": {
      "label": "V",
      "options": [
-      "Kleurtoon",
-      "Verzadiging",
-      "Waarde",
-      "Alfa",
-      "Luminantie",
-      "Nul",
-      "Vol"
+      "H",
+      "S",
+      "V",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     }
    }
@@ -854,7 +854,7 @@
     "color": {
      "label": "Kleur"
     },
-    "count": {
+    "cells": {
      "label": "Aantal"
     },
     "offset": {
@@ -918,6 +918,13 @@
       "Lineair",
       "Stralen"
      ]
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
     }
    }
   },
@@ -949,6 +956,13 @@
     },
     "strength": {
      "label": "Sterkte"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
     }
    }
   },
@@ -1905,10 +1919,10 @@
     "phase": {
      "label": "Fase"
     },
-    "radius": {
+    "dotRadius": {
      "label": "Straal"
     },
-    "scale": {
+    "zoom": {
      "label": "Schaal"
     },
     "seed": {
@@ -1928,6 +1942,13 @@
     },
     "start": {
      "label": "Begin"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
     }
    }
   },
@@ -1980,11 +2001,11 @@
     "alpha": {
      "label": "Alfa"
     },
-    "composite": {
+    "mode": {
      "label": "Plaatsing",
      "options": [
-      "Erachter",
-      "Erbovenop"
+      "Erbovenop",
+      "Erachter"
      ]
     },
     "count": {
@@ -2369,7 +2390,7 @@
    "description": "Verzacht de alfaranden van de laag en laat ze vanaf de omtrek infaden. Meer iteraties geven een vloeiendere, diepere overgang. Stijl Klassiek: Naar binnen vervaagt binnen de bestaande omtrek; Alfa vervagen spreidt de verzachte rand ook naar buiten.",
    "name": "Zachte rand",
    "params": {
-    "blur": {
+    "strength": {
      "label": "Sterkte"
     },
     "iter": {
@@ -2994,6 +3015,9 @@
       "Verloop",
       "Spectrum"
      ]
+    },
+    "squeeze": {
+     "label": "Samendrukken"
     }
    }
   },
@@ -4061,6 +4085,13 @@
     },
     "sweep": {
      "label": "Hoek"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
     }
    }
   },
@@ -4685,7 +4716,7 @@
    "description": "Verschuift het beeld van de laag en laat het aan de randen van het kader van de laag rondlopen.",
    "name": "Verschuiving",
    "params": {
-    "feather": {
+    "seamFeather": {
      "label": "Zachte rand"
     },
     "mask": {
@@ -4693,6 +4724,13 @@
     },
     "offset": {
      "label": "Verschuiving"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
     }
    }
   },
@@ -4777,12 +4815,12 @@
      "label": "Omgevingslicht"
     },
     "amount": {
-     "label": "Ruwheid"
+     "label": "Hoeveelheid"
     },
     "blend": {
      "label": "Mengen"
     },
-    "blur": {
+    "bevel": {
      "label": "Schuine kant"
     },
     "color": {
@@ -4804,7 +4842,7 @@
      "label": "Intensiteit"
     },
     "light": {
-     "label": "Lichtkleur"
+     "label": "Kleur"
     },
     "refraction": {
      "label": "Breking"
@@ -4813,7 +4851,7 @@
      "label": "Samples gladheid"
     },
     "scale": {
-     "label": "Schaal ruwheid"
+     "label": "Schaal"
     },
     "seed": {
      "label": "Seed"
@@ -4919,6 +4957,13 @@
      "label": "Glans"
     },
     "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    },
+    "roll": {
      "label": "Stijl",
      "options": [
       "Klassiek",
@@ -5411,26 +5456,26 @@
     "angle": {
      "label": "Hoek"
     },
-    "angleChannel": {
-     "label": "Hoekbron",
+    "phi": {
+     "label": "φ",
      "options": [
+      "Lum",
       "R",
       "G",
       "B",
-      "Luminantie",
       "Alfa"
      ]
     },
     "center": {
      "label": "Midden"
     },
-    "distanceChannel": {
-     "label": "Afstandsbron",
+    "rho": {
+     "label": "ρ",
      "options": [
+      "Lum",
       "R",
       "G",
       "B",
-      "Luminantie",
       "Alfa"
      ]
     },
@@ -5697,7 +5742,7 @@
      "label": "Hoek"
     },
     "center": {
-     "label": "Midden"
+     "label": "Positie"
     },
     "color": {
      "label": "Kleur"
@@ -5818,7 +5863,7 @@
      "label": "Licht"
     },
     "reach": {
-     "label": "Lengte"
+     "label": "Grootte"
     },
     "style": {
      "label": "Stijl",
@@ -5842,8 +5887,8 @@
     "direction": {
      "label": "Richting",
      "options": [
-      "Met de klok mee",
-      "Tegen de klok in",
+      "CW",
+      "CCW",
       "Beide"
      ]
     },
@@ -6202,7 +6247,7 @@
     "choke": {
      "label": "Inkrimpen"
     },
-    "feather": {
+    "softness": {
      "label": "Zachte rand"
     },
     "lockLuminance": {
@@ -6221,7 +6266,7 @@
     "target": {
      "label": "Nieuwe kleur"
     },
-    "threshold": {
+    "tolerance": {
      "label": "Drempel"
     }
    }
@@ -6287,14 +6332,14 @@
       "B"
      ]
     },
-    "mode": {
+    "split": {
      "label": "Modus",
      "options": [
       "Licht",
       "Donker",
       "Masker",
       "Luma",
-      "Gemiddelde"
+      "Luma-alfa"
      ]
     },
     "strength": {
@@ -6313,19 +6358,19 @@
    "description": "Tekent een kronkelend lint met wisselende breedte over de ondoorzichtige delen van de laag; animeer Fase om het te laten stromen, of spaar het uit de laag uit.",
    "name": "Lint",
    "params": {
-    "angle": {
+    "tilt": {
      "label": "Hoek"
     },
     "color": {
      "label": "Kleur"
     },
-    "frequency": {
+    "waves": {
      "label": "Frequentie"
     },
-    "magnitude": {
+    "amplitude": {
      "label": "Uitslag"
     },
-    "offset": {
+    "shift": {
      "label": "Verschuiving"
     },
     "phase": {
@@ -6334,14 +6379,14 @@
     "punch": {
      "label": "Uitsparen"
     },
-    "smoothing": {
+    "soften": {
      "label": "Afvlakking"
     },
     "tint": {
      "label": "Tint"
     },
     "tintAmount": {
-     "label": "Hoeveelheid tint"
+     "label": "Tintkleur"
     },
     "width": {
      "label": "Breedte"
@@ -6379,11 +6424,11 @@
     "octaves": {
      "label": "Octaven"
     },
-    "roughness": {
-     "label": "Ruwheid"
+    "strength": {
+     "label": "Sterkte"
     },
-    "scale": {
-     "label": "Schaal"
+    "detail": {
+     "label": "Detail"
     },
     "seed": {
      "label": "Seed"
@@ -6672,7 +6717,7 @@
    "description": "Past een onscherp masker toe met een 3x3-omgeving om fijne details te versterken.",
    "name": "Verscherpen",
    "params": {
-    "amount": {
+    "sharpness": {
      "label": "Sterkte"
     },
     "radius": {
@@ -6767,7 +6812,7 @@
      "label": "Spiegelende hoek"
     },
     "blur": {
-     "label": "Grootte"
+     "label": "Straal"
     },
     "color_d": {
      "label": "Diffuse kleur"
@@ -6830,8 +6875,8 @@
     "blend": {
      "label": "Mengen"
     },
-    "blur": {
-     "label": "Grootte"
+    "diffusion": {
+     "label": "Diffusie"
     },
     "brightness": {
      "label": "Helderheid"
@@ -6853,7 +6898,7 @@
      "label": "Hooglichten"
     },
     "opacity": {
-     "label": "Dekking"
+     "label": "Alfa"
     },
     "outside": {
      "label": "Gloed buiten"
@@ -7173,7 +7218,7 @@
       "SD"
      ]
     },
-    "saturation": {
+    "sat": {
      "label": "Verzadiging"
     },
     "threshold": {
@@ -7480,10 +7525,10 @@
    "description": "Snijdt de laag langs een lijn en trekt de twee helften uit elkaar, waarbij de pixels op de lijn de opening opvullen.",
    "name": "Segment uitrekken",
    "params": {
-    "angle": {
+    "cutAngle": {
      "label": "Hoek"
     },
-    "offset": {
+    "shift": {
      "label": "Verschuiving"
     },
     "relative": {
@@ -7492,7 +7537,7 @@
     "spread": {
      "label": "Spreiding"
     },
-    "stretch": {
+    "span": {
      "label": "Uitrekken"
     }
    }
@@ -7798,7 +7843,7 @@
      "label": "Eigen tekens"
     },
     "charset": {
-     "label": "Tekens",
+     "label": "Tekenset",
      "options": [
       "Letters",
       "Hoofdletters",
@@ -7911,14 +7956,14 @@
    }
   },
   "texttransform": {
-   "description": "Verplaatst, schaalt, draait en kleurt letters, woorden of regels binnen een bereik en past hun dekking aan. Anker bepaalt of schalen en draaien elk onderdeel of het midden van de laag gebruiken. Verplaats het bereik met Verschuiving om de verandering door de tekst te laten lopen.",
+   "description": "Verplaatst, schaalt, draait en kleurt letters, woorden of regels binnen een bereik en past hun dekking aan. Anker bepaalt of schalen en draaien elk onderdeel of het midden van de laag gebruiken. Verplaats het bereik met Fase om de verandering door de tekst te laten lopen.",
    "name": "Tekst transformeren",
    "params": {
-    "anchor": {
+    "anchorTo": {
      "label": "Anker",
      "options": [
-      "Onderdeel",
-      "Laag"
+      "Laag",
+      "Onderdeel"
      ]
     },
     "easeIn": {
@@ -7931,38 +7976,38 @@
      "label": "Einde"
     },
     "offset": {
-     "label": "Verschuiving"
+     "label": "Fase"
     },
-    "opacity": {
+    "alpha": {
      "label": "Dekking"
     },
     "overlap": {
      "label": "Overlap"
     },
     "position": {
-     "label": "Positie"
+     "label": "Verschuiving"
     },
     "randomOrder": {
      "label": "Willekeurige volgorde"
     },
     "rotation": {
-     "label": "Rotatie"
+     "label": "Hoek"
     },
-    "scale": {
+    "scaleBy": {
      "label": "Schaal"
     },
     "seed": {
      "label": "Seed"
     },
-    "shape": {
+    "curve": {
      "label": "Vorm",
      "options": [
       "Vierkant",
+      "Vloeiend",
+      "Driehoek",
       "Oplopend",
       "Aflopend",
-      "Driehoek",
-      "Rond",
-      "Vloeiend"
+      "Rond"
      ]
     },
     "smoothness": {
@@ -7978,7 +8023,7 @@
      "label": "Tint"
     },
     "unit": {
-     "label": "Op basis van",
+     "label": "Component",
      "options": [
       "Teken",
       "Woord",
@@ -7990,6 +8035,13 @@
      "label": "Bereik",
      "options": [
       "Oud",
+      "Standaard"
+     ]
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
       "Standaard"
      ]
     }
@@ -8026,7 +8078,7 @@
     "level": {
      "label": "Drempel"
     },
-    "softness": {
+    "feather": {
      "label": "Zachte rand"
     }
    }
@@ -8080,6 +8132,13 @@
     },
     "stretch": {
      "label": "Uitrekken"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
     }
    }
   },
@@ -8143,6 +8202,13 @@
     },
     "stretch": {
      "label": "Uitrekken"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
     }
    }
   },
@@ -8182,7 +8248,14 @@
    "name": "Framesnelheid",
    "params": {
     "fps": {
-     "label": "Frames/s"
+     "label": "Stappen/s"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
     }
    }
   },
@@ -8494,7 +8567,7 @@
       "Rood"
      ]
     },
-    "radius": {
+    "blurRadius": {
      "label": "Sterkte"
     },
     "showMask": {
@@ -8666,7 +8739,7 @@
     "phase": {
      "label": "Fase"
     },
-    "scale": {
+    "cellScale": {
      "label": "Schaal"
     },
     "seed": {
@@ -8801,8 +8874,15 @@
       "Standaard"
      ]
     },
-    "warpAngle": {
+    "warp": {
      "label": "Vervormingshoek"
+    },
+    "axes": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
     }
    }
   },
@@ -8817,10 +8897,10 @@
      "label": "Einde"
     },
     "feather": {
-     "label": "Zachte rand"
+     "label": "Zachtheid"
     },
     "softness": {
-     "label": "Zachtheid"
+     "label": "Zachte rand"
     },
     "start": {
      "label": "Begin"
@@ -8883,7 +8963,7 @@
       "Uit"
      ]
     },
-    "strength": {
+    "zoom": {
      "label": "Sterkte"
     }
    }

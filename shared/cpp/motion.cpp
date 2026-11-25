@@ -402,7 +402,7 @@ void OnPath(const LayerEffect& e, float t, const RepeatSpace& space, std::vector
         Spot s;
         s.u = placed[k].second;
         s.outer = SkMatrix::Translate(p.fX, p.fY);
-        if (tangent) s.outer.preRotate(std::atan2(v.fY, v.fX) * 360 / (float)kTau);
+        if (tangent) s.outer.preRotate(std::atan2(v.fY, v.fX) * 360 / (float)kTau + (ends ? -90.0f : 0.0f));
         s.outer.preTranslate(-space.anchor.fX, -space.anchor.fY);
         found[k] = s;
         ok[k] = true;
@@ -664,8 +664,9 @@ void FollowPath(const Layer& l, double timeMs, const SkPath& path, Placement* p)
         SkVector tangent;
         if (!walk.getPosTan((SkScalar)at, &pos, &tangent)) return;
         SkVector out{tangent.fY, -tangent.fX};
+        const bool facing = Param(e, "style", t, 0) >= 0.5f;
         if (walk.isClosed()) {
-            if (path.contains(pos.fX + out.fX * 0.5f, pos.fY + out.fY * 0.5f)) out = -out;
+            if (!facing && path.contains(pos.fX + out.fX * 0.5f, pos.fY + out.fY * 0.5f)) out = -out;
         } else {
             const float length = walk.getLength();
             double area = 0;
@@ -682,9 +683,9 @@ void FollowPath(const Layer& l, double timeMs, const SkPath& path, Placement* p)
         }
         const bool legacy = Param(e, "legacyCoordinates", t, 0) >= 0.5f;
         const float heading = (float)(std::atan2(tangent.fY, tangent.fX) * 360 / kTau);
-        const float turn = Param(e, "orientation", t, 0) + (Param(e, "rotate", t, 1) >= 0.5f ? heading + (legacy ? 180.0f : 0.0f) : 0.0f);
+        const float turn = Param(e, "orientation", t, 0) + (Param(e, "rotate", t, 1) >= 0.5f ? heading + (legacy || facing ? 180.0f : 0.0f) : 0.0f);
         const SkVector offset{Param(e, "offset", t, 0, 0), Param(e, "offset", t, 0, 1)};
-        const SkVector shift = legacy ? offset : SkMatrix::RotateDeg(turn).mapVector(offset.fX, offset.fY);
+        const SkVector shift = legacy || facing ? offset : SkMatrix::RotateDeg(turn).mapVector(offset.fX, offset.fY);
         p->location = pos + out * Param(e, "inset", t, 0) + shift;
         p->rotation += turn;
         return;
@@ -700,7 +701,7 @@ bool EchoOf(const Layer& l, double timeMs, Echo* echo) {
         echo->count = std::clamp((int)(echo->standard ? std::lround(count) : std::floor(count + 1e-4f)), 0, 20);
         echo->seconds = std::clamp(Param(e, "seconds", t, 0.5f), -60.0f, 60.0f);
         echo->alpha = std::clamp(Param(e, "alpha", t, 1), 0.0f, 1.0f);
-        echo->atop = Param(e, "composite", t, 0) >= 0.5f;
+        echo->atop = Param(e, "mode", t, 1) < 0.5f;
         return echo->count > 0 && echo->seconds != 0;
     }
     return false;
@@ -823,6 +824,8 @@ void ParseSteps(Layer* l) {
         if (e.hidden || e.id != "absent.timequant") continue;
         const Anim* fps = Find(e, "fps");
         l->steps = fps && !fps->empty() ? *fps : Anim{{8.0f}};
+        const Anim* style = Find(e, "style");
+        l->stepMiddle = style && !style->empty() && style->get(0, 0, 0) > 0.5f;
         return;
     }
 }

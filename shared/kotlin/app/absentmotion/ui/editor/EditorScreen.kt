@@ -188,6 +188,8 @@ internal fun EditorTools(state: EditorState, scope: kotlinx.coroutines.Coroutine
                 5 -> app.absentmotion.ui.home.GifScreen { close() }
                 6 -> app.absentmotion.ui.home.EnhanceImageScreen { close() }
                 7 -> app.absentmotion.ui.home.SendScreen(state.store, state.projectId) { close() }
+                8 -> app.absentmotion.ui.home.ConvertImageScreen { close() }
+                9 -> app.absentmotion.ui.home.MergeScreen { close() }
             }
         }
     }

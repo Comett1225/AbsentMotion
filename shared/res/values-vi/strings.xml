@@ -198,6 +198,10 @@
     <string name="bundle_pick_folder">Chọn thư mục để lưu</string>
     <string name="bundle_for_now">Hiện tại: %1$s</string>
     <string name="bundle_folder_lost">Không thể truy cập thư mục này. Nhấn để chọn lại; trong lúc đó, các gói sẽ được lưu vào %1$s.</string>
+    <string name="settings_video_folder">Thư mục video và GIF</string>
+    <string name="settings_sound_folder">Thư mục âm thanh</string>
+    <string name="settings_folder_default">Dùng thư mục mặc định</string>
+    <string name="export_folder_lost">Không thể truy cập thư mục này. Nhấn để chọn lại; trong lúc đó, các bản xuất sẽ được lưu vào %1$s.</string>
     <string name="settings_about">Giới thiệu</string>
     <string name="settings_report_issue">Báo cáo sự cố</string>
     <string name="settings_suggest_feature">Đề xuất tính năng</string>
@@ -358,6 +362,7 @@
     <string name="theme_light">Sáng</string>
     <string name="theme_dark">Tối</string>
     <string name="theme_daylight">Ban ngày</string>
+    <string name="theme_light_green">Xanh lá nhạt</string>
     <string name="theme_custom">Tùy chỉnh</string>
     <string name="theme_custom_named">Tùy chỉnh (%1$s)</string>
     <string name="theme_error_bad_colour">Màu không hợp lệ cho %1$s</string>
@@ -796,6 +801,7 @@
     <string name="export_quality">Chất lượng</string>
     <string name="export_quality_low">Thấp</string>
     <string name="export_quality_high">Cao</string>
+    <string name="export_same_as_source">Giống nguồn</string>
     <string name="export_format">Định dạng</string>
     <string name="export_transparent_becomes">Vùng trong suốt trở thành</string>
     <string name="export_white">Trắng</string>
@@ -1034,6 +1040,8 @@
     <string name="caption_position_bottom">Dưới</string>
     <string name="caption_words_per_caption">Số từ mỗi phụ đề</string>
     <string name="caption_generate">Tạo</string>
+    <string name="caption_import_srt">Nhập SRT</string>
+    <string name="caption_srt_empty">Không tìm thấy phụ đề nào trong tệp</string>
     <string name="caption_not_now">Để sau</string>
     <string name="caption_download">Tải xuống</string>
     <string name="draw_back">Quay lại</string>
@@ -2167,8 +2175,8 @@
     <string name="caption_remaining">Còn khoảng %1$s</string>
     <string name="caption_progress">%1$s%%</string>
     <string name="caption_model">Mô hình giọng nói</string>
-    <string name="caption_model_standard">Tiêu chuẩn · 60 MB</string>
-    <string name="caption_model_precision">Độ chính xác cao hơn · 82 MB</string>
+    <string name="caption_model_standard">Tiêu chuẩn · 264 MB</string>
+    <string name="caption_model_precision">Độ chính xác cao hơn · 874 MB</string>
     <string name="model_err_no_triangles">Mô hình không có tam giác</string>
     <string name="model_err_too_complex">Mô hình quá phức tạp</string>
     <string name="model_err_missing_vertex">Một mặt dùng đỉnh không tồn tại</string>
@@ -2227,6 +2235,7 @@
     <string name="effect_section_palette">Bảng màu tùy chỉnh</string>
     <string name="effect_section_back">Mặt sau của lớp</string>
     <string name="effect_section_colorblend">Màu và hòa trộn</string>
+    <string name="effect_section_randomization">Ngẫu nhiên hóa</string>
     <string name="palettes">Bảng màu</string>
     <string name="palette_untitled">Chưa đặt tên</string>
     <string name="palette_new">Mới</string>
@@ -2476,6 +2485,7 @@
     <string name="tools_failed">Không thể hoàn tất: %1$s</string>
     <string name="tools_save">Lưu</string>
     <string name="tools_add_to_project">Thêm vào dự án</string>
+    <string name="tools_add_more">Thêm công cụ khác</string>
     <string name="tools_part">Phần giữ lại</string>
     <string name="tools_start">Bắt đầu</string>
     <string name="tools_end">Kết thúc</string>
@@ -2507,6 +2517,15 @@
     <string name="tools_finding_cuts">Đang tìm các điểm cắt…</string>
     <string name="tools_trim_few_cuts">Video này gần như không có điểm cắt nào, nên chế độ Nhanh chỉ bắt đầu được từ đầu. Hãy chọn Chính xác để bắt đầu ở bất kỳ đâu.</string>
     <string name="tools_trim_no_fast">Không thể cắt nhanh ở đây, nên sẽ cắt chính xác.</string>
+    <string name="tools_merge">Ghép</string>
+    <string name="tools_merge_about">Ghép các video thành một.</string>
+    <string name="tools_merge_add">Thêm video</string>
+    <string name="tools_merge_start">Ghép</string>
+    <string name="tools_merging">Đang ghép… %1$d%%</string>
+    <string name="tools_merge_need_two">Thêm ít nhất hai video.</string>
+    <string name="tools_merge_no_fast">Các video này khác nhau nên sẽ được mã hóa lại.</string>
+    <string name="tools_merge_up">Di chuyển lên</string>
+    <string name="tools_merge_down">Di chuyển xuống</string>
     <string name="shape_param_round_corners">Bo tròn góc</string>
     <string name="shape_param_notch">Khía</string>
     <string name="shape_param_point">Mũi nhọn</string>
@@ -2664,6 +2683,13 @@
     <string name="tools_enhance_image_about">Thêm chi tiết cho ảnh chụp hoặc tranh vẽ bằng AI.</string>
     <string name="tools_enhance_pick">Chọn một ảnh</string>
     <string name="tools_enhance_running">Đang nâng cao hình ảnh: %1$d%%</string>
+    <string name="tools_convert_image">Chuyển đổi hình ảnh</string>
+    <string name="tools_convert_image_about">Biến một hình ảnh hoặc ảnh động thành PNG, JPG, WebP hoặc GIF.</string>
+    <string name="tools_convert_pick">Chọn một hình ảnh</string>
+    <string name="tools_convert_to">Chuyển đổi sang</string>
+    <string name="tools_convert_start">Chuyển đổi</string>
+    <string name="tools_converting">Đang chuyển đổi… %1$d%%</string>
+    <string name="tools_convert_too_large">Có thể chuyển đổi ảnh động tối đa 2048 × 2048 pixel và 3000 khung hình.</string>
     <string name="ai_model_detail_max">Mô hình AI nâng cao Chân thực Tối đa</string>
     <string name="ai_model_cartoon_max">Mô hình AI nâng cao Anime và hoạt hình Tối đa</string>
     <string name="ai_enhance_image_upscale2_hint">Rộng và cao gấp đôi</string>

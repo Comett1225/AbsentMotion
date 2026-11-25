@@ -22,8 +22,7 @@
    "default": 1,
    "min": -2,
    "max": 2,
-   "step": 0.001,
-   "percent": true
+   "step": 0.01
   },
   {
    "id": "decimals",

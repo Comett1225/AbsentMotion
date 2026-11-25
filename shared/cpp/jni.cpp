@@ -258,14 +258,15 @@ JNIEXPORT void JNICALL JNI_FN(nativeSetAccurateBlur)(JNIEnv*, jclass, jlong engi
     engineOf(engine)->setAccurateBlur(on);
 }
 
-JNIEXPORT jboolean JNICALL JNI_FN(nativeFastCaptionCpu)(JNIEnv*, jclass) {
+JNIEXPORT jint JNICALL JNI_FN(nativeCaptionCpuLevel)(JNIEnv*, jclass) {
 #if defined(__aarch64__)
     const unsigned long need = HWCAP_ASIMDDP | HWCAP_ASIMDHP | HWCAP_FPHP | HWCAP_ATOMICS | HWCAP_ASIMDRDM | HWCAP_CRC32;
-    return (getauxval(AT_HWCAP) & need) == need;
+    if ((getauxval(AT_HWCAP) & need) != need) return 0;
+    return (getauxval(AT_HWCAP2) & HWCAP2_I8MM) ? 2 : 1;
 #elif defined(__x86_64__)
-    return __builtin_cpu_supports("avx2") && __builtin_cpu_supports("fma") && __builtin_cpu_supports("f16c");
+    return __builtin_cpu_supports("avx2") && __builtin_cpu_supports("fma") && __builtin_cpu_supports("f16c") ? 1 : 0;
 #else
-    return false;
+    return 0;
 #endif
 }
 

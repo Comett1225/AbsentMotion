@@ -220,9 +220,9 @@ class EffectMigrationTest {
         close(1f, all[0].number("style"))
         close(0.03f, all[1].number("amount"))
         assertEquals("#ffbebebe", all[2].prop("tint")["value"])
-        close(1f, all[2].number("scale"))
-        close(1f, all[2].number("opacity"))
-        close(5f, all[2].number("shape"))
+        close(0f, all[2].number("scaleBy"))
+        close(0f, all[2].number("alpha"))
+        close(1f, all[2].number("curve"))
         assertEquals(2, all[2].prop("seed").keyframes.size)
         assertEquals("#00000000", all[3].prop("tint")["value"])
     }
@@ -333,7 +333,7 @@ class EffectMigrationTest {
 
         assertEquals("true", own("sharpen")["hidden"])
         assertEquals("false", own("sharpen")["locallyApplied"])
-        close(expected("sharpen", "strength", 1.5f), own("sharpen").number("amount"))
+        close(expected("sharpen", "strength", 1.5f), own("sharpen").number("sharpness"))
         close(expected("sharpen", "radius", 2f), own("sharpen").number("radius"))
 
         val gradient = own("gradientoverlay")
@@ -372,7 +372,7 @@ class EffectMigrationTest {
         close(expected("colorwheels", "gamma", -120f, 0), wheels.number("gammaHue"))
 
         close(expected("lightglow", "strength", 0.4f), own("lightglow").number("blur"))
-        close(expected("softglow", "strength", 0.2f), own("softglow").number("blur"))
+        close(0.2f, own("softglow").number("diffusion"))
 
         val vibrance = own("huesaturation", 0)
         close(expected("huesaturation", "vib", 0.4f), vibrance.number("vibrance"))
@@ -447,7 +447,7 @@ class EffectMigrationTest {
         assertEquals(mapOf("magnitude" to 50f, "frequency" to 2f, "evolution" to 0f, "seed" to 0f, "angle" to 45f, "slack" to 0.25f, "zshake" to 0f, "pattern" to 1f), numbers("autoshake"))
         assertEquals(mapOf("progress" to 0f, "orientation" to 0f, "inset" to 0f, "style" to 1f), numbers("movealongpath"))
         assertEquals("true", own("movealongpath").prop("rotate")["value"])
-        assertEquals(mapOf("feather" to 0f), numbers("offset"))
+        assertEquals(mapOf("seamFeather" to 0f, "style" to 1f), numbers("offset"))
         assertEquals("false", own("offset").prop("mask")["value"])
         assertEquals(mapOf("direction" to 0f, "angle" to 45f, "frequency" to 2f, "magnitude" to 25f, "wave" to 0f, "phase" to 0f), numbers("oscillate"))
         assertEquals(mapOf("frequency" to 1f, "shrink" to 0.9f, "grow" to 1.1f, "phase" to 0f, "wave" to 0f, "style" to 2f), numbers("pulsesize"))

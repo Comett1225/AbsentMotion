@@ -57,7 +57,7 @@ def build():
         "- **%d** are converted to a similar effect that does not look identical." % counts["similar"],
         "- **%d** are converted but have not been compared side by side yet." % counts["unmeasured"],
         "- Not converted yet: **%d**." % counts["none"],
-        "- **Blending modes:** all of Alight's blending modes come across. Multiply and Subtract get their opacity converted so they look the same.",
+        "- **Blending modes:** all of Alight's blending modes come across. Multiply, Subtract, Screen, Lighten and Darken get their opacity converted so they look the same.",
         "",
         "Something imports wrong? [Send the project as an Import problem](%s): the XML and a screenshot of the same moment in Alight Motion. That is the fastest way to get it fixed." % ISSUE,
         "",

@@ -44,7 +44,7 @@ class AlightEffectCoverageTest {
             <property name="intensity" type="float" value="2" /><property name="threshold" type="float" value="0.7" /><property name="thresholdColor" type="color" value="#FF3366CC" />
             <property name="fillColor" type="color" value="#FF3366CC" /><property name="blend" type="float" value="0.25" /><property name="quality" type="float" value="150" /></effect>""")
         assertEquals("absent.rays", varied["id"])
-        assertEquals(1.1125f * 0.065f, varied.floats("reach")[0], 1e-5f)
+        assertEquals(0.18f * Math.pow(1.1125, 1.3).toFloat(), varied.floats("reach")[0], 1e-5f)
         assertEquals(listOf(2f, 0.7f, 0.25f), listOf("intensity", "threshold", "blend").map { varied.floats(it)[0] })
         assertEquals(0.5f + 40f / 220f, varied.floats("center")[0], 1e-4f)
         assertEquals("#FF3366CC", varied.children.single { it["name"] == "thresholdAdd" }["value"])

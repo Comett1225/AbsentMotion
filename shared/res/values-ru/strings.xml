@@ -198,6 +198,10 @@
     <string name="bundle_pick_folder">Выберите папку для сохранения</string>
     <string name="bundle_for_now">Пока: %1$s</string>
     <string name="bundle_folder_lost">Нет доступа к этой папке. Нажмите, чтобы выбрать её снова; до этого пакеты будут сохраняться в %1$s.</string>
+    <string name="settings_video_folder">Папка для видео и GIF</string>
+    <string name="settings_sound_folder">Папка для звуков</string>
+    <string name="settings_folder_default">Использовать папку по умолчанию</string>
+    <string name="export_folder_lost">Нет доступа к этой папке. Нажмите, чтобы выбрать её снова; до этого экспорт будет сохраняться в %1$s.</string>
     <string name="settings_about">О приложении</string>
     <string name="settings_report_issue">Сообщить о проблеме</string>
     <string name="settings_suggest_feature">Предложить функцию</string>
@@ -358,6 +362,7 @@
     <string name="theme_light">Светлая</string>
     <string name="theme_dark">Тёмная</string>
     <string name="theme_daylight">Дневной свет</string>
+    <string name="theme_light_green">Светло-зелёная</string>
     <string name="theme_custom">Пользовательская</string>
     <string name="theme_custom_named">Пользовательская (%1$s)</string>
     <string name="theme_error_bad_colour">Неверный цвет для %1$s</string>
@@ -826,6 +831,7 @@
     <string name="export_quality">Качество</string>
     <string name="export_quality_low">Низкое</string>
     <string name="export_quality_high">Высокое</string>
+    <string name="export_same_as_source">Как в исходнике</string>
     <string name="export_format">Формат</string>
     <string name="export_transparent_becomes">Прозрачные области становятся</string>
     <string name="export_white">Белый</string>
@@ -1076,6 +1082,8 @@
     <string name="caption_position_bottom">Снизу</string>
     <string name="caption_words_per_caption">Слов в субтитре</string>
     <string name="caption_generate">Создать</string>
+    <string name="caption_import_srt">Импорт SRT</string>
+    <string name="caption_srt_empty">В файле не найдено субтитров</string>
     <string name="caption_not_now">Не сейчас</string>
     <string name="caption_download">Скачать</string>
     <string name="draw_back">Назад</string>
@@ -2257,8 +2265,8 @@
     <string name="caption_remaining">Осталось около %1$s</string>
     <string name="caption_progress">%1$s%%</string>
     <string name="caption_model">Модель распознавания речи</string>
-    <string name="caption_model_standard">Стандартная · 60 MB</string>
-    <string name="caption_model_precision">Повышенная точность · 82 MB</string>
+    <string name="caption_model_standard">Стандартная · 264 MB</string>
+    <string name="caption_model_precision">Повышенная точность · 874 MB</string>
     <string name="model_err_no_triangles">В модели нет треугольников</string>
     <string name="model_err_too_complex">Модель слишком сложная</string>
     <string name="model_err_missing_vertex">Грань использует несуществующую вершину</string>
@@ -2320,6 +2328,7 @@
     <string name="effect_section_palette">Своя палитра</string>
     <string name="effect_section_back">Обратная сторона слоя</string>
     <string name="effect_section_colorblend">Цвет и смешивание</string>
+    <string name="effect_section_randomization">Случайность</string>
     <string name="palettes">Палитры</string>
     <string name="palette_untitled">Без названия</string>
     <string name="palette_new">Новая</string>
@@ -2581,6 +2590,7 @@
     <string name="tools_failed">Не удалось завершить: %1$s</string>
     <string name="tools_save">Сохранить</string>
     <string name="tools_add_to_project">Добавить в проект</string>
+    <string name="tools_add_more">Добавить инструменты</string>
     <string name="tools_part">Оставляемая часть</string>
     <string name="tools_start">Начало</string>
     <string name="tools_end">Конец</string>
@@ -2612,6 +2622,15 @@
     <string name="tools_finding_cuts">Поиск точек обрезки…</string>
     <string name="tools_trim_few_cuts">В этом видео почти нет точек обрезки, поэтому режим «Быстро» может начинаться только с начала. Выберите «Точно», чтобы начать с любого места.</string>
     <string name="tools_trim_no_fast">Быстрая обрезка здесь невозможна, поэтому видео будет обрезано точно.</string>
+    <string name="tools_merge">Объединение</string>
+    <string name="tools_merge_about">Объединяет видео в одно.</string>
+    <string name="tools_merge_add">Добавить видео</string>
+    <string name="tools_merge_start">Объединить</string>
+    <string name="tools_merging">Объединение… %1$d%%</string>
+    <string name="tools_merge_need_two">Добавьте не менее двух видео.</string>
+    <string name="tools_merge_no_fast">Видео отличаются, поэтому будут перекодированы.</string>
+    <string name="tools_merge_up">Вверх</string>
+    <string name="tools_merge_down">Вниз</string>
     <string name="shape_param_round_corners">Скругление углов</string>
     <string name="shape_param_notch">Выемка</string>
     <string name="shape_param_point">Острие</string>
@@ -2769,6 +2788,13 @@
     <string name="tools_enhance_image_about">Добавляет деталей фото или рисунку с помощью AI.</string>
     <string name="tools_enhance_pick">Выберите фото</string>
     <string name="tools_enhance_running">Улучшение изображения: %1$d%%</string>
+    <string name="tools_convert_image">Конвертация изображения</string>
+    <string name="tools_convert_image_about">Преобразует изображение или анимацию в PNG, JPG, WebP или GIF.</string>
+    <string name="tools_convert_pick">Выберите изображение</string>
+    <string name="tools_convert_to">Конвертировать в</string>
+    <string name="tools_convert_start">Конвертировать</string>
+    <string name="tools_converting">Конвертация… %1$d%%</string>
+    <string name="tools_convert_too_large">Можно конвертировать анимации до 2048 × 2048 пикселей и 3000 кадров.</string>
     <string name="ai_model_detail_max">Модель AI Enhance для реалистичных изображений, Макс.</string>
     <string name="ai_model_cartoon_max">Модель AI Enhance для аниме и мультфильмов, Макс.</string>
     <string name="ai_enhance_image_upscale2_hint">Вдвое больше по ширине и высоте</string>

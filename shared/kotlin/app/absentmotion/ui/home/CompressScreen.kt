@@ -304,7 +304,7 @@ internal fun PickCard(
     }
 }
 
-private fun details(picked: PickedMedia): String {
+internal fun details(picked: PickedMedia): String {
     val s = picked.source
     val turned = picked.rotation % 180 != 0
     val size = "${if (turned) s.height else s.width} × ${if (turned) s.width else s.height}"

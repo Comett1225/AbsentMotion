@@ -198,6 +198,10 @@
     <string name="bundle_pick_folder">选择保存文件夹</string>
     <string name="bundle_for_now">当前： %1$s</string>
     <string name="bundle_folder_lost">无法访问此文件夹。点击重新选择；在此之前，包将保存到 %1$s。</string>
+    <string name="settings_video_folder">视频和 GIF 文件夹</string>
+    <string name="settings_sound_folder">声音文件夹</string>
+    <string name="settings_folder_default">使用默认文件夹</string>
+    <string name="export_folder_lost">无法访问此文件夹。点击重新选择；在此之前，导出的文件将保存到 %1$s。</string>
     <string name="settings_about">关于</string>
     <string name="settings_report_issue">反馈问题</string>
     <string name="settings_suggest_feature">提出功能建议</string>
@@ -358,6 +362,7 @@
     <string name="theme_light">浅色</string>
     <string name="theme_dark">深色</string>
     <string name="theme_daylight">日光</string>
+    <string name="theme_light_green">浅绿</string>
     <string name="theme_custom">自定义</string>
     <string name="theme_custom_named">自定义（%1$s）</string>
     <string name="theme_error_bad_colour">%1$s 的颜色无效</string>
@@ -796,6 +801,7 @@
     <string name="export_quality">质量</string>
     <string name="export_quality_low">低</string>
     <string name="export_quality_high">高</string>
+    <string name="export_same_as_source">与源相同</string>
     <string name="export_format">格式</string>
     <string name="export_transparent_becomes">透明区域变为</string>
     <string name="export_white">白色</string>
@@ -1034,6 +1040,8 @@
     <string name="caption_position_bottom">底部</string>
     <string name="caption_words_per_caption">每条字幕的词数</string>
     <string name="caption_generate">生成</string>
+    <string name="caption_import_srt">导入 SRT</string>
+    <string name="caption_srt_empty">文件中没有找到字幕</string>
     <string name="caption_not_now">暂不</string>
     <string name="caption_download">下载</string>
     <string name="draw_back">返回</string>
@@ -2167,8 +2175,8 @@
     <string name="caption_remaining">剩余约 %1$s</string>
     <string name="caption_progress">%1$s%%</string>
     <string name="caption_model">语音模型</string>
-    <string name="caption_model_standard">标准 · 60 MB</string>
-    <string name="caption_model_precision">更高精度 · 82 MB</string>
+    <string name="caption_model_standard">标准 · 264 MB</string>
+    <string name="caption_model_precision">更高精度 · 874 MB</string>
     <string name="model_err_no_triangles">模型没有三角形</string>
     <string name="model_err_too_complex">模型过于复杂</string>
     <string name="model_err_missing_vertex">某个面使用了不存在的顶点</string>
@@ -2227,6 +2235,7 @@
     <string name="effect_section_palette">自定义调色板</string>
     <string name="effect_section_back">图层背面</string>
     <string name="effect_section_colorblend">颜色与混合</string>
+    <string name="effect_section_randomization">随机化</string>
     <string name="palettes">调色板</string>
     <string name="palette_untitled">未命名</string>
     <string name="palette_new">新建</string>
@@ -2476,6 +2485,7 @@
     <string name="tools_failed">无法完成：%1$s</string>
     <string name="tools_save">保存</string>
     <string name="tools_add_to_project">添加到项目</string>
+    <string name="tools_add_more">添加更多工具</string>
     <string name="tools_part">保留的片段</string>
     <string name="tools_start">开始</string>
     <string name="tools_end">结束</string>
@@ -2507,6 +2517,15 @@
     <string name="tools_finding_cuts">正在查找裁剪点…</string>
     <string name="tools_trim_few_cuts">此视频几乎没有裁剪点，快速模式只能从开头开始。选择精确模式可从任意位置开始。</string>
     <string name="tools_trim_no_fast">此处无法快速裁剪，将使用精确裁剪。</string>
+    <string name="tools_merge">合并</string>
+    <string name="tools_merge_about">将多个视频合并为一个。</string>
+    <string name="tools_merge_add">添加视频</string>
+    <string name="tools_merge_start">合并</string>
+    <string name="tools_merging">正在合并… %1$d%%</string>
+    <string name="tools_merge_need_two">请至少添加两个视频。</string>
+    <string name="tools_merge_no_fast">这些视频不一致，因此将重新编码。</string>
+    <string name="tools_merge_up">上移</string>
+    <string name="tools_merge_down">下移</string>
     <string name="shape_param_round_corners">圆角</string>
     <string name="shape_param_notch">凹口</string>
     <string name="shape_param_point">尖端</string>
@@ -2664,6 +2683,13 @@
     <string name="tools_enhance_image_about">用AI为照片或绘画增添细节。</string>
     <string name="tools_enhance_pick">选择照片</string>
     <string name="tools_enhance_running">正在增强图片：%1$d%%</string>
+    <string name="tools_convert_image">转换图片</string>
+    <string name="tools_convert_image_about">将图片或动画转换为 PNG、JPG、WebP 或 GIF。</string>
+    <string name="tools_convert_pick">选择图片</string>
+    <string name="tools_convert_to">转换为</string>
+    <string name="tools_convert_start">转换</string>
+    <string name="tools_converting">正在转换… %1$d%%</string>
+    <string name="tools_convert_too_large">可转换最大 2048 × 2048 像素、3000 帧的动画。</string>
     <string name="ai_model_detail_max">AI增强写实最高质量模型</string>
     <string name="ai_model_cartoon_max">AI增强动漫和卡通最高质量模型</string>
     <string name="ai_enhance_image_upscale2_hint">宽度和高度各变为2倍</string>

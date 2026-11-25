@@ -13,7 +13,7 @@ The timeline is the area under the play bar. Each layer is a row with a bar show
 - **Rows.** One row per layer, with the front layer on top. Inside an open group (see **Edit Group** in [Shapes, drawing and masks](@shapes)) only the layers of that group are listed. At the left, the eye shows or hides the layer (a hidden layer is not drawn and its sound is silent) and a tiny picture identifies it.
 - **Bar colors.** Ordinary layers are teal with diagonal stripes, text layers are amber, camera layers are crimson and audio layers are violet with a waveform. Photos and videos show a strip of pictures. The layer name is written on the bar.
 - **Label colors.** The layer menu can mark a layer with one of eleven label colors, shown as a small colored corner on the bar.
-- **Keyframe diamonds.** Small diamonds on a bar are keyframes. They are bigger on the selected layer. While a property or effect is open, only its keyframes show. See [Keyframes and easing](@keyframes).
+- **Keyframe diamonds.** Small diamonds on a bar are keyframes. They are bigger on the selected layer. While a property or effect is open, only its keyframes show; with an effect open, the layer's other keyframes show as small dim diamonds. See [Keyframes and easing](@keyframes).
 
 ![The timeline: the playhead and the time (1), the ruler (2), the eye of a layer (3), the layer bars (4) and a keyframe diamond (5).](img/timeline-rows.webp)
 

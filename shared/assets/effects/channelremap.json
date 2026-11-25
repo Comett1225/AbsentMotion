@@ -11,13 +11,13 @@
    "type": "choice",
    "default": 0,
    "options": [
-    "Red",
-    "Green",
-    "Blue",
-    "Alpha",
-    "Luminance",
-    "Zero",
-    "Full"
+    "R",
+    "G",
+    "B",
+    "A",
+    "Y",
+    "0",
+    "1"
    ]
   },
   {
@@ -26,13 +26,13 @@
    "type": "choice",
    "default": 1,
    "options": [
-    "Red",
-    "Green",
-    "Blue",
-    "Alpha",
-    "Luminance",
-    "Zero",
-    "Full"
+    "R",
+    "G",
+    "B",
+    "A",
+    "Y",
+    "0",
+    "1"
    ]
   },
   {
@@ -41,13 +41,13 @@
    "type": "choice",
    "default": 2,
    "options": [
-    "Red",
-    "Green",
-    "Blue",
-    "Alpha",
-    "Luminance",
-    "Zero",
-    "Full"
+    "R",
+    "G",
+    "B",
+    "A",
+    "Y",
+    "0",
+    "1"
    ]
   },
   {
@@ -56,13 +56,13 @@
    "type": "choice",
    "default": 3,
    "options": [
-    "Red",
-    "Green",
-    "Blue",
-    "Alpha",
-    "Luminance",
-    "Zero",
-    "Full"
+    "R",
+    "G",
+    "B",
+    "A",
+    "Y",
+    "0",
+    "1"
    ]
   }
  ],

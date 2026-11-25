@@ -98,10 +98,15 @@ class ExportSizes(context: Context) {
     }
 
     companion object {
-        fun key(kind: ExportKind, s: ExportSettings): String? = when (kind) {
-            ExportKind.Video -> "video.${s.codec.name}"
-            ExportKind.Gif -> "gif"
-            else -> null
+        fun key(kind: ExportKind, s: ExportSettings, sampled: Boolean): String? {
+            val how = if (sampled) "sampled" else "formula"
+            return when (kind) {
+                ExportKind.Video -> s.fixedFormat().let { "video.$how.${it.codec.name}.${it.container.name}" }
+                ExportKind.Gif -> "gif"
+                ExportKind.Sequence -> "sequence.$how.${s.image.name}"
+                ExportKind.Audio -> if (s.audioFormat == AudioFormat.Wav16 || s.audioFormat == AudioFormat.Wav24) null else "audio.$how.${s.audioFormat.name}"
+                ExportKind.Frame, ExportKind.FrameAs, ExportKind.Package, ExportKind.Xml -> null
+            }
         }
     }
 }

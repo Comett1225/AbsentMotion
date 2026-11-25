@@ -202,7 +202,7 @@ class DeskAppState {
     suspend fun maintainNow() {
         autoBackupIfDue(context, settings)
         sweepStorageDaily(context)
-        withContext(Dispatchers.IO) { runCatching { sweepStaleTemps(context.filesDir, context.cacheDir) }; runCatching { app.absentmotion.export.MediaStoreExport(context).discardAbandoned() } }
+        withContext(Dispatchers.IO) { runCatching { sweepStaleTemps(context.filesDir, context.cacheDir) }; runCatching { app.absentmotion.export.MediaStoreExport(context).discardAbandoned() }; runCatching { app.absentmotion.ai.AiModel.dropReplaced(context) } }
     }
 
     suspend fun maintain() {

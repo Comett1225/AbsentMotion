@@ -378,7 +378,7 @@ class Importer(
             "id", "label", "startTime", "endTime", "fillType", "fillImage", "fillVideo", "inTime", "outTime", "speed", "blending",
             "parent", "hidden", "lock", "clippingMask", "mediaFillMode", "s", "tag", "align", "font", "size", "wrapWidth", "src", "type", "link",
             "presetId", "templatePPId", "points", "color", "stroke", "style", "scaleLinked", "loop", "loopIn", "mixPieces", "threeD",
-            "noiseId", "retimeLength", "pathLayer", "matteFrame", "matteEdge", "genIn", "genOut", "genLoop", "outlineShape", "outlineMark", "textMetrics",
+            "noiseId", "retimeLength", "pathLayer", "matteFrame", "matteEdge", "genIn", "genOut", "genLoop", "outlineShape", "outlineMark", "textMetrics", "blendSource",
         )
 
         private fun uniqueLayerIds(root: XmlNode): XmlNode {

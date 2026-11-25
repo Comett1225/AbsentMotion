@@ -198,6 +198,10 @@
     <string name="bundle_pick_folder">저장할 폴더 선택</string>
     <string name="bundle_for_now">현재 위치: %1$s</string>
     <string name="bundle_folder_lost">이 폴더에 접근할 수 없습니다. 탭하여 다시 선택하세요. 그전까지 번들은 %1$s에 저장됩니다.</string>
+    <string name="settings_video_folder">동영상 및 GIF 폴더</string>
+    <string name="settings_sound_folder">사운드 폴더</string>
+    <string name="settings_folder_default">기본 폴더 사용</string>
+    <string name="export_folder_lost">이 폴더에 접근할 수 없습니다. 탭하여 다시 선택하세요. 그전까지 내보내기는 %1$s에 저장됩니다.</string>
     <string name="settings_about">정보</string>
     <string name="settings_report_issue">문제 신고</string>
     <string name="settings_suggest_feature">기능 제안</string>
@@ -358,6 +362,7 @@
     <string name="theme_light">라이트</string>
     <string name="theme_dark">다크</string>
     <string name="theme_daylight">데이라이트</string>
+    <string name="theme_light_green">라이트 그린</string>
     <string name="theme_custom">사용자 지정</string>
     <string name="theme_custom_named">사용자 지정 (%1$s)</string>
     <string name="theme_error_bad_colour">%1$s의 색상이 올바르지 않습니다</string>
@@ -796,6 +801,7 @@
     <string name="export_quality">화질</string>
     <string name="export_quality_low">낮음</string>
     <string name="export_quality_high">높음</string>
+    <string name="export_same_as_source">원본과 같게</string>
     <string name="export_format">형식</string>
     <string name="export_transparent_becomes">투명 영역 채우기</string>
     <string name="export_white">흰색</string>
@@ -1034,6 +1040,8 @@
     <string name="caption_position_bottom">아래</string>
     <string name="caption_words_per_caption">자막당 단어 수</string>
     <string name="caption_generate">생성</string>
+    <string name="caption_import_srt">SRT 가져오기</string>
+    <string name="caption_srt_empty">파일에서 자막을 찾을 수 없습니다</string>
     <string name="caption_not_now">나중에</string>
     <string name="caption_download">다운로드</string>
     <string name="draw_back">뒤로</string>
@@ -2167,8 +2175,8 @@
     <string name="caption_remaining">약 %1$s 남음</string>
     <string name="caption_progress">%1$s%%</string>
     <string name="caption_model">음성 인식 모델</string>
-    <string name="caption_model_standard">표준 · 60 MB</string>
-    <string name="caption_model_precision">높은 정확도 · 82 MB</string>
+    <string name="caption_model_standard">표준 · 264 MB</string>
+    <string name="caption_model_precision">높은 정확도 · 874 MB</string>
     <string name="model_err_no_triangles">모델에 삼각형이 없습니다</string>
     <string name="model_err_too_complex">모델이 너무 복잡합니다</string>
     <string name="model_err_missing_vertex">면이 존재하지 않는 정점을 사용합니다</string>
@@ -2227,6 +2235,7 @@
     <string name="effect_section_palette">사용자 팔레트</string>
     <string name="effect_section_back">레이어 뒷면</string>
     <string name="effect_section_colorblend">색상 및 블렌딩</string>
+    <string name="effect_section_randomization">무작위화</string>
     <string name="palettes">팔레트</string>
     <string name="palette_untitled">제목 없음</string>
     <string name="palette_new">새로 만들기</string>
@@ -2476,6 +2485,7 @@
     <string name="tools_failed">완료하지 못했습니다: %1$s</string>
     <string name="tools_save">저장</string>
     <string name="tools_add_to_project">프로젝트에 추가</string>
+    <string name="tools_add_more">도구 더 추가</string>
     <string name="tools_part">유지할 구간</string>
     <string name="tools_start">시작</string>
     <string name="tools_end">끝</string>
@@ -2507,6 +2517,15 @@
     <string name="tools_finding_cuts">자를 위치 찾는 중…</string>
     <string name="tools_trim_few_cuts">이 동영상에는 자를 위치가 거의 없어 빠르게를 선택하면 처음부터 시작할 수밖에 없습니다. 원하는 위치에서 시작하려면 정확하게를 선택하세요.</string>
     <string name="tools_trim_no_fast">여기서는 빠르게 자를 수 없어 정확하게 자릅니다.</string>
+    <string name="tools_merge">병합</string>
+    <string name="tools_merge_about">여러 동영상을 하나로 합칩니다.</string>
+    <string name="tools_merge_add">동영상 추가</string>
+    <string name="tools_merge_start">병합</string>
+    <string name="tools_merging">병합 중… %1$d%%</string>
+    <string name="tools_merge_need_two">동영상을 두 개 이상 추가하세요.</string>
+    <string name="tools_merge_no_fast">동영상 사양이 서로 달라 다시 인코딩합니다.</string>
+    <string name="tools_merge_up">위로 이동</string>
+    <string name="tools_merge_down">아래로 이동</string>
     <string name="shape_param_round_corners">모서리 둥글게</string>
     <string name="shape_param_notch">홈</string>
     <string name="shape_param_point">뾰족한 끝</string>
@@ -2664,6 +2683,13 @@
     <string name="tools_enhance_image_about">AI로 사진이나 그림에 디테일을 더합니다.</string>
     <string name="tools_enhance_pick">사진 선택</string>
     <string name="tools_enhance_running">이미지 화질 개선 중: %1$d%%</string>
+    <string name="tools_convert_image">이미지 변환</string>
+    <string name="tools_convert_image_about">이미지나 애니메이션을 PNG, JPG, WebP 또는 GIF로 바꿉니다.</string>
+    <string name="tools_convert_pick">이미지 선택</string>
+    <string name="tools_convert_to">변환할 형식</string>
+    <string name="tools_convert_start">변환</string>
+    <string name="tools_converting">변환 중… %1$d%%</string>
+    <string name="tools_convert_too_large">2048 × 2048픽셀, 3000프레임까지의 애니메이션을 변환할 수 있습니다.</string>
     <string name="ai_model_detail_max">AI 화질 개선 사실적 최대 모델</string>
     <string name="ai_model_cartoon_max">AI 화질 개선 애니메이션·만화 최대 모델</string>
     <string name="ai_enhance_image_upscale2_hint">너비와 높이를 2배로</string>

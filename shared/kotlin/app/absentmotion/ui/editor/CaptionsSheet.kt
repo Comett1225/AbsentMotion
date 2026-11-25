@@ -64,6 +64,13 @@ import app.absentmotion.ai.CaptionPosition
 import app.absentmotion.ai.CaptionStyle
 import app.absentmotion.ai.addCaptions
 import app.absentmotion.ai.recogniseCaptions
+import app.absentmotion.ai.srtChunks
+import app.absentmotion.ai.srtText
+import app.absentmotion.platform.readAtMost
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import app.absentmotion.audio.soundUri
 import app.absentmotion.model.shownName
 import app.absentmotion.editor.EditorState
@@ -92,6 +99,8 @@ private val Swatches = listOf(0xFFFFFFFF, 0xFFFFE14D, 0xFFFF9F1C, 0xFFFF4D4D, 0x
 internal val Warning get() = Am.Warning
 
 private var lastStyle = CaptionStyle()
+
+private const val MaxSrtBytes = 8 shl 20
 
 private fun CaptionPosition.labelRes() = when (this) {
     CaptionPosition.Top -> R.string.caption_position_top
@@ -189,6 +198,15 @@ internal fun CaptionsSheet(state: EditorState, clipId: Long? = null, onClose: ()
         if (source != null && sources.none { it.id == source }) { message = context.getString(R.string.ai_no_sound_to_caption); return }
         if (CaptionModel.installed(context, style.highPrecision)) start { captions() } else { message = ""; phase = Phase.Confirm }
     }
+    val srt = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) start {
+            val text = withContext(Dispatchers.IO) { context.contentResolver.openInputStream(uri)?.use { srtText(it.readAtMost(MaxSrtBytes)) } }
+                ?: error(context.getString(R.string.caption_unable))
+            val chunks = snapshot.srtChunks(text, source).ifEmpty { error(context.getString(R.string.caption_srt_empty)) }
+            state.addCaptions(chunks, style, fonts)
+            onClose()
+        }
+    }
     fun download() = start {
         phase = Phase.Download
         progress = 0f
@@ -253,6 +271,7 @@ internal fun CaptionsSheet(state: EditorState, clipId: Long? = null, onClose: ()
                         message = message,
                         onBrowse = { browsing = true },
                         onGenerate = ::generate,
+                        onImport = { srt.launch(arrayOf("*/*")) },
                         onClose = ::dismiss,
                     )
                 }
@@ -284,6 +303,7 @@ private fun SetupScreen(
     message: String,
     onBrowse: () -> Unit,
     onGenerate: () -> Unit,
+    onImport: () -> Unit,
     onClose: () -> Unit,
 ) {
     Column(Modifier.fillMaxWidth()) {
@@ -373,7 +393,10 @@ private fun SetupScreen(
             if (message.isNotEmpty()) {
                 Text(message, Modifier.fillMaxWidth().padding(bottom = 8.dp), color = Warning, fontSize = 13.sp, lineHeight = 17.sp, maxLines = 2)
             }
-            Action(stringResource(R.string.caption_generate), Modifier.fillMaxWidth(), primary = true, onClick = onGenerate)
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Action(stringResource(R.string.caption_import_srt), Modifier.weight(1f), onClick = onImport)
+                Action(stringResource(R.string.caption_generate), Modifier.weight(1f), primary = true, onClick = onGenerate)
+            }
         }
     }
 }

@@ -108,10 +108,11 @@ const ShaderMode kShaderModes[] = {
     {"divide", true, "return b / max(s, 1e-6);"},
 };
 
-sk_sp<SkBlender> ShaderBlender(const std::string& id) {
-    thread_local std::map<std::string, sk_sp<SkBlender>> cache;
-    if (auto hit = cache.find(id); hit != cache.end()) return hit->second;
-    sk_sp<SkBlender> blender;
+sk_sp<SkRuntimeEffect> ShaderBlend(const std::string& id, bool premul) {
+    thread_local std::map<std::string, sk_sp<SkRuntimeEffect>> cache;
+    const std::string key = premul ? id + "/premul" : id;
+    if (auto hit = cache.find(key); hit != cache.end()) return hit->second;
+    sk_sp<SkRuntimeEffect> effect;
     for (const ShaderMode& mode : kShaderModes) {
         if (id != mode.id) continue;
         std::string sksl = kBlendHelpers;
@@ -122,33 +123,49 @@ sk_sp<SkBlender> ShaderBlender(const std::string& id) {
         } else {
             sksl += std::string("float3 mixColor(float3 s, float3 b) { ") + mode.code + " }\n";
         }
-        sksl += R"(
+        sksl += premul ? "uniform half again;\n" : "";
+        sksl += std::string(R"(
 half4 main(half4 src, half4 dst) {
     float sa = float(src.a), da = float(dst.a);
     if (sa <= 0.0) return dst;
-    float3 s = clamp(float3(src.rgb) / sa, 0.0, 1.0);
+    float3 s = clamp(float3(src.rgb))") + (premul ? "" : " / sa") + R"(, 0.0, 1.0);
     float3 b = da > 0.0 ? clamp(float3(dst.rgb) / da, 0.0, 1.0) : float3(0.0);
     float3 mixed = clamp(mixColor(s, b), 0.0, 1.0);
+    float w = sa)" + (premul ? " * float(again)" : "") + R"(;
     float alpha = sa + da * (1.0 - sa);
-    float3 rgb = (1.0 - da) * float3(src.rgb) + (1.0 - sa) * float3(dst.rgb) + sa * da * mixed;
+    float3 rgb = (1.0 - da) * float3(src.rgb) + (1.0 - w) * float3(dst.rgb) + w * da * mixed;
     return half4(half3(min(rgb, float3(alpha))), half(alpha));
 })";
         auto result = SkRuntimeEffect::MakeForBlender(SkString(sksl.c_str()));
-        if (result.effect) blender = result.effect->makeBlender(nullptr);
+        if (result.effect) effect = result.effect;
         else __android_log_print(ANDROID_LOG_ERROR, "AMStyles", "blend %s: %s", id.c_str(), result.errorText.c_str());
         break;
     }
+    cache[key] = effect;
+    return effect;
+}
+
+sk_sp<SkBlender> ShaderBlender(const std::string& id) {
+    thread_local std::map<std::string, sk_sp<SkBlender>> cache;
+    if (auto hit = cache.find(id); hit != cache.end()) return hit->second;
+    sk_sp<SkRuntimeEffect> effect = ShaderBlend(id, false);
+    sk_sp<SkBlender> blender = effect ? effect->makeBlender(nullptr) : nullptr;
     cache[id] = blender;
     return blender;
 }
 
-void SetBlend(SkPaint* paint, const std::string& id) {
+void SetBlend(SkPaint* paint, const std::string& id, float again = -1) {
     if (id.empty() || id == "normal") return;
     if (id == "screen") paint->setBlendMode(SkBlendMode::kScreen);
     else if (id == "mask") paint->setBlendMode(SkBlendMode::kDstIn);
     else if (id == "exclude") paint->setBlendMode(SkBlendMode::kDstOut);
     else if (id == "clipping-mask") paint->setBlendMode(SkBlendMode::kSrcATop);
+    else if (sk_sp<SkRuntimeEffect> premul = again >= 0 ? ShaderBlend(id, true) : nullptr) paint->setBlender(premul->makeBlender(SkData::MakeWithCopy(&again, sizeof again)));
     else if (auto blender = ShaderBlender(id)) paint->setBlender(blender);
+}
+
+float PremulOpacity(const Layer& l, double timeMs) {
+    return l.premulBlend ? std::clamp(l.opacity.get(0, l.localTime(timeMs), 1) * MotionOpacity(l, timeMs), 0.0f, 1.0f) : -1;
 }
 
 bool IsNormal(const std::string& id) { return id.empty() || id == "normal"; }
@@ -1526,7 +1543,7 @@ void DrawShuttered(SkCanvas* canvas, const std::vector<Layer>& siblings, const L
     }
     if (ov.blend || !IsNormal(l.blending)) {
         if (ov.blend) composite.setBlendMode(ov.mode);
-        else SetBlend(&composite, l.blending);
+        else SetBlend(&composite, l.blending, PremulOpacity(l, timeMs));
         sample.blend = true;
         sample.mode = SkBlendMode::kSrcOver;
     }
@@ -1670,7 +1687,7 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
         const bool grouped = !ov.blend && !IsNormal(l.blending) && !SeesPrevious(siblings, l);
         if (grouped) {
             SkPaint composite;
-            SetBlend(&composite, l.blending);
+            SetBlend(&composite, l.blending, PremulOpacity(l, timeMs));
             canvas->saveLayer(nullptr, &composite);
             plain.blend = true;
             plain.mode = SkBlendMode::kSrcOver;
@@ -1717,7 +1734,7 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
         const bool grouped = !ov.blend && !IsNormal(l.blending) && !SeesPrevious(siblings, l);
         if (grouped) {
             SkPaint composite;
-            SetBlend(&composite, l.blending);
+            SetBlend(&composite, l.blending, PremulOpacity(l, timeMs));
             canvas->saveLayer(nullptr, &composite);
             plain.blend = true;
             plain.mode = SkBlendMode::kSrcOver;
@@ -1793,7 +1810,7 @@ void DrawOne(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& 
         SkPaint layerPaint;
         layerPaint.setAlphaf(opacity);
         if (ov.blend) layerPaint.setBlendMode(ov.mode);
-        else SetBlend(&layerPaint, l.blending);
+        else SetBlend(&layerPaint, l.blending, l.premulBlend ? opacity : -1);
         if (shadow) {
             const Edge& s = l.shadow;
             const float sigma = std::max(s.size.get(0, t, 4), 0.0f) * 0.5f;
@@ -1898,6 +1915,7 @@ bool TextGuideBelow(const Layer& layer, float t, SkPath* path) {
 
 void ParseStyle(const XmlNode& n, Layer* l) {
     l->blending = AttrOf(n, "blending");
+    l->premulBlend = AttrOf(n, "blendSource") == "premul";
     l->clippingMask = AttrOf(n, "clippingMask") == "true";
     l->parent = strtoll(AttrOf(n, "parent").c_str(), nullptr, 10);
     l->pathLayer = strtoll(AttrOf(n, "pathLayer").c_str(), nullptr, 10);
@@ -2275,7 +2293,7 @@ void Collect(SkCanvas* canvas, const std::vector<Layer>& layers, const Layer& l,
     pass->depth = l.sight.depth;
     pass->perPixel = DepthPerPixel(l, timeMs);
     pass->look = SkPaint();
-    SetBlend(&pass->look, l.blending);
+    SetBlend(&pass->look, l.blending, l.premulBlend ? opacity : -1);
     SeenFlat(l, timeMs, &pass->flat);
     {
         depth::Scope scope(pass);
@@ -2306,7 +2324,7 @@ void DrawList(SkCanvas* canvas, const std::vector<Layer>& listed, int width, int
         const float t = base.localTime(timeMs);
         SkPaint stack;
         stack.setAlphaf(std::clamp(base.opacity.get(0, t, 1) * MotionOpacity(base, timeMs), 0.0f, 1.0f));
-        SetBlend(&stack, base.blending);
+        SetBlend(&stack, base.blending, PremulOpacity(base, timeMs));
         Echo echo;
         const bool seeded = SeesPrevious(layers, base) && !EchoOf(base, timeMs, &echo) && !base.effect("absent.videofeedback") &&
                             (base.fillType != "media" || pictures(base.mediaUri, base.id));

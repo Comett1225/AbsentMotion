@@ -9,19 +9,24 @@ import kotlin.math.roundToLong
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+internal class ByteCounter : OutputStream() {
+    var bytes = 0L
+    override fun write(value: Int) { bytes++ }
+    override fun write(data: ByteArray, offset: Int, length: Int) { bytes += length }
+}
+
+internal fun sizeSamples(frames: Int): List<Int> = listOf(0, frames / 4, frames / 2, frames * 3 / 4, frames - 1).map { it.coerceAtLeast(0) }.distinct()
+
+internal data class SequenceSample(val frameMs: Double, val bytes: Long?)
+
 internal data class GifSample(val bytes: Long, val encodeMs: List<Double>, val renderMs: List<Double> = emptyList(), val lanes: Int = 1)
 
 internal fun gifSampleEstimate(width: Int, height: Int, frames: Int, samples: List<ByteArray>): GifSample {
     require(samples.isNotEmpty())
-    class Counter : OutputStream() {
-        var bytes = 0L
-        override fun write(value: Int) { bytes++ }
-        override fun write(data: ByteArray, offset: Int, length: Int) { bytes += length }
-    }
     var overhead = 0L
     val encodeMs = ArrayList<Double>()
     val sizes = samples.map { pixels ->
-        val out = Counter()
+        val out = ByteCounter()
         val started = System.nanoTime()
         val writer = GifWriter(out, width, height)
         overhead = out.bytes + 1
@@ -73,21 +78,21 @@ internal suspend fun measureVideoDraw(engine: EngineThread, scene: Scene, settin
     }
 }
 
-internal suspend fun measureSequenceFrame(engine: EngineThread, scene: Scene, settings: ExportSettings): Double {
+internal suspend fun measureSequence(engine: EngineThread, scene: Scene, settings: ExportSettings): SequenceSample {
     val (width, height) = exportSize(scene, settings.shortSide, even = false)
     val frames = frameCount(scene, settings.fps)
-    val discard = object : OutputStream() {
-        override fun write(value: Int) {}
-        override fun write(data: ByteArray, offset: Int, length: Int) {}
-    }
     return engine.exportSession(scene.toXml(), settings.smoothing, settings.fps) {
+        suspend fun encoded(index: Int): Long {
+            val pixels = still(frameTimeMs(scene, settings.fps, index), width, height) ?: error("Cannot sample the drawing time")
+            return withContext(Dispatchers.Default) { ByteCounter().also { app.absentmotion.platform.encodeRgba(pixels, width, height, settings, null, it) }.bytes }
+        }
         val times = drawSamples(frames, settings.interpolation).map { index ->
             val started = System.nanoTime()
-            val pixels = still(frameTimeMs(scene, settings.fps, index), width, height) ?: error("Cannot sample the drawing time")
-            withContext(Dispatchers.Default) { app.absentmotion.platform.encodeRgba(pixels, width, height, settings, null, discard) }
+            encoded(index)
             (System.nanoTime() - started) / 1e6
         }
-        drawingMs(times, settings.interpolation)
+        val sizes = sizeSamples(frames).map { encoded(it) }
+        SequenceSample(drawingMs(times, settings.interpolation), (sizes.average() * frames).toLong())
     }
 }
 
@@ -96,9 +101,9 @@ internal suspend fun measureGif(engine: EngineThread, scene: Scene, settings: Ex
     val frames = frameCount(scene, settings.fps)
     return engine.exportSession(scene.toXml(), settings.smoothing, settings.fps) {
         val renderMs = ArrayList<Double>()
-        val samples = listOf(0, frames / 4, frames / 2, frames * 3 / 4, frames - 1).distinct().map { index ->
+        val samples = sizeSamples(frames).map { index ->
             val started = System.nanoTime()
-            (still(frameTimeMs(scene, settings.fps, index), width, height) ?: error("Cannot sample GIF size")).also {
+            (still(frameTimeMs(scene, settings.fps, index), width, height)?.let { ImageEncode.flatten(it, settings.background, it) } ?: error("Cannot sample GIF size")).also {
                 renderMs += (System.nanoTime() - started) / 1e6
             }
         }

@@ -60,10 +60,10 @@ class PatternMigrationTest {
     }
 
     @Test fun checkersUseAlightsCellSizeAndKeepNegativeStretch() {
-        assertEquals(10f / 2.475f, migrate("checker2").number("count"), 1e-4f)
-        assertEquals(6f / 2.475f, migrate("checker").number("count"), 1e-4f)
+        assertEquals(10f, migrate("checker2").number("cells"), 1e-4f)
+        assertEquals(6f, migrate("checker").number("cells"), 1e-4f)
         val v = migrate("checker2", "amount" to "57.5", "stretch" to "41,-24", "position" to "40,-25")
-        assertEquals(57.5f / 2.475f, v.number("count"), 1e-3f)
+        assertEquals(57.5f, v.number("cells"), 1e-3f)
         assertEquals("41.000000,-24.000000", v.value("stretch"))
         assertEquals("40.000000,-25.000000", v.value("offset"))
     }
@@ -88,8 +88,10 @@ class PatternMigrationTest {
 
     @Test fun tileRotateAndShiftUseAlightsCellSize() {
         for (id in listOf("tilerotate", "tilerotate2", "tileshift", "tileshift2")) {
-            assertEquals(id, 6f / 2.475f, migrate(id).number("count"), 1e-4f)
-            assertEquals(id, 57.5f / 2.475f, migrate(id, "amount" to "57.5").number("count"), 1e-3f)
+            assertEquals(id, null, migrate(id).value("count"))
+            assertEquals(id, "10.000000", catalog.find(migrate(id)["id"]!!)!!.params.single { it.id == "count" }.default)
+            assertEquals(id, 57.5f, migrate(id, "amount" to "57.5").number("count"), 1e-3f)
+            assertEquals(id, 1f, migrate(id).number("style"), 1e-6f)
             assertEquals(id, 1f, migrate(id).number("edges"), 1e-6f)
             assertEquals(id, "true", migrate(id, "screenSpace" to "true").value("screenSpace"))
         }
@@ -146,18 +148,18 @@ class PatternMigrationTest {
 
     @Test fun ribbonSitsOnAlightsSideAndKeepsItsEdgesSharp() {
         val v = migrate("ribbon", "amplitude" to "0.4", "frequency" to "7.25", "offset" to "0.25", "smoothing" to "0.2575", "angle" to "900")
-        assertEquals(-0.5f, v.number("offset"), 1e-6f)
-        assertEquals(-900f, v.number("angle"), 1e-4f)
-        assertEquals(0.02575f, v.number("smoothing"), 1e-6f)
-        assertEquals(0.2f, v.number("magnitude"), 1e-6f)
-        assertEquals(3.9875f, v.number("frequency"), 1e-5f)
+        assertEquals(0.25f, v.number("shift"), 1e-6f)
+        assertEquals(900f, v.number("tilt"), 1e-4f)
+        assertEquals(0.2575f, v.number("soften"), 1e-6f)
+        assertEquals(0.4f, v.number("amplitude"), 1e-6f)
+        assertEquals(7.25f, v.number("waves"), 1e-5f)
     }
 
     @Test fun dotsTakeAlightsCellsPerLayerHeightAndRadiusPerCell() {
         for (id in listOf("dots", "dots2")) {
             val v = migrate(id, "scale" to "25.75", "radius" to "0.65")
-            assertEquals(id, 13f / 25.75f, v.number("scale"), 1e-5f)
-            assertEquals(id, 1.3f, v.number("radius"), 1e-5f)
+            assertEquals(id, 25.75f, v.number("zoom"), 1e-5f)
+            assertEquals(id, 0.65f, v.number("dotRadius"), 1e-5f)
         }
     }
 

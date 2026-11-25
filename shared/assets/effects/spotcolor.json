@@ -32,7 +32,7 @@
    "percent": true
   },
   {
-   "id": "saturation",
+   "id": "sat",
    "label": "Saturation",
    "type": "float",
    "default": 0,
@@ -61,5 +61,5 @@
    ]
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nlayout(color) uniform half4 color;\nuniform float threshold;\nuniform float feather;\nuniform float saturation;\nuniform float choke;\nuniform float grey;\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float3 rgb = float3(src.rgb) / float(src.a);\n    float d = distance(rgb, float3(color.rgb)) * choke;\n    float keep = 1.0 - smoothstep(threshold, threshold + feather + 0.0001, d);\n    float y = dot(rgb, grey > 0.5 ? float3(0.299, 0.587, 0.114) : float3(0.2126, 0.7152, 0.0722));\n    float3 other = mix(float3(y), rgb, saturation);\n    return half4(half3(mix(other, rgb, keep)) * src.a, src.a);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nlayout(color) uniform half4 color;\nuniform float threshold;\nuniform float feather;\nuniform float sat;\nuniform float choke;\nuniform float grey;\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    float3 rgb = float3(src.rgb) / float(src.a);\n    float d = distance(rgb, float3(color.rgb)) * choke;\n    float keep = 1.0 - smoothstep(threshold, threshold + feather + 0.0001, d);\n    float y = dot(rgb, grey > 0.5 ? float3(0.299, 0.587, 0.114) : float3(0.2126, 0.7152, 0.0722));\n    float3 other = mix(float3(y), rgb, min(sat * 4.0, 1.0));\n    return half4(half3(mix(other, rgb, keep)) * src.a, src.a);\n}\n"
 }

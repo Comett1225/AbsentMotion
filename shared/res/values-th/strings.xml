@@ -198,6 +198,10 @@
     <string name="bundle_pick_folder">เลือกโฟลเดอร์ที่จะบันทึก</string>
     <string name="bundle_for_now">ตอนนี้: %1$s</string>
     <string name="bundle_folder_lost">ไม่สามารถเข้าถึงโฟลเดอร์นี้ได้ แตะเพื่อเลือกอีกครั้ง ระหว่างนี้ชุดจะบันทึกใน %1$s</string>
+    <string name="settings_video_folder">โฟลเดอร์วิดีโอและ GIF</string>
+    <string name="settings_sound_folder">โฟลเดอร์เสียง</string>
+    <string name="settings_folder_default">ใช้โฟลเดอร์เริ่มต้น</string>
+    <string name="export_folder_lost">ไม่สามารถเข้าถึงโฟลเดอร์นี้ได้ แตะเพื่อเลือกอีกครั้ง ระหว่างนี้การส่งออกจะบันทึกใน %1$s</string>
     <string name="settings_about">เกี่ยวกับ</string>
     <string name="settings_report_issue">รายงานปัญหา</string>
     <string name="settings_suggest_feature">เสนอฟีเจอร์</string>
@@ -358,6 +362,7 @@
     <string name="theme_light">สว่าง</string>
     <string name="theme_dark">มืด</string>
     <string name="theme_daylight">กลางวัน</string>
+    <string name="theme_light_green">เขียวอ่อน</string>
     <string name="theme_custom">กำหนดเอง</string>
     <string name="theme_custom_named">กำหนดเอง (%1$s)</string>
     <string name="theme_error_bad_colour">สีของ %1$s ไม่ถูกต้อง</string>
@@ -796,6 +801,7 @@
     <string name="export_quality">คุณภาพ</string>
     <string name="export_quality_low">ต่ำ</string>
     <string name="export_quality_high">สูง</string>
+    <string name="export_same_as_source">เหมือนต้นฉบับ</string>
     <string name="export_format">รูปแบบ</string>
     <string name="export_transparent_becomes">พื้นที่โปร่งใสจะกลายเป็น</string>
     <string name="export_white">สีขาว</string>
@@ -1034,6 +1040,8 @@
     <string name="caption_position_bottom">ล่าง</string>
     <string name="caption_words_per_caption">จำนวนคำต่อคำบรรยาย</string>
     <string name="caption_generate">สร้าง</string>
+    <string name="caption_import_srt">นำเข้า SRT</string>
+    <string name="caption_srt_empty">ไม่พบคำบรรยายในไฟล์</string>
     <string name="caption_not_now">ไม่ใช่ตอนนี้</string>
     <string name="caption_download">ดาวน์โหลด</string>
     <string name="draw_back">กลับ</string>
@@ -2167,8 +2175,8 @@
     <string name="caption_remaining">เหลืออีกประมาณ %1$s</string>
     <string name="caption_progress">%1$s%%</string>
     <string name="caption_model">โมเดลเสียงพูด</string>
-    <string name="caption_model_standard">มาตรฐาน · 60 MB</string>
-    <string name="caption_model_precision">แม่นยำสูงกว่า · 82 MB</string>
+    <string name="caption_model_standard">มาตรฐาน · 264 MB</string>
+    <string name="caption_model_precision">แม่นยำสูงกว่า · 874 MB</string>
     <string name="model_err_no_triangles">โมเดลไม่มีสามเหลี่ยม</string>
     <string name="model_err_too_complex">โมเดลซับซ้อนเกินไป</string>
     <string name="model_err_missing_vertex">มีหน้าที่ใช้จุดยอดที่ไม่มีอยู่</string>
@@ -2227,6 +2235,7 @@
     <string name="effect_section_palette">จานสีกำหนดเอง</string>
     <string name="effect_section_back">ด้านหลังของเลเยอร์</string>
     <string name="effect_section_colorblend">สีและการผสม</string>
+    <string name="effect_section_randomization">การสุ่ม</string>
     <string name="palettes">จานสี</string>
     <string name="palette_untitled">ไม่มีชื่อ</string>
     <string name="palette_new">ใหม่</string>
@@ -2476,6 +2485,7 @@
     <string name="tools_failed">ทำไม่สำเร็จ: %1$s</string>
     <string name="tools_save">บันทึก</string>
     <string name="tools_add_to_project">เพิ่มในโปรเจกต์</string>
+    <string name="tools_add_more">เพิ่มเครื่องมืออื่น</string>
     <string name="tools_part">ส่วนที่จะเก็บไว้</string>
     <string name="tools_start">เริ่ม</string>
     <string name="tools_end">สิ้นสุด</string>
@@ -2507,6 +2517,15 @@
     <string name="tools_finding_cuts">กำลังหาจุดตัด…</string>
     <string name="tools_trim_few_cuts">วิดีโอนี้แทบไม่มีจุดตัดเลย แบบเร็วจึงเริ่มได้แค่ที่ต้นเท่านั้น เลือกแบบแม่นยำเพื่อเริ่มตรงไหนก็ได้</string>
     <string name="tools_trim_no_fast">ที่นี่ตัดแบบเร็วไม่ได้ จึงจะตัดแบบแม่นยำแทน</string>
+    <string name="tools_merge">รวมวิดีโอ</string>
+    <string name="tools_merge_about">รวมวิดีโอหลายรายการให้เป็นหนึ่งเดียว</string>
+    <string name="tools_merge_add">เพิ่มวิดีโอ</string>
+    <string name="tools_merge_start">รวม</string>
+    <string name="tools_merging">กำลังรวม… %1$d%%</string>
+    <string name="tools_merge_need_two">เพิ่มวิดีโออย่างน้อยสองรายการ</string>
+    <string name="tools_merge_no_fast">วิดีโอเหล่านี้ต่างกัน จึงต้องเข้ารหัสใหม่</string>
+    <string name="tools_merge_up">เลื่อนขึ้น</string>
+    <string name="tools_merge_down">เลื่อนลง</string>
     <string name="shape_param_round_corners">มนมุม</string>
     <string name="shape_param_notch">รอยบาก</string>
     <string name="shape_param_point">ปลายแหลม</string>
@@ -2664,6 +2683,13 @@
     <string name="tools_enhance_image_about">เพิ่มรายละเอียดให้รูปถ่ายหรือภาพวาดด้วย AI</string>
     <string name="tools_enhance_pick">เลือกรูปถ่าย</string>
     <string name="tools_enhance_running">กำลังเพิ่มคุณภาพรูปภาพ: %1$d%%</string>
+    <string name="tools_convert_image">แปลงรูปภาพ</string>
+    <string name="tools_convert_image_about">แปลงรูปภาพหรืออนิเมชันเป็น PNG, JPG, WebP หรือ GIF</string>
+    <string name="tools_convert_pick">เลือกรูปภาพ</string>
+    <string name="tools_convert_to">แปลงเป็น</string>
+    <string name="tools_convert_start">แปลง</string>
+    <string name="tools_converting">กำลังแปลง… %1$d%%</string>
+    <string name="tools_convert_too_large">แปลงอนิเมชันได้ไม่เกิน 2048 × 2048 พิกเซลและ 3000 เฟรม</string>
     <string name="ai_model_detail_max">โมเดล AI Enhance สมจริง Max</string>
     <string name="ai_model_cartoon_max">โมเดล AI Enhance อนิเมะและการ์ตูน Max</string>
     <string name="ai_enhance_image_upscale2_hint">กว้างและสูงเป็น 2 เท่า</string>

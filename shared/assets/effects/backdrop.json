@@ -7,12 +7,13 @@
  "params": [
   {
    "id": "mix",
-   "label": "Mix",
+   "label": "Fill",
    "type": "float",
    "default": 0,
    "min": 0,
    "max": 1,
-   "step": 0.01
+   "step": 0.01,
+   "percent": true
   },
   {
    "id": "mask",

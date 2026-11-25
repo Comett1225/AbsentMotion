@@ -198,6 +198,10 @@
     <string name="bundle_pick_folder">Elige una carpeta donde guardar</string>
     <string name="bundle_for_now">Por ahora: %1$s</string>
     <string name="bundle_folder_lost">No se puede acceder a esta carpeta. Púlsala para elegirla de nuevo; hasta entonces, los paquetes se guardarán en %1$s.</string>
+    <string name="settings_video_folder">Carpeta de vídeos y GIF</string>
+    <string name="settings_sound_folder">Carpeta de sonidos</string>
+    <string name="settings_folder_default">Usar la carpeta predeterminada</string>
+    <string name="export_folder_lost">No se puede acceder a esta carpeta. Púlsala para elegirla de nuevo; hasta entonces, las exportaciones se guardarán en %1$s.</string>
     <string name="settings_about">Acerca de</string>
     <string name="settings_report_issue">Informar de un problema</string>
     <string name="settings_suggest_feature">Sugerir una función</string>
@@ -358,6 +362,7 @@
     <string name="theme_light">Claro</string>
     <string name="theme_dark">Oscuro</string>
     <string name="theme_daylight">Luz de día</string>
+    <string name="theme_light_green">Verde claro</string>
     <string name="theme_custom">Personalizado</string>
     <string name="theme_custom_named">Personalizado (%1$s)</string>
     <string name="theme_error_bad_colour">Color no válido para %1$s</string>
@@ -816,6 +821,7 @@
     <string name="export_quality">Calidad</string>
     <string name="export_quality_low">Baja</string>
     <string name="export_quality_high">Alta</string>
+    <string name="export_same_as_source">Igual que el original</string>
     <string name="export_format">Formato</string>
     <string name="export_transparent_becomes">Las zonas transparentes se convierten en</string>
     <string name="export_white">Blanco</string>
@@ -1062,6 +1068,8 @@
     <string name="caption_position_bottom">Abajo</string>
     <string name="caption_words_per_caption">Palabras por subtítulo</string>
     <string name="caption_generate">Generar</string>
+    <string name="caption_import_srt">Importar SRT</string>
+    <string name="caption_srt_empty">No se encontraron subtítulos en el archivo</string>
     <string name="caption_not_now">Ahora no</string>
     <string name="caption_download">Descargar</string>
     <string name="draw_back">Atrás</string>
@@ -2227,8 +2235,8 @@
     <string name="caption_remaining">Quedan unos %1$s</string>
     <string name="caption_progress">%1$s%%</string>
     <string name="caption_model">Modelo de voz</string>
-    <string name="caption_model_standard">Estándar · 60 MB</string>
-    <string name="caption_model_precision">Mayor precisión · 82 MB</string>
+    <string name="caption_model_standard">Estándar · 264 MB</string>
+    <string name="caption_model_precision">Mayor precisión · 874 MB</string>
     <string name="model_err_no_triangles">El modelo no tiene triángulos</string>
     <string name="model_err_too_complex">El modelo es demasiado complejo</string>
     <string name="model_err_missing_vertex">Una cara usa un vértice que no existe</string>
@@ -2289,6 +2297,7 @@
     <string name="effect_section_palette">Paleta personalizada</string>
     <string name="effect_section_back">Reverso de la capa</string>
     <string name="effect_section_colorblend">Color y fusión</string>
+    <string name="effect_section_randomization">Aleatorización</string>
     <string name="palettes">Paletas</string>
     <string name="palette_untitled">Sin título</string>
     <string name="palette_new">Nueva</string>
@@ -2546,6 +2555,7 @@
     <string name="tools_failed">No se ha podido terminar: %1$s</string>
     <string name="tools_save">Guardar</string>
     <string name="tools_add_to_project">Añadir al proyecto</string>
+    <string name="tools_add_more">Añadir más herramientas</string>
     <string name="tools_part">Parte que conservar</string>
     <string name="tools_start">Inicio</string>
     <string name="tools_end">Fin</string>
@@ -2577,6 +2587,15 @@
     <string name="tools_finding_cuts">Buscando los puntos de corte…</string>
     <string name="tools_trim_few_cuts">Este vídeo casi no tiene puntos de corte, así que Rápido solo puede empezar desde el principio. Elige Exacto para empezar donde quieras.</string>
     <string name="tools_trim_no_fast">Aquí no se puede hacer un corte rápido, así que se cortará de forma exacta.</string>
+    <string name="tools_merge">Unir</string>
+    <string name="tools_merge_about">Une varios vídeos en uno.</string>
+    <string name="tools_merge_add">Añadir vídeos</string>
+    <string name="tools_merge_start">Unir</string>
+    <string name="tools_merging">Uniendo… %1$d%%</string>
+    <string name="tools_merge_need_two">Añade al menos dos vídeos.</string>
+    <string name="tools_merge_no_fast">Estos vídeos son distintos, así que se volverán a codificar.</string>
+    <string name="tools_merge_up">Subir</string>
+    <string name="tools_merge_down">Bajar</string>
     <string name="shape_param_round_corners">Redondear esquinas</string>
     <string name="shape_param_notch">Muesca</string>
     <string name="shape_param_point">Punta</string>
@@ -2734,6 +2753,13 @@
     <string name="tools_enhance_image_about">Añade detalles a una foto o un dibujo con IA.</string>
     <string name="tools_enhance_pick">Elegir una foto</string>
     <string name="tools_enhance_running">Mejorando la imagen: %1$d%%</string>
+    <string name="tools_convert_image">Convertir imagen</string>
+    <string name="tools_convert_image_about">Convierte una imagen o animación a PNG, JPG, WebP o GIF.</string>
+    <string name="tools_convert_pick">Elige una imagen</string>
+    <string name="tools_convert_to">Convertir a</string>
+    <string name="tools_convert_start">Convertir</string>
+    <string name="tools_converting">Convirtiendo… %1$d%%</string>
+    <string name="tools_convert_too_large">Se pueden convertir animaciones de hasta 2048 × 2048 píxeles y 3000 fotogramas.</string>
     <string name="ai_model_detail_max">Modelo de Mejorar con IA Realista Máx</string>
     <string name="ai_model_cartoon_max">Modelo de Mejorar con IA Anime y dibujos animados Máx</string>
     <string name="ai_enhance_image_upscale2_hint">El doble de ancho y de alto</string>

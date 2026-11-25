@@ -397,6 +397,122 @@ internal fun transcode(
     }
 }
 
+internal fun transcodeJoined(
+    context: Context, inputs: List<Pair<String, Int>>, startsUs: LongArray, out: File, width: Int, height: Int, sound: AudioCopy?,
+    cancelled: () -> Boolean, open: () -> MediaCodec, progress: (Float) -> Unit,
+): Boolean {
+    var encoder: MediaCodec? = null
+    var gl: ProxyGl? = null
+    var frames: SurfaceTexture? = null
+    var surface: Surface? = null
+    var muxer: MediaMuxer? = null
+    val thread = HandlerThread("am-join-frames").apply { start() }
+    try {
+        encoder = open()
+        gl = ProxyGl(encoder.createInputSurface(), width, height)
+        val available = Semaphore(0)
+        frames = SurfaceTexture(gl.texture).apply { setOnFrameAvailableListener({ available.release() }, Handler(thread.looper)) }
+        surface = Surface(frames)
+        encoder.start()
+        muxer = MediaMuxer(out.path, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+        val info = MediaCodec.BufferInfo()
+        val matrix = FloatArray(16)
+        var muxTrack = -1
+        var encoded = false
+        val totalUs = startsUs.last().coerceAtLeast(1)
+        fun drain(wait: Boolean): Boolean {
+            var quiet = System.nanoTime()
+            while (true) {
+                val index = encoder.dequeueOutputBuffer(info, if (wait) 10_000 else 0)
+                when {
+                    index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> {
+                        muxTrack = muxer.addTrack(encoder.outputFormat)
+                        sound?.format?.let { sound.track = muxer.addTrack(it) }
+                        muxer.start()
+                        quiet = System.nanoTime()
+                    }
+                    index >= 0 -> {
+                        quiet = System.nanoTime()
+                        if (info.size > 0 && info.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG == 0 && muxTrack >= 0) {
+                            muxer.writeSampleData(muxTrack, encoder.getOutputBuffer(index)!!, info)
+                            sound?.copyUntil(muxer, info.presentationTimeUs)
+                        }
+                        encoder.releaseOutputBuffer(index, false)
+                        if (info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) { encoded = true; return true }
+                    }
+                    else -> if (!wait) return false else {
+                        if (cancelled()) return false
+                        check(System.nanoTime() - quiet < TimeUnit.SECONDS.toNanos(10)) { "the encoder did not finish the joined video" }
+                    }
+                }
+            }
+        }
+        var lastUs = -1L
+        for ((index, input) in inputs.withIndex()) {
+            val extractor = MediaExtractor()
+            var decoder: MediaCodec? = null
+            try {
+                extractor.setDataSource(context, Uri.parse(openableUri(input.first)), null)
+                val (track, format) = videoTrack(extractor)
+                extractor.selectTrack(track)
+                val (visibleWidth, visibleHeight) = visibleSize(format)
+                format.setInteger(MediaFormat.KEY_ROTATION, 0)
+                format.requestSdr()
+                decoder = openDecoder(format, surface)
+                val startUs = maxOf(startsUs[index], lastUs + 1)
+                var inputDone = false
+                var decodeDone = false
+                var heard = System.nanoTime()
+                while (!decodeDone) {
+                    if (cancelled()) return false
+                    if (!inputDone) {
+                        val slot = decoder.dequeueInputBuffer(5_000)
+                        if (slot >= 0) {
+                            val size = extractor.readSampleData(decoder.getInputBuffer(slot)!!, 0)
+                            if (size < 0) { decoder.queueInputBuffer(slot, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM); inputDone = true }
+                            else { decoder.queueInputBuffer(slot, 0, size, extractor.sampleTime, 0); extractor.advance() }
+                        }
+                    }
+                    val slot = decoder.dequeueOutputBuffer(info, 5_000)
+                    if (slot < 0) check(System.nanoTime() - heard < TimeUnit.SECONDS.toNanos(10)) { "the decoder stopped making the joined video" }
+                    else {
+                        heard = System.nanoTime()
+                        val at = startUs + info.presentationTimeUs.coerceAtLeast(0)
+                        val shown = info.size > 0 && at > lastUs
+                        decodeDone = info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0
+                        decoder.releaseOutputBuffer(slot, shown)
+                        if (shown) {
+                            check(available.tryAcquire(2, TimeUnit.SECONDS)) { "the decoder did not deliver frame $at" }
+                            frames.updateTexImage()
+                            frames.getTransformMatrix(matrix)
+                            gl.draw(matrix, at * 1000, input.second, visibleWidth, visibleHeight)
+                            lastUs = at
+                            progress((at.toFloat() / totalUs).coerceIn(0f, 0.99f))
+                        }
+                    }
+                    drain(false)
+                }
+            } finally {
+                runCatching { decoder?.stop() }; decoder?.release()
+                extractor.release()
+            }
+        }
+        check(lastUs >= 0) { "no frames were decoded" }
+        encoder.signalEndOfInputStream()
+        if (!encoded && !drain(true)) return false
+        if (muxTrack >= 0) sound?.copyUntil(muxer, Long.MAX_VALUE)
+        muxer.stop()
+        return true
+    } finally {
+        surface?.release()
+        frames?.release()
+        gl?.close()
+        runCatching { encoder?.stop() }; encoder?.release()
+        runCatching { muxer?.release() }
+        thread.quitSafely()
+    }
+}
+
 private fun shownFrom(extractor: MediaExtractor, startUs: Long, endUs: Long): Long {
     val first = firstShownUs(generateSequence { extractor.sampleTime.takeIf { it >= 0 && it <= endUs + END_SLACK_US }?.also { extractor.advance() } }, startUs, endUs)
     extractor.seekTo(startUs, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
@@ -446,7 +562,33 @@ private class ProxyGl(private val surface: Surface, private val width: Int, priv
     }
 
     fun draw(matrix: FloatArray, timeNs: Long) {
+        paint(matrix, 0, 0, width, height)
+        present(timeNs)
+    }
+
+    fun draw(matrix: FloatArray, timeNs: Long, turn: Int, sourceWidth: Int, sourceHeight: Int) {
+        val turned = turn % 180 != 0
+        val w = (if (turned) sourceHeight else sourceWidth).coerceAtLeast(1)
+        val h = (if (turned) sourceWidth else sourceHeight).coerceAtLeast(1)
+        val scale = min(width.toFloat() / w, height.toFloat() / h)
+        val shownWidth = (w * scale).roundToInt().coerceIn(1, width)
+        val shownHeight = (h * scale).roundToInt().coerceIn(1, height)
         GLES20.glViewport(0, 0, width, height)
+        GLES20.glClearColor(0f, 0f, 0f, 1f)
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+        val turning = when (turn) {
+            90 -> floatArrayOf(0f, 1f, 0f, 0f, -1f, 0f, 0f, 0f, 0f, 0f, 1f, 0f, 1f, 0f, 0f, 1f)
+            180 -> floatArrayOf(-1f, 0f, 0f, 0f, 0f, -1f, 0f, 0f, 0f, 0f, 1f, 0f, 1f, 1f, 0f, 1f)
+            270 -> floatArrayOf(0f, -1f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 1f, 0f, 1f)
+            else -> null
+        }
+        paint(turning?.let { FloatArray(16).also { out -> android.opengl.Matrix.multiplyMM(out, 0, matrix, 0, it, 0) } } ?: matrix,
+            (width - shownWidth) / 2, (height - shownHeight) / 2, shownWidth, shownHeight)
+        present(timeNs)
+    }
+
+    private fun paint(matrix: FloatArray, x: Int, y: Int, width: Int, height: Int) {
+        GLES20.glViewport(x, y, width, height)
         GLES20.glUseProgram(program)
         val corner = GLES20.glGetAttribLocation(program, "corner")
         GLES20.glEnableVertexAttribArray(corner)
@@ -457,6 +599,9 @@ private class ProxyGl(private val surface: Surface, private val width: Int, priv
         GLES20.glUniform2f(GLES20.glGetUniformLocation(program, "across"), matrix[0] * dx, matrix[1] * dx)
         GLES20.glUniform2f(GLES20.glGetUniformLocation(program, "down"), matrix[4] * dy, matrix[5] * dy)
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
+    }
+
+    private fun present(timeNs: Long) {
         EGLExt.eglPresentationTimeANDROID(display, window, timeNs)
         check(EGL14.eglSwapBuffers(display, window)) { "cannot hand a frame to the encoder" }
     }

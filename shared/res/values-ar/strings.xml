@@ -198,6 +198,10 @@
     <string name="bundle_pick_folder">اختر مجلدًا للحفظ فيه</string>
     <string name="bundle_for_now">حاليًا: %1$s</string>
     <string name="bundle_folder_lost">تعذّر الوصول إلى هذا المجلد. اضغط لاختياره مجددًا؛ حتى ذلك الحين تُحفظ الحزم في %1$s.</string>
+    <string name="settings_video_folder">مجلد الفيديوهات وملفات GIF</string>
+    <string name="settings_sound_folder">مجلد الأصوات</string>
+    <string name="settings_folder_default">استخدام المجلد الافتراضي</string>
+    <string name="export_folder_lost">تعذّر الوصول إلى هذا المجلد. اضغط لاختياره مجددًا؛ حتى ذلك الحين تُحفظ عمليات التصدير في %1$s.</string>
     <string name="settings_about">حول</string>
     <string name="settings_report_issue">الإبلاغ عن مشكلة</string>
     <string name="settings_suggest_feature">اقترح ميزة</string>
@@ -358,6 +362,7 @@
     <string name="theme_light">فاتح</string>
     <string name="theme_dark">داكن</string>
     <string name="theme_daylight">نهاري</string>
+    <string name="theme_light_green">أخضر فاتح</string>
     <string name="theme_custom">مخصص</string>
     <string name="theme_custom_named">مخصص (%1$s)</string>
     <string name="theme_error_bad_colour">لون غير صالح لـ %1$s</string>
@@ -846,6 +851,7 @@
     <string name="export_quality">الجودة</string>
     <string name="export_quality_low">منخفضة</string>
     <string name="export_quality_high">عالية</string>
+    <string name="export_same_as_source">مثل المصدر</string>
     <string name="export_format">الصيغة</string>
     <string name="export_transparent_becomes">تصبح المناطق الشفافة</string>
     <string name="export_white">أبيض</string>
@@ -1104,6 +1110,8 @@
     <string name="caption_position_bottom">أسفل</string>
     <string name="caption_words_per_caption">الكلمات لكل تسمية توضيحية</string>
     <string name="caption_generate">إنشاء</string>
+    <string name="caption_import_srt">استيراد SRT</string>
+    <string name="caption_srt_empty">لم يتم العثور على تسميات توضيحية في الملف</string>
     <string name="caption_not_now">ليس الآن</string>
     <string name="caption_download">تنزيل</string>
     <string name="draw_back">رجوع</string>
@@ -2317,8 +2325,8 @@
     <string name="caption_remaining">المتبقي حوالي %1$s</string>
     <string name="caption_progress">%1$s%%</string>
     <string name="caption_model">نموذج الكلام</string>
-    <string name="caption_model_standard">قياسي · 60 MB</string>
-    <string name="caption_model_precision">دقة أعلى · 82 MB</string>
+    <string name="caption_model_standard">قياسي · 264 MB</string>
+    <string name="caption_model_precision">دقة أعلى · 874 MB</string>
     <string name="model_err_no_triangles">لا يحتوي النموذج على مثلثات</string>
     <string name="model_err_too_complex">النموذج معقد جداً</string>
     <string name="model_err_missing_vertex">أحد الأوجه يستخدم رأساً غير موجود</string>
@@ -2382,6 +2390,7 @@
     <string name="effect_section_palette">لوحة ألوان مخصصة</string>
     <string name="effect_section_back">خلف الطبقة</string>
     <string name="effect_section_colorblend">اللون والمزج</string>
+    <string name="effect_section_randomization">العشوائية</string>
     <string name="palettes">لوحات الألوان</string>
     <string name="palette_untitled">بلا عنوان</string>
     <string name="palette_new">جديدة</string>
@@ -2651,6 +2660,7 @@
     <string name="tools_failed">تعذّر الإنهاء: %1$s</string>
     <string name="tools_save">حفظ</string>
     <string name="tools_add_to_project">إضافة إلى المشروع</string>
+    <string name="tools_add_more">إضافة المزيد من الأدوات</string>
     <string name="tools_part">الجزء المراد الاحتفاظ به</string>
     <string name="tools_start">البداية</string>
     <string name="tools_end">النهاية</string>
@@ -2682,6 +2692,15 @@
     <string name="tools_finding_cuts">جارٍ البحث عن نقاط القطع…</string>
     <string name="tools_trim_few_cuts">لا يحتوي هذا الفيديو تقريبًا على نقاط قطع، لذا لا يستطيع «سريع» البدء إلا من البداية. اختر «دقيق» للبدء من أي موضع.</string>
     <string name="tools_trim_no_fast">القص السريع غير ممكن هنا، لذا سيتم القص بدقة.</string>
+    <string name="tools_merge">دمج</string>
+    <string name="tools_merge_about">يدمج الفيديوهات في فيديو واحد.</string>
+    <string name="tools_merge_add">إضافة فيديوهات</string>
+    <string name="tools_merge_start">دمج</string>
+    <string name="tools_merging">جارٍ الدمج… %1$d%%</string>
+    <string name="tools_merge_need_two">أضف فيديوين على الأقل.</string>
+    <string name="tools_merge_no_fast">هذه الفيديوهات مختلفة، لذا ستُعاد ترميزها.</string>
+    <string name="tools_merge_up">تحريك لأعلى</string>
+    <string name="tools_merge_down">تحريك لأسفل</string>
     <string name="shape_param_round_corners">تدوير الزوايا</string>
     <string name="shape_param_notch">شق</string>
     <string name="shape_param_point">الرأس المدبب</string>
@@ -2839,6 +2858,13 @@
     <string name="tools_enhance_image_about">أضف تفاصيل إلى صورة أو رسم بالذكاء الاصطناعي.</string>
     <string name="tools_enhance_pick">اختر صورة</string>
     <string name="tools_enhance_running">جارٍ تحسين الصورة: %1$d%%</string>
+    <string name="tools_convert_image">تحويل الصورة</string>
+    <string name="tools_convert_image_about">يحوّل صورة أو رسمًا متحركًا إلى PNG أو JPG أو WebP أو GIF.</string>
+    <string name="tools_convert_pick">اختر صورة</string>
+    <string name="tools_convert_to">تحويل إلى</string>
+    <string name="tools_convert_start">تحويل</string>
+    <string name="tools_converting">جارٍ التحويل… %1$d%%</string>
+    <string name="tools_convert_too_large">يمكن تحويل الرسوم المتحركة حتى 2048 × 2048 بكسل و3000 إطار.</string>
     <string name="ai_model_detail_max">نموذج تحسين AI الواقعي بجودة الأقصى</string>
     <string name="ai_model_cartoon_max">نموذج تحسين AI للأنمي والكارتون بجودة الأقصى</string>
     <string name="ai_enhance_image_upscale2_hint">ضعف العرض والارتفاع</string>

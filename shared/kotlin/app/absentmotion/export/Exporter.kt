@@ -60,7 +60,7 @@ internal fun CommunityDetails.problem(scene: Scene, access: MediaAccess, addedBy
     else -> null
 }
 
-class Exporter(context: Context, private val engine: EngineThread, private val store: ExportStore, private val access: MediaAccess = MediaAccess.forApp(context), private val bundles: ExportStore? = null, private val stage: ExportStore? = null) {
+class Exporter(context: Context, private val engine: EngineThread, private val store: ExportStore, private val access: MediaAccess = MediaAccess.forApp(context), private val bundles: ExportStore? = null, private val stage: ExportStore? = null, private val videos: ExportStore? = null, private val sounds: ExportStore? = null) {
     private val context = context.applicationContext
 
     suspend fun export(kind: ExportKind, scene: Scene, s: ExportSettings, frame: Int, name: String, note: (UiText) -> Unit = {}, community: CommunityDetails? = null, includeAddedEffects: Boolean = true, progress: (Float) -> Unit): ExportResult {
@@ -79,7 +79,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                             progress(0f)
                             mix = ExportAudio.mixFor?.invoke(scene, f.audio.effectiveRate)
                             closingUnlessAbandoned(mix) {
-                                direct(saved, name, f.container.ext, f.container.mime, "Movies/$AppFolder", stage ?: store) { fd ->
+                                direct(saved, name, f.container.ext, f.container.mime, "Movies/$AppFolder", stage ?: videos ?: store) { fd ->
                                     watched { alive ->
                                         cool { thermal ->
                                             exportVideo(engine, scene, xml, f, fd, mix, thermal.hot, { thermal.pauseMs().also { paused += it } }, note, { looks = it }) { alive(); progress(it) }
@@ -98,14 +98,14 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
                     ExportKind.Audio -> {
                         val mix = ExportAudio.mixFor?.invoke(scene, audioRate(s)) ?: throw ExportError(txt(R.string.export_error_no_sound))
                         closingUnlessAbandoned(mix) {
-                            direct(saved, name, s.audioFormat.ext, s.audioFormat.mime, "Music/$AppFolder") { fd ->
+                            direct(saved, name, s.audioFormat.ext, s.audioFormat.mime, "Music/$AppFolder", sounds ?: store) { fd ->
                                 watched { alive -> exportAudio(s, (scene.totalTime + 1) * 1000L, mix, fd) { alive(); progress(it) } }
                             }.verified(kind, scene, s, true).unreadable(mix, scene)
                         }
                     }
                     ExportKind.Gif -> {
                         exportSize(scene, s.shortSide, even = false).let { (w, h) -> checkPicture(w, h) }
-                        direct(saved, name, "gif", "image/gif", "Pictures/$AppFolder", stage ?: store) { fd ->
+                        direct(saved, name, "gif", "image/gif", "Pictures/$AppFolder", stage ?: videos ?: store) { fd ->
                             watched { alive -> cool { gif(scene, xml, s, fdStream(fd), it::pauseMs) { p -> alive(); progress(p) } } }
                         }.verified(kind, scene, s, false)
                     }
@@ -137,9 +137,42 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
             } }
         } catch (t: Throwable) {
             val full = storageFull(t)
-            withContext(NonCancellable + Dispatchers.IO) { synchronized(saved) { saved.toList() }.forEach { runCatching { (if (kind == ExportKind.Package) bundles ?: store else store).delete(it) } } }
+            withContext(NonCancellable + Dispatchers.IO) { synchronized(saved) { saved.toList() }.forEach { runCatching { (chosenStore(kind) ?: store).delete(it) } } }
             throw if (full) StorageFullException() else plainCodecError(t)
         }
+    }
+
+    suspend fun measureBytes(kind: ExportKind, scene: Scene, s: ExportSettings, frame: Int, community: CommunityDetails? = null, includeAddedEffects: Boolean = true): Long = withContext(Dispatchers.Default) {
+        val xml = scene.toXml()
+        when (kind) {
+            ExportKind.Xml -> xml.toByteArray().size.toLong()
+            ExportKind.Frame, ExportKind.FrameAs -> {
+                val shape = if (kind == ExportKind.Frame) s.copy(image = ImageKind.Png) else s
+                checkPicture(scene.width, scene.height)
+                val pixels = engine.exportSession(xml) { still(scene.frameStart(frame), scene.width, scene.height) } ?: error("Cannot draw the frame")
+                ByteCounter().also { encode(pixels, scene.width, scene.height, shape, null, it) }.bytes
+            }
+            ExportKind.Audio -> measureAudioBytes(s, (scene.totalTime + 1) * 1000L, { ExportAudio.mixFor?.invoke(scene, audioRate(s)) }, context.cacheDir)
+            ExportKind.Package -> withContext(Dispatchers.IO) {
+                val effects = if (includeAddedEffects) AddedEffectStore(context.filesDir).bundled(scene) else emptyMap()
+                val shared = community?.let { communityPart(scene, xml, it, effects.values.sumOf { bytes -> bytes.size.toLong() }) }
+                var media = 0L
+                ByteCounter().also { counter ->
+                    writeProjectPackage(scene, xml, counter, access, { uri -> streamLength(uri)?.let { media += it; java.io.ByteArrayInputStream(ByteArray(0)) } }, shared, effects) {}
+                }.bytes + media
+            }
+            else -> error("${kind.name} is measured elsewhere")
+        }
+    }
+
+    private fun streamLength(uri: String): Long? =
+        runCatching { context.contentResolver.openAssetFileDescriptor(Uri.parse(uri), "r")?.use { it.length } }.getOrNull()?.takeIf { it >= 0 }
+
+    private fun chosenStore(kind: ExportKind): ExportStore? = when (kind) {
+        ExportKind.Package -> bundles
+        ExportKind.Video, ExportKind.Gif -> videos.takeIf { stage == null }
+        ExportKind.Audio -> sounds
+        else -> null
     }
 
     private fun plainCodecError(t: Throwable): Throwable {
@@ -162,7 +195,7 @@ class Exporter(context: Context, private val engine: EngineThread, private val s
 
     private suspend fun direct(saved: MutableList<Uri>, name: String, ext: String, mime: String, where: String, target: ExportStore = store, make: suspend (java.io.FileDescriptor) -> Unit): ExportResult {
         val (file, used) = withContext(NonCancellable + Dispatchers.IO) {
-            try { target.open(null, "$name.$ext", mime) to target } catch (e: ExportError) { if (target === store) throw e else store.open(null, "$name.$ext", mime) to store }
+            savedIn(target, store) { it.open(null, "$name.$ext", mime) }
         }
         val uri = try {
             currentCoroutineContext().ensureActive()

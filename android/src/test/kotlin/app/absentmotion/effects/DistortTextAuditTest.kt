@@ -80,7 +80,7 @@ class DistortTextAuditTest {
     }
 
     @Test fun newlyAddedEffectsUseTheRecordedDefaults() {
-        assertEquals("10.000000", defaults("stretch")["stretch"])
+        assertEquals("10.000000", defaults("stretch")["span"])
         assertEquals("#ffff5566", defaults("ominoglass")["color"])
         assertEquals("0.000000", defaults("polardisplacement")["angle"])
         val reach = catalog.find("absent.polardisplacement")!!.params.first { it.id == "reach" }
@@ -88,7 +88,7 @@ class DistortTextAuditTest {
         assertEquals(-1000f, reach.min, 0f)
         assertEquals(1000f, reach.max, 0f)
         val result = migration.migrate(scene("<effect id=\"com.alightcreative.effects.stretchsegment\"/>"))
-        assertEquals(43.2f, values(effects(result.scene).single())["stretch"]!!.toFloat(), 1e-4f)
+        assertEquals(10f, values(effects(result.scene).single())["span"]!!.toFloat(), 1e-4f)
     }
 
     @Test fun importedMagnifierKeepsItsControls() {

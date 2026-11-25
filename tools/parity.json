@@ -361,6 +361,16 @@
       "note": "absent_bg model built into the desktop library; photo and video cut-out tested on Mac (DeskAiTest, DeskAiPortsTest)"
     },
     {
+      "id": "ai.captions_srt",
+      "name": "Import SRT in the Auto Captions sheet",
+      "where": "CaptionsSheet.kt, ai/Captions.kt",
+      "android": "untested",
+      "macos": "untested",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "plain Kotlin parsing; the file comes from the system picker (Android) or the file dialog (desktop)"
+    },
+    {
       "id": "ai.captions",
       "name": "Auto captions (Whisper)",
       "where": "CaptionsSheet.kt, ai/Captions.kt",
@@ -951,6 +961,16 @@
       "note": "OGG uses libopus when the FFmpeg build has it, otherwise the native opus encoder with -strict -2 (Windows release build)"
     },
     {
+      "id": "export.folders",
+      "name": "Settings: Videos and GIFs folder and Sounds folder for exports",
+      "where": "SettingsDrawer.kt, ExportScreen.kt, export/Exporter.kt",
+      "android": "untested",
+      "macos": "untested",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "Android writes through the Storage Access Framework folder (TreeExport), desktop through a chosen folder (BundleFolder); a folder that cannot be reached falls back to the default one"
+    },
+    {
       "id": "export.package",
       "name": "Project package and XML export",
       "where": "ExportScreen.kt",
@@ -1109,6 +1129,16 @@
       "windows": "works",
       "linux": "works",
       "note": "same code on every platform: the frame reader (MediaCodec or ffmpeg) feeds the GIF export encoder. Windows: checked in the installed app Linux: the GIF tests of DeskToolsTest pass in Docker"
+    },
+    {
+      "id": "home.tools_convert",
+      "name": "Tools tab: Convert Image (PNG, JPG, WebP, GIF; animated GIF and WebP both ways)",
+      "where": "ToolsTab.kt, ConvertImageScreen.kt, tools/ImageConvert.kt",
+      "android": "untested",
+      "macos": "untested",
+      "windows": "untested",
+      "linux": "untested",
+      "note": "same code on every platform; animated WebP is muxed in Kotlin from WebP stills of the platform encoder (Bitmap.compress, Skia on desktop); DeskImageConvertTest converts GIF to animated WebP and back and stills between all four formats on Mac"
     },
     {
       "id": "home.tools_downloader",

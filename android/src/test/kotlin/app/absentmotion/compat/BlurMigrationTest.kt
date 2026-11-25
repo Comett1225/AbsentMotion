@@ -96,7 +96,7 @@ class BlurMigrationTest {
             val e = migrate(id, "rmode" to "2", "gmode" to "1", "bmode" to "0", "amode" to "2")
             assertEquals(listOf(3f, 1f, 0f, 3f), listOf("r", "g", "b", "a").map { e.number(it) })
         }
-        assertEquals(0.4695f, migrate("streaks-zoom").number("strength"), 1e-4f)
+        assertEquals(0.15f, migrate("streaks-zoom").number("zoom"), 1e-6f)
         assertEquals(3.5f, migrate("streaks-spin").number("sweep"), 1e-5f)
         assertEquals(12f, migrate("streaks-spin", "angle" to "12").number("sweep"), 1e-5f)
     }
@@ -123,11 +123,11 @@ class BlurMigrationTest {
 
     @Test fun sharpenKeepsTheRadiusAndUnsharpMaskShowsAlightsRedMask() {
         val s = migrate("sharpen", "strength" to "5.75", "radius" to "3.25")
-        assertEquals(23f, s.number("amount"), 1e-3f)
+        assertEquals(5.75f, s.number("sharpness"), 1e-5f)
         assertEquals(1f, s.number("style"), 0f)
         assertEquals(3.25f, s.number("radius"), 1e-5f)
         val u = migrate("unsharpmask", "strength" to "0.515", "showMask" to "true")
-        assertEquals(1.2875f, u.number("radius"), 1e-5f)
+        assertEquals(0.515f, u.number("blurRadius"), 1e-5f)
         assertEquals(1f, u.number("maskColor"), 0f)
         assertEquals("true", u.value("showMask"))
     }

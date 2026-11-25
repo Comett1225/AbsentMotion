@@ -45,7 +45,7 @@ class StylizeEffectsTest {
         }
         assertEquals("Hz", effect("blink").params.single { it.id == "frequency" }.unit)
         assertEquals(listOf("Frequency", "Strength", "Seed", "Mode"), effect("flicker").params.map { it.label })
-        assertEquals(80f, effect("sharpen").params.first().max)
+        assertEquals(20f, effect("sharpen").params.first().max)
         assertEquals(10f, effect("sharpen").params.single { it.id == "radius" }.max)
         assertEquals(4f, effect("rays").params.single { it.id == "reach" }.max)
         assertEquals(5f, effect("rays").params.single { it.id == "intensity" }.max)

@@ -58,6 +58,15 @@ class KeyScopeTest {
         assertEquals(emptyList<Int>(), base.frames(KeyScope(effectIndex = 5)))
     }
 
+    @Test fun otherEffectsAndTheTransformShowBesideTheOpenEffect() {
+        val base = layer()
+        fun others(scope: KeyScope) = base.otherKeyframeTimes(scope).map { scene.frameAt(it) }
+        assertEquals(listOf(20, 45), others(KeyScope(effectIndex = 0)))
+        assertEquals(listOf(30, 45, 50), others(KeyScope(effectIndex = 1)))
+        assertEquals(listOf(20, 45, 50), others(KeyScope(radius)))
+        assertEquals(listOf(10, 20, 30, 45, 50), others(KeyScope(effectIndex = 5)))
+    }
+
     @Test fun aParameterWithoutKeyframesOrAPropertyHasNone() {
         assertEquals(emptyList<Int>(), layer().frames(KeyScope(PropRef.effect(0, "missing"))))
         assertEquals(emptyList<Int>(), layer().frames(KeyScope(PropRef.Opacity)))

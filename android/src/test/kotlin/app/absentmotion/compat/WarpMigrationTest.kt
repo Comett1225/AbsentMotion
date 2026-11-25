@@ -6,6 +6,7 @@ import app.absentmotion.model.XmlNode
 import app.absentmotion.model.keyframes
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
 
@@ -62,8 +63,9 @@ class WarpMigrationTest {
         val scene = Scene.parse("""<scene title="p" width="1080" height="1080" fps="30" totalTime="1000"><shape id="1" startTime="0" endTime="1000" fillType="color" s=".rect">
             $effect<property name="size" type="vec2" value="110,82.5" /></shape></scene>""")
         val warp = migration.migrate(scene).scene.node.children.single { it.name == "shape" }.children.single { it.name == "effect" }
-            .children.single { it["name"] == "warpAngle" }
-        assertEquals(listOf(0f to 90f, 1f to 270f), warp.keyframes.map { it.t to it.v.toFloat() })
+            .children.single { it["name"] == "warp" }
+        assertEquals(90f, warp["value"]!!.toFloat(), 1e-6f)
+        assertTrue(warp.keyframes.isEmpty())
     }
 
     @Test fun pinchBulgeKeepsAlightsStrengthAndRadius() {
@@ -112,7 +114,7 @@ class WarpMigrationTest {
         assertEquals(20f, d.number("spacing"), 1e-3f)
         assertEquals(20f, d.number("crossSpacing"), 1e-3f)
         assertEquals(270f, d.number("angle"), 1e-6f)
-        assertEquals(0f, d.number("warpAngle"), 1e-6f)
+        assertEquals(90f, d.number("warp"), 1e-6f)
         assertEquals(1f, d.number("origin"), 1e-6f)
         assertEquals(1f, d.number("style"), 1e-6f)
         val v = migrate("wavewarp", "xamp" to "32.5", "xspace" to "40", "yamp" to "20", "yspace" to "60", "phase" to "250")
@@ -142,36 +144,37 @@ class WarpMigrationTest {
         assertEquals(0.5f, migrate("squeeze", "strength" to "0.5").number("amount"), 1e-6f)
         assertEquals(3, catalog.find("absent.squeeze")!!.params.single { it.id == "shape" }.options.size)
         val rgb = migrate("rgbsep", "strength" to "2.1125", "angle" to "900", "centerChannel" to "2", "mode" to "3")
-        assertEquals(4f, rgb.number("mode"), 1e-6f)
+        assertEquals(3f, rgb.number("split"), 1e-6f)
         assertEquals(2f, rgb.number("center"), 1e-6f)
-        assertEquals(1f, migrate("rgbsep", "mode" to "1").number("mode"), 1e-6f)
+        assertEquals(1f, migrate("rgbsep", "mode" to "1").number("split"), 1e-6f)
         assertEquals(1f, migrate("polar").number("middle"), 1e-6f)
         assertEquals("0.000000" to 2, options("absent.polar", "middle"))
     }
 
-    @Test fun offsetScalesEachAxisByItsSideAndNarrowsTheFeather() {
+    @Test fun offsetScalesEachAxisByItsSideAndKeepsAlightsFeather() {
         val v = migrate("offset", "offset" to "40,-25", "feather" to "0.25", "mask" to "true")
         assertEquals(40f * 0.001f * 220, v.numbers("offset")[0], 1e-4f)
         assertEquals(-25f * 0.001f * 165, v.numbers("offset")[1], 1e-4f)
-        assertEquals(0.0375f, v.number("feather"), 1e-6f)
+        assertEquals(0.25f, v.number("seamFeather"), 1e-6f)
+        assertEquals(1f, v.number("style"), 0f)
     }
 
     @Test fun stretchSegmentMeasuresInScenePixelsWithAlightsDefault() {
         val d = migrate("stretchsegment")
-        assertEquals(43.2f, d.number("stretch"), 1e-4f)
+        assertEquals(10f, d.number("span"), 1e-4f)
         assertNull(d.value("relative"))
         val v = migrate("stretchsegment", "stretch" to "232.5", "offset" to "500")
-        assertEquals(1004.4f, v.number("stretch"), 1e-2f)
-        assertEquals(-540f, v.number("offset"), 1e-3f)
+        assertEquals(232.5f, v.number("span"), 1e-3f)
+        assertEquals(500f, v.number("shift"), 1e-3f)
     }
 
     @Test fun waveWarpTurnsWithItsWavesAndCanUseTheScreen() {
         val v = migrate("wavewarp2", "a1d" to "450", "a2d" to "112.5", "screenSpace" to "true", "m1" to "140")
-        assertEquals(562.5f, v.number("warpAngle"), 1e-4f)
+        assertEquals(112.5f, v.number("warp"), 1e-4f)
         assertEquals(450f, v.number("angle"), 1e-4f)
         assertEquals("true", v.value("screenSpace"))
-        assertEquals(120f, migrate("wavewarp2", "a1d" to "30").number("warpAngle"), 1e-4f)
-        assertEquals(90f, migrate("wavewarp2").number("warpAngle"), 1e-4f)
+        assertEquals(90f, migrate("wavewarp2", "a1d" to "30").number("warp"), 1e-4f)
+        assertEquals(90f, migrate("wavewarp2").number("warp"), 1e-4f)
         assertEquals("false", catalog.find("absent.wavewarp")!!.params.single { it.id == "screenSpace" }.default)
     }
 

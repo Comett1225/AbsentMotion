@@ -1062,6 +1062,23 @@ private class TimelineView(val state: EditorState, density: Density, private val
         }
     }
 
+    private var othersNode: app.absentmotion.model.XmlNode? = null
+    private var othersScope: KeyScope? = null
+    private var othersFps = 0
+    private var others: List<Int> = emptyList()
+
+    fun otherKeyFrames(layer: Layer): List<Int> {
+        val scope = state.keyScope?.takeIf { layer.id == state.selectedId && (it.effectIndex >= 0 || it.ref?.kind == app.absentmotion.model.PropRef.Kind.Effect) } ?: return emptyList()
+        val fps = state.scene.fps
+        if (othersNode === layer.node && othersScope == scope && othersFps == fps) return others
+        val shown = keyFrames(layer).toSet()
+        others = layer.otherKeyframeTimes(scope).map { state.scene.frameAt(it) }.distinct().filterNot { it in shown }
+        othersNode = layer.node
+        othersScope = scope
+        othersFps = fps
+        return others
+    }
+
     private var stepsFps = 0
     private var stepsZoom = 0f
     private var stepsCache: DeskRuler.Steps? = null
@@ -1192,7 +1209,7 @@ private class TimelineView(val state: EditorState, density: Density, private val
         keyFrame = hit.frame
         keyMs = TimelineMath.frameTimeMs(hit.frame, fps)
         keyId = hit.id
-        snapTargets = TimelineMath.snapTargets(state.scene, hit.id, state.playheadFrame)
+        snapTargets = TimelineMath.snapTargets(state.scene, hit.id, state.playheadFrame) + keyLayer?.let(::otherKeyFrames).orEmpty()
     }
 
     private fun snapNear(ms: Float): Int? = if (deskLayout && snapDisabled) null else TimelineMath.snapFrame(ms, snapTargets, fps, SnapZone.px / timeScale().pxPerMs)
@@ -1933,7 +1950,7 @@ private fun DrawScope.drawTimeline(view: TimelineView, measurer: TextMeasurer, s
     val stripe = TimelineMath.frameTimeMs(2 * step, fps) * time.pxPerMs
     fun paint(row: Int, layer: Layer) {
         val rowTime = view.timeFor(layer.id, time)
-        drawRow(layer, layer.id == state.selectedId, view.shownTop(row, layer.id), rowTime, stripe, measurer, styles, if (layer.hidden) eyeOff else eye, locks.of(layer), outline, state.scene, state.frame, pictures[layer.id], view.keyFrames(layer), appear, view.keyFrame.takeIf { layer.id == view.keyId }, view.limits[layer.id], view.headerWidth, layer.id == view.hoveredId, view.hoveredKey?.takeIf { it.first == layer.id }?.second)
+        drawRow(layer, layer.id == state.selectedId, view.shownTop(row, layer.id), rowTime, stripe, measurer, styles, if (layer.hidden) eyeOff else eye, locks.of(layer), outline, state.scene, state.frame, pictures[layer.id], view.keyFrames(layer), appear, view.keyFrame.takeIf { layer.id == view.keyId }, view.limits[layer.id], view.headerWidth, layer.id == view.hoveredId, view.hoveredKey?.takeIf { it.first == layer.id }?.second, view.otherKeyFrames(layer))
         layer.mediaFill?.takeIf { it.video }?.let { proxies[it.uri] }?.let { done ->
             drawProxyProgress(rowTime.x(layer.startTime.toFloat()), rowTime.x(layer.endTime + 1f), view.shownTop(row, layer.id), done)
         }
@@ -2141,7 +2158,7 @@ private fun DrawScope.drawRetimeMarks(scene: Scene, time: TimeScale) {
 
 private fun DrawScope.drawRow(
     layer: Layer, selected: Boolean, top: Float, time: TimeScale, stripe: Float,
-    measurer: TextMeasurer, styles: TimelineStyles, eye: Painter, lock: Painter, outline: Path, scene: Scene, frame: Int, picture: StripPicture?, keyFrames: List<Int>, appear: Float = 1f, held: Int? = null, limit: Boolean? = null, headerWidth: Float = 0f, hovered: Boolean = false, hoverKey: Int? = null,
+    measurer: TextMeasurer, styles: TimelineStyles, eye: Painter, lock: Painter, outline: Path, scene: Scene, frame: Int, picture: StripPicture?, keyFrames: List<Int>, appear: Float = 1f, held: Int? = null, limit: Boolean? = null, headerWidth: Float = 0f, hovered: Boolean = false, hoverKey: Int? = null, otherKeys: List<Int> = emptyList(),
 ) {
     val barTop = top + BarInset.toPx()
     val barBottom = top + (RowHeight - BarInset).toPx()
@@ -2157,6 +2174,7 @@ private fun DrawScope.drawRow(
     val mediaLabel = deskLayout && picture != null
     val labelStyle = if (mediaLabel) styles.mediaLabel else if (layer.kind == "audio") styles.audioLabel else styles.label
     drawLabel(layer.shownName(), measurer, if (deskLayout) max(left, headerWidth) else left, right, barTop, barBottom, labelStyle, mediaLabel)
+    drawOtherKeys(otherKeys, scene, time, left, right, centre, outline)
     drawKeyframes(keyFrames, scene, selected, frame, time, left, right, centre, outline, appear, held, hoverKey)
     if (deskLayout) {
         val chosen = selected || layer.id in MultiSelect.ids
@@ -2273,6 +2291,24 @@ private fun DrawScope.drawKeyframes(frames: List<Int>, scene: Scene, selected: B
             if (here) drawPath(outline, Am.Accent, style = Stroke(3.55.dp.toPx()))
             drawPath(outline, Color.Black, style = Stroke(1.4.dp.toPx()))
             drawPath(outline, if (keyFrame == grabbed) Am.Accent else Color.White)
+        }
+    }
+}
+
+private fun DrawScope.drawOtherKeys(frames: List<Int>, scene: Scene, time: TimeScale, left: Float, right: Float, centre: Float, outline: Path) {
+    if (frames.isEmpty()) return
+    val half = Offset(KeyFaint.width.toPx() / 2, KeyFaint.height.toPx() / 2)
+    clipRect(left = max(left, 0f), right = min(right, size.width)) {
+        for (keyFrame in frames) {
+            val x = time.x(scene.frameStart(keyFrame).toFloat())
+            if (x < -half.x || x > size.width + half.x) continue
+            outline.rewind()
+            outline.moveTo(x, centre - half.y)
+            outline.lineTo(x + half.x, centre)
+            outline.lineTo(x, centre + half.y)
+            outline.lineTo(x - half.x, centre)
+            outline.close()
+            drawPath(outline, Color.White.copy(alpha = 0.4f))
         }
     }
 }

@@ -10,6 +10,7 @@
 #include <string>
 #include <string_view>
 #include <sys/stat.h>
+#include "drawing.h"
 #include "textanim.h"
 #include "warp.h"
 #include "include/core/SkContourMeasure.h"
@@ -773,14 +774,16 @@ Look Progress(const LayerEffect& e, float t, float v) {
     return k;
 }
 
+const int kCurveShapes[6] = {0, 5, 3, 1, 2, 4};
+
 Look Transform(const LayerEffect& e, float t, float w) {
     w += (w * w * (3 - 2 * w) - w) * std::clamp(e.value("smoothness", t, 0), 0.0f, 1.0f);
     Look k;
     if (const Property* p = e.prop("position")) k.move = {p->anim.get(0, t, 0) * w, p->anim.get(1, t, 0) * w};
-    k.scale = 1 + (e.value("scale", t, 1) - 1) * w;
+    k.scale = 1 + e.value("scaleBy", t, 0) * w;
     k.verticalStretch = std::max(0.0f, 1 + e.value("stretch", t, 0) * w);
     k.rotation = e.value("rotation", t, 0) * w;
-    k.alpha = 1 + (std::clamp(e.value("opacity", t, 1), 0.0f, 1.0f) - 1) * w;
+    k.alpha = 1 + std::clamp(e.value("alpha", t, 0), -1.0f, 0.0f) * w;
     if (const Property* p = e.prop("tint")) {
         k.tint = {p->anim.get(1, t, 1), p->anim.get(2, t, 1), p->anim.get(3, t, 1), std::clamp(p->anim.get(0, t, 0) * w, 0.0f, 1.0f)};
     }
@@ -802,8 +805,10 @@ float AlightWeight(const LayerEffect& e, float t, int shape, int rank, int count
         else if (shape == textanim::kRound) w = std::fabs(d) < 1 ? std::sqrt(1 - d * d) : 0;
         else w = std::clamp(shape == textanim::kRampUp ? (d + 1) / 2 : (1 - d) / 2, 0.0f, 1.0f);
     }
-    w = std::pow(w, 1 + 0.8f * std::clamp(e.value("easeIn", t, 0), -1.0f, 1.0f));
-    return 1 - std::pow(1 - w, 1 + 0.8f * std::clamp(e.value("easeOut", t, 0), -1.0f, 1.0f));
+    const float in = std::clamp(e.value("easeIn", t, 0), -1.0f, 1.0f), out = std::clamp(e.value("easeOut", t, 0), -1.0f, 1.0f);
+    if (e.value("style", t, 0) >= 0.5f) return 1 - std::pow(1 - std::pow(w, std::pow(1.6f, 1 + in)), std::exp2(out));
+    w = std::pow(w, 1 + 0.8f * in);
+    return 1 - std::pow(1 - w, 1 + 0.8f * out);
 }
 
 SkColor4f Blend(SkColor4f under, SkColor4f over) {
@@ -851,7 +856,7 @@ void Apply(const Layer& l, float t, float seconds, const std::string& shown, con
         }
         const float amount = std::clamp(e.value("progress", t, 1), 0.0f, 1.0f), softness = e.value("softness", t, 0);
         const float start = e.value("start", t, 0), end = e.value("end", t, 1), offset = e.value("offset", t, 0);
-        const int shape = Choice(e, "shape", t, 0, 5), style = Choice(e, "style", t, 1, 4);
+        const int shape = kCurveShapes[Choice(e, "curve", t, 0, 5)], style = Choice(e, "style", t, 1, 4);
         const uint64_t seed = Seed(l, e, t);
         const float speed = e.value("speed", t, 24), cycles = e.value("cycles", t, 1), spread = e.value("spread", t, 30);
         const float size = e.value("amount", t, 4), turn = e.value("rotation", t, 0), letters = e.value("letters", t, 1), every = e.value("every", t, 0.6f);
@@ -869,8 +874,9 @@ void Apply(const Layer& l, float t, float seconds, const std::string& shown, con
                                                          (1 - textanim::Reveal(std::clamp(start, 0.0f, 1.0f), rank[u], steps, softness)))
                                     : Transform(e, t, alight ? AlightWeight(e, t, shape, rank[u], count)
                                                              : textanim::RangeWeight(shape, rank[u], count, start + offset, end + offset));
+                if (alight && l.alight && e.value("style", t, 0) >= 0.5f) looks[u].alpha = std::sqrt(std::max(looks[u].alpha, 0.0f));
             }
-            const SkPoint c = !progress && Choice(e, "anchor", t, 0, 1) == 1 ? SkPoint{0, 0}
+            const SkPoint c = !progress && Choice(e, "anchorTo", t, 1, 1) == 0 ? SkPoint{0, 0}
                               : box[u].isEmpty() ? fallback[u] : box[u].center();
             matrices[u] = SkMatrix::Translate(-c.fX, -c.fY);
             matrices[u].postScale(looks[u].scale, looks[u].scale * looks[u].verticalStretch);
@@ -1221,6 +1227,15 @@ sk_sp<SkColorFilter> AlightEdges() {
 void DrawText(SkCanvas* canvas, const Layer& layer, float t, const SkPaint& paint, int fps, TextPart part) {
     auto& text = *layer.text;
     layout(text);
+    if (const LayerEffect* e = layer.effect("absent.drawingprogress"); e && e->value("style", t, 0) >= 0.5f &&
+        (e->value("start", t, 0) > 0 || e->value("end", t, 1) < 1)) {
+        if (part == TextPart::kColor) return;
+        SkPaint fill(paint);
+        fill.setStyle(SkPaint::kFill_Style);
+        fill.setAntiAlias(true);
+        canvas->drawPath(DrawingProgressPath(layer, TextGlyphPath(layer, t, fps), t), fill);
+        return;
+    }
     if (TextAnimated(layer)) {
         const std::vector<Glyph> glyphs = Animate(layer, t, fps);
         const bool alight = layer.alight && part != TextPart::kColor;

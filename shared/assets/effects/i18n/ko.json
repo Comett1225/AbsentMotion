@@ -120,7 +120,7 @@
      "label": "레이어에 마스크"
     },
     "mix": {
-     "label": "혼합"
+     "label": "채우기"
     },
     "spill": {
      "label": "이펙트 외부 확장"
@@ -743,49 +743,49 @@
     "a": {
      "label": "A",
      "options": [
-      "빨강",
-      "초록",
-      "파랑",
-      "알파",
-      "휘도",
+      "R",
+      "G",
+      "B",
+      "A",
+      "Y",
       "0",
-      "최대"
+      "1"
      ]
     },
     "b": {
      "label": "B",
      "options": [
-      "빨강",
-      "초록",
-      "파랑",
-      "알파",
-      "휘도",
+      "R",
+      "G",
+      "B",
+      "A",
+      "Y",
       "0",
-      "최대"
+      "1"
      ]
     },
     "g": {
      "label": "G",
      "options": [
-      "빨강",
-      "초록",
-      "파랑",
-      "알파",
-      "휘도",
+      "R",
+      "G",
+      "B",
+      "A",
+      "Y",
       "0",
-      "최대"
+      "1"
      ]
     },
     "r": {
      "label": "R",
      "options": [
-      "빨강",
-      "초록",
-      "파랑",
-      "알파",
-      "휘도",
+      "R",
+      "G",
+      "B",
+      "A",
+      "Y",
       "0",
-      "최대"
+      "1"
      ]
     }
    }
@@ -797,49 +797,49 @@
     "a": {
      "label": "A",
      "options": [
-      "색조",
-      "채도",
-      "명도",
-      "알파",
-      "휘도",
+      "H",
+      "S",
+      "V",
+      "A",
+      "Y",
       "0",
-      "최대"
+      "1"
      ]
     },
     "h": {
      "label": "H",
      "options": [
-      "색조",
-      "채도",
-      "명도",
-      "알파",
-      "휘도",
+      "H",
+      "S",
+      "V",
+      "A",
+      "Y",
       "0",
-      "최대"
+      "1"
      ]
     },
     "s": {
      "label": "S",
      "options": [
-      "색조",
-      "채도",
-      "명도",
-      "알파",
-      "휘도",
+      "H",
+      "S",
+      "V",
+      "A",
+      "Y",
       "0",
-      "최대"
+      "1"
      ]
     },
     "v": {
      "label": "V",
      "options": [
-      "색조",
-      "채도",
-      "명도",
-      "알파",
-      "휘도",
+      "H",
+      "S",
+      "V",
+      "A",
+      "Y",
       "0",
-      "최대"
+      "1"
      ]
     }
    }
@@ -854,7 +854,7 @@
     "color": {
      "label": "색상"
     },
-    "count": {
+    "cells": {
      "label": "개수"
     },
     "offset": {
@@ -918,6 +918,13 @@
       "선형",
       "광선"
      ]
+    },
+    "style": {
+     "label": "스타일",
+     "options": [
+      "클래식",
+      "표준"
+     ]
     }
    }
   },
@@ -948,6 +955,13 @@
      "options": [
       "레이어",
       "화면"
+     ]
+    },
+    "style": {
+     "label": "스타일",
+     "options": [
+      "클래식",
+      "표준"
      ]
     }
    }
@@ -1905,10 +1919,10 @@
     "phase": {
      "label": "위상"
     },
-    "radius": {
+    "dotRadius": {
      "label": "반경"
     },
-    "scale": {
+    "zoom": {
      "label": "크기"
     },
     "seed": {
@@ -1928,6 +1942,13 @@
     },
     "start": {
      "label": "시작"
+    },
+    "style": {
+     "label": "스타일",
+     "options": [
+      "클래식",
+      "표준"
+     ]
     }
    }
   },
@@ -1980,11 +2001,11 @@
     "alpha": {
      "label": "알파"
     },
-    "composite": {
+    "mode": {
      "label": "합성",
      "options": [
-      "뒤",
-      "위"
+      "위",
+      "뒤"
      ]
     },
     "count": {
@@ -2369,7 +2390,7 @@
    "description": "레이어의 알파 가장자리를 부드럽게 하여 윤곽선에서부터 서서히 나타나게 합니다. 반복 횟수를 늘리면 더 부드럽고 깊게 페이드됩니다. 클래식 스타일: 안쪽은 기존 윤곽선 안으로 페이드하고, 알파 블러는 부드러워진 가장자리를 윤곽선 밖으로도 퍼뜨립니다.",
    "name": "페더",
    "params": {
-    "blur": {
+    "strength": {
      "label": "강도"
     },
     "mode": {
@@ -2994,6 +3015,9 @@
       "그라데이션",
       "스펙트럼"
      ]
+    },
+    "squeeze": {
+     "label": "조임"
     }
    }
   },
@@ -4061,6 +4085,13 @@
     },
     "sweep": {
      "label": "각도"
+    },
+    "style": {
+     "label": "스타일",
+     "options": [
+      "클래식",
+      "표준"
+     ]
     }
    }
   },
@@ -4685,7 +4716,7 @@
    "description": "레이어 이미지를 이동하고 레이어 경계에서 반대편으로 이어 붙입니다.",
    "name": "오프셋",
    "params": {
-    "feather": {
+    "seamFeather": {
      "label": "페더"
     },
     "mask": {
@@ -4693,6 +4724,13 @@
     },
     "offset": {
      "label": "오프셋"
+    },
+    "style": {
+     "label": "스타일",
+     "options": [
+      "클래식",
+      "표준"
+     ]
     }
    }
   },
@@ -4777,12 +4815,12 @@
      "label": "주변광"
     },
     "amount": {
-     "label": "거칠기"
+     "label": "양"
     },
     "blend": {
      "label": "혼합"
     },
-    "blur": {
+    "bevel": {
      "label": "베벨"
     },
     "color": {
@@ -4804,7 +4842,7 @@
      "label": "강도"
     },
     "light": {
-     "label": "조명 색상"
+     "label": "색상"
     },
     "refraction": {
      "label": "굴절"
@@ -4813,7 +4851,7 @@
      "label": "매끄럽게 하기 샘플 수"
     },
     "scale": {
-     "label": "거칠기 크기"
+     "label": "크기"
     },
     "seed": {
      "label": "시드"
@@ -4919,6 +4957,13 @@
      "label": "광택"
     },
     "style": {
+     "label": "스타일",
+     "options": [
+      "클래식",
+      "표준"
+     ]
+    },
+    "roll": {
      "label": "스타일",
      "options": [
       "클래식",
@@ -5411,26 +5456,26 @@
     "angle": {
      "label": "각도"
     },
-    "angleChannel": {
-     "label": "각도 기준",
+    "phi": {
+     "label": "φ",
      "options": [
+      "Lum",
       "R",
       "G",
       "B",
-      "휘도",
       "알파"
      ]
     },
     "center": {
      "label": "중심"
     },
-    "distanceChannel": {
-     "label": "거리 기준",
+    "rho": {
+     "label": "ρ",
      "options": [
+      "Lum",
       "R",
       "G",
       "B",
-      "휘도",
       "알파"
      ]
     },
@@ -5697,7 +5742,7 @@
      "label": "각도"
     },
     "center": {
-     "label": "중심"
+     "label": "위치"
     },
     "color": {
      "label": "색상"
@@ -5815,7 +5860,7 @@
      "label": "조명"
     },
     "reach": {
-     "label": "길이"
+     "label": "크기"
     },
     "fill": {
      "label": "채우기"
@@ -5842,8 +5887,8 @@
     "direction": {
      "label": "방향",
      "options": [
-      "시계 방향",
-      "시계 반대 방향",
+      "CW",
+      "CCW",
       "양방향"
      ]
     },
@@ -6202,7 +6247,7 @@
     "choke": {
      "label": "초크"
     },
-    "feather": {
+    "softness": {
      "label": "페더"
     },
     "lockLuminance": {
@@ -6214,7 +6259,7 @@
     "target": {
      "label": "새 색상"
     },
-    "threshold": {
+    "tolerance": {
      "label": "임계값"
     },
     "match": {
@@ -6287,14 +6332,14 @@
       "B"
      ]
     },
-    "mode": {
+    "split": {
      "label": "모드",
      "options": [
       "밝게",
       "어둡게",
       "마스크",
       "루마",
-      "평균"
+      "루마 알파"
      ]
     },
     "strength": {
@@ -6313,19 +6358,19 @@
    "description": "레이어의 불투명한 부분 위에 폭이 변하며 꼬이는 리본을 그립니다. 위상을 애니메이션하면 흐르듯 움직이고, 레이어에서 리본 모양을 오려낼 수도 있습니다.",
    "name": "리본",
    "params": {
-    "angle": {
+    "tilt": {
      "label": "각도"
     },
     "color": {
      "label": "색상"
     },
-    "frequency": {
+    "waves": {
      "label": "주파수"
     },
-    "magnitude": {
+    "amplitude": {
      "label": "크기"
     },
-    "offset": {
+    "shift": {
      "label": "오프셋"
     },
     "phase": {
@@ -6334,14 +6379,14 @@
     "punch": {
      "label": "오려내기"
     },
-    "smoothing": {
+    "soften": {
      "label": "부드럽게"
     },
     "tint": {
      "label": "색조"
     },
     "tintAmount": {
-     "label": "색조 양"
+     "label": "틴트 색상"
     },
     "width": {
      "label": "폭"
@@ -6379,11 +6424,11 @@
     "octaves": {
      "label": "옥타브"
     },
-    "roughness": {
-     "label": "거칠기"
+    "strength": {
+     "label": "강도"
     },
-    "scale": {
-     "label": "크기"
+    "detail": {
+     "label": "디테일"
     },
     "seed": {
      "label": "시드"
@@ -6672,7 +6717,7 @@
    "description": "3x3 주변 픽셀로 언샤프 마스크를 적용해 세부 묘사를 또렷하게 합니다.",
    "name": "선명하게",
    "params": {
-    "amount": {
+    "sharpness": {
      "label": "강도"
     },
     "radius": {
@@ -6767,7 +6812,7 @@
      "label": "반사광 각도"
     },
     "blur": {
-     "label": "크기"
+     "label": "반지름"
     },
     "color_d": {
      "label": "확산광 색상"
@@ -6830,8 +6875,8 @@
     "blend": {
      "label": "혼합"
     },
-    "blur": {
-     "label": "크기"
+    "diffusion": {
+     "label": "확산"
     },
     "brightness": {
      "label": "밝기"
@@ -6846,7 +6891,7 @@
      "label": "하이라이트"
     },
     "opacity": {
-     "label": "불투명도"
+     "label": "알파"
     },
     "outside": {
      "label": "바깥 글로우"
@@ -7166,7 +7211,7 @@
     "feather": {
      "label": "페더"
     },
-    "saturation": {
+    "sat": {
      "label": "채도"
     },
     "threshold": {
@@ -7480,10 +7525,10 @@
    "description": "선을 따라 레이어를 자르고 두 조각을 벌려, 선 위의 픽셀을 틈 사이로 늘립니다.",
    "name": "구간 늘리기",
    "params": {
-    "angle": {
+    "cutAngle": {
      "label": "각도"
     },
-    "offset": {
+    "shift": {
      "label": "오프셋"
     },
     "relative": {
@@ -7492,7 +7537,7 @@
     "spread": {
      "label": "퍼짐"
     },
-    "stretch": {
+    "span": {
      "label": "늘리기"
     }
    }
@@ -7798,7 +7843,7 @@
      "label": "직접 입력"
     },
     "charset": {
-     "label": "문자",
+     "label": "문자 세트",
      "options": [
       "글자",
       "대문자",
@@ -7911,14 +7956,14 @@
    }
   },
   "texttransform": {
-   "description": "범위 안의 글자, 단어 또는 줄을 이동하고, 크기를 바꾸고, 회전하고, 페이드하고, 색을 입힙니다. 기준점은 크기와 회전을 각 구성 요소 기준으로 할지 레이어 중심 기준으로 할지 정합니다. 오프셋으로 범위를 움직이면 변화가 텍스트를 따라 이어집니다.",
+   "description": "범위 안의 글자, 단어 또는 줄을 이동하고, 크기를 바꾸고, 회전하고, 페이드하고, 색을 입힙니다. 기준점은 크기와 회전을 각 구성 요소 기준으로 할지 레이어 중심 기준으로 할지 정합니다. 위상으로 범위를 움직이면 변화가 텍스트를 따라 이어집니다.",
    "name": "텍스트 변형",
    "params": {
-    "anchor": {
+    "anchorTo": {
      "label": "기준점",
      "options": [
-      "구성 요소",
-      "레이어"
+      "레이어",
+      "구성 요소"
      ]
     },
     "easeIn": {
@@ -7931,38 +7976,38 @@
      "label": "끝"
     },
     "offset": {
-     "label": "오프셋"
+     "label": "위상"
     },
-    "opacity": {
+    "alpha": {
      "label": "불투명도"
     },
     "overlap": {
      "label": "겹침"
     },
     "position": {
-     "label": "위치"
+     "label": "오프셋"
     },
     "randomOrder": {
      "label": "무작위 순서"
     },
     "rotation": {
-     "label": "회전"
+     "label": "각도"
     },
-    "scale": {
+    "scaleBy": {
      "label": "크기"
     },
     "seed": {
      "label": "시드"
     },
-    "shape": {
+    "curve": {
      "label": "도형",
      "options": [
       "사각형",
+      "부드럽게",
+      "삼각형",
       "상승 경사",
       "하강 경사",
-      "삼각형",
-      "둥글게",
-      "부드럽게"
+      "둥글게"
      ]
     },
     "smoothness": {
@@ -7978,7 +8023,7 @@
      "label": "색조"
     },
     "unit": {
-     "label": "기준",
+     "label": "구성 요소",
      "options": [
       "글자",
       "단어",
@@ -7990,6 +8035,13 @@
      "label": "범위",
      "options": [
       "이전 방식",
+      "표준"
+     ]
+    },
+    "style": {
+     "label": "스타일",
+     "options": [
+      "클래식",
       "표준"
      ]
     }
@@ -8026,7 +8078,7 @@
     "level": {
      "label": "임계값"
     },
-    "softness": {
+    "feather": {
      "label": "페더"
     }
    }
@@ -8080,6 +8132,13 @@
     },
     "stretch": {
      "label": "늘리기"
+    },
+    "style": {
+     "label": "스타일",
+     "options": [
+      "클래식",
+      "표준"
+     ]
     }
    }
   },
@@ -8143,6 +8202,13 @@
     },
     "stretch": {
      "label": "늘리기"
+    },
+    "style": {
+     "label": "스타일",
+     "options": [
+      "클래식",
+      "표준"
+     ]
     }
    }
   },
@@ -8182,7 +8248,14 @@
    "name": "프레임 레이트",
    "params": {
     "fps": {
-     "label": "프레임/초"
+     "label": "단계/초"
+    },
+    "style": {
+     "label": "스타일",
+     "options": [
+      "클래식",
+      "표준"
+     ]
     }
    }
   },
@@ -8487,7 +8560,7 @@
     "amount": {
      "label": "양"
     },
-    "radius": {
+    "blurRadius": {
      "label": "강도"
     },
     "showMask": {
@@ -8666,7 +8739,7 @@
     "phase": {
      "label": "위상"
     },
-    "scale": {
+    "cellScale": {
      "label": "크기"
     },
     "seed": {
@@ -8769,7 +8842,7 @@
     "speed": {
      "label": "속도"
     },
-    "warpAngle": {
+    "warp": {
      "label": "워프 각도"
     },
     "screenSpace": {
@@ -8803,6 +8876,13 @@
       "클래식",
       "표준"
      ]
+    },
+    "axes": {
+     "label": "스타일",
+     "options": [
+      "클래식",
+      "표준"
+     ]
     }
    }
   },
@@ -8817,10 +8897,10 @@
      "label": "끝"
     },
     "feather": {
-     "label": "페더"
+     "label": "부드러움"
     },
     "softness": {
-     "label": "부드러움"
+     "label": "페더"
     },
     "start": {
      "label": "시작"
@@ -8883,7 +8963,7 @@
       "끔"
      ]
     },
-    "strength": {
+    "zoom": {
      "label": "강도"
     }
    }

@@ -16,8 +16,8 @@ The button turns gray with a reason when the export cannot run: **Not enough sto
 
 | Card | Result | Saved in |
 |---|---|---|
-| **Video** | MP4, MOV, MKV or WebM | Movies/AbsentMotion |
-| **Audio Only** | WAV, FLAC, M4A, OGG or MP3 | Music/AbsentMotion |
+| **Video** | MP4, MOV, MKV or WebM | Movies/AbsentMotion, or the **Videos and GIFs folder** you chose |
+| **Audio Only** | WAV, FLAC, M4A, OGG or MP3 | Music/AbsentMotion, or the **Sounds folder** you chose |
 | **Project Bundle** | An `.absproj` file with the project and its media | Documents/AbsentMotion, or the **Bundles folder** you chose |
 | **Current Frame as PNG** | One PNG image of the frame at the playhead | Pictures/AbsentMotion |
 | **Current Frame as...** | One image: PNG, JPEG, WebP, WebP lossless or BMP | Pictures/AbsentMotion |
@@ -66,7 +66,7 @@ It only acts on video clips whose frame rate (counting the clip's speed) is lowe
 
 **Motion Blur.** **Off**, **Low**, **Medium** or **High**. It smears the moving parts of video clips like a camera shutter that stays open longer (a quarter, a half or a whole frame). Unlike Frame Interpolation it also helps when a clip already has the export frame rate: fast pans and quick movement look smoother and less choppy. It only changes video clips, never shapes or text (for those, use the Motion Blur effect).
 
-**Quality.** A slider from **Low** to **High** that shows the resulting bit rate (for example "5.9 Mbps"). The bit rate follows the picture size, the frame rate and the codec: H.265 and AV1 need less than H.264 for the same look. The phone's encoder may adjust it a little.
+**Quality.** A slider from **Low** to **High** that shows the resulting bit rate (for example "5.9 Mbps"). The bit rate follows the picture size, the frame rate and the codec: H.265 and AV1 need less than H.264 for the same look. The encoder is asked to keep to this bit rate, so the video comes out close to it rather than bigger. When the project is essentially one video clip, **Custom** and **Same as source** sit above the slider: **Same as source** uses the bit rate of that video, so the export is about as big as the original; moving the slider goes back to **Custom**.
 
 **Audio.** A row such as "AAC · 128 kbps · 44.1 kHz · Stereo" opens the audio settings of the video:
 
@@ -121,7 +121,7 @@ One image per frame, saved in a folder named like the **Filename** (the project 
 ## Check before and during export
 
 - **Storage.** The app needs the estimated size plus a safety margin. If that is more than the free space it says "Not enough" and stops; if less than 1 GB would be left it says "Low". If the phone runs out of space during the export, the export stops and the unfinished file is removed.
-- **Estimates.** The size and time estimates improve as you export: the app learns from your last exports. Before that, it uses the speed measured by the check on first start. The time estimate also draws a few frames of your project at the chosen size (for GIFs and image sequences it also encodes them), so heavy effects such as VHS or blurs and big videos make it longer.
+- **Estimates.** The size estimate is measured from your project, not guessed: a video encodes a few one-second parts spread over the project with the chosen codec, quality, size and smoothing, plus a few seconds of its sound, then scales them up (a project of 6 seconds or less is encoded whole); an image sequence or GIF encodes a few of its frames; a picture encodes the frame itself; a sound file encodes a few seconds of the sound in the chosen format (WAV is counted exactly); a project bundle counts the files it packs. It shows **Calculating…** until then. The size and time estimates also improve as you export: the app learns from your last exports of the same format. Before that, the time estimate uses the speed measured by the check on first start. The time estimate also draws a few frames of your project at the chosen size (for GIFs and image sequences it also encodes them), so heavy effects such as VHS or blurs and big videos make it longer.
 - **Busy encoder.** If the phone's hardware video encoder is busy (for example another app holds it) or refuses the size and frame rate, the export first asks it to work at its own pace, then uses the slower software encoder and says so while it runs. Only if every encoder refuses does it stop, with "This phone's video encoder is busy or cannot make this size".
 - **Missing media.** If a project uses files that are not on the phone, the app lists them first ("Media Missing"). **Export Anyway** leaves those layers out.
 - **Heat.** If the phone gets warm, the export slows down on purpose by pausing a little after each frame, and a message says so. When it is very hot, it pauses between frames until it cools down.
@@ -132,7 +132,7 @@ One image per frame, saved in a folder named like the **Filename** (the project 
 
 The **Saved to storage** screen shows where the file is, plays it back (or shows the image or the pictures one by one; if the phone cannot play the video right now, it shows its first frame with a play button that tries again), and has **Share Video**, **Share GIF**, **Share Image Sequence**, **Share Image**, **Share Audio** or **Share Project XML** to send it with Android's share sheet, and **OK**.
 
-A video, GIF or image is not saved on its own: the screen says **Ready to save**, shows it, and **Save video**, **Save GIF** or **Save image** saves it to Movies/AbsentMotion or Pictures/AbsentMotion. The share button sends it without saving it. If you leave without saving, exporting the same project again with the same settings (and, for an image, the same frame) shows it at once, without exporting it again. On a computer, they are saved straight away.
+A video, GIF or image is not saved on its own: the screen says **Ready to save**, shows it, and **Save video**, **Save GIF** or **Save image** saves it to Movies/AbsentMotion or Pictures/AbsentMotion; videos and GIFs go to the **Videos and GIFs folder** instead if you chose one in [Settings](@settings). The share button sends it without saving it. If you leave without saving, exporting the same project again with the same settings (and, for an image, the same frame) shows it at once, without exporting it again. On a computer, they are saved straight away.
 
 ## Keep a copy as a Template
 

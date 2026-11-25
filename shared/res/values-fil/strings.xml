@@ -198,6 +198,10 @@
     <string name="bundle_pick_folder">Pumili ng folder na pagse-save-an</string>
     <string name="bundle_for_now">Sa ngayon: %1$s</string>
     <string name="bundle_folder_lost">Hindi ma-access ang folder na ito. I-tap para piliin itong muli; hanggang noon, sa %1$s mase-save ang mga bundle.</string>
+    <string name="settings_video_folder">Folder ng mga bidyo at GIF</string>
+    <string name="settings_sound_folder">Folder ng mga tunog</string>
+    <string name="settings_folder_default">Gamitin ang default na folder</string>
+    <string name="export_folder_lost">Hindi ma-access ang folder na ito. I-tap para piliin itong muli; hanggang noon, sa %1$s mase-save ang mga export.</string>
     <string name="settings_about">Tungkol</string>
     <string name="settings_report_issue">Mag-ulat ng problema</string>
     <string name="settings_suggest_feature">Magmungkahi ng feature</string>
@@ -358,6 +362,7 @@
     <string name="theme_light">Maliwanag</string>
     <string name="theme_dark">Madilim</string>
     <string name="theme_daylight">Daylight</string>
+    <string name="theme_light_green">Maliwanag na berde</string>
     <string name="theme_custom">Pasadya</string>
     <string name="theme_custom_named">Pasadya (%1$s)</string>
     <string name="theme_error_bad_colour">Maling kulay para sa %1$s</string>
@@ -806,6 +811,7 @@
     <string name="export_quality">Kalidad</string>
     <string name="export_quality_low">Mababa</string>
     <string name="export_quality_high">Mataas</string>
+    <string name="export_same_as_source">Kapareho ng source</string>
     <string name="export_format">Format</string>
     <string name="export_transparent_becomes">Ang transparent na bahagi ay magiging</string>
     <string name="export_white">Puti</string>
@@ -1048,6 +1054,8 @@
     <string name="caption_position_bottom">Ibaba</string>
     <string name="caption_words_per_caption">Mga salita kada kapsyon</string>
     <string name="caption_generate">Gumawa</string>
+    <string name="caption_import_srt">I-import ang SRT</string>
+    <string name="caption_srt_empty">Walang nakitang kapsyon sa file</string>
     <string name="caption_not_now">Mamaya na</string>
     <string name="caption_download">I-download</string>
     <string name="draw_back">Bumalik</string>
@@ -2197,8 +2205,8 @@
     <string name="caption_remaining">Mga %1$s na lang</string>
     <string name="caption_progress">%1$s%%</string>
     <string name="caption_model">Speech model</string>
-    <string name="caption_model_standard">Standard · 60 MB</string>
-    <string name="caption_model_precision">Mas mataas na precision · 82 MB</string>
+    <string name="caption_model_standard">Standard · 264 MB</string>
+    <string name="caption_model_precision">Mas mataas na precision · 874 MB</string>
     <string name="model_err_no_triangles">Walang triangle ang model</string>
     <string name="model_err_too_complex">Masyadong kumplikado ang model</string>
     <string name="model_err_missing_vertex">May face na gumagamit ng vertex na wala</string>
@@ -2258,6 +2266,7 @@
     <string name="effect_section_palette">Sariling Palette</string>
     <string name="effect_section_back">Likod ng Layer</string>
     <string name="effect_section_colorblend">Kulay at Blending</string>
+    <string name="effect_section_randomization">Randomization</string>
     <string name="palettes">Mga palette</string>
     <string name="palette_untitled">Walang pamagat</string>
     <string name="palette_new">Bago</string>
@@ -2511,6 +2520,7 @@
     <string name="tools_failed">Hindi natapos: %1$s</string>
     <string name="tools_save">I-save</string>
     <string name="tools_add_to_project">Idagdag sa proyekto</string>
+    <string name="tools_add_more">Magdagdag pa ng mga tool</string>
     <string name="tools_part">Bahaging itatabi</string>
     <string name="tools_start">Simula</string>
     <string name="tools_end">Wakas</string>
@@ -2542,6 +2552,15 @@
     <string name="tools_finding_cuts">Hinahanap ang mga cut point…</string>
     <string name="tools_trim_few_cuts">Halos walang cut point ang bidyong ito, kaya sa simula lang makakapagsimula ang Mabilis. Piliin ang Eksakto para magsimula kahit saan.</string>
     <string name="tools_trim_no_fast">Hindi posible rito ang mabilis na cut, kaya eksaktong puputulin ito.</string>
+    <string name="tools_merge">I-merge</string>
+    <string name="tools_merge_about">Pinagsasama ang mga bidyo sa isa.</string>
+    <string name="tools_merge_add">Magdagdag ng mga bidyo</string>
+    <string name="tools_merge_start">I-merge</string>
+    <string name="tools_merging">Nagme-merge… %1$d%%</string>
+    <string name="tools_merge_need_two">Magdagdag ng hindi bababa sa dalawang bidyo.</string>
+    <string name="tools_merge_no_fast">Magkakaiba ang mga bidyong ito, kaya ie-encode ulit ang mga ito.</string>
+    <string name="tools_merge_up">Ilipat pataas</string>
+    <string name="tools_merge_down">Ilipat pababa</string>
     <string name="shape_param_round_corners">Bilugan ang mga kanto</string>
     <string name="shape_param_notch">Uka</string>
     <string name="shape_param_point">Dulo</string>
@@ -2699,6 +2718,13 @@
     <string name="tools_enhance_image_about">Magdagdag ng detalye sa larawan o drawing gamit ang AI.</string>
     <string name="tools_enhance_pick">Pumili ng larawan</string>
     <string name="tools_enhance_running">Ine-enhance ang larawan: %1$d%%</string>
+    <string name="tools_convert_image">I-convert ang larawan</string>
+    <string name="tools_convert_image_about">Ginagawang PNG, JPG, WebP o GIF ang isang larawan o animation.</string>
+    <string name="tools_convert_pick">Pumili ng larawan</string>
+    <string name="tools_convert_to">I-convert sa</string>
+    <string name="tools_convert_start">I-convert</string>
+    <string name="tools_converting">Kino-convert… %1$d%%</string>
+    <string name="tools_convert_too_large">Maaaring i-convert ang mga animation na hanggang 2048 × 2048 pixel at 3000 frame.</string>
     <string name="ai_model_detail_max">Makatotohanang Max model ng AI Enhance</string>
     <string name="ai_model_cartoon_max">Anime at cartoon na Max model ng AI Enhance</string>
     <string name="ai_enhance_image_upscale2_hint">Doble ang lapad at taas</string>

@@ -217,6 +217,7 @@ private fun sectionTitle(key: String): String = when (key) {
     "palette" -> stringResource(R.string.effect_section_palette)
     "back" -> stringResource(R.string.effect_section_back)
     "colorblend" -> stringResource(R.string.effect_section_colorblend)
+    "randomization" -> stringResource(R.string.effect_section_randomization)
     else -> key
 }
 

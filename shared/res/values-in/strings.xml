@@ -198,6 +198,10 @@
     <string name="bundle_pick_folder">Pilih folder penyimpanan</string>
     <string name="bundle_for_now">Untuk saat ini: %1$s</string>
     <string name="bundle_folder_lost">Folder ini tidak dapat diakses. Ketuk untuk memilihnya lagi; sampai saat itu, bundel disimpan di %1$s.</string>
+    <string name="settings_video_folder">Folder video dan GIF</string>
+    <string name="settings_sound_folder">Folder suara</string>
+    <string name="settings_folder_default">Gunakan folder default</string>
+    <string name="export_folder_lost">Folder ini tidak dapat diakses. Ketuk untuk memilihnya lagi; sampai saat itu, hasil ekspor disimpan di %1$s.</string>
     <string name="settings_about">Tentang</string>
     <string name="settings_report_issue">Laporkan masalah</string>
     <string name="settings_suggest_feature">Sarankan fitur</string>
@@ -358,6 +362,7 @@
     <string name="theme_light">Terang</string>
     <string name="theme_dark">Gelap</string>
     <string name="theme_daylight">Siang</string>
+    <string name="theme_light_green">Hijau terang</string>
     <string name="theme_custom">Kustom</string>
     <string name="theme_custom_named">Kustom (%1$s)</string>
     <string name="theme_error_bad_colour">Warna tidak valid untuk %1$s</string>
@@ -796,6 +801,7 @@
     <string name="export_quality">Kualitas</string>
     <string name="export_quality_low">Rendah</string>
     <string name="export_quality_high">Tinggi</string>
+    <string name="export_same_as_source">Sama seperti sumber</string>
     <string name="export_format">Format</string>
     <string name="export_transparent_becomes">Area transparan menjadi</string>
     <string name="export_white">Putih</string>
@@ -1034,6 +1040,8 @@
     <string name="caption_position_bottom">Bawah</string>
     <string name="caption_words_per_caption">Kata per takarir</string>
     <string name="caption_generate">Buat</string>
+    <string name="caption_import_srt">Impor SRT</string>
+    <string name="caption_srt_empty">Tidak ada takarir yang ditemukan di file</string>
     <string name="caption_not_now">Nanti saja</string>
     <string name="caption_download">Unduh</string>
     <string name="draw_back">Kembali</string>
@@ -2167,8 +2175,8 @@
     <string name="caption_remaining">Sisa sekitar %1$s</string>
     <string name="caption_progress">%1$s%%</string>
     <string name="caption_model">Model ucapan</string>
-    <string name="caption_model_standard">Standar · 60 MB</string>
-    <string name="caption_model_precision">Presisi lebih tinggi · 82 MB</string>
+    <string name="caption_model_standard">Standar · 264 MB</string>
+    <string name="caption_model_precision">Presisi lebih tinggi · 874 MB</string>
     <string name="model_err_no_triangles">Model tidak memiliki segitiga</string>
     <string name="model_err_too_complex">Model terlalu kompleks</string>
     <string name="model_err_missing_vertex">Ada permukaan yang memakai vertex yang tidak ada</string>
@@ -2227,6 +2235,7 @@
     <string name="effect_section_palette">Palet Kustom</string>
     <string name="effect_section_back">Bagian Belakang Lapisan</string>
     <string name="effect_section_colorblend">Warna &amp; Pembauran</string>
+    <string name="effect_section_randomization">Pengacakan</string>
     <string name="palettes">Palet</string>
     <string name="palette_untitled">Tanpa judul</string>
     <string name="palette_new">Baru</string>
@@ -2476,6 +2485,7 @@
     <string name="tools_failed">Tidak dapat menyelesaikan: %1$s</string>
     <string name="tools_save">Simpan</string>
     <string name="tools_add_to_project">Tambahkan ke proyek</string>
+    <string name="tools_add_more">Tambah alat lainnya</string>
     <string name="tools_part">Bagian yang disimpan</string>
     <string name="tools_start">Mulai</string>
     <string name="tools_end">Akhir</string>
@@ -2507,6 +2517,15 @@
     <string name="tools_finding_cuts">Mencari titik potong…</string>
     <string name="tools_trim_few_cuts">Video ini hampir tidak punya titik potong, jadi Cepat hanya bisa dimulai dari awal. Pilih Tepat untuk memulai dari mana saja.</string>
     <string name="tools_trim_no_fast">Pemangkasan cepat tidak bisa dilakukan di sini, jadi akan dipangkas secara tepat.</string>
+    <string name="tools_merge">Gabungkan</string>
+    <string name="tools_merge_about">Menggabungkan video menjadi satu.</string>
+    <string name="tools_merge_add">Tambah video</string>
+    <string name="tools_merge_start">Gabungkan</string>
+    <string name="tools_merging">Menggabungkan… %1$d%%</string>
+    <string name="tools_merge_need_two">Tambahkan minimal dua video.</string>
+    <string name="tools_merge_no_fast">Video-video ini berbeda, jadi akan dienkode ulang.</string>
+    <string name="tools_merge_up">Naikkan</string>
+    <string name="tools_merge_down">Turunkan</string>
     <string name="shape_param_round_corners">Bulatkan sudut</string>
     <string name="shape_param_notch">Takik</string>
     <string name="shape_param_point">Ujung</string>
@@ -2664,6 +2683,13 @@
     <string name="tools_enhance_image_about">Menambah detail pada foto atau gambar dengan AI.</string>
     <string name="tools_enhance_pick">Pilih foto</string>
     <string name="tools_enhance_running">Meningkatkan gambar: %1$d%%</string>
+    <string name="tools_convert_image">Konversi gambar</string>
+    <string name="tools_convert_image_about">Mengubah gambar atau animasi menjadi PNG, JPG, WebP, atau GIF.</string>
+    <string name="tools_convert_pick">Pilih gambar</string>
+    <string name="tools_convert_to">Konversi ke</string>
+    <string name="tools_convert_start">Konversi</string>
+    <string name="tools_converting">Mengonversi… %1$d%%</string>
+    <string name="tools_convert_too_large">Animasi hingga 2048 × 2048 piksel dan 3000 frame dapat dikonversi.</string>
     <string name="ai_model_detail_max">Model Peningkatan AI Realistis Maks.</string>
     <string name="ai_model_cartoon_max">Model Peningkatan AI Anime dan kartun Maks.</string>
     <string name="ai_enhance_image_upscale2_hint">Lebar dan tinggi dua kali lipat</string>

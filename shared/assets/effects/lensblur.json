@@ -53,7 +53,23 @@
     "Spin",
     "Zoom"
    ]
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 1,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "legacyDefault": 0,
+   "when": {
+    "style": [
+     0
+    ]
+   }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 center;\nuniform float sweep;\nuniform float radius;\nuniform float feather;\nuniform float blur;\nhalf4 main(float2 coord) {\n    float2 c = center * size;\n    float2 d = coord - c;\n    float k = smoothstep(radius, radius + feather + 0.0001, length(d) / (0.5 * min(size.x, size.y)));\n    float span = radians(sweep) * k;\n    if (span <= 0.0) return image.eval(coord);\n    half4 sum = half4(0.0);\n    for (int i = 0; i < 48; i++) {\n        float a = span * (float(i) / 47.0 - 0.5);\n        sum += image.eval(blur > 0.5 ? c + d * (1.0 + a) : c + float2(cos(a) * d.x - sin(a) * d.y, sin(a) * d.x + cos(a) * d.y));\n    }\n    return sum / 48.0;\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 center;\nuniform float sweep;\nuniform float radius;\nuniform float feather;\nuniform float blur;\nuniform float style;\nuniform float4 screen;\nhalf4 main(float2 coord) {\n    float2 c = center * size;\n    float2 d = coord - c;\n    float k = smoothstep(radius, radius + feather + 0.0001, style > 0.5 ? length(d / (0.5 * size)) : length(d) / (0.5 * min(size.x, size.y)));\n    float span = radians(sweep) * k;\n    if (span <= 0.0) return image.eval(coord);\n    half4 sum = half4(0.0);\n    for (int i = 0; i < 48; i++) {\n        float a = span * (float(i) / 47.0 - 0.5);\n        sum += image.eval(blur > 0.5 ? clamp(c + d * (1.0 + a), screen.xy + 0.5, screen.xy + screen.zw - 0.5) : c + float2(cos(a) * d.x - sin(a) * d.y, sin(a) * d.x + cos(a) * d.y));\n    }\n    return sum / 48.0;\n}\n"
 }

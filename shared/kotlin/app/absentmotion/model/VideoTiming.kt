@@ -115,6 +115,8 @@ fun Layer.steppedMs(timeMs: Double): Double {
     if (endTime <= startTime) return timeMs
     val fps = effect.effectProperty("fps")?.valueAt(((timeMs - startTime) / (endTime - startTime)).toFloat())?.finiteFloat() ?: 8f
     if (!(fps > 0f)) return timeMs
+    if ((effect.effectProperty("style")?.valueAt(0f)?.finiteFloat() ?: 0f) > 0.5f)
+        return startTime + (maxOf(kotlin.math.ceil((timeMs - startTime) * fps / 1000 - 1e-6) - 1, 0.0) + 0.5) * 1000 / fps
     return startTime + kotlin.math.floor((timeMs - startTime) * fps / 1000 + 1e-4) * 1000 / fps
 }
 

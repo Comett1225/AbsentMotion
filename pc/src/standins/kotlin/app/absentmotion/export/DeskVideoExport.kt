@@ -121,8 +121,14 @@ internal object DeskEncoders {
         MediaEngine.current.encoderWorks(name, s, width, height)
     }
 
-    fun videoArgs(name: String, s: ExportSettings, width: Int, height: Int): List<String> {
-        val bitrate = videoBitrate(width, height, s)
+    fun rateArgs(name: String, bitrate: Int, exact: Boolean): List<String> = when {
+        name.endsWith("_videotoolbox") -> listOf("-maxrate", "${bitrate.toLong() * 10 / 7}", "-bufsize", "${bitrate.toLong() * 2}")
+        name == "libvpx-vp9" || exact && name in setOf("libx264", "libx265") -> listOf("-minrate", "$bitrate", "-maxrate", "$bitrate", "-bufsize", "$bitrate")
+        name == "libx264" -> listOf("-maxrate", "$bitrate", "-bufsize", "${bitrate.toLong() * 2}")
+        else -> emptyList()
+    }
+
+    fun videoArgs(name: String, s: ExportSettings, width: Int, height: Int, bitrate: Int = videoBitrate(width, height, s)): List<String> {
         val tuned = when {
             name.endsWith("_videotoolbox") -> listOf("-realtime", "0") + if (s.codec == Codec.H264) listOf("-profile:v", "high") else emptyList()
             name == "libx264" -> listOf("-preset", "veryfast", "-profile:v", "high")
@@ -133,7 +139,7 @@ internal object DeskEncoders {
             name.endsWith("_nvenc") -> listOf("-preset", "p4")
             else -> emptyList()
         }
-        return listOf("-c:v", name) + tuned + listOf("-b:v", "$bitrate", "-g", "${s.fps}") + (if (vaapi(name)) emptyList() else listOf("-pix_fmt", "yuv420p")) +
+        return listOf("-c:v", name) + tuned + listOf("-b:v", "$bitrate") + rateArgs(name, bitrate, s.bitrate > 0) + listOf("-g", "${s.fps}") + (if (vaapi(name)) emptyList() else listOf("-pix_fmt", "yuv420p")) +
             listOf("-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709", "-color_range", "tv")
     }
 
@@ -226,7 +232,7 @@ internal suspend fun writePcm(mix: AudioMix, totalUs: Long, rate: Int, file: Fil
 
 internal suspend fun exportVideo(
     engine: EngineThread, scene: Scene, xml: String, s: ExportSettings, out: FileDescriptor, audio: AudioMix?,
-    hotAtStart: Boolean = false, pauseMs: () -> Long = { 0L }, note: (UiText) -> Unit = {}, looks: (FrameLooks) -> Unit = {}, progress: (Float) -> Unit,
+    hotAtStart: Boolean = false, pauseMs: () -> Long = { 0L }, note: (UiText) -> Unit = {}, looks: (FrameLooks) -> Unit = {}, sample: IntArray? = null, progress: (Float) -> Unit,
 ) {
     val (width, height) = exportSize(scene, s.shortSide, even = true)
     val frames = frameCount(scene, s.fps)
@@ -281,7 +287,9 @@ internal suspend fun exportVideo(
                         suspend fun buffer() = runInterruptible(Dispatchers.IO) { waitFor { free.poll(50, java.util.concurrent.TimeUnit.MILLISECONDS) } }
                         suspend fun send(pixels: ByteArray) { runInterruptible(Dispatchers.IO) { waitFor { pixels.takeIf { queue.offer(it, 50, java.util.concurrent.TimeUnit.MILLISECONDS) } } } }
                         try {
-                            for (k in 0 until frames) {
+                            val count = sample?.size ?: frames
+                            for (i in 0 until count) {
+                                val k = sample?.get(i) ?: i
                                 currentCoroutineContext().ensureActive()
                                 failure.get()?.let { throw ExportError(txt(R.string.library_text_value, running.problem()), it) }
                                 val pixels = buffer() ?: continue
@@ -290,8 +298,8 @@ internal suspend fun exportVideo(
                                     0 -> free.offer(pixels)
                                     else -> throw ExportError(txt(R.string.export_error_draw_frame, k.toString()))
                                 }
-                                progress((k + 1f) / frames * 0.98f)
-                                if (k % 30 == 0) ensureRoomFor(result)
+                                progress((i + 1f) / count * 0.98f)
+                                if (i % 30 == 0) ensureRoomFor(result)
                                 pauseMs().takeIf { it > 0 }?.let { delay(it) }
                             }
                             buffer()?.let { pixels ->

@@ -4,7 +4,7 @@
  "category": "text",
  "since": "3.0.0",
  "native": true,
- "description": "Moves, scales, turns, fades and tints letters, words or lines inside a range. Anchor sets whether scaling and rotation use each component or the center of the layer. Move the range with Offset to make the change travel through the text.",
+ "description": "Moves, scales, turns, fades and tints letters, words or lines inside a range. Anchor sets whether scaling and rotation use each component or the center of the layer. Move the range with Phase to make the change travel through the text.",
  "params": [
   {
    "id": "version",
@@ -47,10 +47,10 @@
   },
   {
    "id": "offset",
-   "label": "Offset",
+   "label": "Phase",
    "type": "float",
    "default": 0,
-   "min": -2,
+   "min": -1,
    "max": 2,
    "step": 0.001,
    "percent": true,
@@ -58,7 +58,7 @@
   },
   {
    "id": "unit",
-   "label": "Based On",
+   "label": "Component",
    "type": "choice",
    "default": 0,
    "options": [
@@ -70,19 +70,19 @@
    "section": "transform"
   },
   {
-   "id": "anchor",
+   "id": "anchorTo",
    "label": "Anchor",
    "type": "choice",
-   "default": 0,
+   "default": 1,
    "options": [
-    "Component",
-    "Layer"
+    "Layer",
+    "Component"
    ],
    "section": "transform"
   },
   {
    "id": "position",
-   "label": "Position",
+   "label": "Offset",
    "type": "point",
    "default": [
     0,
@@ -96,7 +96,7 @@
   },
   {
    "id": "rotation",
-   "label": "Rotation",
+   "label": "Angle",
    "type": "angle",
    "default": 0,
    "min": -3600,
@@ -105,16 +105,14 @@
    "section": "transform"
   },
   {
-   "id": "scale",
+   "id": "scaleBy",
    "label": "Scale",
    "type": "float",
-   "default": 1,
-   "min": 0,
+   "default": 0,
+   "min": -1,
    "max": 10,
-   "step": 0.001,
-   "percent": true,
-   "section": "transform",
-   "drag": 0.01
+   "step": 0.01,
+   "section": "transform"
   },
   {
    "id": "stretch",
@@ -123,20 +121,17 @@
    "default": 0,
    "min": -1,
    "max": 10,
-   "step": 0.001,
-   "percent": true,
-   "section": "transform",
-   "drag": 0.01
+   "step": 0.01,
+   "section": "transform"
   },
   {
-   "id": "opacity",
-   "label": "Opacity",
+   "id": "alpha",
+   "label": "Alpha",
    "type": "float",
-   "default": 1,
-   "min": 0,
+   "default": 0,
+   "min": -1,
    "max": 1,
    "step": 0.001,
-   "percent": true,
    "section": "transform"
   },
   {
@@ -197,17 +192,17 @@
    "section": "easing"
   },
   {
-   "id": "shape",
+   "id": "curve",
    "label": "Shape",
    "type": "choice",
    "default": 0,
    "options": [
     "Square",
+    "Smooth",
+    "Triangle",
     "Ramp Up",
     "Ramp Down",
-    "Triangle",
-    "Round",
-    "Smooth"
+    "Round"
    ],
    "section": "easing"
   },
@@ -239,13 +234,28 @@
    "max": 1000,
    "step": 1,
    "section": "random"
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 1,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "legacyDefault": 0,
+   "when": {
+    "style": [
+     0
+    ]
+   }
   }
  ],
  "presets": [
   {
    "name": "Wave",
    "params": {
-    "shape": 5,
     "start": 0,
     "end": 0.35,
     "position": [
@@ -261,18 +271,16 @@
       1.5,
       -1
      ]
-    ]
+    ],
+    "curve": 1
    }
   },
   {
    "name": "Spin Cascade",
    "params": {
-    "shape": 1,
     "start": 0,
     "end": 0.3,
     "rotation": -180,
-    "scale": 0,
-    "opacity": 0,
     "offset": [
      [
       0,
@@ -282,7 +290,10 @@
       1.5,
       -1
      ]
-    ]
+    ],
+    "curve": 3,
+    "scaleBy": -1,
+    "alpha": -1
    }
   }
  ]

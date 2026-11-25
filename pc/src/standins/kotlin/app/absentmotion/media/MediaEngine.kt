@@ -59,6 +59,7 @@ interface MediaEngine {
     fun compress(input: File, job: VideoJob, audio: Boolean, durationUs: Long, out: File, startUs: Long, endUs: Long, progress: (Float) -> Unit, alive: () -> Boolean)
     fun extractAudio(input: File, job: AudioJob, durationUs: Long, out: File, progress: (Float) -> Unit, alive: () -> Boolean)
     fun trim(input: File, startUs: Long, endUs: Long, out: File, progress: (Float) -> Unit, alive: () -> Boolean)
+    fun merge(inputs: List<File>, clips: List<app.absentmotion.tools.MergeFacts>, job: app.absentmotion.tools.MergeJob, out: File, progress: (Float) -> Unit, alive: () -> Boolean)
     fun reverse(parts: ReverseParts, progress: (Float) -> Unit, alive: () -> Boolean): Pair<Int, Int>?
     fun gifVideo(plan: GifPlan, alive: () -> Boolean)
     fun steadyFrames(file: File, start: String, length: String, rate: String, width: Int = 0, height: Int = 0): MediaStream

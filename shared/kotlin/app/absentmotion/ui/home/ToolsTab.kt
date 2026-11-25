@@ -16,6 +16,7 @@ import androidx.annotation.StringRes
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -151,7 +152,9 @@ private val installScope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.
 private var installPercent by mutableStateOf<Int?>(null)
 private val downloader = videoDownloader()
 
-internal val DefaultToolOrder = listOf("compress", "trim", "extract", "gif", "downloader", "enhance", "importer", "send")
+internal val DefaultToolOrder = listOf("compress", "trim", "extract", "gif", "merge", "downloader", "enhance", "convert", "importer", "send")
+
+internal val DefaultHiddenTools = setOf("gif", "merge", "enhance", "convert", "importer")
 
 internal fun toolOrder(saved: List<String>): List<String> {
     val valid = DefaultToolOrder.toSet()
@@ -173,8 +176,10 @@ internal fun toolInfo(id: String): ToolInfo = when (id) {
     "trim" -> ToolInfo(HomeIcons.Trim, R.string.tools_trim, R.string.tools_trim_about, 3)
     "extract" -> ToolInfo(HomeIcons.Audio, R.string.tools_extract, R.string.tools_extract_about, 4)
     "gif" -> ToolInfo(HomeIcons.Gif, R.string.tools_gif, R.string.tools_gif_about, 5)
+    "merge" -> ToolInfo(HomeIcons.Merge, R.string.tools_merge, R.string.tools_merge_about, 9)
     "downloader" -> ToolInfo(HomeIcons.Download, R.string.tools_downloader, R.string.tools_downloader_about, 2)
     "enhance" -> ToolInfo(HomeIcons.Compress, R.string.tools_enhance_image, R.string.tools_enhance_image_about, 6)
+    "convert" -> ToolInfo(HomeIcons.ImageConvert, R.string.tools_convert_image, R.string.tools_convert_image_about, 8)
     "importer" -> ToolInfo(HomeIcons.ProjectImporter, R.string.tools_importer, R.string.tools_importer_about, 0)
     else -> ToolInfo(HomeIcons.Devices, R.string.tools_send, R.string.tools_send_about, 7)
 }
@@ -209,7 +214,9 @@ internal fun ToolsTab(modifier: Modifier, store: ProjectStore, settings: AppSett
     var open by rememberSaveable { mutableIntStateOf(0) }
     var compressFrom by remember { mutableStateOf<Uri?>(null) }
     var asking by remember { mutableStateOf(false) }
+    var adding by remember { mutableStateOf(false) }
     val order = settings.toolOrder.filterNot { it in settings.toolsHidden }
+    val more = settings.toolOrder.filter { it in settings.toolsHidden }
     LaunchedEffect(revision) {
         if (engine !is Engine.Getting) engine = if (!downloader.available) Engine.Unavailable else if (downloader.installed(context)) Engine.Ready else Engine.Missing
     }
@@ -268,6 +275,10 @@ internal fun ToolsTab(modifier: Modifier, store: ProjectStore, settings: AppSett
         else Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             order.forEach { id -> key(id) { cardFor(id, Modifier) } }
         }
+        if (more.isNotEmpty()) {
+            Spacer(Modifier.height(if (order.isEmpty()) 0.dp else 12.dp))
+            AddMoreTools { adding = true }
+        }
         Spacer(Modifier.height(28.dp))
         ToolsFooter()
         if (asking) AlertDialog(
@@ -288,8 +299,54 @@ internal fun ToolsTab(modifier: Modifier, store: ProjectStore, settings: AppSett
         5 -> GifScreen { open = 0 }
         6 -> EnhanceImageScreen { open = 0 }
         7 -> SendScreen(store) { open = 0 }
+        8 -> ConvertImageScreen { open = 0 }
+        9 -> MergeScreen { open = 0 }
     }
     if (customizing) CustomizeToolsSheet(settings) { onCustomizing(false) }
+    if (adding) AddToolsSheet(settings) { adding = false }
+}
+
+@Composable
+private fun AddMoreTools(onClick: () -> Unit) {
+    val shape = RoundedCornerShape(12.dp)
+    Row(
+        Modifier.fillMaxWidth().heightIn(min = 64.dp).clip(shape).background(Am.HomeAccent.copy(alpha = 0.1f)).border(1.5.dp, Am.HomeAccent.copy(alpha = 0.55f), shape)
+            .deskPress(12.dp).clickable(onClick = onClick).padding(horizontal = 16.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(HomeIcons.Plus, null, Modifier.size(22.dp), tint = Am.HomeAccent)
+        Spacer(Modifier.width(10.dp))
+        Text(stringResource(R.string.tools_add_more), color = Am.HomeAccent, fontSize = 17.sp, fontWeight = FontWeight.Bold)
+    }
+}
+
+@Composable
+private fun AddToolsSheet(settings: AppSettings, onClose: () -> Unit) {
+    val hidden = settings.toolOrder.filter { it in settings.toolsHidden }
+    LaunchedEffect(hidden.isEmpty()) { if (hidden.isEmpty()) onClose() }
+    ToolSheet(stringResource(R.string.tools_add_more), onClose, closeButton = true) {
+        Spacer(Modifier.height(16.dp))
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            hidden.forEach { id ->
+                key(id) {
+                    val tool = toolInfo(id)
+                    Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Am.Card).padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Box(Modifier.size(44.dp).background(Am.Navy, CircleShape), contentAlignment = Alignment.Center) {
+                            Icon(tool.icon, null, Modifier.size(22.dp), tint = Am.OnNavy)
+                        }
+                        Spacer(Modifier.width(14.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text(stringResource(tool.title), color = Am.Navy, fontSize = 17.sp, fontWeight = FontWeight.Bold)
+                            Text(stringResource(tool.about), color = Am.HomeDim, fontSize = 14.sp, lineHeight = 18.sp)
+                        }
+                        Spacer(Modifier.width(10.dp))
+                        BigButton(stringResource(R.string.community_add), Modifier.widthIn(min = 72.dp)) { settings.toolsHidden = settings.toolsHidden - id }
+                    }
+                }
+            }
+        }
+        Spacer(Modifier.height(24.dp))
+    }
 }
 
 @Composable

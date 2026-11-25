@@ -176,6 +176,7 @@ data class ExportSettings(
     val audioFormat: AudioFormat = AudioFormat.M4a,
     val interpolationLevel: SmoothLevel = SmoothLevel.Medium,
     val motionBlur: MotionBlur = MotionBlur.Off,
+    val bitrate: Int = 0,
 ) {
     val smoothing: Smoothing get() = Smoothing(interpolation, interpolationLevel, motionBlur)
 }
@@ -206,8 +207,21 @@ fun frameTimeMs(scene: Scene, fps: Int, index: Int): Int = if (fps == scene.fps)
 fun sequenceFrameName(index: Int, ext: String): String = String.format(Locale.ROOT, "frame_%05d.%s", index + 1, ext)
 
 fun videoBitrate(width: Int, height: Int, s: ExportSettings): Int {
+    if (s.bitrate > 0) return s.bitrate
     val bitsPerPixel = 0.03 * 10.0.pow(s.quality.coerceIn(0f, 1f).toDouble()) * s.codec.bitsVsH264
     return (width.toDouble() * height * s.fps * bitsPerPixel).coerceAtMost(Int.MAX_VALUE.toDouble()).roundToInt()
+}
+
+fun soleVideo(scene: Scene): String? {
+    val videos = ArrayList<app.absentmotion.model.XmlNode>()
+    fun walk(n: app.absentmotion.model.XmlNode) {
+        if (n.name == "media") return
+        if (n["fillVideo"] != null) videos += n
+        n.children.forEach(::walk)
+    }
+    walk(scene.node)
+    val only = app.absentmotion.model.Layer(videos.singleOrNull() ?: return null)
+    return only.node["fillVideo"]?.takeIf { (only.endTime - only.startTime + 1) * 10L >= (scene.totalTime + 1) * 9L }
 }
 
 fun videoBitrate(width: Int, height: Int, s: ExportSettings, bitrates: IntRange?): Int =

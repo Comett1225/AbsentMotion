@@ -60,26 +60,56 @@ data class CaptionStyle(
 
 private const val MAX_CAPTION_MS = 3000
 private const val PAUSE_MS = 500
+private const val HANG_MS = 150
+private const val MIN_CAPTION_MS = 700
 private const val SENTENCE_ENDS = ".?!…。？！"
+private const val PHRASE_ENDS = ",;:、，；："
+
+private val weakEnds = ("a an the of to in on at for from with by my your his her our their its and or but " +
+    "o os as um uma de do da dos das em no na nos nas e ou que meu minha " +
+    "el la los las un una del al en y mi tu su le les une du des et mon ma ton ta " +
+    "der die das den dem ein eine einen und zu mit il lo gli di per con").split(' ').toSet()
+
+private fun wordKey(text: String) = text.lowercase().replace(Regex("[^\\p{L}\\p{N}']+"), " ").trim()
 
 fun chunkWords(words: List<Word>, maxWords: Int): List<Chunk> {
-    val chunks = mutableListOf<Chunk>()
-    var current = mutableListOf<Word>()
-    fun flush() {
-        if (current.isEmpty()) return
-        val start = current.first().startMs
-        val text = current.zipWithNext().joinToString("", current.first().text) { (_, b) -> (if (b.glued) "" else " ") + b.text }
-        chunks += Chunk(text, start, min(current.last().endMs, start + MAX_CAPTION_MS))
-        current = mutableListOf()
-    }
+    val most = maxWords.coerceAtLeast(1)
+    val phrases = ArrayList<List<Word>>()
+    var current = ArrayList<Word>()
     for (word in words) {
         val last = current.lastOrNull()
-        if (last != null && (current.size >= maxWords || word.endMs - current.first().startMs > MAX_CAPTION_MS ||
-                word.startMs - last.endMs > PAUSE_MS || SENTENCE_ENDS.any { last.text.endsWith(it) })) flush()
+        if (last != null && (word.startMs - last.endMs > PAUSE_MS || SENTENCE_ENDS.any { last.text.endsWith(it) } ||
+                current.size >= 2 && PHRASE_ENDS.any { last.text.endsWith(it) })) {
+            phrases += current
+            current = ArrayList()
+        }
         current += word
     }
-    flush()
-    return chunks
+    if (current.isNotEmpty()) phrases += current
+    val pieces = ArrayList<List<Word>>()
+    fun split(run: List<Word>) {
+        if (run.size == 1 || run.size <= most && run.last().endMs - run.first().startMs <= MAX_CAPTION_MS) {
+            pieces += run
+            return
+        }
+        val parts = maxOf(2, (run.size + most - 1) / most)
+        val even = run.size.toFloat() / parts
+        val cut = (1 until run.size).minBy { at ->
+            val crowded = at > most || run.size - at > most * (parts - 1)
+            kotlin.math.abs(at - even) - (run[at].startMs - run[at - 1].endMs) / 250f +
+                (if (wordKey(run[at - 1].text) in weakEnds) 1.5f else 0f) + (if (crowded) 100f else 0f)
+        }
+        split(run.subList(0, cut))
+        split(run.subList(cut, run.size))
+    }
+    phrases.forEach(::split)
+    return pieces.mapIndexed { i, piece ->
+        val start = piece.first().startMs
+        val next = pieces.getOrNull(i + 1)?.first()?.startMs ?: Int.MAX_VALUE
+        val end = minOf(maxOf(piece.last().endMs + HANG_MS, start + MIN_CAPTION_MS), next, start + MAX_CAPTION_MS)
+        val text = piece.zipWithNext().joinToString("", piece.first().text) { (_, b) -> (if (b.glued) "" else " ") + b.text }
+        Chunk(text, start, maxOf(end, start + 1))
+    }
 }
 
 fun captionSize(width: Int, height: Int, percent: Int): Float = 0.06f * min(width, height) / 3f * percent / 100f
@@ -127,6 +157,63 @@ internal fun Scene.captionLayers(
     }
 }
 
+private val SrtTime = Regex("""(\d+):(\d{1,2}):(\d{1,2})(?:[,.](\d{1,3}))?""")
+private val SrtTags = Regex("""</?\s*(?:i|b|u|s|font)\b[^>]*>|\{\\[^}]*\}""", RegexOption.IGNORE_CASE)
+
+private fun srtMs(match: MatchResult): Int {
+    val (h, m, s, f) = match.destructured
+    return ((h.toLong() * 3600 + m.toLong() * 60 + s.toLong()) * 1000 + f.padEnd(3, '0').toLong()).coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
+}
+
+fun srtText(bytes: ByteArray): String {
+    val utf16 = bytes.size >= 2 && (bytes[0] == 0xFF.toByte() && bytes[1] == 0xFE.toByte() || bytes[0] == 0xFE.toByte() && bytes[1] == 0xFF.toByte())
+    return String(bytes, if (utf16) Charsets.UTF_16 else Charsets.UTF_8).removePrefix("\uFEFF")
+}
+
+fun srtCues(text: String): List<Chunk> {
+    val lines = text.removePrefix("\uFEFF").split("\r\n", "\n", "\r")
+    val cues = ArrayList<Chunk>()
+    var i = 0
+    while (i < lines.size) {
+        val times = lines[i++].split("-->").takeIf { it.size == 2 }?.map { SrtTime.find(it) } ?: continue
+        val start = times[0]?.let(::srtMs) ?: continue
+        val end = times[1]?.let(::srtMs) ?: continue
+        val body = ArrayList<String>()
+        while (i < lines.size && lines[i].isNotBlank() && "-->" !in lines[i]) body += lines[i++]
+        if (i < lines.size && "-->" in lines[i] && body.lastOrNull()?.trim()?.all(Char::isDigit) == true) body.removeAt(body.lastIndex)
+        val words = body.map { it.replace(SrtTags, "").trim() }.filter { it.isNotEmpty() }.joinToString("\n")
+        if (words.isNotEmpty() && end > start) cues += Chunk(words, start, end)
+    }
+    return cues.sortedBy { it.startMs }
+}
+
+internal fun Scene.srtChunks(text: String, layerId: Long? = null): List<Chunk> {
+    val clip = layerId?.let(::layer)
+    val timing = clip?.let { app.absentmotion.model.VideoTiming(it) }
+    fun place(ms: Int) = if (clip == null) ms else clip.startTime + timing!!.localMs(ms.toDouble()).roundToInt()
+    val first = if (clip == null) 0 else frameAt(clip.startTime)
+    val end = when {
+        clip != null -> frameAt(clip.endTime) + 1
+        totalTime > 0 -> lastFrame + 1
+        else -> Int.MAX_VALUE
+    }
+    val cues = srtCues(text).mapNotNull { cue ->
+        val a = place(cue.startMs); val b = place(cue.endMs)
+        val from = frameAt(minOf(a, b))
+        val to = maxOf(frameAt(maxOf(a, b)), from + 1).coerceAtMost(end)
+        if (from.coerceAtLeast(first) < to) Triple(cue.text, from.coerceAtLeast(first), to) else null
+    }
+    val out = ArrayList<Chunk>()
+    for ((a, b) in cues.flatMap { listOf(it.second, it.third) }.distinct().sorted().zipWithNext()) {
+        val shown = cues.filter { it.second <= a && it.third >= b }.joinToString("\n") { it.first }
+        if (shown.isEmpty()) continue
+        val last = out.lastOrNull()
+        if (last != null && last.endMs == frameStart(a) && last.text == shown) out[out.lastIndex] = last.copy(endMs = frameStart(b))
+        else out += Chunk(shown, frameStart(a), frameStart(b))
+    }
+    return out
+}
+
 internal fun EditorState.addCaptions(chunks: List<Chunk>, style: CaptionStyle, fonts: FontLibrary) {
     val wrap = captionWrap(scene.width)
     val layers = scene.captionLayers(chunks, style) { text, size -> captionTextHeight(fonts, text, style.font, size, wrap) }
@@ -154,14 +241,14 @@ internal suspend fun recogniseCaptions(
             fun step(local: Float, label: Int) = progress((k + local) / windows.size, AppText.get(label))
             val from = maxOf(startMs, keepFrom - CAPTION_OVERLAP_MS)
             val pcm = withContext(Dispatchers.IO) { speechPcm(mix, from, keepTo) { step(0.15f * it, R.string.ai_reading_audio) } }
-            words += Whisper.transcribe(CaptionModel.file(context, style.highPrecision), pcm, style.english) { step(0.15f + 0.85f * it / 100f, R.string.ai_recognising_speech) }
-                .filter { it.startMs + from >= keepFrom && (it.startMs + from < keepTo || k == windows.lastIndex) }
-                .map { it.copy(startMs = min(it.startMs + from, endMs - 1), endMs = min(it.endMs + from, endMs)) }
+            words += Whisper.transcribe(CaptionModel.file(context, style.highPrecision), CaptionModel.heads(style.highPrecision), pcm, style.english) { step(0.15f + 0.85f * it / 100f, R.string.ai_recognising_speech) }
+                .filter { it.startMs + from >= keepFrom && it.startMs + from < keepTo }
+                .map { it.copy(startMs = it.startMs + from, endMs = min(it.endMs + from, endMs)) }
         }
     } finally {
         (mix as? Closeable)?.close()
     }
-    return chunkWords(words, style.maxWords).ifEmpty { error(AppText.get(R.string.ai_no_speech)) }
+    return chunkWords(words, style.maxWords).map { it.copy(endMs = min(it.endMs, endMs)) }.ifEmpty { error(AppText.get(R.string.ai_no_speech)) }
 }
 
 internal data class CaptionInput(val scene: Scene, val startMs: Int, val endMs: Int)
@@ -319,9 +406,72 @@ internal fun speechEdges(pcm: FloatArray, rate: Int, frameMs: Int = 10, pauseMs:
     return SpeechEdges(onsets, offsets)
 }
 
+private fun squeezedRuns(starts: IntArray): List<IntRange> {
+    val runs = ArrayList<IntRange>()
+    var i = 0
+    while (i < starts.size) {
+        var j = i
+        while (j + 1 < starts.size && starts[j + 1] - starts[j] < SQUEEZED_MS) j++
+        if (j - i + 1 >= SQUEEZED_RUN) runs += i..j
+        i = j + 1
+    }
+    return runs
+}
+
+private fun dropRepeats(raw: List<RawWord>, timed: IntArray): Pair<List<RawWord>, IntArray> {
+    val keys = raw.map { wordKey(it.text) }
+    val starts = timed.copyOf()
+    val drop = BooleanArray(raw.size)
+    for (run in squeezedRuns(timed)) {
+        for (k in run.first..run.last - 3) {
+            val gram = keys.subList(k, k + 4)
+            val elsewhere = (0..keys.size - 4).any { m ->
+                (m + 4 <= run.first || m > run.last) && kotlin.math.abs(timed[m] - timed[k]) < REPEAT_WINDOW_MS && keys.subList(m, m + 4) == gram
+            }
+            if (elsewhere) for (d in k until k + 4) drop[d] = true
+        }
+        if (run.any { drop[it] }) continue
+        val count = run.last - run.first + 1
+        val from = timed[run.first]
+        val until = minOf(timed.getOrNull(run.last + 1) ?: (from + SPREAD_MS * count), from + SPREAD_MS * count)
+        val weights = run.map { keys[it].length.coerceAtLeast(1) }
+        var before = 0
+        for ((n, k) in run.withIndex()) {
+            starts[k] = from + ((until - from).toLong() * before / weights.sum()).toInt()
+            before += weights[n]
+        }
+    }
+    val kept = raw.indices.filterNot { drop[it] }
+    return kept.map { raw[it] } to IntArray(kept.size) { starts[kept[it]] }
+}
+
+private val phantoms = setOf(
+    "you", "thank you", "thank you very much", "thanks for watching", "thank you for watching", "the end", "bye",
+    "please subscribe", "subtitles by the amara org community", "obrigado", "obrigada", "obrigado por assistir", "gracias",
+    "gracias por ver", "merci", "danke", "vielen dank", "продолжение следует", "ご視聴ありがとうございました",
+)
+
+private fun dropPhantoms(raw: List<RawWord>, starts: IntArray): List<Int> {
+    val groups = ArrayList<MutableList<Int>>()
+    for (i in raw.indices) {
+        val last = groups.lastOrNull()
+        if (last != null && starts[i] - starts[last.last()] < PHANTOM_GAP_MS) last += i else groups += mutableListOf(i)
+    }
+    return groups.filterNot { group ->
+        group.joinToString("") { (if (it != group.first() && !raw[it].glued) " " else "") + wordKey(raw[it].text) }.replace(Regex("\\s+"), " ").trim() in phantoms
+    }.flatten()
+}
+
 internal fun alignWords(raw: List<RawWord>, edges: SpeechEdges): List<Word> {
     if (raw.isEmpty()) return emptyList()
-    val starts = IntArray(raw.size) { i -> raw[i].let { if (it.dtw >= 0) maxOf(0, it.dtw - DTW_LEAD_MS) else it.t0 } }
+    val first = IntArray(raw.size) { i -> raw[i].let { if (it.dtw >= 0) maxOf(0, it.dtw - DTW_LEAD_MS) else it.t0 } }
+    val (unique, timed) = dropRepeats(raw, first)
+    val keep = dropPhantoms(unique, timed)
+    if (keep.isEmpty()) return emptyList()
+    return timeWords(keep.map { unique[it] }, IntArray(keep.size) { timed[keep[it]] }, edges)
+}
+
+private fun timeWords(raw: List<RawWord>, starts: IntArray, edges: SpeechEdges): List<Word> {
     for (i in 1 until starts.size) starts[i] = maxOf(starts[i], starts[i - 1] + MIN_WORD_GAP_MS)
     for (onset in edges.onsets) {
         val quietFrom = edges.offsets.lastOrNull { it < onset } ?: Int.MIN_VALUE
@@ -335,11 +485,8 @@ internal fun alignWords(raw: List<RawWord>, edges: SpeechEdges): List<Word> {
         val start = starts[i]
         val next = starts.getOrNull(i + 1)
         val pause = edges.offsets.firstOrNull { it > start && (next == null || it <= next) }
-        val end = when {
-            pause != null -> pause
-            next != null -> next
-            else -> start + maxOf(LAST_WORD_MS, raw[i].t1 - raw[i].t0)
-        }
+        val spoken = start + (WORD_MS_PER_LETTER * wordKey(raw[i].text).length).coerceIn(SHORTEST_WORD_MS, LONGEST_WORD_MS)
+        val end = minOf(pause ?: Int.MAX_VALUE, next ?: Int.MAX_VALUE, if (raw[i].dtw >= 0 || next != null) spoken else maxOf(spoken, start + raw[i].t1 - raw[i].t0))
         Word(raw[i].text, start, maxOf(end, start + 1), raw[i].glued)
     }
 }
@@ -349,17 +496,24 @@ private const val MIN_WORD_GAP_MS = 40
 private const val SNAP_BEFORE_MS = 300
 private const val SNAP_AFTER_MS = 750
 private const val SNAP_CENTER_MS = 30
-private const val LAST_WORD_MS = 300
+private const val SQUEEZED_MS = 60
+private const val SQUEEZED_RUN = 3
+private const val SPREAD_MS = 450
+private const val REPEAT_WINDOW_MS = 30_000
+private const val PHANTOM_GAP_MS = 2_000
+private const val WORD_MS_PER_LETTER = 70
+private const val SHORTEST_WORD_MS = 250
+private const val LONGEST_WORD_MS = 900
 
 internal object Whisper {
     init { loadCaptionLibrary() }
-    private external fun nativeOpen(path: String): Long
+    private external fun nativeOpen(path: String, heads: Int): Long
     private external fun nativeCancel(handle: Long)
     private external fun nativeClose(handle: Long)
     private external fun nativeRun(handle: Long, pcm: FloatArray, english: Boolean, listener: IntConsumer): ByteArray?
 
-    suspend fun transcribe(model: File, pcm: FloatArray, english: Boolean, progress: (Int) -> Unit): List<Word> = withContext(Dispatchers.Default) {
-        val handle = nativeOpen(model.path)
+    suspend fun transcribe(model: File, heads: Int, pcm: FloatArray, english: Boolean, progress: (Int) -> Unit): List<Word> = withContext(Dispatchers.Default) {
+        val handle = nativeOpen(model.path, heads)
         check(handle != 0L) { AppText.get(R.string.ai_caption_model_load_failed) }
         try {
             val stop = launch(start = CoroutineStart.UNDISPATCHED) { try { awaitCancellation() } finally { nativeCancel(handle) } }
@@ -369,7 +523,7 @@ internal object Whisper {
                 val parts = line.split('\t', limit = 4)
                 val word = parts.getOrNull(3)?.trim().orEmpty()
                 if (word.isEmpty()) null else RawWord(word, parts[0].toInt(), parts[1].toInt(), parts[2].toLongOrNull()?.toInt() ?: -1)
-            }.toList()
+            }.filter { (if (it.dtw >= 0) it.dtw else it.t0) < pcm.size / (SPEECH_RATE / 1000) }.toList()
             alignWords(splitSpaceless(raw), speechEdges(pcm, SPEECH_RATE))
         } finally {
             nativeClose(handle)
@@ -381,20 +535,24 @@ internal object CaptionModel {
     const val NAME = app.absentmotion.platform.CAPTION_MODEL_NAME
 
     const val BYTES = app.absentmotion.platform.CAPTION_MODEL_BYTES
-    const val SHA256 = "422f1ae452ade6f30a004d7e5c6a43195e4433bc370bf23fac9cc591f01a8898"
+    const val SHA256 = "49c8fb02b65e6049d5fa6c04f81f53b867b5ec9540406812c643f177317f779f"
     private const val RELEASE = "https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1"
-    private const val PRECISE_NAME = "ggml-base-q8_0.bin"
-    private const val PRECISE_BYTES = 81_768_585L
-    private const val PRECISE_SHA256 = "c577b9a86e7e048a0b7eada054f4dd79a56bbfa911fbdacf900ac5b567cbb7d9"
+    private const val PRECISE_NAME = "ggml-large-v3-turbo-q8_0.bin"
+    private const val PRECISE_BYTES = 874_188_075L
+    private const val PRECISE_SHA256 = "317eb69c11673c9de1e1f0d459b253999804ec71ac4c23c17ecf5fbe24e259a1"
+    private val OLD_NAMES = listOf("ggml-base-q5_1.bin", "ggml-base-q8_0.bin")
 
     fun name(highPrecision: Boolean) = if (highPrecision) PRECISE_NAME else NAME
     fun bytes(highPrecision: Boolean) = if (highPrecision) PRECISE_BYTES else BYTES
+    fun heads(highPrecision: Boolean) = if (highPrecision) 2 else 1
     private fun hash(highPrecision: Boolean) = if (highPrecision) PRECISE_SHA256 else SHA256
 
     fun file(context: Context, highPrecision: Boolean = false) = File(context.filesDir, "models/${name(highPrecision)}")
+    private fun oldFiles(context: Context) = OLD_NAMES.map { File(context.filesDir, "models/$it") }
     fun installed(context: Context, highPrecision: Boolean = false) = file(context, highPrecision).length() == bytes(highPrecision)
-    fun storedBytes(context: Context) = file(context).length() + file(context, true).length()
-    fun remove(context: Context) { file(context).delete(); file(context, true).delete() }
+    fun storedBytes(context: Context) = file(context).length() + file(context, true).length() + oldFiles(context).sumOf { it.length() }
+    fun remove(context: Context) { file(context).delete(); file(context, true).delete(); removeOld(context) }
+    fun removeOld(context: Context) = oldFiles(context).forEach { it.delete() }
 
     fun verify(context: Context, highPrecision: Boolean = false) {
         val file = file(context, highPrecision)

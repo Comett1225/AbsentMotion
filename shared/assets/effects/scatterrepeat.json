@@ -86,7 +86,8 @@
    "id": "fillColor",
    "label": "Fill Color",
    "type": "color",
-   "default": "#ffffff"
+   "default": "#2d1ef6",
+   "legacyDefault": "#ffffff"
   },
   {
    "id": "fillAmount",

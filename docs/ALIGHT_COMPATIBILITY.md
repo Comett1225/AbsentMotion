@@ -8,11 +8,11 @@ Export the project from Alight Motion as XML and open it in AbsentMotion. After 
 
 ## In short
 
-- **156** Alight effects look the same and **14** are very close.
+- **155** Alight effects look the same and **15** are very close.
 - **99** are converted to a similar effect that does not look identical.
 - **8** are converted but have not been compared side by side yet.
 - Not converted yet: **1**.
-- **Blending modes:** all of Alight's blending modes come across. Multiply and Subtract get their opacity converted so they look the same.
+- **Blending modes:** all of Alight's blending modes come across. Multiply, Subtract, Screen, Lighten and Darken get their opacity converted so they look the same.
 
 Something imports wrong? [Send the project as an Import problem](https://github.com/Comett1225/AbsentMotion/issues/new?template=import_problem.yml): the XML and a screenshot of the same moment in Alight Motion. That is the fastest way to get it fixed.
 
@@ -34,6 +34,7 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | checker | Checker | Same look |
 | Chroma Key | Chroma Key | Same look |
 | chromakey-adv | Chroma Key | Same look |
+| chromaticzoomblur | Chromatic Zoom Blur | Same look |
 | Circular Ripple | Circular Ripple | Same look |
 | circularripple | Circular Ripple | Same look |
 | Color Temperature | Color Temperature | Same look |
@@ -60,6 +61,7 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Exposure / Gamma | Exposure | Same look |
 | Fade In/Out | Fade In/Out | Same look |
 | Feather | Feather | Same look |
+| findedges | Edge Detect | Same look |
 | findedges-edgeglow | Edge Detect | Same look |
 | Flip Layer | Flip Layer | Same look |
 | flip2 | Flip Layer | Same look |
@@ -72,7 +74,6 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | gradientoverlay | Gradient Overlay | Same look |
 | Grid | Grid | Same look |
 | grid | Grid | Same look |
-| Grid Repeat | Grid Repeat | Same look |
 | Highlights and Shadows | Highlights & Shadows | Same look |
 | Hot Color | Split Tone | Same look |
 | Hue Shift | Hue & Saturation | Same look |
@@ -81,8 +82,9 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Inner Pinch/Bulge | Inner Pinch/Bulge | Same look |
 | internal.smoothbevel | Smooth Bevel | Same look |
 | invert | Invert | Same look |
+| lensblur | Lens Blur | Same look |
+| lensblur2 | Lens Blur | Same look |
 | Light Glow | Light Glow | Same look |
-| Linear Repeat | Linear Repeat | Same look |
 | Long Shadow | Long Shadow | Same look |
 | longshadow | Long Shadow | Same look |
 | Luma Key | Luma Key | Same look |
@@ -98,6 +100,7 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | motionblur | Motion Blur | Same look |
 | motionblur2 | Motion Blur | Same look |
 | motionblur3 | Motion Blur | Same look |
+| Move Along Path | Move Along Path | Same look |
 | movealongpath | Move Along Path | Same look |
 | movealongpath2 | Move Along Path | Same look |
 | Offset | Offset | Same look |
@@ -110,9 +113,7 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Parenting Helper | Parenting Helper | Same look |
 | Pinch/Bulge | Pinch/Bulge | Same look |
 | pinchbulge | Pinch/Bulge | Same look |
-| Pixelate | Pixelate | Same look |
 | pixelate | Pixelate | Same look |
-| polar | Polar Coordinates | Same look |
 | Polar Displacement Map | Polar Displacement Map | Same look |
 | Posterize | Posterize | Same look |
 | Precise/Fast Box Blur | Blur | Same look |
@@ -120,7 +121,6 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Pulse Opacity | Pulse Opacity | Same look |
 | Pulse Size | Pulse Size | Same look |
 | pulseopacity | Pulse Opacity | Same look |
-| Radial Repeat | Radial Repeat | Same look |
 | Radial Wipe | Radial Wipe | Same look |
 | radialshadow | Radial Shadow | Same look |
 | Random Displacement | Random Displacement | Same look |
@@ -156,7 +156,6 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Stripes | Stripes | Same look |
 | Swing | Swing | Same look |
 | swing | Swing | Same look |
-| Swirl | Swirl | Same look |
 | swirl | Swirl | Same look |
 | swirl2 | Swirl | Same look |
 | swirl3 | Swirl | Same look |
@@ -164,10 +163,10 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Text Transform | Text Transform | Same look |
 | Threshold | Threshold | Same look |
 | Tiles | Tiles | Same look |
+| Time Quantization | Frame Rate | Same look |
 | Timecode | Timecode | Same look |
 | turbulence | Turbulence | Same look |
 | Turbulent Displace | Turbulent Displace | Same look |
-| Unsharp Mask | Unsharp Mask | Same look |
 | Vignette | Vignette | Same look |
 | Wave Warp | Wave Warp | Same look |
 | wavewarp | Wave Warp | Same look |
@@ -179,17 +178,18 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Cube | Cube | Very close |
 | drawing.stroketaper | Stroke Taper | Very close |
 | Fill Behind | Fill Behind | Very close |
-| findedges | Edge Detect | Very close |
 | flip | Flip Layer | Very close |
 | Halftone Dots | Halftone | Very close |
 | Hollow Box | Hollow Box | Very close |
-| lensblur | Lens Blur | Very close |
-| lensblur2 | Lens Blur | Very close |
+| Linear Repeat | Linear Repeat | Very close |
+| Pixelate | Pixelate | Very close |
+| Repeat Along Path | Repeat Along Path | Very close |
 | Simple Starfield | Simple Starfield | Very close |
 | Starfield | Starfield | Very close |
 | starfield2 | Starfield | Very close |
 | Three-axis Cross | Three-axis Cross | Very close |
 | Turbulence | Turbulence | Very close |
+| Unsharp Mask | Unsharp Mask | Very close |
 | 360-reorient-sphere | 360° Reorient Sphere | Similar, not identical |
 | Auto-Shake | Auto-Shake | Similar, not identical |
 | Block Dissolve | Block Dissolve | Similar, not identical |
@@ -201,7 +201,6 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | cartoon | Cartoon | Similar, not identical |
 | checkerdissolve | Block Dissolve | Similar, not identical |
 | chromaticvortexblur | Vortex Blur | Similar, not identical |
-| chromaticzoomblur | Chromatic Zoom Blur | Similar, not identical |
 | Clouds | Clouds | Similar, not identical |
 | clouds | Clouds | Similar, not identical |
 | clouds2 | Clouds | Similar, not identical |
@@ -226,6 +225,7 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | glass | Glass | Similar, not identical |
 | glass2 | Glass | Similar, not identical |
 | glowscan | Glow Scan | Similar, not identical |
+| Grid Repeat | Grid Repeat | Similar, not identical |
 | grunge | Grunge | Similar, not identical |
 | Halftone Lines | Halftone Lines | Similar, not identical |
 | Heart | Heart | Similar, not identical |
@@ -242,7 +242,6 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Lightning | Lightning | Similar, not identical |
 | Linear Streaks | Linear Streaks | Similar, not identical |
 | Mosaic | Mosaic | Similar, not identical |
-| Move Along Path | Move Along Path | Similar, not identical |
 | Noise | Noise | Similar, not identical |
 | noise | Noise | Similar, not identical |
 | noise2 | Noise | Similar, not identical |
@@ -252,12 +251,13 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | outline | Outline | Similar, not identical |
 | Page Curl | Page Curl | Similar, not identical |
 | perlindisplace | Auto-Shake | Similar, not identical |
+| polar | Polar Coordinates | Similar, not identical |
 | Pyramid | Pyramid | Similar, not identical |
 | Radial Rays | Radial Rays | Similar, not identical |
+| Radial Repeat | Radial Repeat | Similar, not identical |
 | Radial Shadow | Radial Shadow | Similar, not identical |
 | Random Jitter | Random Jitter | Similar, not identical |
 | Raster Extrude | Raster Extrude | Similar, not identical |
-| Repeat Along Path | Repeat Along Path | Similar, not identical |
 | Ribbon | Ribbon | Similar, not identical |
 | Ring | Torus | Similar, not identical |
 | Scatter Field | Scatter Field | Similar, not identical |
@@ -271,12 +271,12 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Star Prism | Star Prism | Similar, not identical |
 | starfield | Starfield | Similar, not identical |
 | streakstrips | Pixelate | Similar, not identical |
+| Swirl | Swirl | Similar, not identical |
 | Text Randomizer | Text Randomizer | Similar, not identical |
 | Tile Rotate | Tile Rotate | Similar, not identical |
 | Tile Shift | Tile Shift | Similar, not identical |
 | tilerotate | Tile Rotate | Similar, not identical |
 | tileshift | Tile Shift | Similar, not identical |
-| Time Quantization | Frame Rate | Similar, not identical |
 | Torus | Torus | Similar, not identical |
 | triprism | Star Prism | Similar, not identical |
 | triprism2 | Star Prism | Similar, not identical |

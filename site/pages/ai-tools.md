@@ -23,7 +23,7 @@ Auto captions turns speech into text layers that appear in time with the voice.
 | **Source** | **Whole project**, or one audio or video layer from the list, shown by name |
 | **Language** | **Auto** (the speech decides the language) or **English** |
 | **Words per caption** | A slider from 1 to 10 (default 4) |
-| **Speech model** | **Standard** (about 60 MB, the default) or **Higher precision** (about 82 MB) |
+| **Speech model** | **Standard** (about 264 MB, the default) or **Higher precision** (about 874 MB) |
 | **Appearance** | Folded at first. Tap it to show the five rows below |
 | **Font** | Opens the font browser |
 | **Size** | 50 to 200 % (default 100 %) |
@@ -33,13 +33,17 @@ Auto captions turns speech into text layers that appear in time with the voice.
 
 The sample caption in the middle of the sheet shows the look you choose, including its position.
 
-The first time, the app asks before downloading a speech model. **Standard** is about 60 MB. The optional **Higher precision** model is about 82 MB. Both support multiple languages and stay below 100 MB. Downloads come from the Whisper model repository on Hugging Face and are checked before use. Recognition then runs offline on your device. **Settings > Remove caption model** removes downloaded caption models.
+The first time, the app asks before downloading a speech model. **Standard** (Whisper small) is about 264 MB. The optional **Higher precision** model (Whisper large-v3 turbo) is about 874 MB; it is the most accurate and takes longer. Both support multiple languages. Downloads come from the Whisper model repository on Hugging Face and are checked before use. Recognition then runs offline on your device. **Settings > Remove caption model** removes downloaded caption models, older ones included.
 
 While captions are generated, the setup controls disappear. The centre shows the current stage, progress and estimated time remaining; **Cancel** is the only action. The estimate appears after enough work has completed and may change. Long recordings are processed in ten-minute parts.
 
-The result is one text layer per caption, in time with the speech and selected together so that you can restyle them. Each caption starts on time, when its first word is spoken. A caption ends at a long pause, sentence end, three seconds or the word limit. For a clip, caption timing follows its position in the project.
+The result is one text layer per caption, in time with the speech and selected together so that you can restyle them. Each caption starts on time, when its first word is spoken, and ends shortly after its last word. Captions break at sentence ends, commas and pauses; a longer phrase is split into even parts that stay within the word limit and three seconds. Lines the model makes up over music, such as a lone "Thank you.", and lines it repeats by mistake are left out. For a clip, caption timing follows its position in the project.
 
 If there is no sound the app says "There is no sound to caption", and if no speech is found, "No speech was found".
+
+### Import SRT
+
+If you already have subtitles, tap **Import SRT** next to **Generate** and pick a `.srt` file. Each subtitle becomes a caption layer with the look chosen under **Appearance**, made the same way as Auto captions; no model is downloaded. Formatting such as italics, bold and colours is dropped, and a subtitle with two lines stays on two lines. Subtitles that overlap show together while they overlap. The times are project times; with a clip as the **Source** (or when you open the sheet from a clip), they are times in that clip's video or sound, so they follow its trims and speed. Subtitles after the end of the project, or of the clip, are left out, and one that runs past the end is cut there. A file without subtitles says "No captions found in the file".
 
 ## Remove Background
 
@@ -126,7 +130,7 @@ Each level has its own model, downloaded once (about 11 MB) after the app has sh
 
 | Item | When | Size | From |
 |---|---|---|---|
-| Speech model for captions | After you confirm the download | about 60 MB Standard, or 82 MB Higher precision | Hugging Face |
+| Speech model for captions | After you confirm the download | about 264 MB Standard, or 874 MB Higher precision | Hugging Face |
 | Background removal model | The first time you remove a background | about 3 MB | this project's GitHub releases |
 | Noise reduction | Never: it is inside the app | | |
 | AI Enhance models | The first time you use Enhance, after you tap Download and start | about 2.4 MB (cartoon 1.3 MB, film grain 2.4 MB more) | this project's GitHub releases |

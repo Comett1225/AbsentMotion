@@ -7,7 +7,7 @@
  "params": [
   {
    "id": "center",
-   "label": "Center",
+   "label": "Position",
    "type": "point",
    "default": [
     0.5,

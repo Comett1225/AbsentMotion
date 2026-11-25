@@ -26,6 +26,14 @@ class ThemeTest {
         }
     }
 
+    @Test fun lightGreenIsBuiltInWithANavyEditorAndAMintAccent() {
+        val green = Palette.BuiltIn.single { it.first == "LightGreen" }.second
+        assertEquals(Color(0xFF00FFA8), green.Accent)
+        assertEquals(Color(0xFF191B27), green.TimelineBg)
+        assertEquals(Color(0xFFF6F6F6), green.HomeBg)
+        assertTrue(green.TopBar.luminance() < 0.05f && green.HomeBg.luminance() > 0.9f)
+    }
+
     @Test fun validFileSetsEveryColourItNames() {
         val all = Palette.Names.joinToString(",") { "\"$it\":\"#102030\"" }
         val theme = ThemeFile.parse("""{"name":"  Slate  ",$all}""")
@@ -89,7 +97,7 @@ class ThemeTest {
     }
 
     @Test fun builtInPalettesAreListedAndDiffer() {
-        assertEquals(listOf("AbsentMotion", "Dark", "Daylight"), Palette.BuiltIn.map { it.first })
+        assertEquals(listOf("AbsentMotion", "Dark", "Daylight", "LightGreen"), Palette.BuiltIn.map { it.first })
         assertTrue(Palette.Dark.HomeBg.luminance() < 0.5f)
         assertNotEquals(Palette.AbsentMotion, Palette.Daylight)
         assertTrue(Palette.Daylight.TopBar.luminance() > 0.5f)

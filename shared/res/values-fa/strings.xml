@@ -198,6 +198,10 @@
     <string name="bundle_pick_folder">پوشه‌ای برای ذخیره انتخاب کنید</string>
     <string name="bundle_for_now">فعلاً: %1$s</string>
     <string name="bundle_folder_lost">دسترسی به این پوشه ممکن نیست. برای انتخاب دوباره روی آن بزنید؛ تا آن زمان بسته‌ها در %1$s ذخیره می‌شوند.</string>
+    <string name="settings_video_folder">پوشه ویدیوها و GIFها</string>
+    <string name="settings_sound_folder">پوشه صداها</string>
+    <string name="settings_folder_default">استفاده از پوشه پیش‌فرض</string>
+    <string name="export_folder_lost">دسترسی به این پوشه ممکن نیست. برای انتخاب دوباره روی آن بزنید؛ تا آن زمان خروجی‌ها در %1$s ذخیره می‌شوند.</string>
     <string name="settings_about">درباره</string>
     <string name="settings_report_issue">گزارش مشکل</string>
     <string name="settings_suggest_feature">پیشنهاد یک قابلیت</string>
@@ -358,6 +362,7 @@
     <string name="theme_light">روشن</string>
     <string name="theme_dark">تیره</string>
     <string name="theme_daylight">روشنایی روز</string>
+    <string name="theme_light_green">سبز روشن</string>
     <string name="theme_custom">سفارشی</string>
     <string name="theme_custom_named">سفارشی (%1$s)</string>
     <string name="theme_error_bad_colour">رنگ نامعتبر برای %1$s</string>
@@ -806,6 +811,7 @@
     <string name="export_quality">کیفیت</string>
     <string name="export_quality_low">کم</string>
     <string name="export_quality_high">زیاد</string>
+    <string name="export_same_as_source">مثل منبع</string>
     <string name="export_format">فرمت</string>
     <string name="export_transparent_becomes">نواحی شفاف به این تبدیل می‌شوند</string>
     <string name="export_white">سفید</string>
@@ -1048,6 +1054,8 @@
     <string name="caption_position_bottom">پایین</string>
     <string name="caption_words_per_caption">کلمات هر زیرنویس</string>
     <string name="caption_generate">تولید</string>
+    <string name="caption_import_srt">وارد کردن SRT</string>
+    <string name="caption_srt_empty">هیچ زیرنویسی در فایل پیدا نشد</string>
     <string name="caption_not_now">الان نه</string>
     <string name="caption_download">دانلود</string>
     <string name="draw_back">بازگشت</string>
@@ -2197,8 +2205,8 @@
     <string name="caption_remaining">حدود %1$s باقی مانده</string>
     <string name="caption_progress">%1$s%%</string>
     <string name="caption_model">مدل گفتار</string>
-    <string name="caption_model_standard">استاندارد · 60 MB</string>
-    <string name="caption_model_precision">دقت بالاتر · 82 MB</string>
+    <string name="caption_model_standard">استاندارد · 264 MB</string>
+    <string name="caption_model_precision">دقت بالاتر · 874 MB</string>
     <string name="model_err_no_triangles">مدل هیچ مثلثی ندارد</string>
     <string name="model_err_too_complex">مدل بیش از حد پیچیده است</string>
     <string name="model_err_missing_vertex">یک وجه از رأسی استفاده می‌کند که وجود ندارد</string>
@@ -2258,6 +2266,7 @@
     <string name="effect_section_palette">پالت سفارشی</string>
     <string name="effect_section_back">پشت لایه</string>
     <string name="effect_section_colorblend">رنگ و ترکیب</string>
+    <string name="effect_section_randomization">تصادفی‌سازی</string>
     <string name="palettes">پالت‌ها</string>
     <string name="palette_untitled">بدون عنوان</string>
     <string name="palette_new">جدید</string>
@@ -2511,6 +2520,7 @@
     <string name="tools_failed">تمام نشد: %1$s</string>
     <string name="tools_save">ذخیره</string>
     <string name="tools_add_to_project">افزودن به پروژه</string>
+    <string name="tools_add_more">افزودن ابزارهای بیشتر</string>
     <string name="tools_part">بخشی که نگه داشته می‌شود</string>
     <string name="tools_start">شروع</string>
     <string name="tools_end">پایان</string>
@@ -2542,6 +2552,15 @@
     <string name="tools_finding_cuts">در حال پیدا کردن نقاط برش…</string>
     <string name="tools_trim_few_cuts">این ویدیو تقریباً نقطهٔ برشی ندارد، برای همین «سریع» فقط از ابتدا می‌تواند شروع کند. برای شروع از هر جا، «دقیق» را انتخاب کنید.</string>
     <string name="tools_trim_no_fast">برش سریع اینجا ممکن نیست، برای همین دقیق برش داده می‌شود.</string>
+    <string name="tools_merge">ادغام</string>
+    <string name="tools_merge_about">ویدیوها را به هم می‌چسباند.</string>
+    <string name="tools_merge_add">افزودن ویدیوها</string>
+    <string name="tools_merge_start">ادغام</string>
+    <string name="tools_merging">در حال ادغام… %1$d%%</string>
+    <string name="tools_merge_need_two">دست‌کم دو ویدیو اضافه کنید.</string>
+    <string name="tools_merge_no_fast">این ویدیوها با هم تفاوت دارند، پس دوباره انکود می‌شوند.</string>
+    <string name="tools_merge_up">انتقال به بالا</string>
+    <string name="tools_merge_down">انتقال به پایین</string>
     <string name="shape_param_round_corners">گرد کردن گوشه‌ها</string>
     <string name="shape_param_notch">بریدگی</string>
     <string name="shape_param_point">نوک</string>
@@ -2699,6 +2718,13 @@
     <string name="tools_enhance_image_about">با AI جزئیات یک عکس یا نقاشی را بیشتر کنید.</string>
     <string name="tools_enhance_pick">انتخاب یک عکس</string>
     <string name="tools_enhance_running">در حال بهبود تصویر: %1$d%%</string>
+    <string name="tools_convert_image">تبدیل تصویر</string>
+    <string name="tools_convert_image_about">یک تصویر یا انیمیشن را به PNG، JPG، WebP یا GIF تبدیل می‌کند.</string>
+    <string name="tools_convert_pick">یک تصویر انتخاب کنید</string>
+    <string name="tools_convert_to">تبدیل به</string>
+    <string name="tools_convert_start">تبدیل</string>
+    <string name="tools_converting">در حال تبدیل… %1$d%%</string>
+    <string name="tools_convert_too_large">انیمیشن‌ها تا 2048 × 2048 پیکسل و 3000 فریم قابل تبدیل هستند.</string>
     <string name="ai_model_detail_max">مدل بهبود AI واقع‌گرایانه با کیفیت حداکثر</string>
     <string name="ai_model_cartoon_max">مدل بهبود AI انیمه و کارتون با کیفیت حداکثر</string>
     <string name="ai_enhance_image_upscale2_hint">دو برابر عرض و ارتفاع</string>

@@ -99,6 +99,7 @@ open class MediaExtractor {
             if (s.type == "video") {
                 setInteger(MediaFormat.KEY_WIDTH, s.width)
                 setInteger(MediaFormat.KEY_HEIGHT, s.height)
+                if (s.profile.isNotEmpty()) setString("am-profile", s.profile)
                 if (s.fps > 0) { if (s.fps == Math.rint(s.fps)) setInteger(MediaFormat.KEY_FRAME_RATE, s.fps.toInt()) else setFloat(MediaFormat.KEY_FRAME_RATE, s.fps.toFloat()) }
                 if (s.rotation != 0) setInteger(MediaFormat.KEY_ROTATION, s.rotation)
                 when (s.transfer) {

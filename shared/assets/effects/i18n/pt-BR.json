@@ -120,7 +120,7 @@
      "label": "Máscara para a camada"
     },
     "mix": {
-     "label": "Mistura"
+     "label": "Preenchimento"
     },
     "spill": {
      "label": "Efeitos se estendem para fora"
@@ -743,49 +743,49 @@
     "a": {
      "label": "A",
      "options": [
-      "Vermelho",
-      "Verde",
-      "Azul",
-      "Alfa",
-      "Luminância",
-      "Zero",
-      "Completo"
+      "R",
+      "G",
+      "B",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     },
     "b": {
      "label": "B",
      "options": [
-      "Vermelho",
-      "Verde",
-      "Azul",
-      "Alfa",
-      "Luminância",
-      "Zero",
-      "Completo"
+      "R",
+      "G",
+      "B",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     },
     "g": {
      "label": "G",
      "options": [
-      "Vermelho",
-      "Verde",
-      "Azul",
-      "Alfa",
-      "Luminância",
-      "Zero",
-      "Completo"
+      "R",
+      "G",
+      "B",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     },
     "r": {
      "label": "R",
      "options": [
-      "Vermelho",
-      "Verde",
-      "Azul",
-      "Alfa",
-      "Luminância",
-      "Zero",
-      "Cheio"
+      "R",
+      "G",
+      "B",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     }
    }
@@ -797,49 +797,49 @@
     "a": {
      "label": "A",
      "options": [
-      "Matiz",
-      "Saturação",
-      "Valor",
-      "Alfa",
-      "Luminância",
-      "Zero",
-      "Completo"
+      "H",
+      "S",
+      "V",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     },
     "h": {
      "label": "H",
      "options": [
-      "Matiz",
-      "Saturação",
-      "Valor",
-      "Alfa",
-      "Luminância",
-      "Zero",
-      "Completo"
+      "H",
+      "S",
+      "V",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     },
     "s": {
      "label": "S",
      "options": [
-      "Matiz",
-      "Saturação",
-      "Valor",
-      "Alfa",
-      "Luminância",
-      "Zero",
-      "Completo"
+      "H",
+      "S",
+      "V",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     },
     "v": {
      "label": "V",
      "options": [
-      "Matiz",
-      "Saturação",
-      "Valor",
-      "Alfa",
-      "Luminância",
-      "Zero",
-      "Completo"
+      "H",
+      "S",
+      "V",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     }
    }
@@ -854,7 +854,7 @@
     "color": {
      "label": "Cor"
     },
-    "count": {
+    "cells": {
      "label": "Quantidade"
     },
     "offset": {
@@ -918,6 +918,13 @@
       "Linear",
       "Raios"
      ]
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Clássico",
+      "Padrão"
+     ]
     }
    }
   },
@@ -948,6 +955,13 @@
      "options": [
       "Camada",
       "Tela"
+     ]
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Clássico",
+      "Padrão"
      ]
     }
    }
@@ -1905,10 +1919,10 @@
     "phase": {
      "label": "Fase"
     },
-    "radius": {
+    "dotRadius": {
      "label": "Raio"
     },
-    "scale": {
+    "zoom": {
      "label": "Escala"
     },
     "seed": {
@@ -1928,6 +1942,13 @@
     },
     "start": {
      "label": "Início"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Clássico",
+      "Padrão"
+     ]
     }
    }
   },
@@ -1980,11 +2001,11 @@
     "alpha": {
      "label": "Alfa"
     },
-    "composite": {
+    "mode": {
      "label": "Composição",
      "options": [
-      "Atrás",
-      "Sobre"
+      "Sobre",
+      "Atrás"
      ]
     },
     "count": {
@@ -2369,7 +2390,7 @@
    "description": "Suaviza as bordas alfa da camada, esmaecendo-as a partir do contorno. Mais Iterações deixam o esmaecimento mais suave e profundo. Estilo Clássico: Para dentro aplica o esmaecimento dentro do contorno existente; Desfoque alfa também espalha a borda suavizada para fora.",
    "name": "Suavizar bordas",
    "params": {
-    "blur": {
+    "strength": {
      "label": "Intensidade"
     },
     "mode": {
@@ -2994,6 +3015,9 @@
       "Gradiente",
       "Espectro"
      ]
+    },
+    "squeeze": {
+     "label": "Compressão"
     }
    }
   },
@@ -4061,6 +4085,13 @@
     },
     "sweep": {
      "label": "Ângulo"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Clássico",
+      "Padrão"
+     ]
     }
    }
   },
@@ -4685,7 +4716,7 @@
    "description": "Desloca a imagem da camada, repetindo-a nas bordas da caixa da camada.",
    "name": "Deslocamento",
    "params": {
-    "feather": {
+    "seamFeather": {
      "label": "Esfumar"
     },
     "mask": {
@@ -4693,6 +4724,13 @@
     },
     "offset": {
      "label": "Deslocamento"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Clássico",
+      "Padrão"
+     ]
     }
    }
   },
@@ -4777,12 +4815,12 @@
      "label": "Ambiente"
     },
     "amount": {
-     "label": "Rugosidade"
+     "label": "Quantidade"
     },
     "blend": {
      "label": "Mesclagem"
     },
-    "blur": {
+    "bevel": {
      "label": "Chanfro"
     },
     "color": {
@@ -4804,7 +4842,7 @@
      "label": "Intensidade"
     },
     "light": {
-     "label": "Cor da luz"
+     "label": "Cor"
     },
     "refraction": {
      "label": "Refração"
@@ -4813,7 +4851,7 @@
      "label": "Amostras de suavização"
     },
     "scale": {
-     "label": "Escala da rugosidade"
+     "label": "Escala"
     },
     "seed": {
      "label": "Semente"
@@ -4919,6 +4957,13 @@
      "label": "Brilho"
     },
     "style": {
+     "label": "Estilo",
+     "options": [
+      "Clássico",
+      "Padrão"
+     ]
+    },
+    "roll": {
      "label": "Estilo",
      "options": [
       "Clássico",
@@ -5411,26 +5456,26 @@
     "angle": {
      "label": "Ângulo"
     },
-    "angleChannel": {
-     "label": "Ângulo de",
+    "phi": {
+     "label": "φ",
      "options": [
+      "Lum",
       "R",
       "G",
       "B",
-      "Luminância",
       "Alfa"
      ]
     },
     "center": {
      "label": "Centro"
     },
-    "distanceChannel": {
-     "label": "Distância de",
+    "rho": {
+     "label": "ρ",
      "options": [
+      "Lum",
       "R",
       "G",
       "B",
-      "Luminância",
       "Alfa"
      ]
     },
@@ -5697,7 +5742,7 @@
      "label": "Ângulo"
     },
     "center": {
-     "label": "Centro"
+     "label": "Posição"
     },
     "color": {
      "label": "Cor"
@@ -5815,7 +5860,7 @@
      "label": "Luz"
     },
     "reach": {
-     "label": "Comprimento"
+     "label": "Tamanho"
     },
     "fill": {
      "label": "Preenchimento"
@@ -5842,8 +5887,8 @@
     "direction": {
      "label": "Direção",
      "options": [
-      "Sentido horário",
-      "Sentido anti-horário",
+      "CW",
+      "CCW",
       "Ambos"
      ]
     },
@@ -6202,7 +6247,7 @@
     "choke": {
      "label": "Contração"
     },
-    "feather": {
+    "softness": {
      "label": "Desvanecimento"
     },
     "lockLuminance": {
@@ -6214,7 +6259,7 @@
     "target": {
      "label": "Nova cor"
     },
-    "threshold": {
+    "tolerance": {
      "label": "Limite"
     },
     "match": {
@@ -6287,14 +6332,14 @@
       "B"
      ]
     },
-    "mode": {
+    "split": {
      "label": "Modo",
      "options": [
       "Claro",
       "Escuro",
       "Máscara",
       "Luma",
-      "Média"
+      "Alfa de luma"
      ]
     },
     "strength": {
@@ -6313,19 +6358,19 @@
    "description": "Desenha uma fita ondulada de largura variável sobre as partes opacas da camada; anime a fase para fazê-la fluir ou recorte-a da camada.",
    "name": "Fita",
    "params": {
-    "angle": {
+    "tilt": {
      "label": "Ângulo"
     },
     "color": {
      "label": "Cor"
     },
-    "frequency": {
+    "waves": {
      "label": "Frequência"
     },
-    "magnitude": {
+    "amplitude": {
      "label": "Magnitude"
     },
-    "offset": {
+    "shift": {
      "label": "Deslocamento"
     },
     "phase": {
@@ -6334,14 +6379,14 @@
     "punch": {
      "label": "Recortar"
     },
-    "smoothing": {
+    "soften": {
      "label": "Suavização"
     },
     "tint": {
      "label": "Tonalidade"
     },
     "tintAmount": {
-     "label": "Intensidade da tonalidade"
+     "label": "Cor do tingimento"
     },
     "width": {
      "label": "Largura"
@@ -6379,11 +6424,11 @@
     "octaves": {
      "label": "Oitavas"
     },
-    "roughness": {
-     "label": "Aspereza"
+    "strength": {
+     "label": "Intensidade"
     },
-    "scale": {
-     "label": "Escala"
+    "detail": {
+     "label": "Detalhe"
     },
     "seed": {
      "label": "Semente"
@@ -6672,7 +6717,7 @@
    "description": "Aplica uma máscara de nitidez usando uma vizinhança 3x3 para realçar detalhes finos.",
    "name": "Nitidez",
    "params": {
-    "amount": {
+    "sharpness": {
      "label": "Intensidade"
     },
     "radius": {
@@ -6767,7 +6812,7 @@
      "label": "Ângulo especular"
     },
     "blur": {
-     "label": "Tamanho"
+     "label": "Raio"
     },
     "color_d": {
      "label": "Cor difusa"
@@ -6830,8 +6875,8 @@
     "blend": {
      "label": "Mesclagem"
     },
-    "blur": {
-     "label": "Tamanho"
+    "diffusion": {
+     "label": "Difusão"
     },
     "brightness": {
      "label": "Brilho"
@@ -6846,7 +6891,7 @@
      "label": "Realces"
     },
     "opacity": {
-     "label": "Opacidade"
+     "label": "Alfa"
     },
     "outside": {
      "label": "Brilho externo"
@@ -7166,7 +7211,7 @@
     "feather": {
      "label": "Suavização"
     },
-    "saturation": {
+    "sat": {
      "label": "Saturação"
     },
     "threshold": {
@@ -7480,10 +7525,10 @@
    "description": "Corta a camada ao longo de uma linha e separa as duas metades, esticando os pixels da linha para dentro da abertura.",
    "name": "Esticar segmento",
    "params": {
-    "angle": {
+    "cutAngle": {
      "label": "Ângulo"
     },
-    "offset": {
+    "shift": {
      "label": "Deslocamento"
     },
     "relative": {
@@ -7492,7 +7537,7 @@
     "spread": {
      "label": "Expansão"
     },
-    "stretch": {
+    "span": {
      "label": "Esticamento"
     }
    }
@@ -7798,7 +7843,7 @@
      "label": "Personalizado"
     },
     "charset": {
-     "label": "Caracteres",
+     "label": "Conjunto de caracteres",
      "options": [
       "Letras",
       "Maiúsculas",
@@ -7825,7 +7870,7 @@
      "label": "Evolução"
     },
     "keepSpaces": {
-     "label": "Manter espaços"
+     "label": "Preservar espaço"
     },
     "progress": {
      "label": "Revelar"
@@ -7911,14 +7956,14 @@
    }
   },
   "texttransform": {
-   "description": "Move, escala, gira, desvanece e tinge letras, palavras ou linhas dentro de um intervalo. A âncora define se a escala e a rotação usam cada componente ou o centro da camada. Mova o intervalo com o deslocamento para fazer a mudança percorrer o texto.",
+   "description": "Move, escala, gira, desvanece e tinge letras, palavras ou linhas dentro de um intervalo. A âncora define se a escala e a rotação usam cada componente ou o centro da camada. Mova o intervalo com a fase para fazer a mudança percorrer o texto.",
    "name": "Transformação de texto",
    "params": {
-    "anchor": {
+    "anchorTo": {
      "label": "Âncora",
      "options": [
-      "Componente",
-      "Camada"
+      "Camada",
+      "Componente"
      ]
     },
     "easeIn": {
@@ -7931,38 +7976,38 @@
      "label": "Fim"
     },
     "offset": {
-     "label": "Deslocamento"
+     "label": "Fase"
     },
-    "opacity": {
+    "alpha": {
      "label": "Opacidade"
     },
     "overlap": {
      "label": "Sobreposição"
     },
     "position": {
-     "label": "Posição"
+     "label": "Deslocamento"
     },
     "randomOrder": {
      "label": "Ordem aleatória"
     },
     "rotation": {
-     "label": "Rotação"
+     "label": "Ângulo"
     },
-    "scale": {
+    "scaleBy": {
      "label": "Escala"
     },
     "seed": {
      "label": "Semente"
     },
-    "shape": {
+    "curve": {
      "label": "Forma",
      "options": [
       "Quadrado",
+      "Suave",
+      "Triângulo",
       "Rampa crescente",
       "Rampa decrescente",
-      "Triângulo",
-      "Arredondado",
-      "Suave"
+      "Arredondado"
      ]
     },
     "smoothness": {
@@ -7978,7 +8023,7 @@
      "label": "Tingir"
     },
     "unit": {
-     "label": "Com base em",
+     "label": "Componente",
      "options": [
       "Caractere",
       "Palavra",
@@ -7990,6 +8035,13 @@
      "label": "Intervalo",
      "options": [
       "Antigo",
+      "Padrão"
+     ]
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Clássico",
       "Padrão"
      ]
     }
@@ -8026,7 +8078,7 @@
     "level": {
      "label": "Limite"
     },
-    "softness": {
+    "feather": {
      "label": "Suavidade"
     }
    }
@@ -8080,6 +8132,13 @@
     },
     "stretch": {
      "label": "Esticar"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Clássico",
+      "Padrão"
+     ]
     }
    }
   },
@@ -8143,6 +8202,13 @@
     },
     "stretch": {
      "label": "Esticar"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Clássico",
+      "Padrão"
+     ]
     }
    }
   },
@@ -8182,7 +8248,14 @@
    "name": "Taxa de quadros",
    "params": {
     "fps": {
-     "label": "Quadros/s"
+     "label": "Passos/s"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Clássico",
+      "Padrão"
+     ]
     }
    }
   },
@@ -8487,7 +8560,7 @@
     "amount": {
      "label": "Quantidade"
     },
-    "radius": {
+    "blurRadius": {
      "label": "Intensidade"
     },
     "showMask": {
@@ -8666,7 +8739,7 @@
     "phase": {
      "label": "Fase"
     },
-    "scale": {
+    "cellScale": {
      "label": "Escala"
     },
     "seed": {
@@ -8769,7 +8842,7 @@
     "speed": {
      "label": "Velocidade"
     },
-    "warpAngle": {
+    "warp": {
      "label": "Ângulo de distorção"
     },
     "screenSpace": {
@@ -8803,6 +8876,13 @@
       "Clássico",
       "Padrão"
      ]
+    },
+    "axes": {
+     "label": "Estilo",
+     "options": [
+      "Clássico",
+      "Padrão"
+     ]
     }
    }
   },
@@ -8817,10 +8897,10 @@
      "label": "Fim"
     },
     "feather": {
-     "label": "Suavização"
+     "label": "Suavidade"
     },
     "softness": {
-     "label": "Suavidade"
+     "label": "Suavização"
     },
     "start": {
      "label": "Início"
@@ -8883,7 +8963,7 @@
       "Desativado"
      ]
     },
-    "strength": {
+    "zoom": {
      "label": "Intensidade"
     }
    }

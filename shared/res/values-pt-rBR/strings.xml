@@ -198,6 +198,10 @@
     <string name="bundle_pick_folder">Escolha uma pasta para salvar</string>
     <string name="bundle_for_now">Por enquanto: %1$s</string>
     <string name="bundle_folder_lost">Não é possível acessar esta pasta. Toque para escolhê-la novamente; até lá, os pacotes serão salvos em %1$s.</string>
+    <string name="settings_video_folder">Pasta de vídeos e GIFs</string>
+    <string name="settings_sound_folder">Pasta de sons</string>
+    <string name="settings_folder_default">Usar a pasta padrão</string>
+    <string name="export_folder_lost">Não é possível acessar esta pasta. Toque para escolhê-la novamente; até lá, as exportações serão salvas em %1$s.</string>
     <string name="settings_about">Sobre</string>
     <string name="settings_report_issue">Relatar problema</string>
     <string name="settings_suggest_feature">Sugerir um recurso</string>
@@ -358,6 +362,7 @@
     <string name="theme_light">Claro</string>
     <string name="theme_dark">Escuro</string>
     <string name="theme_daylight">Daylight</string>
+    <string name="theme_light_green">Verde-claro</string>
     <string name="theme_custom">Personalizado</string>
     <string name="theme_custom_named">Personalizado (%1$s)</string>
     <string name="theme_error_bad_colour">Cor inválida para %1$s</string>
@@ -816,6 +821,7 @@
     <string name="export_quality">Qualidade</string>
     <string name="export_quality_low">Baixa</string>
     <string name="export_quality_high">Alta</string>
+    <string name="export_same_as_source">Igual à origem</string>
     <string name="export_format">Formato</string>
     <string name="export_transparent_becomes">Áreas transparentes ficam</string>
     <string name="export_white">Branco</string>
@@ -1062,6 +1068,8 @@
     <string name="caption_position_bottom">Inferior</string>
     <string name="caption_words_per_caption">Palavras por legenda</string>
     <string name="caption_generate">Gerar</string>
+    <string name="caption_import_srt">Importar SRT</string>
+    <string name="caption_srt_empty">Nenhuma legenda encontrada no arquivo</string>
     <string name="caption_not_now">Agora não</string>
     <string name="caption_download">Baixar</string>
     <string name="draw_back">Voltar</string>
@@ -2227,8 +2235,8 @@
     <string name="caption_remaining">Cerca de %1$s restantes</string>
     <string name="caption_progress">%1$s%%</string>
     <string name="caption_model">Modelo de fala</string>
-    <string name="caption_model_standard">Padrão · 60 MB</string>
-    <string name="caption_model_precision">Maior precisão · 82 MB</string>
+    <string name="caption_model_standard">Padrão · 264 MB</string>
+    <string name="caption_model_precision">Maior precisão · 874 MB</string>
     <string name="model_err_no_triangles">O modelo não tem triângulos</string>
     <string name="model_err_too_complex">O modelo é complexo demais</string>
     <string name="model_err_missing_vertex">Uma face usa um vértice que não existe</string>
@@ -2289,6 +2297,7 @@
     <string name="effect_section_palette">Paleta personalizada</string>
     <string name="effect_section_back">Verso da camada</string>
     <string name="effect_section_colorblend">Cor e mesclagem</string>
+    <string name="effect_section_randomization">Aleatorização</string>
     <string name="palettes">Paletas</string>
     <string name="palette_untitled">Sem título</string>
     <string name="palette_new">Nova</string>
@@ -2546,6 +2555,7 @@
     <string name="tools_failed">Não foi possível concluir: %1$s</string>
     <string name="tools_save">Salvar</string>
     <string name="tools_add_to_project">Adicionar ao projeto</string>
+    <string name="tools_add_more">Adicionar mais ferramentas</string>
     <string name="tools_part">Parte a manter</string>
     <string name="tools_start">Início</string>
     <string name="tools_end">Fim</string>
@@ -2577,6 +2587,15 @@
     <string name="tools_finding_cuts">Procurando os pontos de corte…</string>
     <string name="tools_trim_few_cuts">Este vídeo quase não tem pontos de corte, então o modo Rápido só pode começar no início. Escolha Exato para começar em qualquer ponto.</string>
     <string name="tools_trim_no_fast">Um corte rápido não é possível aqui, então o corte será exato.</string>
+    <string name="tools_merge">Mesclar</string>
+    <string name="tools_merge_about">Junta vários vídeos em um.</string>
+    <string name="tools_merge_add">Adicionar vídeos</string>
+    <string name="tools_merge_start">Mesclar</string>
+    <string name="tools_merging">Mesclando… %1$d%%</string>
+    <string name="tools_merge_need_two">Adicione pelo menos dois vídeos.</string>
+    <string name="tools_merge_no_fast">Estes vídeos são diferentes, então serão recodificados.</string>
+    <string name="tools_merge_up">Subir</string>
+    <string name="tools_merge_down">Descer</string>
     <string name="shape_param_round_corners">Arredondar cantos</string>
     <string name="shape_param_notch">Entalhe</string>
     <string name="shape_param_point">Ponta</string>
@@ -2734,6 +2753,13 @@
     <string name="tools_enhance_image_about">Adicione detalhes a uma foto ou desenho com IA.</string>
     <string name="tools_enhance_pick">Escolher uma foto</string>
     <string name="tools_enhance_running">Melhorando a imagem: %1$d%%</string>
+    <string name="tools_convert_image">Converter imagem</string>
+    <string name="tools_convert_image_about">Transforma uma imagem ou animação em PNG, JPG, WebP ou GIF.</string>
+    <string name="tools_convert_pick">Escolha uma imagem</string>
+    <string name="tools_convert_to">Converter para</string>
+    <string name="tools_convert_start">Converter</string>
+    <string name="tools_converting">Convertendo… %1$d%%</string>
+    <string name="tools_convert_too_large">É possível converter animações de até 2048 × 2048 pixels e 3000 quadros.</string>
     <string name="ai_model_detail_max">Modelo de Melhorar com IA Realista Máx</string>
     <string name="ai_model_cartoon_max">Modelo de Melhorar com IA Anime e desenho animado Máx</string>
     <string name="ai_enhance_image_upscale2_hint">O dobro da largura e da altura</string>

@@ -343,6 +343,7 @@ class DeskToolsTest {
 
     private fun ComposeUiTest.openTool(name: String, picked: Boolean) {
         val state = DeskAppState()
+        state.settings.toolsHidden = emptySet()
         setContent { DeskApp(state) }
         settle(800)
         onNodeWithText("Tools").performClick()
@@ -364,6 +365,7 @@ class DeskToolsTest {
         prepare("tab")
         runSkikoComposeUiTest(size = Size(1280f, 800f)) {
             val state = DeskAppState()
+            state.settings.toolsHidden = emptySet()
             setContent { DeskApp(state) }
             settle(800)
             onNodeWithText("Tools").performClick()

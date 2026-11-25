@@ -120,7 +120,7 @@
      "label": "Katmana maskele"
     },
     "mix": {
-     "label": "Karışım"
+     "label": "Dolgu"
     },
     "spill": {
      "label": "Efektler Dışarı Taşsın"
@@ -743,49 +743,49 @@
     "a": {
      "label": "A",
      "options": [
-      "Kırmızı",
-      "Yeşil",
-      "Mavi",
-      "Alfa",
-      "Parlaklık",
-      "Sıfır",
-      "Tam"
+      "R",
+      "G",
+      "B",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     },
     "b": {
      "label": "B",
      "options": [
-      "Kırmızı",
-      "Yeşil",
-      "Mavi",
-      "Alfa",
-      "Parlaklık",
-      "Sıfır",
-      "Tam"
+      "R",
+      "G",
+      "B",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     },
     "g": {
      "label": "G",
      "options": [
-      "Kırmızı",
-      "Yeşil",
-      "Mavi",
-      "Alfa",
-      "Parlaklık",
-      "Sıfır",
-      "Tam"
+      "R",
+      "G",
+      "B",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     },
     "r": {
      "label": "R",
      "options": [
-      "Kırmızı",
-      "Yeşil",
-      "Mavi",
-      "Alfa",
-      "Parlaklık",
-      "Sıfır",
-      "Tam"
+      "R",
+      "G",
+      "B",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     }
    }
@@ -797,49 +797,49 @@
     "a": {
      "label": "A",
      "options": [
-      "Ton",
-      "Doygunluk",
-      "Değer",
-      "Alfa",
-      "Parlaklık",
-      "Sıfır",
-      "Tam"
+      "H",
+      "S",
+      "V",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     },
     "h": {
      "label": "H",
      "options": [
-      "Ton",
-      "Doygunluk",
-      "Değer",
-      "Alfa",
-      "Parlaklık",
-      "Sıfır",
-      "Tam"
+      "H",
+      "S",
+      "V",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     },
     "s": {
      "label": "S",
      "options": [
-      "Ton",
-      "Doygunluk",
-      "Değer",
-      "Alfa",
-      "Parlaklık",
-      "Sıfır",
-      "Tam"
+      "H",
+      "S",
+      "V",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     },
     "v": {
      "label": "V",
      "options": [
-      "Ton",
-      "Doygunluk",
-      "Değer",
-      "Alfa",
-      "Parlaklık",
-      "Sıfır",
-      "Tam"
+      "H",
+      "S",
+      "V",
+      "A",
+      "Y",
+      "0",
+      "1"
      ]
     }
    }
@@ -854,7 +854,7 @@
     "color": {
      "label": "Renk"
     },
-    "count": {
+    "cells": {
      "label": "Adet"
     },
     "offset": {
@@ -918,6 +918,13 @@
       "Doğrusal",
       "Işınlar"
      ]
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klasik",
+      "Standart"
+     ]
     }
    }
   },
@@ -948,6 +955,13 @@
      "options": [
       "Katman",
       "Ekran"
+     ]
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klasik",
+      "Standart"
      ]
     }
    }
@@ -1905,10 +1919,10 @@
     "phase": {
      "label": "Faz"
     },
-    "radius": {
+    "dotRadius": {
      "label": "Yarıçap"
     },
-    "scale": {
+    "zoom": {
      "label": "Ölçek"
     },
     "seed": {
@@ -1928,6 +1942,13 @@
     },
     "start": {
      "label": "Başlangıç"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klasik",
+      "Standart"
+     ]
     }
    }
   },
@@ -1980,11 +2001,11 @@
     "alpha": {
      "label": "Alfa"
     },
-    "composite": {
+    "mode": {
      "label": "Birleştirme",
      "options": [
-      "Arkada",
-      "Üstte"
+      "Üstte",
+      "Arkada"
      ]
     },
     "count": {
@@ -2369,7 +2390,7 @@
    "description": "Katmanın alfa kenarlarını yumuşatır ve onları dış hattan başlayarak belirginleştirir. Yineleme sayısı arttıkça geçiş daha yumuşak ve derin olur. Klasik stilde: İçe doğru, mevcut dış hattın içine solar; Alfa bulanıklaştır yumuşatılan kenarı dışarıya da taşır.",
    "name": "Tüylendirme",
    "params": {
-    "blur": {
+    "strength": {
      "label": "Güç"
     },
     "mode": {
@@ -2994,6 +3015,9 @@
       "Gradyan",
       "Spektrum"
      ]
+    },
+    "squeeze": {
+     "label": "Sıkıştırma"
     }
    }
   },
@@ -4061,6 +4085,13 @@
     },
     "sweep": {
      "label": "Açı"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klasik",
+      "Standart"
+     ]
     }
    }
   },
@@ -4685,7 +4716,7 @@
    "description": "Katmanın görüntüsünü kaydırır ve katman kutusunun kenarlarında başa döndürür.",
    "name": "Kaydırma",
    "params": {
-    "feather": {
+    "seamFeather": {
      "label": "Yumuşatma"
     },
     "mask": {
@@ -4693,6 +4724,13 @@
     },
     "offset": {
      "label": "Kaydırma"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klasik",
+      "Standart"
+     ]
     }
    }
   },
@@ -4777,12 +4815,12 @@
      "label": "Ortam"
     },
     "amount": {
-     "label": "Pürüzlülük"
+     "label": "Miktar"
     },
     "blend": {
      "label": "Karışım"
     },
-    "blur": {
+    "bevel": {
      "label": "Eğim"
     },
     "color": {
@@ -4804,7 +4842,7 @@
      "label": "Yoğunluk"
     },
     "light": {
-     "label": "Işık rengi"
+     "label": "Renk"
     },
     "refraction": {
      "label": "Kırılma"
@@ -4813,7 +4851,7 @@
      "label": "Yumuşatma örnekleri"
     },
     "scale": {
-     "label": "Pürüzlülük ölçeği"
+     "label": "Ölçek"
     },
     "seed": {
      "label": "Tohum"
@@ -4919,6 +4957,13 @@
      "label": "Parlaklık"
     },
     "style": {
+     "label": "Stil",
+     "options": [
+      "Klasik",
+      "Standart"
+     ]
+    },
+    "roll": {
      "label": "Stil",
      "options": [
       "Klasik",
@@ -5411,26 +5456,26 @@
     "angle": {
      "label": "Açı"
     },
-    "angleChannel": {
-     "label": "Açı kaynağı",
+    "phi": {
+     "label": "φ",
      "options": [
+      "Lum",
       "R",
       "G",
       "B",
-      "Parlaklık",
       "Alfa"
      ]
     },
     "center": {
      "label": "Merkez"
     },
-    "distanceChannel": {
-     "label": "Mesafe kaynağı",
+    "rho": {
+     "label": "ρ",
      "options": [
+      "Lum",
       "R",
       "G",
       "B",
-      "Parlaklık",
       "Alfa"
      ]
     },
@@ -5697,7 +5742,7 @@
      "label": "Açı"
     },
     "center": {
-     "label": "Merkez"
+     "label": "Konum"
     },
     "color": {
      "label": "Renk"
@@ -5815,7 +5860,7 @@
      "label": "Işık"
     },
     "reach": {
-     "label": "Uzunluk"
+     "label": "Boyut"
     },
     "fill": {
      "label": "Dolgu"
@@ -5842,8 +5887,8 @@
     "direction": {
      "label": "Yön",
      "options": [
-      "Saat yönünde",
-      "Saat yönünün tersine",
+      "CW",
+      "CCW",
       "Her ikisi"
      ]
     },
@@ -6202,7 +6247,7 @@
     "choke": {
      "label": "Daraltma"
     },
-    "feather": {
+    "softness": {
      "label": "Kenar yumuşatma"
     },
     "lockLuminance": {
@@ -6214,7 +6259,7 @@
     "target": {
      "label": "Yeni renk"
     },
-    "threshold": {
+    "tolerance": {
      "label": "Eşik"
     },
     "match": {
@@ -6287,14 +6332,14 @@
       "B"
      ]
     },
-    "mode": {
+    "split": {
      "label": "Mod",
      "options": [
       "Açık",
       "Koyu",
       "Maske",
       "Luma",
-      "Ortalama"
+      "Luma Alfa"
      ]
     },
     "strength": {
@@ -6313,19 +6358,19 @@
    "description": "Katmanın opak kısımları boyunca genişliği değişen kıvrımlı bir şerit çizer; akması için Faz'ı canlandırın veya şeridi katmandan oyun.",
    "name": "Şerit",
    "params": {
-    "angle": {
+    "tilt": {
      "label": "Açı"
     },
     "color": {
      "label": "Renk"
     },
-    "frequency": {
+    "waves": {
      "label": "Frekans"
     },
-    "magnitude": {
+    "amplitude": {
      "label": "Büyüklük"
     },
-    "offset": {
+    "shift": {
      "label": "Ofset"
     },
     "phase": {
@@ -6334,14 +6379,14 @@
     "punch": {
      "label": "Oy"
     },
-    "smoothing": {
+    "soften": {
      "label": "Yumuşatma"
     },
     "tint": {
      "label": "Ton"
     },
     "tintAmount": {
-     "label": "Ton miktarı"
+     "label": "Ton rengi"
     },
     "width": {
      "label": "Genişlik"
@@ -6379,11 +6424,11 @@
     "octaves": {
      "label": "Oktavlar"
     },
-    "roughness": {
-     "label": "Pürüzlülük"
+    "strength": {
+     "label": "Güç"
     },
-    "scale": {
-     "label": "Ölçek"
+    "detail": {
+     "label": "Detay"
     },
     "seed": {
      "label": "Tohum"
@@ -6672,7 +6717,7 @@
    "description": "3x3 komşuluk kullanarak keskin olmayan maske uygular ve ince ayrıntıları belirginleştirir.",
    "name": "Keskinleştir",
    "params": {
-    "amount": {
+    "sharpness": {
      "label": "Güç"
     },
     "radius": {
@@ -6767,7 +6812,7 @@
      "label": "Yansıma açısı"
     },
     "blur": {
-     "label": "Boyut"
+     "label": "Yarıçap"
     },
     "color_d": {
      "label": "Dağınık ışık rengi"
@@ -6830,8 +6875,8 @@
     "blend": {
      "label": "Karışım"
     },
-    "blur": {
-     "label": "Boyut"
+    "diffusion": {
+     "label": "Yayılım"
     },
     "brightness": {
      "label": "Parlaklık"
@@ -6846,7 +6891,7 @@
      "label": "Işıklar"
     },
     "opacity": {
-     "label": "Opaklık"
+     "label": "Alfa"
     },
     "outside": {
      "label": "Dış parıltı"
@@ -7166,7 +7211,7 @@
     "feather": {
      "label": "Kenar yumuşatma"
     },
-    "saturation": {
+    "sat": {
      "label": "Doygunluk"
     },
     "threshold": {
@@ -7480,10 +7525,10 @@
    "description": "Katmanı bir çizgi boyunca keser ve iki yarıyı birbirinden ayırır; çizgideki pikselleri boşluğa doğru uzatır.",
    "name": "Segment Esnetme",
    "params": {
-    "angle": {
+    "cutAngle": {
      "label": "Açı"
     },
-    "offset": {
+    "shift": {
      "label": "Ofset"
     },
     "relative": {
@@ -7492,7 +7537,7 @@
     "spread": {
      "label": "Yayılım"
     },
-    "stretch": {
+    "span": {
      "label": "Esnetme"
     }
    }
@@ -7798,7 +7843,7 @@
      "label": "Özel"
     },
     "charset": {
-     "label": "Karakterler",
+     "label": "Karakter kümesi",
      "options": [
       "Harfler",
       "Büyük harf",
@@ -7825,7 +7870,7 @@
      "label": "Evrim"
     },
     "keepSpaces": {
-     "label": "Boşlukları koru"
+     "label": "Boşluğu koru"
     },
     "progress": {
      "label": "Ortaya çıkar"
@@ -7911,14 +7956,14 @@
    }
   },
   "texttransform": {
-   "description": "Bir aralıktaki harfleri, kelimeleri veya satırları taşır, ölçekler, döndürür, soldurur ve renklendirir. Çapa, ölçekleme ve döndürmenin her bileşeni mi yoksa katman merkezini mi kullanacağını belirler. Değişikliğin metin boyunca ilerlemesi için aralığı Ofset ile kaydırın.",
+   "description": "Bir aralıktaki harfleri, kelimeleri veya satırları taşır, ölçekler, döndürür, soldurur ve renklendirir. Çapa, ölçekleme ve döndürmenin her bileşeni mi yoksa katman merkezini mi kullanacağını belirler. Değişikliğin metin boyunca ilerlemesi için aralığı Faz ile kaydırın.",
    "name": "Metin Dönüştürme",
    "params": {
-    "anchor": {
+    "anchorTo": {
      "label": "Çapa",
      "options": [
-      "Bileşen",
-      "Katman"
+      "Katman",
+      "Bileşen"
      ]
     },
     "easeIn": {
@@ -7931,38 +7976,38 @@
      "label": "Bitiş"
     },
     "offset": {
-     "label": "Kaydırma"
+     "label": "Faz"
     },
-    "opacity": {
+    "alpha": {
      "label": "Opaklık"
     },
     "overlap": {
      "label": "Örtüşme"
     },
     "position": {
-     "label": "Konum"
+     "label": "Ofset"
     },
     "randomOrder": {
      "label": "Rastgele sıra"
     },
     "rotation": {
-     "label": "Döndürme"
+     "label": "Açı"
     },
-    "scale": {
+    "scaleBy": {
      "label": "Ölçek"
     },
     "seed": {
      "label": "Tohum"
     },
-    "shape": {
+    "curve": {
      "label": "Şekil",
      "options": [
       "Kare",
+      "Pürüzsüz",
+      "Üçgen",
       "Yükselen",
       "Alçalan",
-      "Üçgen",
-      "Yuvarlak",
-      "Pürüzsüz"
+      "Yuvarlak"
      ]
     },
     "smoothness": {
@@ -7978,7 +8023,7 @@
      "label": "Renk tonu"
     },
     "unit": {
-     "label": "Şuna göre",
+     "label": "Bileşen",
      "options": [
       "Karakter",
       "Kelime",
@@ -7990,6 +8035,13 @@
      "label": "Aralık",
      "options": [
       "Eski",
+      "Standart"
+     ]
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klasik",
       "Standart"
      ]
     }
@@ -8026,7 +8078,7 @@
     "level": {
      "label": "Eşik"
     },
-    "softness": {
+    "feather": {
      "label": "Yumuşatma"
     }
    }
@@ -8080,6 +8132,13 @@
     },
     "stretch": {
      "label": "Uzatma"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klasik",
+      "Standart"
+     ]
     }
    }
   },
@@ -8143,6 +8202,13 @@
     },
     "stretch": {
      "label": "Uzatma"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klasik",
+      "Standart"
+     ]
     }
    }
   },
@@ -8182,7 +8248,14 @@
    "name": "Kare hızı",
    "params": {
     "fps": {
-     "label": "Kare/sn"
+     "label": "Adım/sn"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klasik",
+      "Standart"
+     ]
     }
    }
   },
@@ -8487,7 +8560,7 @@
     "amount": {
      "label": "Miktar"
     },
-    "radius": {
+    "blurRadius": {
      "label": "Güç"
     },
     "showMask": {
@@ -8666,7 +8739,7 @@
     "phase": {
      "label": "Faz"
     },
-    "scale": {
+    "cellScale": {
      "label": "Ölçek"
     },
     "seed": {
@@ -8769,7 +8842,7 @@
     "speed": {
      "label": "Hız"
     },
-    "warpAngle": {
+    "warp": {
      "label": "Büküm açısı"
     },
     "screenSpace": {
@@ -8803,6 +8876,13 @@
       "Klasik",
       "Standart"
      ]
+    },
+    "axes": {
+     "label": "Stil",
+     "options": [
+      "Klasik",
+      "Standart"
+     ]
     }
    }
   },
@@ -8817,10 +8897,10 @@
      "label": "Bitiş"
     },
     "feather": {
-     "label": "Kenar yumuşatma"
+     "label": "Yumuşaklık"
     },
     "softness": {
-     "label": "Yumuşaklık"
+     "label": "Kenar yumuşatma"
     },
     "start": {
      "label": "Başlangıç"
@@ -8883,7 +8963,7 @@
       "Kapalı"
      ]
     },
-    "strength": {
+    "zoom": {
      "label": "Güç"
     }
    }

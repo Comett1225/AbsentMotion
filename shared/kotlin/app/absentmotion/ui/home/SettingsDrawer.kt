@@ -240,7 +240,7 @@ internal fun PlaybackSettings(settings: AppSettings) {
 internal fun ProjectsSettings(settings: AppSettings, onDemoMode: (Boolean) -> Unit) {
     if (!DESK) SwitchRow(stringResource(R.string.settings_open_xml), settings.xmlUpload, enabled = true) { settings.xmlUpload = it }
     SwitchRow(stringResource(R.string.settings_keep_media_copies), settings.keepMediaCopies, enabled = true) { settings.keepMediaCopies = it }
-    BundlesFolderRows(settings)
+    ExportFolderRows(settings)
     if (settings.demoModeShown) SwitchRow(stringResource(R.string.settings_demo_mode), settings.demoMode, enabled = true) { settings.demoMode = it; onDemoMode(it) }
     if (!DESK) SwitchRow(stringResource(R.string.settings_ask_mobile_data), settings.askMobileData, enabled = true) { settings.askMobileData = it }
     CaptionModelRow()
@@ -342,23 +342,45 @@ private fun CaptionModelRow() {
 }
 
 @Composable
-private fun BundlesFolderRows(settings: AppSettings) {
+private fun FolderRows(settings: AppSettings, @StringRes title: Int, @StringRes reset: Int, @StringRes lost: Int, folder: String?, fallback: String, onFolder: (String?) -> Unit) {
     val context = LocalContext.current
-    val pick = rememberBundleFolderPicker(settings)
-    val folder = settings.bundlesFolder
+    val pick = rememberFolderChoice(settings, folder, stringResource(title), onFolder)
     val view = folderView(folder)
-    ActionRow(stringResource(R.string.settings_bundles_folder), if (folder == null) defaultBundles() else view?.label.orEmpty(), chevron = true) { pick() }
-    if (view?.reachable == false) Text(stringResource(R.string.bundle_folder_lost, defaultBundles()), Modifier.padding(start = 15.dp, end = 15.dp, bottom = 6.dp), color = Am.HomeAccent, fontSize = 12.sp, lineHeight = 16.sp)
-    if (folder != null) ActionRow(stringResource(R.string.settings_bundles_default), "", chevron = false) {
-        app.absentmotion.platform.forgetFolder(context, folder)
-        settings.bundlesFolder = null
+    ActionRow(stringResource(title), if (folder == null) fallback else view?.label.orEmpty(), chevron = true) { pick() }
+    if (view?.reachable == false) Text(stringResource(lost, fallback), Modifier.padding(start = 15.dp, end = 15.dp, bottom = 6.dp), color = Am.HomeAccent, fontSize = 12.sp, lineHeight = 16.sp)
+    if (folder != null) ActionRow(stringResource(reset), "", chevron = false) {
+        onFolder(null)
+        settings.release(context, folder)
     }
 }
 
 @Composable
-internal fun defaultBundles(): String {
+private fun ExportFolderRows(settings: AppSettings) {
+    FolderRows(settings, R.string.settings_bundles_folder, R.string.settings_bundles_default, R.string.bundle_folder_lost, settings.bundlesFolder, defaultBundles()) { settings.bundlesFolder = it }
+    FolderRows(settings, R.string.settings_video_folder, R.string.settings_folder_default, R.string.export_folder_lost, settings.videoFolder, defaultFolder("Movies")) { settings.videoFolder = it }
+    FolderRows(settings, R.string.settings_sound_folder, R.string.settings_folder_default, R.string.export_folder_lost, settings.soundFolder, defaultFolder("Music")) { settings.soundFolder = it }
+}
+
+@Composable
+private fun defaultFolder(root: String): String {
     val context = LocalContext.current
-    return remember { app.absentmotion.export.MediaStoreExport(context).location("Documents/${app.absentmotion.export.AppFolder}") }
+    return remember(root) { app.absentmotion.export.MediaStoreExport(context).location("$root/${app.absentmotion.export.AppFolder}") }
+}
+
+@Composable
+internal fun defaultBundles(): String = defaultFolder("Documents")
+
+internal fun AppSettings.release(context: Context, folder: String) {
+    if (folder !in listOf(bundlesFolder, videoFolder, soundFolder)) app.absentmotion.platform.forgetFolder(context, folder)
+}
+
+@Composable
+private fun rememberFolderChoice(settings: AppSettings, folder: String?, title: String, onFolder: (String?) -> Unit): () -> Unit {
+    val context = LocalContext.current
+    return app.absentmotion.platform.rememberFolderPicker(folder, title) { picked ->
+        onFolder(picked)
+        folder?.takeIf { it != picked }?.let { settings.release(context, it) }
+    }
 }
 
 internal class FolderView(val label: String, val reachable: Boolean)
@@ -378,13 +400,8 @@ internal fun folderView(folder: String?): FolderView? {
 }
 
 @Composable
-internal fun rememberBundleFolderPicker(settings: AppSettings): () -> Unit {
-    val context = LocalContext.current
-    return app.absentmotion.platform.rememberFolderPicker(settings.bundlesFolder) { picked ->
-        settings.bundlesFolder?.takeIf { it != picked }?.let { app.absentmotion.platform.forgetFolder(context, it) }
-        settings.bundlesFolder = picked
-    }
-}
+internal fun rememberBundleFolderPicker(settings: AppSettings): () -> Unit =
+    rememberFolderChoice(settings, settings.bundlesFolder, stringResource(R.string.settings_bundles_folder)) { settings.bundlesFolder = it }
 
 @Composable
 private fun DownloaderRow() {

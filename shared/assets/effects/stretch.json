@@ -5,7 +5,7 @@
  "description": "Cuts the layer along a line and pulls the two halves apart, stretching the pixels on the line into the gap.",
  "params": [
   {
-   "id": "angle",
+   "id": "cutAngle",
    "label": "Angle",
    "type": "angle",
    "default": 0,
@@ -14,23 +14,23 @@
    "step": 1
   },
   {
-   "id": "stretch",
+   "id": "span",
    "label": "Stretch",
    "type": "float",
    "default": 10,
-   "legacyDefault": 200,
+   "legacyDefault": 46.296296,
    "min": 0,
-   "max": 5000,
-   "step": 1
+   "max": 900,
+   "step": 0.1
   },
   {
-   "id": "offset",
+   "id": "shift",
    "label": "Offset",
    "type": "float",
    "default": 0,
-   "min": -5000,
-   "max": 5000,
-   "step": 1
+   "min": -2000,
+   "max": 2000,
+   "step": 0.1
   },
   {
    "id": "spread",
@@ -48,5 +48,5 @@
    "default": false
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float angle;\nuniform float stretch;\nuniform float offset;\nuniform float spread;\nuniform float relative;\nhalf4 main(float2 coord) {\n    float r = radians(angle);\n    float2 dir = float2(cos(r), sin(r));\n    float unit = relative > 0.5 ? (abs(size.x * dir.x) + abs(size.y * dir.y)) * 0.001 : 1.0;\n    float d = dot(coord - 0.5 * size, dir) - offset * unit;\n    float gap = 0.5 * max(stretch, 0.0) * unit;\n    float2 from = abs(d) <= gap ? coord - dir * d + dir * (d / max(gap, 0.001)) * spread : coord - dir * sign(d) * gap;\n    return image.eval(from);\n}"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float cutAngle;\nuniform float span;\nuniform float shift;\nuniform float spread;\nuniform float relative;\nhalf4 main(float2 coord) {\n    float r = radians(-cutAngle);\n    float2 dir = float2(cos(r), sin(r));\n    float unit = relative > 0.5 ? (abs(size.x * dir.x) + abs(size.y * dir.y)) * 0.001 : 1.0;\n    float d = dot(coord - 0.5 * size, dir) + shift * 1.08 * unit;\n    float gap = 2.16 * max(span, 0.0) * unit;\n    float2 from = abs(d) <= gap ? coord - dir * d + dir * (d / max(gap, 0.001)) * spread : coord - dir * sign(d) * gap;\n    return image.eval(from);\n}"
 }

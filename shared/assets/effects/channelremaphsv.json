@@ -11,13 +11,13 @@
    "type": "choice",
    "default": 0,
    "options": [
-    "Hue",
-    "Saturation",
-    "Value",
-    "Alpha",
-    "Luminance",
-    "Zero",
-    "Full"
+    "H",
+    "S",
+    "V",
+    "A",
+    "Y",
+    "0",
+    "1"
    ]
   },
   {
@@ -26,13 +26,13 @@
    "type": "choice",
    "default": 1,
    "options": [
-    "Hue",
-    "Saturation",
-    "Value",
-    "Alpha",
-    "Luminance",
-    "Zero",
-    "Full"
+    "H",
+    "S",
+    "V",
+    "A",
+    "Y",
+    "0",
+    "1"
    ]
   },
   {
@@ -41,13 +41,13 @@
    "type": "choice",
    "default": 2,
    "options": [
-    "Hue",
-    "Saturation",
-    "Value",
-    "Alpha",
-    "Luminance",
-    "Zero",
-    "Full"
+    "H",
+    "S",
+    "V",
+    "A",
+    "Y",
+    "0",
+    "1"
    ]
   },
   {
@@ -56,13 +56,13 @@
    "type": "choice",
    "default": 3,
    "options": [
-    "Hue",
-    "Saturation",
-    "Value",
-    "Alpha",
-    "Luminance",
-    "Zero",
-    "Full"
+    "H",
+    "S",
+    "V",
+    "A",
+    "Y",
+    "0",
+    "1"
    ]
   }
  ],

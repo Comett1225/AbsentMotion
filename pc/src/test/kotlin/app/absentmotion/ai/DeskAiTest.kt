@@ -72,10 +72,24 @@ class DeskAiTest {
         }
     }
 
+    @Test fun oldCaptionModelsAreRemovedAtStartAndNewOnesKept() {
+        val dir = java.nio.file.Files.createTempDirectory("captions").toFile()
+        try {
+            val app = object : Context() { override val filesDir: File get() = dir }
+            val models = File(dir, "models").apply { mkdirs() }
+            val old = listOf("ggml-base-q5_1.bin", "ggml-base-q8_0.bin").map { File(models, it).apply { writeText("old") } }
+            val kept = listOf(CaptionModel.name(false), CaptionModel.name(true)).map { File(models, it).apply { writeText("new") } }
+            assertEquals(12L, CaptionModel.storedBytes(app))
+            AiModel.dropReplaced(app)
+            assertTrue(old.none { it.exists() })
+            assertTrue(kept.all { it.exists() })
+        } finally { dir.deleteRecursively() }
+    }
+
     @Test fun captionsRunModel() = runBlocking {
-        val model = File("../build/ai-test/ggml-base-q5_1.bin")
+        val model = File("../build/ai-test/ggml-small-q8_0.bin")
         assumeTrue(model.isFile && model.length() == CaptionModel.BYTES)
-        val words = Whisper.transcribe(model, FloatArray(16_000), true) { }
+        val words = Whisper.transcribe(model, CaptionModel.heads(false), FloatArray(16_000), true) { }
         assertTrue(words.all { it.text.isNotBlank() })
     }
 

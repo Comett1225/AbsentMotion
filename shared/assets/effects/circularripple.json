@@ -71,7 +71,23 @@
     "Layer",
     "Screen"
    ]
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 1,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "legacyDefault": 0,
+   "when": {
+    "style": [
+     0
+    ]
+   }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float4 screen;\nuniform float time;\nuniform float2 center;\nuniform float frequency;\nuniform float strength;\nuniform float phase;\nuniform float radius;\nuniform float feather;\nuniform float reach;\nhalf4 main(float2 coord) {\n    float m = reach > 0.5 ? min(screen.z, screen.w) : min(size.x, size.y);\n    float2 d = coord - center * size;\n    float r = length(d) / m;\n    if (r <= 0.0) return image.eval(coord);\n    float edge = max(feather * radius, 0.0005);\n    float fade = 1.0 - smoothstep(radius - edge, radius, r);\n    float wave = sin(6.2831853 * (frequency * r - phase));\n    return image.eval(coord + d / (r * m) * wave * strength * m * 0.5 * fade);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float4 screen;\nuniform float time;\nuniform float2 center;\nuniform float frequency;\nuniform float strength;\nuniform float phase;\nuniform float radius;\nuniform float feather;\nuniform float reach;\nuniform float style;\nhalf4 main(float2 coord) {\n    float m = reach > 0.5 ? min(screen.z, screen.w) : min(size.x, size.y);\n    float2 d = coord - center * size;\n    float r = length(d) / m;\n    if (r <= 0.0) return image.eval(coord);\n    float edge = max(feather * radius, 0.0005);\n    float fade = style > 0.5 ? 1.0 - smoothstep(radius * (1.0 - 0.5 * feather), radius * (1.0 + 0.5 * feather) + 0.0005, r) : 1.0 - smoothstep(radius - edge, radius, r);\n    float wave = sin(6.2831853 * (frequency * r + (style > 0.5 ? phase : -phase)));\n    float2 q = coord + d / (r * m) * wave * strength * m * 0.5 * fade;\n    return image.eval(style > 0.5 ? clamp(q, screen.xy + 0.5, screen.xy + screen.zw - 0.5) : q);\n}\n"
 }

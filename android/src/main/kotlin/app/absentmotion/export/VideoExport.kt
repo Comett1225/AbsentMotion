@@ -62,13 +62,13 @@ private const val OpusLookaheadFrames = 312
 
 internal suspend fun exportVideo(
     engine: EngineThread, scene: Scene, xml: String, s: ExportSettings, out: FileDescriptor, audio: AudioMix?,
-    hotAtStart: Boolean = false, pauseMs: () -> Long = { 0L }, note: (UiText) -> Unit = {}, looks: (FrameLooks) -> Unit = {}, progress: (Float) -> Unit,
+    hotAtStart: Boolean = false, pauseMs: () -> Long = { 0L }, note: (UiText) -> Unit = {}, looks: (FrameLooks) -> Unit = {}, sample: IntArray? = null, progress: (Float) -> Unit,
 ) {
     val (width, height) = exportSize(scene, s.shortSide, even = true)
     val frames = frameCount(scene, s.fps)
     EncoderTrouble.last = null
     holdingVideo(engine::holdVideo, engine::releaseVideo) {
-        encode(engine, scene, xml, s, out, audio, width, height, frames, hotAtStart, pauseMs, note, looks, progress)
+        encode(engine, scene, xml, s, out, audio, width, height, frames, hotAtStart, pauseMs, note, looks, sample, progress)
     }
 }
 
@@ -112,10 +112,12 @@ internal fun openVideoEncoder(s: ExportSettings, width: Int, height: Int, hot: B
             continue
         }
         var highFailed = false
-        for (bestEffort in if (hot || rated < 2.0 * s.fps) listOf(true, false) else listOf(false, true)) for (profile in if (high) listOf(true, false) else listOf(false)) {
+        val rate = encoderBitrate(bitrate ?: videoBitrate(width, height, s), caps.videoCapabilities!!.bitrateRange.let { it.lower..it.upper })
+        val mode = bitrateMode(bitrate == null && s.bitrate > 0) { caps.encoderCapabilities?.isBitrateModeSupported(it) == true }
+        for (bestEffort in if (hot || rated < 2.0 * s.fps) listOf(true, false) else listOf(false, true)) for (profile in if (high) listOf(true, false) else listOf(false)) for (picked in listOf(mode, null).distinct()) {
             try {
-                codec.configure(encoderFormat(info, caps, s, width, height, profile, bestEffort, hot, bitrate), null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
-                Log.i("AMExport", "encoding with ${info.name}${if (profile) " (High)" else ""}${if (bestEffort) " at best effort" else ""}; rated for ${rated.toInt()} fps at ${width}x$height")
+                codec.configure(encoderFormat(info, s, width, height, profile, bestEffort, hot, rate, picked), null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
+                Log.i("AMExport", "encoding with ${info.name}${if (profile) " (High)" else ""}${if (bestEffort) " at best effort" else ""} at $rate bps, mode ${picked ?: "default"}; rated for ${rated.toInt()} fps at ${width}x$height")
                 if (highFailed && !profile) HighRefused += key
                 if (!info.hardware && infos.any { it.hardware }) note(txt(R.string.export_note_software))
                 EncoderTrouble.last = info.name
@@ -132,11 +134,20 @@ internal fun openVideoEncoder(s: ExportSettings, width: Int, height: Int, hot: B
     throw ExportError(txt(R.string.export_error_encoder_busy), last)
 }
 
-private fun encoderFormat(info: MediaCodecInfo, caps: MediaCodecInfo.CodecCapabilities, s: ExportSettings, width: Int, height: Int,
-                          profile: Boolean, bestEffort: Boolean, hot: Boolean, bitrate: Int?) = MediaFormat.createVideoFormat(s.codec.mime, width, height).apply {
-    val bitrates = caps.videoCapabilities!!.bitrateRange
+internal fun encoderBitrate(wanted: Int, range: IntRange): Int = if (range.last <= 0) wanted else wanted.coerceIn(range.first.coerceAtLeast(1), range.last)
+
+internal fun bitrateMode(exact: Boolean, supported: (Int) -> Boolean): Int? = when {
+    exact && supported(MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR) -> MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR
+    supported(MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_VBR) -> MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_VBR
+    supported(MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR) -> MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR
+    else -> null
+}
+
+private fun encoderFormat(info: MediaCodecInfo, s: ExportSettings, width: Int, height: Int,
+                          profile: Boolean, bestEffort: Boolean, hot: Boolean, bitrate: Int, mode: Int?) = MediaFormat.createVideoFormat(s.codec.mime, width, height).apply {
     setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface)
-    setInteger(MediaFormat.KEY_BIT_RATE, (bitrate ?: videoBitrate(width, height, s)).coerceIn(bitrates.lower, bitrates.upper))
+    setInteger(MediaFormat.KEY_BIT_RATE, bitrate)
+    if (mode != null) setInteger(MediaFormat.KEY_BITRATE_MODE, mode)
     setInteger(MediaFormat.KEY_FRAME_RATE, s.fps)
     setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1)
     setInteger(MediaFormat.KEY_COLOR_STANDARD, if (fixedBt601(info)) MediaFormat.COLOR_STANDARD_BT601_NTSC else MediaFormat.COLOR_STANDARD_BT709)
@@ -156,7 +167,7 @@ internal fun turnsForEncoder(s: ExportSettings, width: Int, height: Int): Boolea
 
 private suspend fun encode(
     engine: EngineThread, scene: Scene, xml: String, s: ExportSettings, out: FileDescriptor, audio: AudioMix?, width: Int, height: Int, frames: Int,
-    hotAtStart: Boolean, pauseMs: () -> Long, note: (UiText) -> Unit, looks: (FrameLooks) -> Unit, progress: (Float) -> Unit,
+    hotAtStart: Boolean, pauseMs: () -> Long, note: (UiText) -> Unit, looks: (FrameLooks) -> Unit, sample: IntArray?, progress: (Float) -> Unit,
 ) {
     val turn = turnsForEncoder(s, width, height)
     val encoder = if (turn) openVideoEncoder(s, height, width, hotAtStart, note) else openVideoEncoder(s, width, height, hotAtStart, note)
@@ -195,15 +206,17 @@ private suspend fun encode(
             }
             suspend fun eachFrame(flush: () -> Unit = {}, draw: suspend (k: Int, presentNs: Long) -> Unit) {
                 val started = System.nanoTime()
-                for (k in 0 until frames) {
+                val count = sample?.size ?: frames
+                for (i in 0 until count) {
+                    val k = sample?.get(i) ?: i
                     currentCoroutineContext().ensureActive()
                     failure.get()?.let { throw it }
                     val drawing = System.nanoTime()
-                    draw(k, (BASE_US + k * 1_000_000L / s.fps) * 1000)
+                    draw(k, (BASE_US + i * 1_000_000L / s.fps) * 1000)
                     spent[0] += System.nanoTime() - drawing
-                    if (k == 0 || k == frames / 2) look(k)
-                    progress((k + 1f) / frames * 0.98f)
-                    if (k % 30 == 0) ensureStorage()
+                    if (sample == null && (k == 0 || k == frames / 2)) look(k)
+                    progress((i + 1f) / count * 0.98f)
+                    if (i % 30 == 0) ensureStorage()
                     pauseMs().takeIf { it > 0 }?.let { delay(it) }
                 }
                 flush()
