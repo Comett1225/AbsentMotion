@@ -13,7 +13,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.R
-import app.absentmotion.fonts.FontName
 import app.absentmotion.ui.home.DeskButton
 import app.absentmotion.ui.home.DeskModal
 import app.absentmotion.ui.theme.Am
@@ -35,10 +34,3 @@ internal fun DeskSaveFailed(app: DeskAppState) {
     }
 }
 
-@Composable
-internal fun DeskFontOffer(names: List<String>, download: () -> Unit, decline: () -> Unit) {
-    DeskAsk(stringResource(R.string.desk_fonts_missing_title), stringResource(R.string.desk_fonts_missing_body, names.joinToString(", ") { FontName.parse(it).label }), onClose = decline, onEnter = download) {
-        DeskButton(stringResource(R.string.update_not_now), decline)
-        DeskButton(stringResource(R.string.update_download), download, primary = true, minWidth = 92.dp)
-    }
-}

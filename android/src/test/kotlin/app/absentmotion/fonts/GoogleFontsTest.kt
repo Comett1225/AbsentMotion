@@ -35,6 +35,19 @@ class GoogleFontsTest {
         assertEquals(300, GoogleFamily("X", 1, setOf(100, 300), emptySet()).regular.weight)
     }
 
+    @Test fun aStyleGoogleLacksFallsBackToTheNearestOne() {
+        val anton = GoogleFamily("Anton", 3, setOf(400), emptySet())
+        assertEquals(FontName("googlefonts", "Anton", 400), anton.nearest(700, false))
+        assertEquals(FontName("googlefonts", "Anton", 400), anton.nearest(400, true))
+        val oswald = GoogleFamily("Oswald", 1, setOf(200, 300, 400, 500, 600, 700), emptySet())
+        assertEquals(700, oswald.nearest(900, false)!!.weight)
+        val lora = GoogleFamily("Lora", 2, setOf(400, 700), setOf(400, 700))
+        assertEquals(FontName("googlefonts", "Lora", 700, true), lora.nearest(800, true))
+        assertEquals(FontName("googlefonts", "Lora", 700), lora.nearest(600, false))
+        assertEquals(FontName("googlefonts", "X", 400, true), GoogleFamily("X", 1, emptySet(), setOf(400)).nearest(700, false))
+        assertEquals(null, GoogleFamily("X", 1, emptySet(), emptySet()).nearest(400, false))
+    }
+
     @Test fun importedThenAppThenDeviceThenGoogleWithoutDuplicates() {
         val google = GoogleFonts.parse(list)
         val result = GoogleFonts.arrange(listOf(entry("Zilla.ttf", 100)), FontCatalog.entries.filter { it.name.family == "Roboto" }.take(1),

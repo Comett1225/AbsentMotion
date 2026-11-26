@@ -2,6 +2,9 @@
  "id": "sharpen",
  "name": "Sharpen",
  "category": "stylize",
+ "also": [
+  "blur"
+ ],
  "description": "Applies an unsharp mask using a 3x3 neighborhood to enhance fine details.",
  "params": [
   {

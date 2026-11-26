@@ -15,16 +15,34 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.UUID
 import kotlin.coroutines.coroutineContext
+import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
+
+internal fun wetShare(blend: Double, amount: Double): Double = blend * (1 - (10.0.pow(-2 * amount.coerceIn(0.0, 1.0)) - 0.01) / 0.99)
 
 internal object NoiseReduction {
     init { app.absentmotion.platform.loadNoiseLibrary() }
     private external fun nativeCreate(): Long
     private external fun nativeProcess(handle: Long, pcm: FloatArray): FloatArray
     private external fun nativeDestroy(handle: Long)
+    private external fun nativeOpenModel(model: ByteArray): Long
+    private external fun nativeModelProcess(handle: Long, pcm: FloatArray): FloatArray
+    private external fun nativeCloseModel(handle: Long)
 
-    suspend fun run(context: Context, uri: String, source: NoiseSource, progress: AiProgress): AiMedia {
+    internal class Engine(val delay: Int, val process: (FloatArray) -> FloatArray, val close: () -> Unit)
+
+    internal fun engine(model: File?): Engine {
+        if (model == null) {
+            val handle = nativeCreate()
+            return Engine(1, { nativeProcess(handle, it) }) { nativeDestroy(handle) }
+        }
+        val handle = nativeOpenModel(model.readBytes())
+        check(handle != 0L) { AppText.get(R.string.ai_model_broken) }
+        return Engine(3, { nativeModelProcess(handle, it) }) { nativeCloseModel(handle) }
+    }
+
+    suspend fun run(context: Context, uri: String, source: NoiseSource, strength: Double = 1.0, model: File? = null, progress: AiProgress): AiMedia {
         val token = UUID.randomUUID()
         val decoded = File(context.cacheDir, "ai-input-$token.pcm")
         val cleaned = File(context.cacheDir, "ai-clean-$token.pcm")
@@ -67,15 +85,15 @@ internal object NoiseReduction {
             }
             check(frames > 0 && rate > 0) { AppText.get(R.string.ai_no_samples_decoded) }
             val noiseFrames = (frames.toDouble() * 48000 / rate).roundToLong().coerceAtLeast(1)
-            val handle = nativeCreate()
+            val engine = engine(model)
             try {
                 DataOutputStream(cleaned.outputStream().buffered()).use { pcm ->
-                    var first = true
+                    var lag = engine.delay
                     var written = 0L
                     var reported = -1
                     fun denoise(block: FloatArray) {
-                        val samples = nativeProcess(handle, block)
-                        if (first) { first = false; return }
+                        val samples = engine.process(block)
+                        if (lag > 0) { lag--; return }
                         val count = minOf(480L, noiseFrames - written).toInt()
                         for (i in 0 until count) pcm.writeFloat(samples[i])
                         written += count
@@ -86,10 +104,10 @@ internal object NoiseReduction {
                         if (percent != reported) { progress(0.3f + percent / 100f, AppText.get(R.string.ai_reducing_noise)); reported = percent }
                     }
                     coroutineContext.ensureActive()
-                    denoise(FloatArray(480))
+                    repeat(engine.delay) { denoise(FloatArray(480)) }
                     check(written == noiseFrames)
                 }
-            } finally { nativeDestroy(handle) }
+            } finally { engine.close() }
             output.outputStream().buffered().use { wav ->
                 val header = ByteBuffer.allocate(44).order(ByteOrder.LITTLE_ENDIAN)
                 header.put("RIFF".toByteArray()).putInt((36 + frames * 2).toInt()).put("WAVEfmt ".toByteArray())
@@ -98,8 +116,9 @@ internal object NoiseReduction {
                 wav.write(header.array())
                 val bytes = ByteBuffer.allocate(960).order(ByteOrder.LITTLE_ENDIAN)
                 var reported = -1
-                val original = if (source.blend < 1.0) DataInputStream(decoded.inputStream().buffered()) else null
-                val keep = (1.0 - source.blend).toFloat()
+                val wet = wetShare(source.blend, strength)
+                val original = if (wet < 1.0) DataInputStream(decoded.inputStream().buffered()) else null
+                val keep = (1.0 - wet).toFloat()
                 try {
                     resample(cleaned, noiseFrames, 48000, rate, frames) { block, count, done ->
                         bytes.clear()

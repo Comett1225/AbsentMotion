@@ -47,8 +47,8 @@ class CommunityBrowseDeskTest {
                 onNodeWithText("Été Glow").assertDoesNotExist()
                 onNodeWithText("Connect").performClick()
                 onNode(hasSetTextAction()).performTextReplacement("alice intro")
-                onNodeWithText("Été Glow").assertExists()
-                onNodeWithText("Apple").assertExists()
+                onAllNodesWithText("Été Glow").onFirst().assertExists()
+                onAllNodesWithText("Apple").onFirst().assertExists()
                 onNodeWithText("Tags").performClick()
                 onNodeWithText("2").assertExists()
                 onNodeWithText("neon").performClick()
@@ -118,9 +118,37 @@ class CommunityBrowseDeskTest {
                     onNode(hasSetTextAction()).performTextReplacement("")
                     onNodeWithText("Projects").performClick()
                     mainClock.advanceTimeBy(1000)
-                    onNodeWithText("Été Glow").assertIsDisplayed()
+                    onAllNodesWithText("Été Glow").onLast().assertIsDisplayed()
                     ImageIO.write(onAllNodes(isRoot()).onFirst().captureToImage().toAwtImage(), "png", shots.resolve("$name.png"))
                 }
+            }
+        } finally {
+            sessionIndex = before
+        }
+    }
+
+    @Test fun newComesFirstAndGroupsEveryKindByDayWithoutMovingTheControls() {
+        val before = sessionIndex
+        sessionIndex = CommunityIndex(listOf(
+            item("Late Project", CommunityKind.Bundle, listOf("intro"), "2026-11-24T12:00:00Z"),
+            item("Late Effect", CommunityKind.Effect, listOf("glow"), "2026-11-24T11:00:00Z"),
+            item("Older Preset", CommunityKind.Preset, listOf("intro"), "2026-11-20T12:00:00Z"),
+        ))
+        try {
+            runSkikoComposeUiTest(size = Size(390f, 844f)) {
+                sessionAllowed = false
+                setContent { CommunityTab(Modifier.fillMaxSize().background(Am.HomeBg)) {} }
+                onNodeWithText("Connect").performClick()
+                onNodeWithText("New").assertIsSelected()
+                onNodeWithContentDescription("Sort").assertIsNotEnabled()
+                onAllNodesWithText("2026", substring = true).assertCountEquals(2)
+                val top = { title: String -> onAllNodesWithText(title).onFirst().fetchSemanticsNode().boundsInRoot.top }
+                assertTrue(top("Late Project") == top("Late Effect") && top("Late Effect") < top("Older Preset"))
+                val tags = onNodeWithText("Tags").fetchSemanticsNode().boundsInRoot
+                onNodeWithText("Projects").performClick()
+                mainClock.advanceTimeBy(1000)
+                onNodeWithContentDescription("Sort").assertIsEnabled()
+                assertEquals(tags, onNodeWithText("Tags").fetchSemanticsNode().boundsInRoot)
             }
         } finally {
             sessionIndex = before

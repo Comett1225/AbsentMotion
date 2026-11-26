@@ -2,6 +2,9 @@
  "id": "lightglow",
  "name": "Light Glow",
  "category": "stylize",
+ "also": [
+  "color"
+ ],
  "description": "Adds a colored glow around the parts of the picture brighter than a threshold.",
  "params": [
   {

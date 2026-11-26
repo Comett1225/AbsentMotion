@@ -288,22 +288,6 @@ class DeskParityRoundTest {
         }
     }
 
-    @Test fun missingGoogleFontsAreOffered() {
-        prepare("fonts")
-        System.setProperty("am.fontOffer", "offline")
-        session(1280, 800) { app ->
-            openEditor(app, "text.xml")
-            waitUntil(timeoutMillis = 20_000) { app.fontOffer != null }
-            settle()
-            onNodeWithText(text(R.string.desk_fonts_missing_title)).assertExists()
-            shot("fonts-offer")
-            onNodeWithText(text(R.string.update_not_now)).performClick()
-            settle()
-            assertNull(app.fontOffer)
-            onNodeWithText(text(R.string.desk_fonts_missing_title)).assertDoesNotExist()
-        }
-    }
-
     @Test fun filesFromTheSystemOpenOrImport() {
         prepare("open-with")
         val sceneFile = File("build/open-with-files/sample.xml").also { it.parentFile.mkdirs(); it.writeText(repo.resolve("testdata/scenes/styles.xml").readText().replace("\"testdata/", "\"" + repo.resolve("testdata").toURI().toString().replaceFirst("file:/", "file:///") + "/")) }

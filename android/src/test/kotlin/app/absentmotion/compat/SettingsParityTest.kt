@@ -94,7 +94,7 @@ class SettingsParityTest {
     }
 
     @Test fun pixelateKeepsOurEdgesAfterAlightsRows() {
-        assertEquals(listOf("threshold", "edges", "style"), catalog.find("absent.pixelate")!!.params.takeLast(3).map { it.id })
+        assertEquals(listOf("threshold", "saturation", "edges", "style", "edgeStyle"), catalog.find("absent.pixelate")!!.params.takeLast(5).map { it.id })
     }
 
     @Test fun rgbSplitLumaIsAlightsLuma() {

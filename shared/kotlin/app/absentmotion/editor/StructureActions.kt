@@ -1,5 +1,7 @@
 package app.absentmotion.editor
 
+import app.absentmotion.i18n.UiText
+
 import app.absentmotion.R
 import app.absentmotion.i18n.AppText
 import androidx.compose.runtime.getValue
@@ -20,6 +22,8 @@ import app.absentmotion.model.cutBetween
 import app.absentmotion.model.withAnimation
 import app.absentmotion.model.withEdgeMotions
 import app.absentmotion.model.withTransition
+import app.absentmotion.model.withoutMotionMarks
+import app.absentmotion.model.addEffect
 import app.absentmotion.model.Layer
 import app.absentmotion.model.MediaDeclaration
 import app.absentmotion.model.Scene
@@ -534,34 +538,87 @@ suspend fun EditorState.distributeSelection(horizontal: Boolean) {
 
 private val NO_FILL_KINDS = setOf("audio", "camera", "nullobj", "light", "embedScene")
 
-enum class StylePart { ColorFill, BorderShadow, Blending }
+enum class StylePart { ColorFill, BorderShadow, Blending, Effects, Motions }
 
-fun EditorState.pasteStyle(parts: Set<StylePart>) {
-    val from = copiedLayerForStyle ?: return
-    val id = selectedId ?: return
-    edit { it.withPastedStyle(id, sampleMs, from, copiedMediaForStyle, parts) }
+class PastedStyle(val scene: Scene, val layers: Int, val skipped: Int, val unpaired: Int, val notes: List<UiText> = emptyList())
+
+fun EditorState.pasteStyle(parts: Set<StylePart>): PastedStyle? = pasteStyleOn(listOfNotNull(selectedId), parts)
+
+internal fun EditorState.pasteStyleOn(ids: List<Long>, parts: Set<StylePart>): PastedStyle? {
+    val from = copiedLayerForStyle ?: return null
+    if (ids.isEmpty()) return null
+    val pasted = scene.withPastedStyle(ids, sampleMs, from, copiedMediaForStyle, parts)
+    edit { pasted.scene }
+    return pasted
 }
 
-internal fun Scene.withPastedStyle(id: Long, timeMs: Int, from: Layer, media: List<MediaDeclaration>, parts: Set<StylePart>): Scene {
-    val styled = update(id, timeMs) { l ->
-        var node = l.node
-        fun take(names: List<String>, attrs: List<String>) {
-            node = node.copy(children = node.children.filterNot { it.name in names } + from.node.children.filter { it.name in names })
-            for (a in attrs) node = node.with(a, from.node[a])
+internal fun Scene.withPastedStyle(ids: List<Long>, timeMs: Int, from: Layer, media: List<MediaDeclaration>, parts: Set<StylePart>): PastedStyle {
+    val bare = MotionSlot.entries.fold(from) { l, slot -> l.withoutMotionMarks(slot) }
+    val visual = from.canAnimate && (StylePart.Effects in parts || StylePart.Motions in parts)
+    var scene = this
+    var skipped = 0
+    var unpaired = 0
+    val notes = mutableListOf<UiText>()
+    val chosen = ids.toHashSet()
+    for (id in ids) {
+        val target = scene.layer(id) ?: continue
+        val own = MotionSlot.entries.mapNotNull { slot -> target.motion(slot)?.let { slot to it } }
+        val keepFade = StylePart.Motions !in parts && own.any { it.second.transition }
+        val refade = StylePart.Blending in parts && StylePart.Motions !in parts && own.isNotEmpty() && !keepFade
+        scene = scene.update(id, timeMs) { l ->
+            var node = l.node
+            fun take(names: List<String>, attrs: List<String>) {
+                node = node.copy(children = node.children.filterNot { it.name in names } + from.node.children.filter { it.name in names })
+                for (a in attrs) node = node.with(a, from.node[a])
+            }
+            if (StylePart.ColorFill in parts && l.kind !in NO_FILL_KINDS && from.kind !in NO_FILL_KINDS) {
+                take(listOf("fillColor", "gradient", "speedMap", "gain"), listOf("fillType", "fillImage", "fillVideo", "mediaFillMode", "inTime", "outTime", "speed", "loop", "loopIn"))
+            }
+            if (StylePart.BorderShadow in parts) take(listOf("border", "shadow", "path-stroke"), emptyList())
+            if (StylePart.Blending in parts) {
+                take(emptyList(), listOf("blending"))
+                val opacity = bare.node.child("transform")?.child("opacity")
+                if (!keepFade) node = node.withChild("transform", (node.child("transform") ?: XmlNode("transform")).withChild("opacity", opacity))
+            }
+            if (StylePart.Effects in parts && visual && l.canAnimate) {
+                node = node.copy(children = node.children.filterNot { it.name == "effect" && it["gen"] == null })
+                node = bare.effects.fold(l.copy(node = node)) { next, effect -> next.addEffect(effect) }.node
+            }
+            l.copy(node = node)
         }
-        if (StylePart.ColorFill in parts && l.kind !in NO_FILL_KINDS && from.kind !in NO_FILL_KINDS) {
-            take(listOf("fillColor", "gradient", "speedMap", "gain"), listOf("fillType", "fillImage", "fillVideo", "mediaFillMode", "inTime", "outTime", "speed", "loop", "loopIn"))
+        if (refade) for ((slot, record) in own) scene = scene.withAnimation(id, slot, record.id, record.ms)
+        if (!visual) continue
+        if (!target.canAnimate) { skipped++; continue }
+        if (StylePart.Motions in parts) for (slot in MotionSlot.entries) {
+            val record = from.motion(slot)
+            val current = scene.layer(id)?.motion(slot)
+            if (record == null && current == null) continue
+            if (record?.transition != true) {
+                val paired = current?.takeIf { it.transition && it.partner in chosen && from.motion(if (slot == MotionSlot.In) MotionSlot.Out else MotionSlot.In)?.transition == true }
+                scene = if (paired != null) scene.withPastedTransition(id, slot, paired, notes) ?: scene else scene.withAnimation(id, slot, record?.id, record?.ms ?: 0)
+                continue
+            }
+            scene = scene.withPastedTransition(id, slot, record, notes) ?: scene.also { unpaired++ }
         }
-        if (StylePart.BorderShadow in parts) take(listOf("border", "shadow", "path-stroke"), emptyList())
-        if (StylePart.Blending in parts) {
-            take(emptyList(), listOf("blending"))
-            val opacity = from.node.child("transform")?.child("opacity")
-            node = node.withChild("transform", (node.child("transform") ?: XmlNode("transform")).withChild("opacity", opacity))
-        }
-        l.copy(node = node)
     }
-    val used = styled.layer(id)?.node?.mediaUris().orEmpty()
-    return media.filter { it.uri in used }.fold(styled) { scene, record -> scene.withMedia(record) }
+    val used = ids.flatMapTo(HashSet()) { scene.layer(it)?.node?.mediaUris().orEmpty() }
+    return PastedStyle(media.filter { it.uri in used }.fold(scene) { s, record -> s.withMedia(record) }, ids.size, skipped, unpaired, notes.distinct())
+}
+
+private fun Scene.withPastedTransition(id: Long, slot: MotionSlot, record: MotionRecord, notes: MutableList<UiText>): Scene? {
+    val kind = TransitionKind.of(record.id) ?: return null
+    val target = layer(id) ?: return null
+    val out = slot == MotionSlot.Out
+    val other = if (out) MotionSlot.In else MotionSlot.Out
+    val mine = target.motion(slot)?.takeIf { it.transition }?.partner
+    val near = (1000 / fps.coerceAtLeast(1)).coerceAtLeast(1)
+    fun gap(p: Layer) = if (out) p.startTime - target.endTime else target.startTime - p.endTime
+    fun cut(p: Layer) = p.canAnimate && if (out) p.startTime > target.startTime && p.endTime > target.endTime else p.startTime < target.startTime && p.endTime < target.endTime
+    val partner = layers.filter { p ->
+        p.id != id && cut(p) && p.motion(other)?.let { !it.transition || it.partner == id } != false && (p.id == mine || !p.hidden && gap(p) <= near)
+    }.minWithOrNull(compareBy<Layer>({ it.id != mine }, { abs(gap(it)) })) ?: return null
+    val result = withTransition(if (out) id else partner.id, if (out) partner.id else id, kind, record.ms)
+    return result.scene.takeIf { it.node !== node }?.also { result.note?.let(notes::add) }
 }
 
 fun EditorState.alignClipTimes(mode: Int) {

@@ -1205,8 +1205,6 @@
     <string name="font_source_google">Google Fonts</string>
     <string name="font_google_hint">Saisissez un nom pour chercher dans tout Google Fonts</string>
     <string name="font_downloads_when_chosen">Téléchargée à la sélection</string>
-    <string name="fonts_missing_title">Polices absentes de cet appareil</string>
-    <string name="fonts_missing_body">Ce projet utilise des polices absentes de cet appareil : %1$s. Le texte s’affiche dans une autre police jusqu’à leur téléchargement depuis Google Fonts.</string>
     <string name="font_favorite">Favori</string>
     <string name="font_category_sans_serif">Sans empattement</string>
     <string name="font_category_serif">Avec empattement</string>
@@ -1370,6 +1368,7 @@
     <string name="structure_paste_fill_color">Coller le remplissage et la couleur</string>
     <string name="structure_paste_border_shadow">Coller la bordure et l’ombre</string>
     <string name="structure_paste_blending">Coller l’opacité et le mode de fusion</string>
+    <string name="structure_paste_motions">Coller les animations et les transitions</string>
     <string name="structure_paste_style">Coller le style</string>
     <string name="text_alignment">Alignement</string>
     <string name="track_track">Suivre</string>
@@ -1840,6 +1839,7 @@
     <string name="ai_model_grain">Modèle de grain pour l’amélioration AI</string>
     <string name="ai_model_cartoon">Modèle de dessin animé pour l’amélioration AI</string>
     <string name="ai_model_cutout">Suppression d’arrière-plan AI 2.0</string>
+    <string name="ai_model_noise">Modèle de réduction du bruit</string>
     <string name="ai_model_broken">Un fichier de modèle AI était endommagé et a été supprimé. Téléchargez-le à nouveau.</string>
     <string name="ai_model_download_failed">Échec du téléchargement du modèle AI. Vérifiez la connexion et réessayez.</string>
     <string name="ai_model_download_wrong">Le fichier téléchargé n’est pas le modèle AI</string>
@@ -1889,6 +1889,7 @@
     <string name="cutout_best">Suppression d’arrière-plan AI 2.0</string>
     <string name="cutout_best_hint">Contours plus nets autour des cheveux et des détails fins. Télécharge %1$s une seule fois. Images uniquement.</string>
     <string name="cutout_fallback_download">Impossible de télécharger la suppression d’arrière-plan AI 2.0 ; le mode Standard a été utilisé. Vérifiez la connexion et réessayez.</string>
+    <string name="ai_noise_fallback_download">Impossible de télécharger le modèle de réduction du bruit ; la réduction du bruit standard a été utilisée. Vérifiez la connexion et réessayez.</string>
     <string name="cutout_fallback_failed">La suppression d’arrière-plan AI 2.0 n’a pas pu traiter cette image ; le mode Standard a été utilisé.</string>
     <string name="ai_gpu_warning">Cela peut bloquer certains téléphones. Si le téléphone se bloque, redémarrez-le : l’AI utilisera à nouveau le processeur.</string>
     <string name="ai_gpu_failed">Le traitement AI sur la puce graphique n’a pas abouti. L’AI utilise désormais le processeur.</string>
@@ -2006,6 +2007,17 @@
     <string name="track_motion_cancelled">Suivi annulé. Les images déjà suivies conservent leurs images clés.</string>
     <string name="track_motion_unavailable">Le suivi de mouvement n’est pas disponible dans cette version.</string>
     <string name="track_motion_failed">Impossible de suivre cette vidéo.</string>
+    <string name="face_tracking_pick">Choisir un visage</string>
+    <string name="face_tracking_again">Suivre à nouveau</string>
+    <string name="face_tracking_none">Aucun visage choisi pour l’instant.</string>
+    <string name="face_tracking_ready">La vidéo suit le visage choisi.</string>
+    <string name="face_tracking_partial">Une partie du clip n’est pas encore suivie.</string>
+    <string name="face_tracking_video_only">Le suivi du visage fonctionne sur les calques vidéo.</string>
+    <string name="face_tracking_tap">Touchez le visage que la vidéo doit suivre.</string>
+    <string name="face_tracking_looking">Recherche de visages…</string>
+    <string name="face_tracking_none_here">Aucun visage trouvé dans cette image. Essayez-en une autre.</string>
+    <string name="face_tracking_lost">Le visage n’a pas pu être suivi dans ce clip.</string>
+    <string name="face_tracking_cancelled">Suivi du visage annulé.</string>
     <string name="edit_layer_copy_name">%1$s copie</string>
     <string name="model_layer_video">Vidéo</string>
     <string name="ai_video_mask_name">Masque de %1$s</string>
@@ -2343,6 +2355,11 @@
         <item quantity="many">Collé sur %1$s calques</item>
         <item quantity="other">Collé sur %1$s calques</item>
     </plurals>
+    <plurals name="structure_transitions_skipped">
+        <item quantity="one">%1$s transition ignorée : il faut un clip juste avant ou après le calque</item>
+        <item quantity="many">%1$s transitions ignorées : il faut un clip juste avant ou après le calque</item>
+        <item quantity="other">%1$s transitions ignorées : il faut un clip juste avant ou après le calque</item>
+    </plurals>
     <string name="subject_keep_all">Tout conserver</string>
     <string name="subject_hint_photo">Pour ne conserver qu’une personne ou un objet, appuyez dessus.</string>
     <string name="subject_hint_video">Pour ne conserver qu’une personne ou un objet, appuyez dessus dans cette première image. L’application le suivra tout au long du clip.</string>
@@ -2463,8 +2480,6 @@
     <string name="desk_folder_back">Retour à tous les médias</string>
     <string name="voice_install_espeak">Aucune voix trouvée. Installez le paquet espeak-ng, puis rouvrez cette fenêtre.</string>
     <string name="desk_close_save_failed">Vos dernières modifications n’ont pas pu être enregistrées. Libérez de l’espace disque, puis cliquez sur Réessayer. Si vous fermez sans enregistrer, AbsentMotion vous proposera à nouveau ces modifications au prochain démarrage.</string>
-    <string name="desk_fonts_missing_title">Polices absentes de cet ordinateur</string>
-    <string name="desk_fonts_missing_body">Ce projet utilise des polices absentes de cet ordinateur : %1$s. Le texte s’affiche dans une autre police jusqu’à ce que vous les téléchargiez depuis Google Fonts.</string>
     <string name="desk_export_busy">Un autre export est en cours. Attendez sa fin ou annulez-le d’abord.</string>
     <string name="desk_export_no_ffmpeg">AbsentMotion n’a pas pu démarrer FFmpeg, le programme utilisé pour créer les fichiers vidéo et audio. Réinstallez AbsentMotion.</string>
     <string name="desk_export_note_software">Aucun encodeur vidéo matériel ne fonctionne sur cet ordinateur. Cet export utilise donc l’encodeur logiciel, plus lent.</string>
@@ -2843,6 +2858,7 @@
     <string name="added_effect_save_failed">Impossible d’enregistrer tous les effets.</string>
     <string name="added_effect_remove_failed">Impossible de retirer l’effet.</string>
     <string name="community_filter_effects">Effets</string>
+    <string name="community_filter_new">Nouveautés</string>
     <string name="added_effect_version">Version %1$d</string>
     <string name="added_effect_already_added">Déjà ajouté</string>
     <string name="added_effect_newer_installed">Vous avez une version plus récente (v%1$d)</string>

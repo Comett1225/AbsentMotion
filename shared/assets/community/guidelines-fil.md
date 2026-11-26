@@ -27,6 +27,7 @@ Tinitingnan muna ng isang tao ang lahat ng nasa tab na **Komunidad** bago ito ma
 
 - Panatilihin itong angkop para sa lahat. Mga tao sa lahat ng edad ang gumagamit ng AbsentMotion.
 - Hanggang 20 MB ang mga project bundle, hanggang 1 MB ang mga preset at hanggang 512 KB ang mga effect.
+- Kailangan ng bawat effect ng thumbnail na nagpapakita nito, sa dalawang laki: maliit (192 × 192 WebP, nakatigil o gumagalaw nang hanggang 3 segundo) at malaki (720 × 720 WebP), hanggang 150 KB bawat isa.
 - Ibinabahagi ang mga item sa ilalim ng CC BY 4.0: puwede itong gamitin at baguhin ng sinuman basta bibigyan nila ng credit ang gumawa.
 - Ang pangalan sa item mo ay ang pangalan ng creator na tina-type mo. Huwag maglagay ng anumang personal dito.
 - Ang maintainer ang nagpapasya kung ano ang ilalagay, at puwede niyang alisin ang isang item anumang oras.

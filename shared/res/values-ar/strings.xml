@@ -1259,8 +1259,6 @@
     <string name="font_source_google">Google Fonts</string>
     <string name="font_google_hint">اكتب اسمًا للبحث في كل خطوط Google Fonts</string>
     <string name="font_downloads_when_chosen">يُحمَّل عند الاختيار</string>
-    <string name="fonts_missing_title">خطوط غير موجودة على هذا الهاتف</string>
-    <string name="fonts_missing_body">يستخدم هذا المشروع خطوطًا غير موجودة على هذا الهاتف: %1$s. يظهر النص بخط آخر حتى تنزّلها من Google Fonts.</string>
     <string name="font_favorite">المفضلة</string>
     <string name="font_category_sans_serif">بدون حواف</string>
     <string name="font_category_serif">بحواف</string>
@@ -1430,6 +1428,7 @@
     <string name="structure_paste_fill_color">لصق التعبئة واللون</string>
     <string name="structure_paste_border_shadow">لصق الحدود والظل</string>
     <string name="structure_paste_blending">لصق العتامة ووضع الدمج</string>
+    <string name="structure_paste_motions">لصق الحركات والانتقالات</string>
     <string name="structure_paste_style">لصق النمط</string>
     <string name="text_alignment">المحاذاة</string>
     <string name="track_track">تتبع</string>
@@ -1921,6 +1920,7 @@
     <string name="ai_model_grain">نموذج AI لتحسين حبيبات الفيلم</string>
     <string name="ai_model_cartoon">نموذج AI لتحسين الكارتون</string>
     <string name="ai_model_cutout">إزالة الخلفية بالذكاء الاصطناعي 2.0</string>
+    <string name="ai_model_noise">نموذج تقليل الضوضاء</string>
     <string name="ai_model_broken">تلف ملف نموذج AI وتم حذفه. نزّله مرة أخرى.</string>
     <string name="ai_model_download_failed">فشل تنزيل نموذج AI. تحقق من الاتصال وحاول مرة أخرى.</string>
     <string name="ai_model_download_wrong">الملف الذي تم تنزيله ليس نموذج AI</string>
@@ -1970,6 +1970,7 @@
     <string name="cutout_best">إزالة الخلفية بالذكاء الاصطناعي 2.0</string>
     <string name="cutout_best_hint">حواف أنظف حول الشعر والتفاصيل الدقيقة. يُنزِّل %1$s مرة واحدة. للصور فقط.</string>
     <string name="cutout_fallback_download">تعذّر تنزيل إزالة الخلفية بالذكاء الاصطناعي 2.0، لذا استُخدم الوضع القياسي. تحقق من الاتصال وحاول مرة أخرى.</string>
+    <string name="ai_noise_fallback_download">تعذّر تنزيل نموذج تقليل الضوضاء، لذا استُخدم تقليل الضوضاء القياسي. تحقق من الاتصال وحاول مرة أخرى.</string>
     <string name="cutout_fallback_failed">تعذّرت إزالة الخلفية بالذكاء الاصطناعي 2.0 لهذه الصورة، لذا استُخدم الوضع القياسي.</string>
     <string name="ai_gpu_warning">قد يؤدي هذا إلى تجميد بعض الهواتف. إذا تجمد الهاتف، أعد تشغيله وسيستخدم الذكاء الاصطناعي المعالج مجددًا.</string>
     <string name="ai_gpu_failed">لم تكتمل معالجة الذكاء الاصطناعي على شريحة الرسوميات، لذا أصبح الذكاء الاصطناعي يستخدم المعالج الآن.</string>
@@ -2087,6 +2088,17 @@
     <string name="track_motion_cancelled">أُلغي التتبع. تحتفظ الإطارات المتتبعة بالفعل بإطاراتها المفتاحية.</string>
     <string name="track_motion_unavailable">تتبع الحركة غير متاح في هذا الإصدار.</string>
     <string name="track_motion_failed">تعذّر تتبع هذا الفيديو.</string>
+    <string name="face_tracking_pick">اختيار وجه</string>
+    <string name="face_tracking_again">تتبع مجددًا</string>
+    <string name="face_tracking_none">لم يُختر أي وجه بعد.</string>
+    <string name="face_tracking_ready">يتبع الفيديو الوجه الذي اخترته.</string>
+    <string name="face_tracking_partial">جزء من المقطع لم يُتتبَّع بعد.</string>
+    <string name="face_tracking_video_only">يعمل تتبع الوجه على طبقات الفيديو.</string>
+    <string name="face_tracking_tap">اضغط على الوجه الذي يجب أن يتبعه الفيديو.</string>
+    <string name="face_tracking_looking">جارٍ البحث عن وجوه…</string>
+    <string name="face_tracking_none_here">لم يُعثر على وجه في هذا الإطار. جرّب إطارًا آخر.</string>
+    <string name="face_tracking_lost">تعذّر تتبع الوجه في هذا المقطع.</string>
+    <string name="face_tracking_cancelled">أُلغي تتبع الوجه.</string>
     <string name="edit_layer_copy_name">نسخة %1$s</string>
     <string name="model_layer_video">فيديو</string>
     <string name="ai_video_mask_name">قناع %1$s</string>
@@ -2442,6 +2454,14 @@
         <item quantity="many">تم اللصق على %1$s طبقة</item>
         <item quantity="other">تم اللصق على %1$s طبقة</item>
     </plurals>
+    <plurals name="structure_transitions_skipped">
+        <item quantity="zero">تم تخطي %1$s انتقال: يلزم مقطع قبل الطبقة أو بعدها مباشرة</item>
+        <item quantity="one">تم تخطي انتقال واحد: يلزم مقطع قبل الطبقة أو بعدها مباشرة</item>
+        <item quantity="two">تم تخطي انتقالين: يلزم مقطع قبل الطبقة أو بعدها مباشرة</item>
+        <item quantity="few">تم تخطي %1$s انتقالات: يلزم مقطع قبل الطبقة أو بعدها مباشرة</item>
+        <item quantity="many">تم تخطي %1$s انتقالًا: يلزم مقطع قبل الطبقة أو بعدها مباشرة</item>
+        <item quantity="other">تم تخطي %1$s انتقال: يلزم مقطع قبل الطبقة أو بعدها مباشرة</item>
+    </plurals>
     <string name="subject_keep_all">الإبقاء على الكل</string>
     <string name="subject_hint_photo">للاحتفاظ بشخص أو عنصر واحد فقط، انقر عليه.</string>
     <string name="subject_hint_video">للاحتفاظ بشخص أو عنصر واحد فقط، انقر عليه في هذا الإطار الأول. يتتبعه التطبيق عبر المقطع.</string>
@@ -2568,8 +2588,6 @@
     <string name="desk_folder_back">العودة إلى كل الوسائط</string>
     <string name="voice_install_espeak">لم يتم العثور على أصوات. ثبّت حزمة espeak-ng ثم افتح هذه النافذة مرة أخرى.</string>
     <string name="desk_close_save_failed">تعذّر حفظ آخر تغييراتك. حرّر بعض مساحة القرص ثم انقر على «إعادة المحاولة». إذا أغلقت دون حفظ، فسيعرض AbsentMotion هذه التغييرات مجددًا عند التشغيل التالي.</string>
-    <string name="desk_fonts_missing_title">خطوط غير موجودة على هذا الكمبيوتر</string>
-    <string name="desk_fonts_missing_body">يستخدم هذا المشروع خطوطًا غير موجودة على هذا الكمبيوتر: %1$s. يظهر النص بخط آخر إلى أن تنزّلها من Google Fonts.</string>
     <string name="desk_export_busy">هناك تصدير آخر لا يزال قيد التنفيذ. انتظر حتى ينتهي أو ألغِه أولًا.</string>
     <string name="desk_export_no_ffmpeg">تعذر على AbsentMotion تشغيل FFmpeg، وهو البرنامج المستخدم لإنشاء ملفات الفيديو والصوت. أعد تثبيت AbsentMotion.</string>
     <string name="desk_export_note_software">لا يعمل أي مشفّر فيديو عتادي على هذا الكمبيوتر، لذا يستخدم هذا التصدير مشفّر البرامج الأبطأ.</string>
@@ -2960,6 +2978,7 @@
     <string name="added_effect_save_failed">تعذّر حفظ كل التأثيرات.</string>
     <string name="added_effect_remove_failed">تعذّرت إزالة التأثير.</string>
     <string name="community_filter_effects">التأثيرات</string>
+    <string name="community_filter_new">الجديد</string>
     <string name="added_effect_version">الإصدار %1$d</string>
     <string name="added_effect_already_added">مضاف بالفعل</string>
     <string name="added_effect_newer_installed">لديك إصدار أحدث (v%1$d)</string>

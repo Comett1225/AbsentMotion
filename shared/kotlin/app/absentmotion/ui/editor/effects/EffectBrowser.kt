@@ -289,7 +289,7 @@ private fun BrowserBody(state: EditorState, pickFile: () -> Unit) {
     val creatorCategories = creatorTiles.filter { it.key in catalog.shownAddedCreators }
         .map { (slug, effects) -> (CreatorCategoryPrefix + slug) to creatorName(effects) }
     val listed = catalog.categories.let { all -> if (hasSound) all.filter { it.first != "ai" } + ("audio" to audioName) + all.filter { it.first == "ai" } else all } +
-        (AddedEffectCategory to addedName) + creatorCategories
+        creatorCategories + (AddedEffectCategory to addedName)
     val page = listOf(searching, category, creator)
     var shownDetail by remember { mutableStateOf<EffectDefinition?>(null) }
     if (detail != null) shownDetail = detail
@@ -648,7 +648,7 @@ private fun EffectsCategoryTile(
             slug != null -> Thumbnail(catalog, creators[slug]?.firstNotNullOfOrNull { it.addedPicture }, Modifier.fillMaxSize(), ContentScale.Crop)
             key == "ai" -> AiBackdrop(Modifier.fillMaxSize())
             key == "audio" -> AudioBackdrop(Modifier.fillMaxSize())
-            else -> Thumbnail(catalog, catalog.listed(key).firstOrNull { !it.isAdded || key == AddedEffectCategory }?.thumbnail, Modifier.fillMaxSize(), ContentScale.Crop)
+            else -> Thumbnail(catalog, catalog.listed(key).firstOrNull { (!it.isAdded || key == AddedEffectCategory) && key !in it.alsoIn }?.thumbnail, Modifier.fillMaxSize(), ContentScale.Crop)
         }
         Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.55f)))
         if (deskLayout) {

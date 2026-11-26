@@ -2,6 +2,9 @@
  "id": "kaleidoscope",
  "name": "Kaleidoscope",
  "category": "repeat",
+ "also": [
+  "distort"
+ ],
  "description": "Mirrored slices around a point.",
  "params": [
   {
@@ -49,7 +52,22 @@
     "Clockwise",
     "Counterclockwise"
    ]
+  },
+  {
+   "id": "edgeStyle",
+   "label": "Style",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "when": {
+    "edgeStyle": [
+     2
+    ]
+   }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 center;\nuniform float segments;\nuniform float angle;\nuniform float mirror;\nuniform float direction;\nhalf4 main(float2 coord) {\n    float2 c = center * size;\n    float flip = direction > 0.5 ? -1.0 : 1.0;\n    float2 d = (coord - c) * float2(1.0, flip);\n    float radius = length(d);\n    if (radius < 0.00001) return image.eval(c);\n    float slice = 6.2831853 / max(floor(segments), 1);\n    float a = mod(atan(d.y, d.x) - radians(angle), slice);\n    a = (mirror > 0.5 ? min(a, slice - a) : a) + radians(angle);\n    return image.eval(c + radius * float2(cos(a), flip * sin(a)));\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 center;\nuniform float segments;\nuniform float angle;\nuniform float mirror;\nuniform float direction;\nuniform float4 screen;\nuniform float edgeStyle;\nhalf4 main(float2 coord) {\n    if (edgeStyle > 0.5 && segments <= 0.0) return half4(0.0);\n    float2 c = center * size;\n    float flip = direction > 0.5 ? -1.0 : 1.0;\n    float2 d = (coord - c) * float2(1.0, flip);\n    float radius = length(d);\n    if (radius < 0.00001) return image.eval(c);\n    float slice = 6.2831853 / (edgeStyle > 0.5 ? segments : max(floor(segments), 1));\n    float a = mod(atan(d.y, d.x) - (edgeStyle > 0.5 ? slice * 0.5 * step(0.5, mirror) : radians(angle)), slice);\n    a = (mirror > 0.5 ? min(a, slice - a) : a) + radians(angle);\n    float2 q = c + radius * float2(cos(a), flip * sin(a));\n    return image.eval(edgeStyle > 0.5 ? clamp(q, screen.xy + 0.5, screen.xy + screen.zw - 0.5) : q);\n}\n"
 }

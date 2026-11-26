@@ -1223,8 +1223,6 @@
     <string name="font_source_google">Google Fonts</string>
     <string name="font_google_hint">Введіть назву, щоб шукати серед усіх шрифтів Google Fonts</string>
     <string name="font_downloads_when_chosen">Завантажується після вибору</string>
-    <string name="fonts_missing_title">Шрифтів немає на цьому телефоні</string>
-    <string name="fonts_missing_body">Цей проєкт використовує шрифти, яких немає на цьому телефоні: %1$s. Доки ви не завантажите їх із Google Fonts, текст відображається іншим шрифтом.</string>
     <string name="font_favorite">Улюблений</string>
     <string name="font_category_sans_serif">Без засічок</string>
     <string name="font_category_serif">З засічками</string>
@@ -1390,6 +1388,7 @@
     <string name="structure_paste_fill_color">Вставити заливку й колір</string>
     <string name="structure_paste_border_shadow">Вставити рамку й тінь</string>
     <string name="structure_paste_blending">Вставити непрозорість і режим накладання</string>
+    <string name="structure_paste_motions">Вставити анімації й переходи</string>
     <string name="structure_paste_style">Вставити стиль</string>
     <string name="text_alignment">Вирівнювання</string>
     <string name="track_track">Відстежувати</string>
@@ -1867,6 +1866,7 @@
     <string name="ai_model_grain">Модель ШІ-покращення зернистості</string>
     <string name="ai_model_cartoon">Модель ШІ-покращення мультфільмів</string>
     <string name="ai_model_cutout">ШІ-видалення фону 2.0</string>
+    <string name="ai_model_noise">Модель шумозаглушення</string>
     <string name="ai_model_broken">Файл моделі ШІ пошкоджено й видалено. Завантажте його ще раз.</string>
     <string name="ai_model_download_failed">Не вдалося завантажити модель ШІ. Перевірте з\'єднання й спробуйте ще раз.</string>
     <string name="ai_model_download_wrong">Завантажений файл не є моделлю ШІ</string>
@@ -1916,6 +1916,7 @@
     <string name="cutout_best">ШІ-видалення фону 2.0</string>
     <string name="cutout_best_hint">Чистіші краї навколо волосся та дрібних деталей. Завантажує %1$s один раз. Лише для зображень.</string>
     <string name="cutout_fallback_download">Не вдалося завантажити ШІ-видалення фону 2.0, тому використано стандартну якість. Перевірте з\'єднання й спробуйте ще раз.</string>
+    <string name="ai_noise_fallback_download">Не вдалося завантажити модель шумозаглушення, тому використано стандартне шумозаглушення. Перевірте з\'єднання й спробуйте ще раз.</string>
     <string name="cutout_fallback_failed">ШІ-видалення фону 2.0 не змогло завершити обробку цього зображення, тому використано стандартну якість.</string>
     <string name="ai_gpu_warning">Це може призвести до зависання деяких телефонів. Якщо телефон завис, перезапустіть його, і ШІ знову використовуватиме процесор.</string>
     <string name="ai_gpu_failed">Робота ШІ на графічному чипі не завершилася, тому тепер ШІ використовує процесор.</string>
@@ -2033,6 +2034,17 @@
     <string name="track_motion_cancelled">Відстеження скасовано. Для вже відстежених кадрів ключові кадри збережено.</string>
     <string name="track_motion_unavailable">Відстеження руху недоступне в цій збірці.</string>
     <string name="track_motion_failed">Не вдалося відстежити це відео.</string>
+    <string name="face_tracking_pick">Вибрати обличчя</string>
+    <string name="face_tracking_again">Відстежити знову</string>
+    <string name="face_tracking_none">Обличчя ще не вибрано.</string>
+    <string name="face_tracking_ready">Відео стежить за вибраним обличчям.</string>
+    <string name="face_tracking_partial">Частину кліпу ще не відстежено.</string>
+    <string name="face_tracking_video_only">Відстеження обличчя працює з відеошарами.</string>
+    <string name="face_tracking_tap">Торкніться обличчя, за яким має стежити відео.</string>
+    <string name="face_tracking_looking">Пошук облич…</string>
+    <string name="face_tracking_none_here">У цьому кадрі обличчя не знайдено. Спробуйте інший.</string>
+    <string name="face_tracking_lost">Не вдалося відстежити обличчя в цьому кліпі.</string>
+    <string name="face_tracking_cancelled">Відстеження обличчя скасовано.</string>
     <string name="edit_layer_copy_name">%1$s (копія)</string>
     <string name="model_layer_video">Відео</string>
     <string name="ai_video_mask_name">Маска: %1$s</string>
@@ -2376,6 +2388,12 @@
         <item quantity="many">Вставлено на %1$s шарів</item>
         <item quantity="other">Вставлено на %1$s шару</item>
     </plurals>
+    <plurals name="structure_transitions_skipped">
+        <item quantity="one">%1$s перехід пропущено: потрібен кліп одразу перед шаром або після нього</item>
+        <item quantity="few">%1$s переходи пропущено: потрібен кліп одразу перед шаром або після нього</item>
+        <item quantity="many">%1$s переходів пропущено: потрібен кліп одразу перед шаром або після нього</item>
+        <item quantity="other">%1$s переходу пропущено: потрібен кліп одразу перед шаром або після нього</item>
+    </plurals>
     <string name="subject_keep_all">Залишити все</string>
     <string name="subject_hint_photo">Щоб залишити лише одну людину чи об\'єкт, торкніться його.</string>
     <string name="subject_hint_video">Щоб залишити лише одну людину чи об\'єкт, торкніться його на першому кадрі. Застосунок відстежуватиме його протягом кліпу.</string>
@@ -2498,8 +2516,6 @@
     <string name="desk_folder_back">Назад до всіх медіа</string>
     <string name="voice_install_espeak">Голосів не знайдено. Встановіть пакет espeak-ng і знову відкрийте це вікно.</string>
     <string name="desk_close_save_failed">Не вдалося зберегти останні зміни. Звільніть місце на диску й натисніть «Спробувати ще». Якщо закрити без збереження, AbsentMotion запропонує ці зміни знову під час наступного запуску.</string>
-    <string name="desk_fonts_missing_title">Шрифтів немає на цьому комп\'ютері</string>
-    <string name="desk_fonts_missing_body">Цей проєкт використовує шрифти, яких немає на цьому комп\'ютері: %1$s. Текст відображається іншим шрифтом, доки ви не завантажите їх із Google Fonts.</string>
     <string name="desk_export_busy">Інший експорт ще триває. Дочекайтеся його завершення або спершу скасуйте його.</string>
     <string name="desk_export_no_ffmpeg">AbsentMotion не вдалося запустити FFmpeg, програму, яка записує відео- та аудіофайли. Встановіть AbsentMotion ще раз.</string>
     <string name="desk_export_note_software">На цьому комп\'ютері не працює жоден апаратний відеокодувальник, тож цей експорт використовує повільніший програмний кодувальник.</string>
@@ -2882,6 +2898,7 @@
     <string name="added_effect_save_failed">Не вдалося зберегти всі ефекти.</string>
     <string name="added_effect_remove_failed">Не вдалося видалити ефект.</string>
     <string name="community_filter_effects">Ефекти</string>
+    <string name="community_filter_new">Нове</string>
     <string name="added_effect_version">Версія %1$d</string>
     <string name="added_effect_already_added">Уже додано</string>
     <string name="added_effect_newer_installed">У вас новіша версія (v%1$d)</string>

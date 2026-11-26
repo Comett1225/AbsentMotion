@@ -45,7 +45,7 @@ class AlightParityTest {
         assertEquals(listOf("Size", "Roundness", "Feather", "Strength", "Tint", "Color", "Punch Out", "Style"), catalog.find("absent.vignette")!!.params.map { it.label })
         assertEquals(listOf("Strength", "float", "0.800000", "0.0..1.0"), params("vignette").getValue("strength").row())
         for (key in listOf("zoomstreaks", "spinstreaks")) {
-            val streaks = catalog.find("absent.$key")!!.params.takeLast(4)
+            val streaks = catalog.find("absent.$key")!!.params.filter { it.id != "alight" }.takeLast(4)
             assertEquals(listOf("R", "G", "B", "A"), streaks.map { it.label })
             assertTrue(streaks.all { it.options == listOf("Min", "Max", "Avg", "Off") && it.default == "1.000000" })
         }

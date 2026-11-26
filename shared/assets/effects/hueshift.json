@@ -1,0 +1,19 @@
+{
+ "id": "hueshift",
+ "name": "Hue Shift",
+ "category": "color",
+ "since": "5.3.2",
+ "description": "Turns every color around the color wheel by the same angle and keeps the brightness.",
+ "params": [
+  {
+   "id": "hue",
+   "label": "Hue Shift",
+   "type": "angle",
+   "default": 0,
+   "min": -360,
+   "max": 360,
+   "step": 0.1
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float hue;\nhalf4 main(float2 coord) {\n    half4 c = unpremul(image.eval(coord));\n    float a = radians(-hue);\n    float3 v = float3(c.rgb);\n    float y = dot(v, float3(0.299, 0.587, 0.114));\n    float2 uv = float2(dot(v, float3(-0.14713, -0.28886, 0.436)), dot(v, float3(0.615, -0.51499, -0.10001)));\n    uv = float2(uv.x * cos(a) - uv.y * sin(a), uv.x * sin(a) + uv.y * cos(a));\n    v = float3(y + 1.13983 * uv.y, y - 0.39465 * uv.x - 0.5806 * uv.y, y + 2.03211 * uv.x);\n    return half4(half3(saturate(v)) * c.a, c.a);\n}\n"
+}

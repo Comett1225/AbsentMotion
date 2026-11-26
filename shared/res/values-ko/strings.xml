@@ -1169,8 +1169,6 @@
     <string name="font_source_google">Google Fonts</string>
     <string name="font_google_hint">이름을 입력해 Google Fonts 전체에서 검색</string>
     <string name="font_downloads_when_chosen">선택 시 다운로드</string>
-    <string name="fonts_missing_title">이 휴대전화에 없는 글꼴</string>
-    <string name="fonts_missing_body">이 프로젝트는 이 휴대전화에 없는 글꼴을 사용합니다: %1$s. Google Fonts에서 다운로드할 때까지 텍스트가 다른 글꼴로 표시됩니다.</string>
     <string name="font_favorite">즐겨찾기</string>
     <string name="font_category_sans_serif">산세리프</string>
     <string name="font_category_serif">세리프</string>
@@ -1330,6 +1328,7 @@
     <string name="structure_paste_fill_color">채우기 및 색상 붙여넣기</string>
     <string name="structure_paste_border_shadow">테두리 및 그림자 붙여넣기</string>
     <string name="structure_paste_blending">불투명도 및 블렌딩 모드 붙여넣기</string>
+    <string name="structure_paste_motions">애니메이션 및 전환 붙여넣기</string>
     <string name="structure_paste_style">스타일 붙여넣기</string>
     <string name="text_alignment">정렬</string>
     <string name="track_track">트래킹</string>
@@ -1786,6 +1785,7 @@
     <string name="ai_model_grain">AI 화질 개선 필름 그레인 모델</string>
     <string name="ai_model_cartoon">AI 화질 개선 만화 모델</string>
     <string name="ai_model_cutout">AI 배경 제거 2.0</string>
+    <string name="ai_model_noise">노이즈 감소 모델</string>
     <string name="ai_model_broken">AI 모델 파일이 손상되어 삭제되었습니다. 다시 다운로드하세요.</string>
     <string name="ai_model_download_failed">AI 모델 다운로드에 실패했습니다. 연결을 확인하고 다시 시도하세요.</string>
     <string name="ai_model_download_wrong">다운로드한 파일이 AI 모델이 아닙니다</string>
@@ -1835,6 +1835,7 @@
     <string name="cutout_best">AI 배경 제거 2.0</string>
     <string name="cutout_best_hint">머리카락과 세부 부분의 가장자리를 더 깔끔하게 처리합니다. %1$s를 한 번 다운로드합니다. 이미지만 지원합니다.</string>
     <string name="cutout_fallback_download">AI 배경 제거 2.0을 다운로드할 수 없어 표준을 사용했습니다. 연결을 확인하고 다시 시도하세요.</string>
+    <string name="ai_noise_fallback_download">노이즈 감소 모델을 다운로드할 수 없어 표준 노이즈 감소를 사용했습니다. 연결을 확인하고 다시 시도하세요.</string>
     <string name="cutout_fallback_failed">AI 배경 제거 2.0으로 이 이미지를 처리하지 못해 표준을 사용했습니다.</string>
     <string name="ai_gpu_warning">일부 기기가 멈출 수 있습니다. 기기가 멈추면 다시 시작하세요. AI가 다시 프로세서를 사용합니다.</string>
     <string name="ai_gpu_failed">그래픽 칩에서 AI 작업이 완료되지 않아 이제 프로세서를 사용합니다.</string>
@@ -1952,6 +1953,17 @@
     <string name="track_motion_cancelled">트래킹을 취소했습니다. 이미 트래킹한 프레임의 키프레임은 유지됩니다.</string>
     <string name="track_motion_unavailable">이 빌드에서는 모션 트래킹을 사용할 수 없습니다.</string>
     <string name="track_motion_failed">이 동영상을 트래킹할 수 없습니다.</string>
+    <string name="face_tracking_pick">얼굴 선택</string>
+    <string name="face_tracking_again">다시 트래킹</string>
+    <string name="face_tracking_none">아직 선택한 얼굴이 없습니다.</string>
+    <string name="face_tracking_ready">동영상이 선택한 얼굴을 따라갑니다.</string>
+    <string name="face_tracking_partial">클립 일부가 아직 트래킹되지 않았습니다.</string>
+    <string name="face_tracking_video_only">얼굴 트래킹은 동영상 레이어에서 작동합니다.</string>
+    <string name="face_tracking_tap">동영상이 따라갈 얼굴을 탭하세요.</string>
+    <string name="face_tracking_looking">얼굴을 찾는 중…</string>
+    <string name="face_tracking_none_here">이 프레임에서 얼굴을 찾지 못했습니다. 다른 프레임을 시도하세요.</string>
+    <string name="face_tracking_lost">이 클립에서 얼굴을 따라갈 수 없었습니다.</string>
+    <string name="face_tracking_cancelled">얼굴 트래킹을 취소했습니다.</string>
     <string name="edit_layer_copy_name">%1$s 복사본</string>
     <string name="model_layer_video">동영상</string>
     <string name="ai_video_mask_name">%1$s 마스크</string>
@@ -2277,6 +2289,9 @@
     <plurals name="structure_style_pasted">
         <item quantity="other">레이어 %1$s개에 붙여넣었습니다</item>
     </plurals>
+    <plurals name="structure_transitions_skipped">
+        <item quantity="other">전환 %1$s개 건너뜀: 레이어 바로 앞이나 뒤에 클립이 있어야 합니다</item>
+    </plurals>
     <string name="subject_keep_all">모두 유지</string>
     <string name="subject_hint_photo">한 사람이나 사물만 남기려면 해당 대상을 누르세요.</string>
     <string name="subject_hint_video">한 사람이나 사물만 남기려면 이 첫 프레임에서 해당 대상을 누르세요. 앱이 클립 전체에서 대상을 추적합니다.</string>
@@ -2393,8 +2408,6 @@
     <string name="desk_folder_back">전체 미디어로 돌아가기</string>
     <string name="voice_install_espeak">음성을 찾을 수 없습니다. espeak-ng 패키지를 설치한 후 이 창을 다시 여세요.</string>
     <string name="desk_close_save_failed">마지막 변경 사항을 저장하지 못했습니다. 디스크 공간을 확보한 다음 다시 시도를 클릭하세요. 저장하지 않고 닫으면 다음에 AbsentMotion을 시작할 때 이 변경 사항을 다시 복구할 수 있습니다.</string>
-    <string name="desk_fonts_missing_title">이 컴퓨터에 없는 글꼴</string>
-    <string name="desk_fonts_missing_body">이 프로젝트는 이 컴퓨터에 없는 글꼴을 사용합니다: %1$s. Google Fonts에서 다운로드하기 전까지 텍스트가 다른 글꼴로 표시됩니다.</string>
     <string name="desk_export_busy">다른 내보내기가 진행 중입니다. 완료될 때까지 기다리거나 먼저 취소하세요.</string>
     <string name="desk_export_no_ffmpeg">AbsentMotion에서 동영상과 오디오 파일을 만드는 프로그램인 FFmpeg를 시작하지 못했습니다. AbsentMotion을 다시 설치하세요.</string>
     <string name="desk_export_note_software">이 컴퓨터에서 사용할 수 있는 하드웨어 동영상 인코더가 없어 속도가 느린 소프트웨어 인코더로 내보냅니다.</string>
@@ -2765,6 +2778,7 @@
     <string name="added_effect_save_failed">일부 효과를 저장하지 못했어요.</string>
     <string name="added_effect_remove_failed">효과를 삭제하지 못했어요.</string>
     <string name="community_filter_effects">효과</string>
+    <string name="community_filter_new">신규</string>
     <string name="added_effect_version">버전 %1$d</string>
     <string name="added_effect_already_added">이미 추가됨</string>
     <string name="added_effect_newer_installed">더 새로운 버전이 있어요(v%1$d)</string>

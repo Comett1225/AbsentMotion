@@ -51,7 +51,22 @@
    "min": 0.01,
    "max": 50,
    "step": 0.01
+  },
+  {
+   "id": "edgeStyle",
+   "label": "Style",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "when": {
+    "edgeStyle": [
+     2
+    ]
+   }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float offset;\nuniform float radius;\nuniform float curlFrom;\nuniform float direction;\nuniform float stretch;\nhalf4 main(float2 coord) {\n    float2 p = coord;\n    if (curlFrom < 0.5) p.x = size.x - p.x;\n    if (direction > 0.5) p.y = size.y - p.y;\n    float x0 = curlFrom < 0.5 ? size.x * (1.0 - offset) : size.x * offset;\n    float yc = size.y * 0.5;\n    float r = max(radius, 0.001) * size.y * 0.5;\n    float k = max(stretch, 0.01) / r;\n    float reach = size.x - x0;\n    float2 c = float2(x0, yc - r);\n    float2 d = p - c;\n    float off = length(d) - r;\n    float phi = atan(d.x, d.y);\n    if (phi < 0.0) phi += 6.2831853;\n    float2 src = float2(-1.0);\n    if (abs(off) <= yc + 0.5 && reach > 0.0) {\n        for (int m = 7; m >= 0; m--) {\n            float along = (phi + 6.2831853 * float(m)) / k;\n            if (along < reach) {\n                src = float2(x0 + along, yc + off);\n                break;\n            }\n        }\n    }\n    if (src.x < 0.0 && p.x <= x0) src = p;\n    if (src.x < 0.0) return half4(0.0);\n    if (curlFrom < 0.5) src.x = size.x - src.x;\n    if (direction > 0.5) src.y = size.y - src.y;\n    return image.eval(src);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float offset;\nuniform float radius;\nuniform float curlFrom;\nuniform float direction;\nuniform float stretch;\nuniform float edgeStyle;\nhalf4 main(float2 coord) {\n    float2 p = coord;\n    if (curlFrom < 0.5) p.x = size.x - p.x;\n    if (direction > 0.5) p.y = size.y - p.y;\n    float x0 = curlFrom < 0.5 ? size.x * (1.0 - offset) : size.x * offset;\n    float yc = size.y * 0.5;\n    float r = edgeStyle > 0.5 ? (max(radius, 0.0) + 0.5) * size.y : max(radius, 0.001) * size.y * 0.5;\n    float k = max(stretch, 0.01) / (edgeStyle > 0.5 ? max(radius * size.y, 0.001) : r);\n    float reach = size.x - x0;\n    float2 c = float2(x0, yc - r);\n    float2 d = p - c;\n    float off = length(d) - r;\n    float phi = atan(d.x, d.y);\n    if (phi < 0.0) phi += 6.2831853;\n    float2 src = float2(-1.0);\n    if (abs(off) <= yc + 0.5 && reach > 0.0 && (edgeStyle < 0.5 || p.x > x0 || p.y < 0.0 || p.y > size.y)) {\n        for (int n = 7; n >= 0; n--) {\n            float m = edgeStyle > 0.5 ? 7.0 - float(n) : float(n);\n            float along = (phi + 6.2831853 * m) / k;\n            if (along < reach) {\n                src = float2(x0 + along, yc + off);\n                break;\n            }\n        }\n    }\n    if (src.x < 0.0 && p.x <= x0) src = p;\n    if (src.x < 0.0) return half4(0.0);\n    if (curlFrom < 0.5) src.x = size.x - src.x;\n    if (direction > 0.5) src.y = size.y - src.y;\n    return image.eval(src);\n}\n"
 }

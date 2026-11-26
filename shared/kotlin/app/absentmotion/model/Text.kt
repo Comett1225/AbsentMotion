@@ -17,7 +17,7 @@ fun Layer.withTextSize(value: Float) = copy(node = node.with("size", formatFloat
 fun Layer.withWrapWidth(value: Int) = copy(node = node.with("wrapWidth", "${value.coerceAtLeast(1)}"))
 fun Layer.withTextAlign(value: String) = copy(node = node.with("align", value))
 fun Layer.textSpacing(name: String, fallback: Float): Float = node.children
-    .firstOrNull { it.name == "effect" && it["id"] == app.absentmotion.compat.ForeignEffectIds.TEXT_SPACING && it["hidden"] != "true" }
+    .firstOrNull { it.name == "effect" && it["id"] in app.absentmotion.engine.TextSpacingEffects && it["hidden"] != "true" }
     ?.children?.firstOrNull { it.name == "property" && it["name"] == name }
     ?.valueAt(t)?.finiteFloat() ?: fallback
 

@@ -2,6 +2,9 @@
  "id": "parenthelper",
  "name": "Parenting Helper",
  "category": "move",
+ "also": [
+  "other"
+ ],
  "since": "5.0.0",
  "native": true,
  "description": "Changes how a child layer follows its parent: scale and rotation can follow fully, stay locked or follow by a set amount. Auto Rotate turns the layer as it moves, like a rolling wheel.",

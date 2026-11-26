@@ -1,0 +1,30 @@
+{
+ "id": "textspacing",
+ "name": "Text Spacing",
+ "category": "text",
+ "since": "5.3.2",
+ "native": true,
+ "description": "Changes the space between the letters and between the lines of a text layer. Letter Spacing spreads the letters apart, or pulls them closer together below 0%. Line Spacing sets how far apart the lines are: 100% is normal and 200% doubles it. Keyframe either one to animate the spacing.",
+ "params": [
+  {
+   "id": "letterspacing",
+   "label": "Letter Spacing",
+   "type": "float",
+   "default": 0,
+   "min": -10,
+   "max": 10,
+   "step": 0.01,
+   "percent": true
+  },
+  {
+   "id": "linespacing",
+   "label": "Line Spacing",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 9.999,
+   "step": 0.001,
+   "percent": true
+  }
+ ]
+}

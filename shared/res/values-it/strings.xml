@@ -1205,8 +1205,6 @@
     <string name="font_source_google">Google Fonts</string>
     <string name="font_google_hint">Digita un nome per cercare in tutto Google Fonts</string>
     <string name="font_downloads_when_chosen">Si scarica alla selezione</string>
-    <string name="fonts_missing_title">Font non presenti sul telefono</string>
-    <string name="fonts_missing_body">Questo progetto usa font non presenti sul telefono: %1$s. Il testo viene mostrato con un altro font finché non li scarichi da Google Fonts.</string>
     <string name="font_favorite">Preferito</string>
     <string name="font_category_sans_serif">Senza grazie</string>
     <string name="font_category_serif">Con grazie</string>
@@ -1370,6 +1368,7 @@
     <string name="structure_paste_fill_color">Incolla riempimento e colore</string>
     <string name="structure_paste_border_shadow">Incolla bordo e ombra</string>
     <string name="structure_paste_blending">Incolla opacità e metodo di fusione</string>
+    <string name="structure_paste_motions">Incolla animazioni e transizioni</string>
     <string name="structure_paste_style">Incolla stile</string>
     <string name="text_alignment">Allineamento</string>
     <string name="track_track">Traccia</string>
@@ -1840,6 +1839,7 @@
     <string name="ai_model_grain">Modello grana per Migliora AI</string>
     <string name="ai_model_cartoon">Modello animazione per Migliora AI</string>
     <string name="ai_model_cutout">Rimozione sfondo AI 2.0</string>
+    <string name="ai_model_noise">Modello Riduci rumore</string>
     <string name="ai_model_broken">Un file del modello AI era danneggiato ed è stato eliminato. Scaricalo di nuovo.</string>
     <string name="ai_model_download_failed">Download del modello AI non riuscito. Controlla la connessione e riprova.</string>
     <string name="ai_model_download_wrong">Il file scaricato non era il modello AI</string>
@@ -1889,6 +1889,7 @@
     <string name="cutout_best">Rimozione sfondo AI 2.0</string>
     <string name="cutout_best_hint">Bordi più puliti intorno a capelli e dettagli fini. Scarica %1$s una sola volta. Solo immagini.</string>
     <string name="cutout_fallback_download">Impossibile scaricare Rimozione sfondo AI 2.0, quindi è stato usato Standard. Controlla la connessione e riprova.</string>
+    <string name="ai_noise_fallback_download">Impossibile scaricare il modello Riduci rumore, quindi è stata usata la riduzione del rumore standard. Controlla la connessione e riprova.</string>
     <string name="cutout_fallback_failed">Rimozione sfondo AI 2.0 non è riuscito a elaborare questa immagine, quindi è stato usato Standard.</string>
     <string name="ai_gpu_warning">Questa opzione può bloccare alcuni telefoni. Se il telefono si blocca, riavvialo e l\'AI userà di nuovo il processore.</string>
     <string name="ai_gpu_failed">L\'elaborazione AI sul chip grafico non è stata completata, quindi ora l\'AI usa il processore.</string>
@@ -2006,6 +2007,17 @@
     <string name="track_motion_cancelled">Tracciamento annullato. I fotogrammi già tracciati conservano i loro keyframe.</string>
     <string name="track_motion_unavailable">Il tracciamento del movimento non è disponibile in questa versione.</string>
     <string name="track_motion_failed">Impossibile tracciare questo video.</string>
+    <string name="face_tracking_pick">Scegli volto</string>
+    <string name="face_tracking_again">Traccia di nuovo</string>
+    <string name="face_tracking_none">Nessun volto scelto finora.</string>
+    <string name="face_tracking_ready">Il video segue il volto scelto.</string>
+    <string name="face_tracking_partial">Una parte della clip non è ancora tracciata.</string>
+    <string name="face_tracking_video_only">Il tracciamento del volto funziona sui livelli video.</string>
+    <string name="face_tracking_tap">Tocca il volto che il video deve seguire.</string>
+    <string name="face_tracking_looking">Ricerca dei volti…</string>
+    <string name="face_tracking_none_here">Nessun volto trovato in questo fotogramma. Provane un altro.</string>
+    <string name="face_tracking_lost">Non è stato possibile seguire il volto in questa clip.</string>
+    <string name="face_tracking_cancelled">Tracciamento del volto annullato.</string>
     <string name="edit_layer_copy_name">%1$s copia</string>
     <string name="model_layer_video">Video</string>
     <string name="ai_video_mask_name">Maschera %1$s</string>
@@ -2343,6 +2355,11 @@
         <item quantity="many">Incollato su %1$s livelli</item>
         <item quantity="other">Incollato su %1$s livelli</item>
     </plurals>
+    <plurals name="structure_transitions_skipped">
+        <item quantity="one">%1$s transizione ignorata: serve una clip subito prima o dopo il livello</item>
+        <item quantity="many">%1$s transizioni ignorate: serve una clip subito prima o dopo il livello</item>
+        <item quantity="other">%1$s transizioni ignorate: serve una clip subito prima o dopo il livello</item>
+    </plurals>
     <string name="subject_keep_all">Mantieni tutto</string>
     <string name="subject_hint_photo">Per mantenere una sola persona o un solo oggetto, toccalo.</string>
     <string name="subject_hint_video">Per mantenere una sola persona o un solo oggetto, toccalo su questo primo fotogramma. L\'app lo seguirà per tutta la clip.</string>
@@ -2463,8 +2480,6 @@
     <string name="desk_folder_back">Torna a tutti i media</string>
     <string name="voice_install_espeak">Nessuna voce trovata. Installa il pacchetto espeak-ng, poi riapri questa finestra.</string>
     <string name="desk_close_save_failed">Non è stato possibile salvare le ultime modifiche. Libera spazio sul disco, poi fai clic su Riprova. Se chiudi senza salvare, AbsentMotion ti riproporrà le modifiche al prossimo avvio.</string>
-    <string name="desk_fonts_missing_title">Font non presenti sul computer</string>
-    <string name="desk_fonts_missing_body">Questo progetto usa font non presenti sul computer: %1$s. Il testo viene mostrato con un altro font finché non li scarichi da Google Fonts.</string>
     <string name="desk_export_busy">È già in corso un\'altra esportazione. Attendi che finisca o annullala prima.</string>
     <string name="desk_export_no_ffmpeg">AbsentMotion non è riuscito ad avviare FFmpeg, il programma usato per creare file video e audio. Reinstalla AbsentMotion.</string>
     <string name="desk_export_note_software">Nessun codificatore video hardware funziona su questo computer, quindi questa esportazione usa il codificatore software, più lento.</string>
@@ -2843,6 +2858,7 @@
     <string name="added_effect_save_failed">Impossibile salvare tutti gli effetti.</string>
     <string name="added_effect_remove_failed">Impossibile rimuovere l’effetto.</string>
     <string name="community_filter_effects">Effetti</string>
+    <string name="community_filter_new">Novità</string>
     <string name="added_effect_version">Versione %1$d</string>
     <string name="added_effect_already_added">Già aggiunto</string>
     <string name="added_effect_newer_installed">Hai una versione più recente (v%1$d)</string>

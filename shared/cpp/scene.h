@@ -256,6 +256,7 @@ struct ShutterBlur {
 bool MotionEffect(const std::string& id);
 bool TextEffect(const std::string& id);
 bool DrawingEffect(const std::string& id);
+const Anim* StrokeRecolor(const Layer& layer);
 bool ShutterBlurOf(const Layer& layer, double timeMs, ShutterBlur* blur);
 void SetFastShutterBlur(bool fast);
 void SetShutterAnyTime(bool on);
@@ -319,7 +320,7 @@ bool CameraViewOn();
 bool CameraFrame(const std::vector<Layer>& layers, const Layer& camera, int width, int height, double timeMs, SkPoint corners[4], bool depthOrder = false);
 bool SeeLayers(const std::vector<Layer>& layers, int width, int height, bool top, int fps, double timeMs, bool depthOrder, std::vector<Layer>* seen,
                bool pieces = false);
-bool SeenPlacement(const Layer& layer, double timeMs, Placement* placement);
+bool SeenPlacement(const Layer& layer, double timeMs, Placement* placement, bool flat = false);
 void SeenPieces(const Layer& layer, double timeMs, SkPoint center, const SkM44& orientation, PieceView* view);
 bool SeenFlat(const Layer& layer, double timeMs, depth::Flat* flat);
 void SplitSeen(std::vector<Layer>* seen, double timeMs);
@@ -382,6 +383,7 @@ void DrawScene(SkCanvas* canvas, const Scene& scene, double timeMs, const MediaP
                const LayerEffects* effects = nullptr);
 void SetLayerEffects(const LayerEffects* effects, const Scene* scene, bool world = false);
 int ProjectFps();
+SkSize ProjectSize();
 const std::vector<Layer>* EffectSiblings();
 class SceneScope {
 public:

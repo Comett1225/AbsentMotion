@@ -33,6 +33,7 @@ import java.util.UUID
 import java.text.Collator
 import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.ZoneOffset
 import app.absentmotion.ui.editor.matchesSearch
 
@@ -41,6 +42,7 @@ val COMMUNITY_RAW = "https://raw.githubusercontent.com/$COMMUNITY_OWNER/AbsentMo
 
 private const val INDEX_MAX_BYTES = 4L shl 20
 private const val THUMB_MAX_BYTES = 4L shl 20
+internal const val EFFECT_PICTURE_MAX_BYTES = 150L shl 10
 private const val PRESET_PROBES = 5
 private const val PRESET_PROBE_SIDE = 64
 private const val PRESET_PICTURE_SIDE = 512
@@ -185,7 +187,13 @@ enum class CommunityKind(
 internal fun communityLimit(kind: CommunityKind, file: String): Long =
     if (file.endsWith(".absproj")) CommunityKind.Bundle.maxBytes else kind.maxBytes
 
-data class CommunityEffectContent(val id: String, val name: String, val version: Long)
+data class CommunityEffectContent(val id: String, val name: String, val version: Long, val thumbnail: String? = null, val hero: String? = null)
+
+internal fun communityEffectPicture(bytes: ByteArray, hero: Boolean): Boolean {
+    if (bytes.size < 21 || bytes.size > EFFECT_PICTURE_MAX_BYTES) return false
+    val head = String(bytes, 0, 16, Charsets.ISO_8859_1)
+    return head.startsWith("RIFF") && head.substring(8, 12) == "WEBP" && !(hero && head.endsWith("VP8X") && (bytes[20].toInt() and 2) != 0)
+}
 
 data class CommunityItem(
     val kind: CommunityKind,
@@ -305,7 +313,9 @@ fun parseCommunityIndex(text: String, versionCode: Int): CommunityIndex {
             val id = entry.opt("id") as? String ?: return@mapNotNull null
             val label = (entry.opt("name") as? String)?.trim()?.take(80) ?: return@mapNotNull null
             val version = addedEffectVersion(entry.opt("version")) ?: return@mapNotNull null
-            if (label.isEmpty() || !addedEffectKey.matches(id)) null else CommunityEffectContent(id, label, version)
+            fun picture(field: String, extension: String) = (entry.opt(field) as? String)?.takeIf { safeCommunityPath(it, folder) && it.endsWith(extension) }
+            if (label.isEmpty() || !addedEffectKey.matches(id)) null
+            else CommunityEffectContent(id, label, version, picture("thumbnail", ".webp"), picture("hero", ".webp"))
         }
         val target = if (minVersion > versionCode) unavailableEffects else items
         target.add(
@@ -363,27 +373,36 @@ internal class CommunityClient(
         }
     }
 
-    fun thumbnail(item: CommunityItem): ByteArray? {
-        val rel = item.thumbnail ?: return null
+    fun thumbnail(item: CommunityItem): ByteArray? =
+        item.thumbnail?.let { pictureBytes(item, it, THUMB_MAX_BYTES) { bytes -> bytes.isNotEmpty() } }
+
+    fun effectPicture(item: CommunityItem, rel: String?, hero: Boolean): File? =
+        rel?.let { picture(item, it, EFFECT_PICTURE_MAX_BYTES) { bytes -> communityEffectPicture(bytes, hero) } }
+
+    fun effectPictures(item: CommunityItem): Map<String, Pair<ByteArray?, ByteArray?>> = item.contents.associate { content ->
+        fun read(rel: String?, hero: Boolean) = rel?.let { runCatching { pictureBytes(item, it, EFFECT_PICTURE_MAX_BYTES) { bytes -> communityEffectPicture(bytes, hero) } }.getOrNull() }
+        content.id to (read(content.thumbnail, false) to read(content.hero, true))
+    }
+
+    private fun picture(item: CommunityItem, rel: String, limit: Long, valid: (ByteArray) -> Boolean): File? = fetchPicture(item, rel, limit, valid)?.first
+
+    private fun pictureBytes(item: CommunityItem, rel: String, limit: Long, valid: (ByteArray) -> Boolean): ByteArray? =
+        fetchPicture(item, rel, limit, valid)?.let { (file, bytes) -> file?.let { runCatching { it.readBytes() }.getOrNull() } ?: bytes }
+
+    private fun fetchPicture(item: CommunityItem, rel: String, limit: Long, valid: (ByteArray) -> Boolean): Pair<File?, ByteArray?>? {
         if (!safeCommunityPath(rel, "${item.kind.folder}/${item.name}/")) return null
-        val dir = File(cacheDir, "community/thumbs")
-        val cached = File(dir, sha256String(rel + item.sha256))
-        if (cached.isFile && cached.length() in 1L..THUMB_MAX_BYTES) {
-            try {
-                return cached.readBytes()
-            } catch (_: IOException) {
-            }
-        }
+        val cached = File(cacheDir, "community/thumbs/" + sha256String(rel + item.sha256))
+        if (cached.isFile && cached.length() in 1L..limit) return cached to null
         val source = CommunityFeed.source
         val bytes = http(source).get(source.asset("", rel)) { conn ->
             if (conn.responseCode !in 200..299) return@get null
             val length = conn.contentLengthLong
-            if (length > THUMB_MAX_BYTES) return@get null
-            conn.inputStream.use { readBounded(it, THUMB_MAX_BYTES) }
+            if (length > limit) return@get null
+            conn.inputStream.use { readBounded(it, limit) }
         } ?: return null
-        if (bytes.isEmpty()) return null
+        if (!valid(bytes)) return null
         keepCached(cached, bytes)
-        return bytes
+        return cached.takeIf { it.isFile } to bytes
     }
 
     suspend fun presetPicture(item: CommunityItem, engine: EngineThread): ByteArray? {
@@ -407,17 +426,17 @@ internal class CommunityClient(
         return picture
     }
 
-    suspend fun effectPicture(item: CommunityItem, engine: EngineThread, context: Context): ByteArray? {
-        if (item.kind != CommunityKind.Effect || !isSha256(item.sha256)) return null
-        val cached = File(cacheDir, "community/thumbs/${item.sha256}.webp")
-        if (cached.isFile && cached.length() in 1L..THUMB_MAX_BYTES) {
-            runCatching { cached.readBytes() }.getOrNull()?.let { return it }
+    suspend fun renderedEffectPictures(item: CommunityItem, engine: EngineThread, context: Context): Map<String, ByteArray> {
+        if (item.kind != CommunityKind.Effect || !isSha256(item.sha256)) return emptyMap()
+        val dir = File(cacheDir, "community/thumbs/${item.sha256}")
+        if (dir.isDirectory) {
+            return dir.listFiles().orEmpty().filter { it.extension == "webp" && it.length() in 1L..THUMB_MAX_BYTES }
+                .mapNotNull { file -> runCatching { file.nameWithoutExtension to file.readBytes() }.getOrNull() }.toMap()
         }
         val file = download(item, preview = true)
         val effects = file.inputStream().use { readAddedEffectEntries(file.name, it, cacheDir) }.mapNotNull { it.second.getOrNull() }
-        val picture = engine.previewAddedEffects(context, effects).firstNotNullOfOrNull { it.picture } ?: return null
-        keepCached(cached, picture)
-        return picture
+        return engine.previewAddedEffects(context, effects).mapNotNull { preview -> preview.picture?.let { preview.effect.definition.key to it } }.toMap()
+            .onEach { (key, bytes) -> keepCached(File(dir, "$key.webp"), bytes) }
     }
 
     fun download(item: CommunityItem): File = download(item, preview = false)
@@ -604,13 +623,20 @@ fun communityMatches(
             item.tags.containsAll(include) && item.tags.none { it in exclude }
     }
     return when (sort) {
-        CommunitySort.Newest -> matches.sortedByDescending { item ->
-            runCatching { Instant.parse(item.added) }.getOrNull()
-                ?: runCatching { LocalDate.parse(item.added).atStartOfDay().toInstant(ZoneOffset.UTC) }.getOrNull()
-        }
+        CommunitySort.Newest -> matches.sortedByDescending { communityAdded(it.added) }
         CommunitySort.Title -> {
             val collator = Collator.getInstance(locale)
             matches.sortedWith { a, b -> collator.compare(a.title.ifEmpty { a.name }, b.title.ifEmpty { b.name }) }
         }
     }
 }
+
+private fun communityAdded(added: String): Instant? = runCatching { Instant.parse(added) }.getOrNull()
+    ?: runCatching { LocalDate.parse(added).atStartOfDay().toInstant(ZoneOffset.UTC) }.getOrNull()
+
+fun communityDays(items: List<CommunityItem>, zone: ZoneId): List<Pair<LocalDate, List<CommunityItem>>> =
+    items.mapNotNull { item ->
+        val day = runCatching { Instant.parse(item.added).atZone(zone).toLocalDate() }.getOrNull() ?: runCatching { LocalDate.parse(item.added) }.getOrNull()
+        day?.let { Triple(it, communityAdded(item.added), item) }
+    }.sortedWith(compareByDescending<Triple<LocalDate, Instant?, CommunityItem>> { it.first }.thenByDescending { it.second })
+        .groupBy({ it.first }, { it.third }).toList()

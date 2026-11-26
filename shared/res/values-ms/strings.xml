@@ -1169,8 +1169,6 @@
     <string name="font_source_google">Google Fonts</string>
     <string name="font_google_hint">Taip nama untuk mencari dalam semua Google Fonts</string>
     <string name="font_downloads_when_chosen">Dimuat turun apabila dipilih</string>
-    <string name="fonts_missing_title">Fon tiada pada telefon ini</string>
-    <string name="fonts_missing_body">Projek ini menggunakan fon yang tiada pada telefon ini: %1$s. Teks dipaparkan dalam fon lain sehingga anda memuat turunnya daripada Google Fonts.</string>
     <string name="font_favorite">Kegemaran</string>
     <string name="font_category_sans_serif">Sans Serif</string>
     <string name="font_category_serif">Serif</string>
@@ -1330,6 +1328,7 @@
     <string name="structure_paste_fill_color">Tampal Isi &amp; Warna</string>
     <string name="structure_paste_border_shadow">Tampal Sempadan &amp; Bayang</string>
     <string name="structure_paste_blending">Tampal Kelegapan &amp; Mod Campuran</string>
+    <string name="structure_paste_motions">Tampal Animasi &amp; Peralihan</string>
     <string name="structure_paste_style">Tampal Gaya</string>
     <string name="text_alignment">Penjajaran</string>
     <string name="track_track">Jejak</string>
@@ -1786,6 +1785,7 @@
     <string name="ai_model_grain">Model butiran Peningkatan AI</string>
     <string name="ai_model_cartoon">Model kartun Peningkatan AI</string>
     <string name="ai_model_cutout">Penyingkiran latar belakang AI 2.0</string>
+    <string name="ai_model_noise">Model Kurangkan Hingar</string>
     <string name="ai_model_broken">Fail model AI telah rosak dan telah dipadam. Muat turun semula.</string>
     <string name="ai_model_download_failed">Muat turun model AI gagal. Semak sambungan dan cuba lagi.</string>
     <string name="ai_model_download_wrong">Muat turun itu bukan model AI</string>
@@ -1835,6 +1835,7 @@
     <string name="cutout_best">Penyingkiran latar belakang AI 2.0</string>
     <string name="cutout_best_hint">Tepi lebih bersih di sekeliling rambut dan butiran halus. Memuat turun %1$s sekali. Imej sahaja.</string>
     <string name="cutout_fallback_download">Penyingkiran latar belakang AI 2.0 tidak dapat dimuat turun, jadi Standard digunakan. Semak sambungan dan cuba lagi.</string>
+    <string name="ai_noise_fallback_download">Model Kurangkan Hingar tidak dapat dimuat turun, jadi pengurangan hingar standard digunakan. Semak sambungan dan cuba lagi.</string>
     <string name="cutout_fallback_failed">Penyingkiran latar belakang AI 2.0 tidak dapat menyelesaikan imej ini, jadi Standard digunakan.</string>
     <string name="ai_gpu_warning">Ini boleh menyebabkan sesetengah telefon hang. Jika telefon hang, mulakan semula dan AI akan menggunakan pemproses semula.</string>
     <string name="ai_gpu_failed">Kerja AI pada cip grafik tidak selesai, jadi AI kini menggunakan pemproses.</string>
@@ -1952,6 +1953,17 @@
     <string name="track_motion_cancelled">Penjejakan dibatalkan. Bingkai yang telah dijejak mengekalkan bingkai kuncinya.</string>
     <string name="track_motion_unavailable">Penjejakan gerakan tidak tersedia dalam binaan ini.</string>
     <string name="track_motion_failed">Video ini tidak dapat dijejaki.</string>
+    <string name="face_tracking_pick">Pilih Wajah</string>
+    <string name="face_tracking_again">Jejak Semula</string>
+    <string name="face_tracking_none">Belum ada wajah dipilih.</string>
+    <string name="face_tracking_ready">Video mengikut wajah yang dipilih.</string>
+    <string name="face_tracking_partial">Sebahagian klip belum dijejak.</string>
+    <string name="face_tracking_video_only">Penjejakan Wajah berfungsi pada lapisan video.</string>
+    <string name="face_tracking_tap">Ketik wajah yang perlu diikut oleh video.</string>
+    <string name="face_tracking_looking">Mencari wajah…</string>
+    <string name="face_tracking_none_here">Tiada wajah ditemui dalam bingkai ini. Cuba bingkai lain.</string>
+    <string name="face_tracking_lost">Wajah tidak dapat diikut dalam klip ini.</string>
+    <string name="face_tracking_cancelled">Penjejakan wajah dibatalkan.</string>
     <string name="edit_layer_copy_name">Salinan %1$s</string>
     <string name="model_layer_video">Video</string>
     <string name="ai_video_mask_name">%1$s topeng</string>
@@ -2277,6 +2289,9 @@
     <plurals name="structure_style_pasted">
         <item quantity="other">Dilekatkan pada %1$s lapisan</item>
     </plurals>
+    <plurals name="structure_transitions_skipped">
+        <item quantity="other">%1$s peralihan dilangkau: perlu klip betul-betul sebelum atau selepas lapisan</item>
+    </plurals>
     <string name="subject_keep_all">Kekalkan semua</string>
     <string name="subject_hint_photo">Untuk kekalkan hanya satu orang atau objek, ketik padanya.</string>
     <string name="subject_hint_video">Untuk kekalkan hanya satu orang atau objek, ketik padanya pada bingkai pertama ini. Apl akan mengikutinya sepanjang klip.</string>
@@ -2393,8 +2408,6 @@
     <string name="desk_folder_back">Kembali ke semua media</string>
     <string name="voice_install_espeak">Tiada suara ditemui. Pasang pakej espeak-ng, kemudian buka tetingkap ini semula.</string>
     <string name="desk_close_save_failed">Perubahan terakhir anda tidak dapat disimpan. Kosongkan sedikit ruang cakera, kemudian klik Cuba lagi. Jika anda menutup tanpa menyimpan, AbsentMotion akan menawarkan perubahan ini sekali lagi pada permulaan seterusnya.</string>
-    <string name="desk_fonts_missing_title">Fon tiada pada komputer ini</string>
-    <string name="desk_fonts_missing_body">Projek ini menggunakan fon yang tiada pada komputer ini: %1$s. Teks dipaparkan dalam fon lain sehingga anda memuat turunnya daripada Google Fonts.</string>
     <string name="desk_export_busy">Eksport lain masih berjalan. Tunggu sehingga ia selesai atau batalkannya dahulu.</string>
     <string name="desk_export_no_ffmpeg">AbsentMotion tidak dapat memulakan FFmpeg, program yang digunakan untuk menghasilkan fail video dan audio. Pasang semula AbsentMotion.</string>
     <string name="desk_export_note_software">Tiada pengekod video perkakasan yang berfungsi pada komputer ini, jadi eksport ini menggunakan pengekod perisian yang lebih perlahan.</string>
@@ -2765,6 +2778,7 @@
     <string name="added_effect_save_failed">Tidak semua kesan dapat disimpan.</string>
     <string name="added_effect_remove_failed">Kesan tidak dapat dialih keluar.</string>
     <string name="community_filter_effects">Kesan</string>
+    <string name="community_filter_new">Baharu</string>
     <string name="added_effect_version">Versi %1$d</string>
     <string name="added_effect_already_added">Sudah ditambah</string>
     <string name="added_effect_newer_installed">Anda ada versi yang lebih baharu (v%1$d)</string>

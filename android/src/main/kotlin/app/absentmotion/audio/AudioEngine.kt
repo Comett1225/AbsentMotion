@@ -265,28 +265,12 @@ class AudioEngine(context: Context) {
 
     private fun stream(clip: AudioClip): LayerStream? = synchronized(streams) { streams[clip.id]?.takeIf { it.uri == clip.uri } }
 
-    private fun keepStreams(t0: Double) {
-        val list = clips
-        synchronized(streams) {
-            val wanted = HashSet<Long>()
-            for (clip in list) {
-                if (t0 + AHEAD_MS < clip.startMs || t0 > clip.endMs + BEHIND_MS || sounds[clip.uri] == false) continue
-                wanted += clip.id
-                val (pos, early) = clip.cue(t0)
-                val loopMs = clip.inMs.takeIf { clip.loop }
-                var s = streams[clip.id]
-                if (s != null && (s.uri != clip.uri || s.loopMs != loopMs)) { s.close(); s = null }
-                if (s == null) streams[clip.id] = LayerStream(clip.uri, pos - LayerStream.LEAD_MS, loopMs) { PcmDecoder(context, clip.uri) }
-                else if (early) s.prepare(pos)
-            }
-            streams.keys.filter { it !in wanted }.forEach { streams.remove(it)?.close() }
-        }
+    private fun keepStreams(t0: Double) = synchronized(streams) {
+        streams.keepFor(clips, t0, { sounds[it] == false }) { PcmDecoder(context, it.uri) }
     }
 
     private companion object {
         const val BLOCK = 1024
-        const val AHEAD_MS = 1500.0
-        const val BEHIND_MS = 300.0
         const val IDLE_MS = 8000L
         val probe: java.util.concurrent.ExecutorService = java.util.concurrent.Executors.newSingleThreadExecutor { Thread(it, "am-audio-probe").apply { isDaemon = true } }
         val ATTRIBUTES: AudioAttributes = AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build()

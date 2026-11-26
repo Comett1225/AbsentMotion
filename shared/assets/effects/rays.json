@@ -2,6 +2,9 @@
  "id": "rays",
  "name": "Rays",
  "category": "stylize",
+ "also": [
+  "color"
+ ],
  "since": "3.0.0",
  "description": "Shines rays of light out from the bright parts of the layer, away from a center point.",
  "params": [

@@ -64,8 +64,9 @@ data class EffectCatalog(
 
     fun search(query: String): List<EffectDefinition> {
         val all = tiles
-        val byName = all.filter { matchesSearch(query, it.name) }.sortedWith(compareBy({ searchRank(query, it.name) }, { it.name.lowercase() }))
-        return byName + all.filter { it !in byName && matchesSearch(query, it.name, it.description) }.sortedBy { it.name.lowercase() }
+        val byName = all.filter { e -> matchesSearch(query, e.name) || e.aliases.any { matchesSearch(query, it) } }
+            .sortedWith(compareBy({ e -> (e.aliases + e.name).minOf { searchRank(query, it) } }, { it.name.lowercase() }))
+        return byName + all.filter { it !in byName && matchesSearch(query, it.name, it.description, *it.aliases.toTypedArray()) }.sortedBy { it.name.lowercase() }
     }
 
     val categories: List<Pair<String, String>> get() =
@@ -74,12 +75,10 @@ data class EffectCatalog(
     internal fun withAdded(store: AddedEffectStore): EffectCatalog {
         val pictures = mutableMapOf<String, java.io.File>()
         val added = store.definitions().map { effect ->
-            val file = store.picture(effect.key)
-            if (!file.isFile) effect else {
-                val path = "added/${effect.key}/${java.util.UUID.randomUUID()}.webp"
-                pictures[path] = file
-                effect.copy(addedPicture = path)
+            fun path(file: java.io.File, extension: String) = file.takeIf { it.isFile }?.let {
+                "added/${effect.key}/${java.util.UUID.randomUUID()}.$extension".also { path -> pictures[path] = it }
             }
+            effect.copy(addedPicture = path(store.picture(effect.key), "webp"), addedHero = path(store.hero(effect.key), "hero.webp"))
         }
         return copy(definitions = definitions.filterNot { it.isAdded } + added, addedPictures = pictures,
             shownAddedEffects = store.shownEffects, shownAddedCreators = store.shownCreators)
@@ -147,6 +146,7 @@ private fun EffectDefinition.translated(json: JSONObject): EffectDefinition {
     return copy(
         name = json.optString("name").ifBlank { name },
         description = json.optString("description").ifBlank { description },
+        aliases = (json.optJSONArray("aliases")?.let { a -> List(a.length()) { a.optString(it) } }.orEmpty() + aliases + name).filter { it.isNotBlank() }.distinct(),
         params = this.params.map { p ->
             val t = params.optJSONObject(p.id) ?: return@map p
             val options = t.optJSONArray("options")?.let { a -> List(a.length()) { a.optString(it) } }

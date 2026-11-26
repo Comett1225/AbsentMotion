@@ -27,6 +27,7 @@ Tudo na aba **Comunidade** é verificado por uma pessoa antes de ser publicado. 
 
 - Mantenha tudo adequado para todos. Pessoas de todas as idades usam o AbsentMotion.
 - Pacotes de projeto podem ter até 20 MB, predefinições até 1 MB e efeitos até 512 KB.
+- Todo efeito precisa de uma miniatura que o mostre, em dois tamanhos: uma pequena (WebP de 192 × 192, parada ou animada de até 3 segundos) e uma grande (WebP de 720 × 720), cada uma com até 150 KB.
 - Os itens são compartilhados sob a licença CC BY 4.0: qualquer pessoa pode usá-los e modificá-los desde que deem crédito a quem os criou.
 - O nome no seu item é o nome de criador que você digita. Não coloque nada pessoal nele.
 - O mantenedor decide o que é publicado e pode remover um item a qualquer momento.

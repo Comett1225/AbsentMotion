@@ -63,7 +63,22 @@
    "min": 0,
    "max": 5,
    "step": 0.01
+  },
+  {
+   "id": "edgeStyle",
+   "label": "Style",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "when": {
+    "edgeStyle": [
+     2
+    ]
+   }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float rotation;\nuniform float2 offset;\nuniform float count;\nuniform float angle;\nuniform float random;\nuniform float seed;\nfloat hash12(float2 p) {\n    float3 q = fract(float3(p.xyx) * 0.1031);\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.x + q.y) * q.z);\n}\nfloat2 hash22(float2 p) {\n    float3 q = fract(float3(p.xyx) * float3(0.1031, 0.1030, 0.0973));\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.xx + q.yz) * q.zy);\n}\nfloat2 hexLocal(float2 p) {\n    float2 r = float2(1.0, 1.7320508);\n    float2 h = r * 0.5;\n    float2 a = mod(p, r) - h;\n    float2 b = mod(p - h, r) - h;\n    return dot(a, a) < dot(b, b) ? a : b;\n}\nhalf4 main(float2 coord) {\n    float unit = size.y / (2.475 * max(count, 0.5));\n    float a = radians(angle);\n    float cs = cos(a);\n    float sn = sin(a);\n    float2 c = size * 0.5 + offset;\n    float2 p = coord - c;\n    p = float2(cs * p.x + sn * p.y, -sn * p.x + cs * p.y) / unit;\n    float2 g = hexLocal(p);\n    float2 id = floor((p - g) * float2(1.0, 0.5773503) * 2.0 + 0.5);\n    float r = radians(rotation + random * 360.0 * (hash12(id + seed * 7.31) - 0.5));\n    float rc = cos(r);\n    float rs = sin(r);\n    float2 q = (p - g) + float2(rc * g.x + rs * g.y, -rs * g.x + rc * g.y);\n    q *= unit;\n    return image.eval(float2(cs * q.x - sn * q.y, sn * q.x + cs * q.y) + c);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float4 screen;\nuniform float time;\nuniform float rotation;\nuniform float2 offset;\nuniform float count;\nuniform float angle;\nuniform float random;\nuniform float seed;\nuniform float edgeStyle;\nfloat hash12(float2 p) {\n    float3 q = fract(float3(p.xyx) * 0.1031);\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.x + q.y) * q.z);\n}\nfloat2 hash22(float2 p) {\n    float3 q = fract(float3(p.xyx) * float3(0.1031, 0.1030, 0.0973));\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.xx + q.yz) * q.zy);\n}\nfloat2 hexLocal(float2 p) {\n    float2 r = float2(1.0, 1.7320508);\n    float2 h = r * 0.5;\n    float2 a = mod(p, r) - h;\n    float2 b = mod(p - h, r) - h;\n    return dot(a, a) < dot(b, b) ? a : b;\n}\nhalf4 main(float2 coord) {\n    float unit = size.y / (2.475 * max(count, 0.5));\n    float a = radians(angle);\n    float cs = cos(a);\n    float sn = sin(a);\n    float2 c = size * 0.5 + offset;\n    float2 p = coord - c;\n    p = float2(cs * p.x + sn * p.y, -sn * p.x + cs * p.y) / unit;\n    float2 g = hexLocal(p);\n    float2 id = floor((p - g) * float2(1.0, 0.5773503) * 2.0 + 0.5);\n    float r = radians(rotation + random * 360.0 * (hash12(id + seed * 7.31) - 0.5));\n    float rc = cos(r);\n    float rs = sin(r);\n    float2 q = (p - g) + float2(rc * g.x + rs * g.y, -rs * g.x + rc * g.y);\n    q *= unit;\n    q = float2(cs * q.x - sn * q.y, sn * q.x + cs * q.y) + c;\n    if (edgeStyle > 0.5) {\n        q = screen.xy + screen.zw - abs(mod(q - screen.xy, 2.0 * screen.zw) - screen.zw);\n        q = clamp(q, screen.xy + 0.5, screen.xy + screen.zw - 0.5);\n        float2 w = clamp(q + 0.5, 0.0, 1.0) * clamp(size - q + 0.5, 0.0, 1.0);\n        return image.eval(clamp(q, float2(0.5), size - 0.5)) * half(w.x * w.y);\n    }\n    return image.eval(q);\n}\n"
 }

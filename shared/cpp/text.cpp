@@ -507,7 +507,8 @@ std::shared_ptr<TextLayout> ParseText(const XmlNode& n) {
         if (child->name == "effect" && attr(*child, "id") == "absent.textpath" && attr(*child, "hidden") != "true") text->wrap = false;
     }
     for (const auto& child : n.children) {
-        if (child->name != "effect" || attr(*child, "id") != "com.alightcreative.effects.textspacing" || attr(*child, "hidden") == "true") continue;
+        const std::string id = attr(*child, "id");
+        if (child->name != "effect" || (id != "absent.textspacing" && id != "com.alightcreative.effects.textspacing") || attr(*child, "hidden") == "true") continue;
         for (const auto& p : child->children) {
             if (attr(*p, "name") == "letterspacing") text->letterSpacing = number(*p, "value", 0);
             if (attr(*p, "name") == "linespacing") text->lineSpacing = number(*p, "value", 1);
@@ -611,7 +612,7 @@ const SkRect& InkBounds(TextLayout& text) {
 }
 namespace {
 const char* const kTextIds[] = {"absent.textprogress", "absent.texttransform", "absent.textrandomizer", "absent.countupdown",
-                                "absent.timecode", "absent.textpath", "absent.textshake", "absent.textblips", "absent.fontweight"};
+                                "absent.timecode", "absent.textpath", "absent.textshake", "absent.textblips", "absent.fontweight", "absent.textspacing"};
 
 struct Piece {
     Paragraph* paragraph;
@@ -1175,7 +1176,7 @@ bool TextEffect(const std::string& id) {
     return std::any_of(std::begin(kTextIds), std::end(kTextIds), [&](const char* k) { return id == k; });
 }
 bool TextAnimated(const Layer& layer) {
-    return layer.text && std::any_of(layer.effects.begin(), layer.effects.end(), [](const LayerEffect& e) { return !e.hidden && TextEffect(e.id) && e.id != "absent.fontweight"; });
+    return layer.text && std::any_of(layer.effects.begin(), layer.effects.end(), [](const LayerEffect& e) { return !e.hidden && TextEffect(e.id) && e.id != "absent.fontweight" && e.id != "absent.textspacing"; });
 }
 SkPath TextGlyphPath(const Layer& layer, float t, int fps) {
     auto& text = *layer.text;

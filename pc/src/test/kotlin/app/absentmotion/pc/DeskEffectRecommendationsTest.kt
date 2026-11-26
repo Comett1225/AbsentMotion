@@ -50,7 +50,7 @@ class DeskEffectRecommendationsTest {
                     mainClock.advanceTimeBy(500)
                     val label = Strings.get(R.string.desk_recommended)
                     onNodeWithText(label).assertIsDisplayed()
-                    for (effect in listOf("Exposure", "Sharpen", "Vignette")) onNodeWithText(effect).assertIsDisplayed()
+                    for (effect in listOf("Exposure / Gamma", "Sharpen", "Vignette")) onNodeWithText(effect).assertIsDisplayed()
                     onNodeWithText("Vignette").performClick()
                     mainClock.advanceTimeBy(500)
                     runOnIdle {

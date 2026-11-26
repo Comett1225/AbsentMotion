@@ -1209,8 +1209,6 @@
     <string name="font_source_google">Google Fonts</string>
     <string name="font_google_hint">Type a name to search all of Google Fonts</string>
     <string name="font_downloads_when_chosen">Downloads when chosen</string>
-    <string name="fonts_missing_title">Fonts not on this phone</string>
-    <string name="fonts_missing_body">This project uses fonts that are not on this phone: %1$s. The text shows in another font until you download them from Google Fonts.</string>
     <string name="font_favorite">Favorite</string>
     <string name="font_category_sans_serif">Sans Serif</string>
     <string name="font_category_serif">Serif</string>
@@ -1372,6 +1370,7 @@
     <string name="structure_paste_fill_color">Paste Fill &amp; Color</string>
     <string name="structure_paste_border_shadow">Paste Frame &amp; Shadow</string>
     <string name="structure_paste_blending">Paste Opacity &amp; Blend Mode</string>
+    <string name="structure_paste_motions">Paste Animations &amp; Transitions</string>
     <string name="structure_paste_style">Paste Style</string>
     <string name="text_alignment">Alignment</string>
     <string name="track_track">Track</string>
@@ -1837,6 +1836,7 @@
     <string name="ai_model_grain">AI Enhance grain model</string>
     <string name="ai_model_cartoon">AI Enhance cartoon model</string>
     <string name="ai_model_cutout">AI background removal 2.0</string>
+    <string name="ai_model_noise">Reduce Noise model</string>
     <string name="ai_model_broken">An AI model file was damaged and was deleted. Download it again.</string>
     <string name="ai_model_download_failed">The AI model download failed. Check the connection and try again.</string>
     <string name="ai_model_download_wrong">The download was not the AI model</string>
@@ -1886,6 +1886,7 @@
     <string name="cutout_best">AI background removal 2.0</string>
     <string name="cutout_best_hint">Cleaner edges around hair and fine detail. Downloads %1$s once. Images only.</string>
     <string name="cutout_fallback_download">AI background removal 2.0 could not be downloaded, so Standard was used. Check the connection and try again.</string>
+    <string name="ai_noise_fallback_download">The Reduce Noise model could not be downloaded, so the standard noise reduction was used. Check the connection and try again.</string>
     <string name="cutout_fallback_failed">AI background removal 2.0 could not finish this image, so Standard was used.</string>
     <string name="ai_gpu_warning">This can freeze some phones. If the phone freezes, restart it and AI will use the processor again.</string>
     <string name="ai_gpu_failed">AI work on the graphics chip did not finish, so AI now uses the processor.</string>
@@ -2003,6 +2004,17 @@
     <string name="track_motion_cancelled">Tracking canceled. Frames already tracked keep their keyframes.</string>
     <string name="track_motion_unavailable">Motion tracking is unavailable in this build.</string>
     <string name="track_motion_failed">This video could not be tracked.</string>
+    <string name="face_tracking_pick">Pick Face</string>
+    <string name="face_tracking_again">Track Again</string>
+    <string name="face_tracking_none">No face picked yet.</string>
+    <string name="face_tracking_ready">The video follows the face you picked.</string>
+    <string name="face_tracking_partial">Part of the clip is not tracked yet.</string>
+    <string name="face_tracking_video_only">Face Tracking works on video layers.</string>
+    <string name="face_tracking_tap">Tap the face the video should follow.</string>
+    <string name="face_tracking_looking">Looking for faces…</string>
+    <string name="face_tracking_none_here">No face found in this frame. Try another one.</string>
+    <string name="face_tracking_lost">The face could not be followed in this clip.</string>
+    <string name="face_tracking_cancelled">Face tracking canceled.</string>
     <string name="edit_layer_copy_name">%1$s Copy</string>
     <string name="model_layer_video">Video</string>
     <string name="ai_video_mask_name">%1$s mask</string>
@@ -2336,6 +2348,10 @@
         <item quantity="one">Pasted onto %1$s layer</item>
         <item quantity="other">Pasted onto %1$s layers</item>
     </plurals>
+    <plurals name="structure_transitions_skipped">
+        <item quantity="one">%1$s transition skipped: it needs a clip right before or after the layer</item>
+        <item quantity="other">%1$s transitions skipped: they need a clip right before or after the layer</item>
+    </plurals>
     <string name="subject_keep_all">Keep everything</string>
     <string name="subject_hint_photo">To keep only one person or thing, tap it.</string>
     <string name="subject_hint_video">To keep only one person or thing, tap it on this first frame. The app follows it through the clip.</string>
@@ -2454,8 +2470,6 @@
     <string name="desk_folder_back">Back to all media</string>
     <string name="voice_install_espeak">No voices found. Install the espeak-ng package, then open this window again.</string>
     <string name="desk_close_save_failed">Your last changes could not be saved. Free some disk space, then click Try Again. If you close without saving, AbsentMotion offers these changes again the next time it starts.</string>
-    <string name="desk_fonts_missing_title">Fonts not on this computer</string>
-    <string name="desk_fonts_missing_body">This project uses fonts that are not on this computer: %1$s. The text shows in another font until you download them from Google Fonts.</string>
     <string name="desk_export_busy">Another export is still running. Wait until it finishes or cancel it first.</string>
     <string name="desk_export_no_ffmpeg">AbsentMotion could not start FFmpeg, the program it uses to write video and sound files. Install AbsentMotion again.</string>
     <string name="desk_export_note_software">No hardware video encoder works on this computer, so this export uses the slower software encoder.</string>
@@ -2830,6 +2844,7 @@
     <string name="added_effect_save_failed">Could not save all effects.</string>
     <string name="added_effect_remove_failed">Could not remove the effect.</string>
     <string name="community_filter_effects">Effects</string>
+    <string name="community_filter_new">New</string>
     <string name="added_effect_version">Version %1$d</string>
     <string name="added_effect_already_added">Already added</string>
     <string name="added_effect_newer_installed">You have a newer version (v%1$d)</string>

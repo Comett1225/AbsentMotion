@@ -65,7 +65,7 @@ object Glide {
     internal fun interrupt() { if (!stepping) stop() }
 }
 
-class PointAdjust(val label: String, val move: (dx: Float, dy: Float, width: Float, height: Float) -> Unit)
+class PointAdjust(val label: String, val scene: Boolean = false, val move: (dx: Float, dy: Float, width: Float, height: Float) -> Unit)
 
 class LayerPoints(
     val points: List<app.absentmotion.model.Pt>,
@@ -406,7 +406,7 @@ class EditorState(
         if (previous != null && (key != previous.key || pivot != previous.pivotId)) endGesture()
         val before = scene
         val direct = change(before)
-        val changed = direct.withValueLinksFollowing(before).withMattesFollowing(before).withOutlinesFollowing(before)
+        val changed = direct.withValueLinksFollowing(before).withMattesFollowing(before).withOutlinesFollowing(before).withFacePathsFollowing()
         if (direct.node !== before.node) lockRefusal(before, direct, groupPath.indices.any { root.focused(groupPath.take(it))?.layer(groupPath[it])?.locked == true })?.let { return hint(it) }
         if (playing) {
             val recording = liveRecording ?: LiveRecording(before, key, settings.overwriteRecording, pivot, ::normalizedPoint)

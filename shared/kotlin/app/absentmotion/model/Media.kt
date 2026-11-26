@@ -41,7 +41,7 @@ data class MediaFill(
 
 fun XmlNode.mediaUris(): Set<String> = buildSet {
     fun walk(n: XmlNode) {
-        if (n.name != "media") {
+        if (n.name != "media" && n.name != "facepath") {
             n["fillImage"]?.let { add(it) }
             n["fillVideo"]?.let { add(it) }
             n["src"]?.let { add(it) }
@@ -80,7 +80,7 @@ fun XmlNode.modelKey(): String? = this["src"]?.let { src ->
 }
 
 fun XmlNode.mapMediaUris(change: (String) -> String): XmlNode {
-    val keys = when (name) { "media" -> listOf("uri"); "ai" -> listOf("original", "result"); else -> listOf("fillImage", "fillVideo", "src") }
+    val keys = when (name) { "media", "facepath" -> listOf("uri"); "ai" -> listOf("original", "result"); else -> listOf("fillImage", "fillVideo", "src") }
     val self = keys.fold(this) { node, key -> node[key]?.let { node.with(key, change(it)) } ?: node }
     return self.copy(children = children.map { it.mapMediaUris(change) })
 }
@@ -89,7 +89,7 @@ fun Scene.mediaName(uri: String): String = (media(uri)?.filename?.takeIf { it.is
     ?: (runCatching { java.net.URI(uri).path }.getOrNull() ?: uri).substringAfterLast('/').takeIf { it.isNotEmpty() } ?: "media").substringAfterLast('/')
 
 private fun XmlNode.withoutMarksOf(uri: String): XmlNode =
-    copy(children = children.filterNot { it.name == "ai" && it["result"] == uri }.map { it.withoutMarksOf(uri) })
+    copy(children = children.filterNot { it.name == "ai" && it["result"] == uri || it.name == "facepath" && it["uri"] == uri }.map { it.withoutMarksOf(uri) })
 
 fun Scene.replaceMedia(old: String, with: MediaDeclaration, dropMarks: Boolean = false): Scene =
     Scene(node.copy(children = node.children.filterNot { it.name == "media" && it["uri"] == old })

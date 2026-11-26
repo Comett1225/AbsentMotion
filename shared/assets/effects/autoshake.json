@@ -81,6 +81,21 @@
     "Standard"
    ],
    "legacyDefault": 0
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "when": {
+    "style": [
+     2
+    ]
+   }
   }
  ]
 }

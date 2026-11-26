@@ -199,7 +199,7 @@ private fun TargetChoice(state: EditorState, mode: TrackMode, enabled: Boolean) 
 }
 
 @Composable
-private fun ActionChip(text: String, enabled: Boolean, onClick: () -> Unit) {
+internal fun ActionChip(text: String, enabled: Boolean, onClick: () -> Unit) {
     Box(
         Modifier.padding(start = 8.dp).width(84.dp).height(36.dp).clip(RoundedCornerShape(6.dp)).background(Am.Button)
             .alpha(if (enabled) 1f else DimAlpha).clickable(enabled = enabled, onClick = onClick),

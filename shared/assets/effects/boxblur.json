@@ -1,0 +1,62 @@
+{
+ "id": "boxblur",
+ "name": "Box Blur",
+ "category": "blur",
+ "since": "5.3.2",
+ "native": true,
+ "description": "Blurs the layer by averaging an even square of nearby pixels. Strength sets how far the blur reaches; Gaussian Blur is smoother.",
+ "params": [
+  {
+   "id": "strength",
+   "label": "Strength",
+   "type": "float",
+   "default": 0.15,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "scale",
+   "label": "Scale",
+   "type": "float",
+   "default": 329,
+   "min": 0,
+   "max": 1000,
+   "step": 0.01,
+   "hidden": true
+  },
+  {
+   "id": "shape",
+   "label": "Shape",
+   "type": "choice",
+   "default": 1,
+   "options": [
+    "Smooth",
+    "Box",
+    "Fast Box"
+   ],
+   "hidden": true
+  },
+  {
+   "id": "iterations",
+   "label": "Iterations",
+   "type": "float",
+   "default": 3,
+   "min": 1,
+   "max": 20,
+   "step": 1,
+   "hidden": true
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "hidden": true
+  }
+ ]
+}

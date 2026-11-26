@@ -180,8 +180,9 @@ class WarpMigrationTest {
 
     @Test fun curlFillsInAlightsLooseDefaultRollAndSqueezesItsArcByStretch() {
         val d = migrate("curl")
-        assertEquals(3f, d.number("radius"), 1e-6f)
-        assertEquals(1.5f, d.number("stretch"), 1e-5f)
+        assertEquals(1f, d.number("radius"), 1e-6f)
+        assertEquals(1f, d.number("stretch"), 1e-5f)
+        assertEquals(1f, d.number("edgeStyle"), 1e-6f)
         val v = migrate("curl", "radius" to "13.25", "stretch" to "13.25")
         assertEquals(13.25f, v.number("radius"), 1e-6f)
         assertEquals(1f / 13.25f, v.number("stretch"), 1e-5f)

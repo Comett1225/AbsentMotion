@@ -196,7 +196,7 @@ def scene(show, effect, preset=None):
         params.update(chosen)
         pins = "".join(prop({"id": f"rest{k}", "type": "point"}, rest) + prop({"id": f"pin{k}", "type": "point"}, at)
                        for k, (rest, at) in enumerate(show.get("pins", []), 1))
-        fx = f'<effect id="absent.{effect["id"]}" hidden="false">' + "".join(prop(p, params[p["id"]]) for p in effect["params"]) + pins + "</effect>"
+        fx = f'<effect id="absent.{effect["id"]}" hidden="false">' + "".join(prop(p, params[p["id"]]) for p in effect["params"]) + pins + show.get("xml", "") + "</effect>"
     fps, total = (ANIM_FPS, round(show["animate"] * 1000 / BASE_FPS)) if "animate" in show else (30, 1000)
     layers = [layer(1, name, end=total - 1) for name in backdrops(show)]
     if "path" in show:

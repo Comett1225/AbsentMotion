@@ -27,6 +27,7 @@ Semua yang ada di tab **Komunitas** diperiksa oleh seseorang sebelum tampil. Ite
 
 - Buatlah sesuai untuk semua orang. Orang dari segala usia memakai AbsentMotion.
 - Bundel proyek bisa berukuran hingga 20 MB, preset hingga 1 MB, dan efek hingga 512 KB.
+- Setiap efek perlu gambar mini yang menunjukkannya, dalam dua ukuran: kecil (WebP 192 × 192, diam atau animasi hingga 3 detik) dan besar (WebP 720 × 720), masing-masing hingga 150 KB.
 - Item dibagikan di bawah CC BY 4.0: siapa pun boleh memakai dan mengubahnya selama mencantumkan kredit untuk pembuatnya.
 - Nama pada item Anda adalah nama kreator yang Anda ketik. Jangan menulis hal pribadi di dalamnya.
 - Pengelola yang memutuskan apa yang tampil, dan dapat menurunkan item kapan saja.

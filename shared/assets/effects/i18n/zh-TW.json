@@ -16,6 +16,103 @@
   "text": "文字"
  },
  "effects": {
+  "advancedchromakey": {
+   "description": "一次最多去除四種顏色。每種顏色可以去除(排除)或不受其他去背影響(包含)，各有自己的臨界值、羽化與亮度敏感度。顯示遮罩會用紅色顯示保留的部分。",
+   "name": "進階色度去背",
+   "params": {
+    "c1active": {
+     "label": "顏色1"
+    },
+    "c1color": {
+     "label": "顏色"
+    },
+    "c1feather": {
+     "label": "羽化"
+    },
+    "c1luma": {
+     "label": "亮度敏感度"
+    },
+    "c1mode": {
+     "label": "模式",
+     "options": [
+      "排除",
+      "包含"
+     ]
+    },
+    "c1threshold": {
+     "label": "閾值"
+    },
+    "c2active": {
+     "label": "顏色2"
+    },
+    "c2color": {
+     "label": "顏色"
+    },
+    "c2feather": {
+     "label": "羽化"
+    },
+    "c2luma": {
+     "label": "亮度敏感度"
+    },
+    "c2mode": {
+     "label": "模式",
+     "options": [
+      "排除",
+      "包含"
+     ]
+    },
+    "c2threshold": {
+     "label": "閾值"
+    },
+    "c3active": {
+     "label": "顏色3"
+    },
+    "c3color": {
+     "label": "顏色"
+    },
+    "c3feather": {
+     "label": "羽化"
+    },
+    "c3luma": {
+     "label": "亮度敏感度"
+    },
+    "c3mode": {
+     "label": "模式",
+     "options": [
+      "排除",
+      "包含"
+     ]
+    },
+    "c3threshold": {
+     "label": "閾值"
+    },
+    "c4active": {
+     "label": "顏色4"
+    },
+    "c4color": {
+     "label": "顏色"
+    },
+    "c4feather": {
+     "label": "羽化"
+    },
+    "c4luma": {
+     "label": "亮度敏感度"
+    },
+    "c4mode": {
+     "label": "模式",
+     "options": [
+      "排除",
+      "包含"
+     ]
+    },
+    "c4threshold": {
+     "label": "閾值"
+    },
+    "showMask": {
+     "label": "顯示遮罩"
+    }
+   }
+  },
   "ascii": {
    "description": "將圖層轉為由字母和符號組成的文字藝術，較亮的區域使用較密實的字元。大小決定圖層上每個字元的寬度，因此字元會隨圖層移動、旋轉和縮放。顏色可保留圖片原色或使用單色，邊緣線條則以|、-、/和\\字元繪製輪廓。",
    "name": "ASCII",
@@ -106,6 +203,13 @@
     },
     "slack": {
      "label": "鬆弛度"
+    },
+    "style": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
     },
     "zshake": {
      "label": "Z軸抖動"
@@ -625,12 +729,75 @@
       "中心",
       "角落"
      ]
+    },
+    "alight": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
+    },
+    "alZ": {
+     "label": "位置 Z"
+    },
+    "alLight": {
+     "label": "方向"
+    },
+    "alElev": {
+     "label": "仰角"
+    },
+    "faceStyle": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
+    },
+    "lightStyle": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
+    }
+   }
+  },
+  "boxblur": {
+   "description": "對周圍像素取一個均勻方框的平均值來模糊圖層。強度決定模糊範圍；高斯模糊更平滑。",
+   "name": "方框模糊",
+   "params": {
+    "iterations": {
+     "label": "迭代次數"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "shape": {
+     "label": "形狀",
+     "options": [
+      "平滑",
+      "方框",
+      "快速方框"
+     ]
+    },
+    "strength": {
+     "label": "強度"
+    },
+    "style": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
     }
    }
   },
   "brightnesscontrast": {
+   "aliases": [
+    "亮度與對比"
+   ],
    "description": "調整圖片的亮度和對比。",
-   "name": "亮度與對比",
+   "name": "亮度/對比",
    "params": {
     "brightness": {
      "label": "亮度"
@@ -1027,6 +1194,13 @@
       "經典",
       "硬邊"
      ]
+    },
+    "alight": {
+     "label": "版面",
+     "options": [
+      "經典",
+      "標準"
+     ]
     }
    }
   },
@@ -1096,8 +1270,11 @@
    }
   },
   "colorwheels": {
+   "aliases": [
+    "暗部、中間調、亮部"
+   ],
    "description": "以色輪分別調整暗部、中間調和亮部的色相、調整量與色階；偏移會改變所有色調。「依亮度」樣式依像素亮度決定各色輪的影響程度。",
-   "name": "暗部、中間調、亮部",
+   "name": "色彩調校",
    "params": {
     "gainAmount": {
      "label": "亮部調整量"
@@ -1269,6 +1446,13 @@
       "經典",
       "堆疊"
      ]
+    },
+    "alight": {
+     "label": "版面",
+     "options": [
+      "經典",
+      "標準"
+     ]
     }
    }
   },
@@ -1432,6 +1616,22 @@
       "經典",
       "標準"
      ]
+    },
+    "alight": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
+    },
+    "alZ": {
+     "label": "位置 Z"
+    },
+    "alLight": {
+     "label": "方向"
+    },
+    "alElev": {
+     "label": "仰角"
     }
    }
   },
@@ -1531,6 +1731,22 @@
       "經典",
       "標準"
      ]
+    },
+    "alight": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
+    },
+    "alZ": {
+     "label": "位置 Z"
+    },
+    "alLight": {
+     "label": "方向"
+    },
+    "alElev": {
+     "label": "仰角"
     }
    }
   },
@@ -1560,6 +1776,13 @@
     },
     "stretch": {
      "label": "拉伸"
+    },
+    "edgeStyle": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
     }
    }
   },
@@ -1655,6 +1878,22 @@
       "中心",
       "角落"
      ]
+    },
+    "alight": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
+    },
+    "alZ": {
+     "label": "位置 Z"
+    },
+    "alLight": {
+     "label": "方向"
+    },
+    "alElev": {
+     "label": "仰角"
     }
    }
   },
@@ -1676,6 +1915,13 @@
     },
     "threshold": {
      "label": "閾值"
+    },
+    "style": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
     }
    }
   },
@@ -1754,6 +2000,22 @@
     },
     "vibrance": {
      "label": "自然飽和度"
+    },
+    "exposure": {
+     "label": "曝光"
+    },
+    "threshold": {
+     "label": "閾值"
+    },
+    "knee": {
+     "label": "閾值柔和度"
+    },
+    "style": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
     }
    }
   },
@@ -2024,8 +2286,11 @@
    }
   },
   "edgedetect": {
+   "aliases": [
+    "邊緣偵測"
+   ],
    "description": "在畫面變化處顯示亮線，其餘部分呈暗色。墨線在白底上畫深色線條；顏色在邊緣保留畫面本身的顏色。",
-   "name": "邊緣偵測",
+   "name": "找尋邊緣",
    "params": {
     "strength": {
      "label": "強度"
@@ -2275,6 +2540,22 @@
       "中心",
       "角落"
      ]
+    },
+    "alight": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
+    },
+    "alZ": {
+     "label": "位置 Z"
+    },
+    "alLight": {
+     "label": "方向"
+    },
+    "alElev": {
+     "label": "仰角"
     }
    }
   },
@@ -2350,8 +2631,11 @@
    }
   },
   "exposure": {
+   "aliases": [
+    "曝光"
+   ],
    "description": "透過曝光級數、偏移及伽瑪校正模擬攝影曝光。「提亮半透明部分」可讓模糊邊緣等半透明像素的亮度超過白色。",
-   "name": "曝光",
+   "name": "曝光/伽瑪",
    "params": {
     "gamma": {
      "label": "伽瑪"
@@ -2364,6 +2648,24 @@
     },
     "stops": {
      "label": "曝光級數"
+    }
+   }
+  },
+  "facetrack": {
+   "aliases": [
+    "臉部動態"
+   ],
+   "description": "影片圖層的臉部動態：影片會移動並縮放，讓你選擇的臉部始終停在畫面中的同一位置。點一下「選擇臉部」，再點一下預覽中的一張臉。臉部只會在整個片段中追蹤一次並保存結果，預覽和匯出都能立即使用。「縮放」設定臉部保持的大小（100%為選擇時的大小），「位置」設定它在畫面中停留的位置，「平滑度」讓動作更平穩。",
+   "name": "臉部追蹤",
+   "params": {
+    "position": {
+     "label": "位置"
+    },
+    "smoothing": {
+     "label": "平滑度"
+    },
+    "zoom": {
+     "label": "縮放"
     }
    }
   },
@@ -2437,6 +2739,13 @@
     "edgeStrength": {
      "label": "邊緣強度"
     },
+    "edgeStyle": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
+    },
     "feather": {
      "label": "羽化"
     },
@@ -2461,18 +2770,18 @@
     "scanStrength": {
      "label": "掃描線強度"
     },
-    "tint": {
-     "label": "色調"
-    },
-    "tintColor": {
-     "label": "色調顏色"
-    },
     "style": {
      "label": "樣式",
      "options": [
       "經典",
       "標準"
      ]
+    },
+    "tint": {
+     "label": "色調"
+    },
+    "tintColor": {
+     "label": "色調顏色"
     }
    }
   },
@@ -2509,6 +2818,13 @@
      "options": [
       "閃動",
       "穩定"
+     ]
+    },
+    "wave": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
      ]
     }
    }
@@ -2616,6 +2932,16 @@
       "中心",
       "角落"
      ]
+    },
+    "style": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
+    },
+    "alZ": {
+     "label": "位置 Z"
     }
    }
   },
@@ -2629,6 +2955,9 @@
    }
   },
   "fourcolor": {
+   "aliases": [
+    "四色漸層"
+   ],
    "description": "在圖層上混合四個位置的顏色（位置以距圖層中心的像素數表示）。",
    "name": "四色漸層",
    "params": {
@@ -2869,6 +3198,18 @@
     }
    }
   },
+  "gaussianblur": {
+   "description": "平滑柔和的模糊。強度決定模糊範圍。",
+   "name": "高斯模糊",
+   "params": {
+    "scale": {
+     "label": "縮放"
+    },
+    "strength": {
+     "label": "強度"
+    }
+   }
+  },
   "glass": {
    "description": "將圖層形狀變成有斜角的玻璃，折射後方圖層，並沿邊緣加上亮光。光照設為「柔和」時，依填色的比例顯示圖層，並以顏色照亮玻璃，斜角內緣朝向光源的一側最亮。",
    "name": "玻璃",
@@ -2952,14 +3293,26 @@
    }
   },
   "glowscan": {
-   "description": "只模糊並照亮圖層中亮度落在指定範圍的部分；為位置加入動畫，讓光暈從陰影掃過亮部。",
+   "description": "在畫面亮度越過臨界值的位置畫出發光的輪廓線，像輪廓掃描。",
    "name": "發光掃描",
    "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blend": {
+     "label": "混合"
+    },
     "blur": {
      "label": "模糊"
     },
     "color": {
      "label": "發光顏色"
+    },
+    "feather": {
+     "label": "羽化"
+    },
+    "fill": {
+     "label": "填色"
     },
     "intensity": {
      "label": "強度"
@@ -2967,11 +3320,30 @@
     "position": {
      "label": "位置"
     },
+    "radius": {
+     "label": "半徑"
+    },
     "show": {
      "label": "僅顯示範圍"
     },
+    "smoothing": {
+     "label": "平滑"
+    },
     "softness": {
      "label": "柔和度"
+    },
+    "style": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
+    },
+    "threshold": {
+     "label": "閾值"
+    },
+    "tint": {
+     "label": "顏色"
     },
     "width": {
      "label": "寬度"
@@ -3209,6 +3581,13 @@
       "經典",
       "標準"
      ]
+    },
+    "alight": {
+     "label": "版面",
+     "options": [
+      "經典",
+      "標準"
+     ]
     }
    }
   },
@@ -3243,8 +3622,11 @@
    }
   },
   "halftone": {
+   "aliases": [
+    "半色調"
+   ],
    "description": "以印刷圓點呈現圖片，暗處的圓點較大。",
-   "name": "半色調",
+   "name": "半色調網點",
    "params": {
     "angle": {
      "label": "角度"
@@ -3254,6 +3636,13 @@
     },
     "colored": {
      "label": "彩色圓點"
+    },
+    "edgeStyle": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
     },
     "ink": {
      "label": "圓點顏色"
@@ -3300,6 +3689,13 @@
      "label": "強度"
     },
     "style": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
+    },
+    "edgeStyle": {
      "label": "樣式",
      "options": [
       "經典",
@@ -3407,6 +3803,22 @@
       "經典",
       "標準"
      ]
+    },
+    "alight": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
+    },
+    "alZ": {
+     "label": "位置 Z"
+    },
+    "alLight": {
+     "label": "方向"
+    },
+    "alElev": {
+     "label": "仰角"
     }
    }
   },
@@ -3431,6 +3843,13 @@
     },
     "seed": {
      "label": "隨機種子"
+    },
+    "edgeStyle": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
     }
    }
   },
@@ -3489,6 +3908,19 @@
     },
     "stretch": {
      "label": "拉伸"
+    },
+    "lineWidth": {
+     "label": "線寬"
+    },
+    "feather": {
+     "label": "羽化"
+    },
+    "edgeStyle": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
     }
    }
   },
@@ -3550,6 +3982,14 @@
     },
     "stretch": {
      "label": "拉伸"
+    },
+    "alight": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準",
+      "圖片"
+     ]
     }
    }
   },
@@ -3645,10 +4085,29 @@
       "中心",
       "角落"
      ]
+    },
+    "alight": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
+    },
+    "alZ": {
+     "label": "位置 Z"
+    },
+    "alLight": {
+     "label": "方向"
+    },
+    "alElev": {
+     "label": "仰角"
     }
    }
   },
   "highlightshadow": {
+   "aliases": [
+    "亮部與陰影"
+   ],
    "description": "依各像素的亮度還原或增強亮部，並提亮或加深陰影。",
    "name": "亮部與陰影",
    "params": {
@@ -3775,6 +4234,22 @@
       "經典",
       "標準"
      ]
+    },
+    "alight": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
+    },
+    "alZ": {
+     "label": "位置 Z"
+    },
+    "alLight": {
+     "label": "方向"
+    },
+    "alElev": {
+     "label": "仰角"
     }
    }
   },
@@ -3909,12 +4384,31 @@
     }
    }
   },
+  "hueshift": {
+   "description": "把每種顏色在色輪上轉動同樣的角度，並保持亮度。",
+   "name": "色相偏移",
+   "params": {
+    "hue": {
+     "label": "色相偏移"
+    }
+   }
+  },
   "innerblur": {
    "description": "模糊圖層內的圖片，並保持輪廓清晰。",
    "name": "內部模糊",
    "params": {
     "blur": {
      "label": "強度"
+    },
+    "iterations": {
+     "label": "迭代次數"
+    },
+    "style": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
     }
    }
   },
@@ -3994,6 +4488,15 @@
     },
     "invert_alpha": {
      "label": "反轉透明度"
+    },
+    "red": {
+     "label": "紅"
+    },
+    "green": {
+     "label": "綠"
+    },
+    "blue": {
+     "label": "藍"
     }
    }
   },
@@ -4060,6 +4563,13 @@
     },
     "segments": {
      "label": "分段數"
+    },
+    "edgeStyle": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
     }
    }
   },
@@ -4096,9 +4606,23 @@
    }
   },
   "lensflare": {
-   "description": "在圖片上疊加帶有光暈的亮光。",
-   "name": "光斑",
+   "aliases": [
+    "光斑"
+   ],
+   "description": "在畫面上疊加一道帶星芒、光暈與反射光環的明亮光線。",
+   "name": "鏡頭光暈",
    "params": {
+    "alpha": {
+     "label": "透明度"
+    },
+    "blendMode": {
+     "label": "混合模式",
+     "options": [
+      "正常",
+      "色彩增值",
+      "濾色"
+     ]
+    },
     "brightness": {
      "label": "亮度"
     },
@@ -4108,8 +4632,21 @@
     "color": {
      "label": "顏色"
     },
+    "points": {
+     "label": "尖角數"
+    },
     "radius": {
      "label": "半徑"
+    },
+    "shine": {
+     "label": "光澤"
+    },
+    "style": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
     }
    }
   },
@@ -4274,6 +4811,13 @@
       "經典",
       "標準"
      ]
+    },
+    "alight": {
+     "label": "版面",
+     "options": [
+      "經典",
+      "標準"
+     ]
     }
    }
   },
@@ -4392,6 +4936,14 @@
      "options": [
       "經典",
       "標準"
+     ]
+    },
+    "weighting": {
+     "label": "模式",
+     "options": [
+      "經典",
+      "明度",
+      "RGB"
      ]
     }
    }
@@ -4709,6 +5261,25 @@
       "中心",
       "角落"
      ]
+    },
+    "alight": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
+    },
+    "alZ": {
+     "label": "位置 Z"
+    },
+    "alLight": {
+     "label": "方向"
+    },
+    "alElev": {
+     "label": "仰角"
+    },
+    "alHeight": {
+     "label": "高度"
     }
    }
   },
@@ -4964,6 +5535,13 @@
      ]
     },
     "roll": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
+    },
+    "space": {
      "label": "樣式",
      "options": [
       "經典",
@@ -5328,6 +5906,16 @@
       "經典",
       "標準"
      ]
+    },
+    "edgeStyle": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
+    },
+    "saturation": {
+     "label": "飽和度"
     }
    }
   },
@@ -5446,6 +6034,18 @@
       "經典",
       "標準"
      ]
+    },
+    "angle": {
+     "label": "角度"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "repeat": {
+     "label": "重複"
+    },
+    "mirror": {
+     "label": "鏡像"
     }
    }
   },
@@ -5706,6 +6306,22 @@
       "中心",
       "角落"
      ]
+    },
+    "alight": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
+    },
+    "alZ": {
+     "label": "位置 Z"
+    },
+    "alLight": {
+     "label": "方向"
+    },
+    "alElev": {
+     "label": "仰角"
     }
    }
   },
@@ -5752,6 +6368,13 @@
     },
     "width": {
      "label": "寬度"
+    },
+    "alight": {
+     "label": "版面",
+     "options": [
+      "經典",
+      "標準"
+     ]
     }
    }
   },
@@ -5840,6 +6463,13 @@
     },
     "sweep": {
      "label": "掃掠角度"
+    },
+    "alight": {
+     "label": "版面",
+     "options": [
+      "經典",
+      "標準"
+     ]
     }
    }
   },
@@ -6018,6 +6648,19 @@
     },
     "glossiness": {
      "label": "高光銳利度"
+    },
+    "style": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
+    },
+    "alLight": {
+     "label": "方向"
+    },
+    "alElev": {
+     "label": "仰角"
     }
    },
    "shortcuts": {
@@ -6107,8 +6750,11 @@
    }
   },
   "reorient360": {
+   "aliases": [
+    "360°球體重新定向"
+   ],
    "description": "在球體內旋轉360°全景圖層，以調平地平線或改變正面方向。",
-   "name": "360°球體重新定向",
+   "name": "360º球體重新定向",
    "params": {
     "pitch": {
      "label": "俯仰"
@@ -6432,6 +7078,18 @@
     },
     "seed": {
      "label": "隨機種子"
+    }
+   }
+  },
+  "saturationvibrance": {
+   "description": "讓顏色更濃或更淡。自然飽和度溫和地增強暗淡的顏色，不動已經鮮豔的顏色。",
+   "name": "飽和度 / 自然飽和度",
+   "params": {
+    "saturation": {
+     "label": "飽和度"
+    },
+    "vibrance": {
+     "label": "自然飽和度"
     }
    }
   },
@@ -6959,6 +7617,42 @@
     }
    }
   },
+  "spectralmap": {
+   "description": "依亮度用三種顏色的光譜為畫面重新上色。重複讓它循環更多次，相位讓它平移，收緊讓每條色帶變寬。",
+   "name": "光譜對應",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blueColor": {
+     "label": "顏色3"
+    },
+    "greenColor": {
+     "label": "顏色2"
+    },
+    "phase": {
+     "label": "相位"
+    },
+    "redColor": {
+     "label": "顏色1"
+    },
+    "repeat": {
+     "label": "重複"
+    },
+    "reverse": {
+     "label": "反轉"
+    },
+    "saturation": {
+     "label": "飽和度"
+    },
+    "scaleBrightness": {
+     "label": "縮放亮度"
+    },
+    "squeeze": {
+     "label": "擠壓"
+    }
+   }
+  },
   "spherize": {
    "description": "以前方投影或等距長方形紋理將圖層包覆在球面上。",
    "name": "球面化",
@@ -7055,6 +7749,22 @@
       "中心",
       "角落"
      ]
+    },
+    "alight": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
+    },
+    "alZ": {
+     "label": "位置 Z"
+    },
+    "alLight": {
+     "label": "方向"
+    },
+    "alElev": {
+     "label": "仰角"
     }
    }
   },
@@ -7168,8 +7878,11 @@
    }
   },
   "splittone": {
+   "aliases": [
+    "分離色調"
+   ],
    "description": "分別為陰影和亮部染上不同色相，同時保留黑白與亮度。陰影階調會彎曲亮度曲線，亮部階調會調整亮部顏色的起始位置。漸層對應樣式僅依像素亮度指定顏色。",
-   "name": "分離色調",
+   "name": "熱色",
    "params": {
     "highlightAmount": {
      "label": "亮部強度"
@@ -7284,6 +7997,13 @@
     },
     "shine": {
      "label": "光澤"
+    },
+    "edgeStyle": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
     }
    }
   },
@@ -7306,20 +8026,17 @@
    }
   },
   "starpolyhedron": {
-   "description": "將圖層套用到由兩個交叉角錐組成的星形上。",
+   "description": "把圖層放在一個星形上，星角在前後兩面隆起成稜，帶光照和深度。",
    "name": "星形多面體",
    "params": {
-    "light": {
-     "label": "光源角度"
+    "orientA": {
+     "label": "方向 α"
     },
-    "perspective": {
-     "label": "透視"
+    "orientB": {
+     "label": "方向 β"
     },
-    "position": {
-     "label": "位置"
-    },
-    "radius": {
-     "label": "半徑"
+    "orientG": {
+     "label": "方向 γ"
     },
     "rotX": {
      "label": "X軸旋轉"
@@ -7330,11 +8047,83 @@
     "rotZ": {
      "label": "Z軸旋轉"
     },
+    "starSize": {
+     "label": "大小"
+    },
+    "starDepth": {
+     "label": "深度"
+    },
+    "pointLength": {
+     "label": "星角長度"
+    },
+    "smoothing": {
+     "label": "平滑度"
+    },
+    "points": {
+     "label": "尖角數"
+    },
+    "alPos": {
+     "label": "位置"
+    },
+    "alZ": {
+     "label": "位置 Z"
+    },
+    "alScale": {
+     "label": "縮放"
+    },
+    "intensity": {
+     "label": "光線強度"
+    },
+    "alShine": {
+     "label": "光澤"
+    },
+    "spec": {
+     "label": "鏡面反射"
+    },
+    "alAmbient": {
+     "label": "環境光"
+    },
+    "alColor": {
+     "label": "顏色"
+    },
+    "lightDir": {
+     "label": "方向"
+    },
+    "lightDepth": {
+     "label": "仰角"
+    },
+    "alMirror": {
+     "label": "鏡像"
+    },
+    "alRepeatX": {
+     "label": "X軸重複"
+    },
+    "alRepeatY": {
+     "label": "Y軸重複"
+    },
+    "alTexAngle": {
+     "label": "紋理角度"
+    },
+    "alCrop": {
+     "label": "裁切"
+    },
+    "radius": {
+     "label": "半徑"
+    },
+    "position": {
+     "label": "位置"
+    },
     "scale": {
      "label": "縮放"
     },
+    "perspective": {
+     "label": "透視"
+    },
     "shading": {
      "label": "明暗"
+    },
+    "light": {
+     "label": "光源角度"
     },
     "shine": {
      "label": "光澤"
@@ -7390,6 +8179,13 @@
      "options": [
       "中心",
       "角落"
+     ]
+    },
+    "style": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
      ]
     }
    }
@@ -7506,6 +8302,22 @@
       "經典",
       "標準"
      ]
+    },
+    "alight": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
+    },
+    "alZ": {
+     "label": "位置 Z"
+    },
+    "alLight": {
+     "label": "方向"
+    },
+    "alElev": {
+     "label": "仰角"
     }
    }
   },
@@ -7518,6 +8330,27 @@
     },
     "grain": {
      "label": "大小"
+    }
+   }
+  },
+  "streakstrips": {
+   "description": "將圖層切成平行的條帶，並在每條條帶上拉伸影像的一條線，像出錯的掃描。",
+   "name": "條紋拉伸",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "angle": {
+     "label": "角度"
+    },
+    "count": {
+     "label": "數量"
+    },
+    "maskToLayer": {
+     "label": "依圖層遮罩"
+    },
+    "phase": {
+     "label": "相位"
     }
    }
   },
@@ -7601,6 +8434,15 @@
     }
    }
   },
+  "strokecolor": {
+   "description": "把圖層的描邊塗成一種顏色：形狀或文字的輪廓，以及繪圖中的每一筆鋼筆與筆刷。",
+   "name": "描邊顏色",
+   "params": {
+    "color": {
+     "label": "顏色"
+    }
+   }
+  },
   "stroketaper": {
    "description": "讓手繪的鋼筆和筆刷筆畫，以及線條和形狀的描邊（邊框與陰影＞描邊）逐漸變細至尖端。從無到起點漸粗，從終點到無漸細。擠壓可讓漸細效果更銳利。",
    "name": "描邊漸細",
@@ -7613,6 +8455,13 @@
     },
     "start": {
      "label": "起點"
+    },
+    "style": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
     }
    }
   },
@@ -7955,6 +8804,18 @@
     "wobbly": "搖擺"
    }
   },
+  "textspacing": {
+   "description": "調整文字圖層中字母之間與行與行之間的距離。「字元間距」可拉開字母，低於0%時則讓字母更緊密。「行距」設定行與行之間的距離：100%為正常，200%為兩倍。為任一項設定關鍵影格，即可讓間距產生動畫。",
+   "name": "文字間距",
+   "params": {
+    "letterspacing": {
+     "label": "字元間距"
+    },
+    "linespacing": {
+     "label": "行距"
+    }
+   }
+  },
   "texttransform": {
    "description": "在範圍內移動、縮放、旋轉、淡化字母、單字或行並為其上色。錨點決定縮放與旋轉是以各個部分還是圖層中心為基準。用相位移動範圍，讓變化在文字中依序傳遞。",
    "name": "文字變形",
@@ -8139,6 +9000,13 @@
       "經典",
       "標準"
      ]
+    },
+    "edgeStyle": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
     }
    }
   },
@@ -8209,6 +9077,13 @@
       "經典",
       "標準"
      ]
+    },
+    "edgeStyle": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
     }
    }
   },
@@ -8244,8 +9119,11 @@
    }
   },
   "timequant": {
+   "aliases": [
+    "影格速率"
+   ],
    "description": "讓此圖層以較低的影格速率移動，呈現卡頓或定格動畫的效果。",
-   "name": "影格速率",
+   "name": "時間量化",
    "params": {
     "fps": {
      "label": "每秒步數"
@@ -8363,6 +9241,22 @@
       "中心",
       "角落"
      ]
+    },
+    "alight": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
+    },
+    "alZ": {
+     "label": "位置 Z"
+    },
+    "alLight": {
+     "label": "方向"
+    },
+    "alElev": {
+     "label": "仰角"
     }
    }
   },
@@ -8409,6 +9303,16 @@
       "經典",
       "標準"
      ]
+    },
+    "wrapStyle": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
+    },
+    "depth": {
+     "label": "深度"
     }
    }
   },
@@ -8528,6 +9432,9 @@
       "經典",
       "標準"
      ]
+    },
+    "singleAxis": {
+     "label": "單軸"
     }
    }
   },
@@ -8549,6 +9456,13 @@
      "options": [
       "圖層",
       "畫面"
+     ]
+    },
+    "edgeStyle": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
      ]
     }
    }
@@ -8574,6 +9488,13 @@
      "options": [
       "灰色",
       "紅色"
+     ]
+    },
+    "style": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
      ]
     }
    }
@@ -8656,8 +9577,11 @@
    }
   },
   "viewer360": {
+   "aliases": [
+    "360° 檢視器"
+   ],
    "description": "透過可旋轉與縮放的虛擬攝影機，檢視 360° 全景圖層。",
-   "name": "360° 檢視器",
+   "name": "360º 檢視器",
    "params": {
     "fov": {
      "label": "視野"
@@ -8965,6 +9889,94 @@
     },
     "zoom": {
      "label": "強度"
+    },
+    "alight": {
+     "label": "版面",
+     "options": [
+      "經典",
+      "標準"
+     ]
+    }
+   }
+  },
+  "ring": {
+   "description": "把圖層包在一個平面環上，像一段短管，帶光照和深度。",
+   "name": "環",
+   "params": {
+    "orientA": {
+     "label": "方向 α"
+    },
+    "orientB": {
+     "label": "方向 β"
+    },
+    "orientG": {
+     "label": "方向 γ"
+    },
+    "rotX": {
+     "label": "X軸旋轉"
+    },
+    "rotY": {
+     "label": "Y軸旋轉"
+    },
+    "rotZ": {
+     "label": "Z軸旋轉"
+    },
+    "radius": {
+     "label": "半徑"
+    },
+    "thickness": {
+     "label": "寬度"
+    },
+    "height": {
+     "label": "長度"
+    },
+    "smoothing": {
+     "label": "平滑度"
+    },
+    "position": {
+     "label": "位置"
+    },
+    "alZ": {
+     "label": "位置 Z"
+    },
+    "scale": {
+     "label": "縮放"
+    },
+    "intensity": {
+     "label": "光線強度"
+    },
+    "shine": {
+     "label": "光澤"
+    },
+    "spec": {
+     "label": "鏡面反射"
+    },
+    "ambient": {
+     "label": "環境光"
+    },
+    "lightColor": {
+     "label": "顏色"
+    },
+    "lightDir": {
+     "label": "方向"
+    },
+    "lightDepth": {
+     "label": "仰角"
+    },
+    "texMirror": {
+     "label": "鏡像"
+    },
+    "texRepeatX": {
+     "label": "X軸重複"
+    },
+    "texRepeatY": {
+     "label": "Y軸重複"
+    },
+    "texAngle": {
+     "label": "紋理角度"
+    },
+    "texCrop": {
+     "label": "裁切"
     }
    }
   }

@@ -1223,8 +1223,6 @@
     <string name="font_source_google">Google Fonts</string>
     <string name="font_google_hint">Введите название, чтобы искать среди всех шрифтов Google Fonts</string>
     <string name="font_downloads_when_chosen">Загрузится при выборе</string>
-    <string name="fonts_missing_title">Шрифты отсутствуют на телефоне</string>
-    <string name="fonts_missing_body">В этом проекте используются шрифты, которых нет на телефоне: %1$s. Текст отображается другим шрифтом, пока вы не скачаете их из Google Fonts.</string>
     <string name="font_favorite">Избранное</string>
     <string name="font_category_sans_serif">Без засечек</string>
     <string name="font_category_serif">С засечками</string>
@@ -1390,6 +1388,7 @@
     <string name="structure_paste_fill_color">Вставить заливку и цвет</string>
     <string name="structure_paste_border_shadow">Вставить рамку и тень</string>
     <string name="structure_paste_blending">Вставить непрозрачность и режим наложения</string>
+    <string name="structure_paste_motions">Вставить анимации и переходы</string>
     <string name="structure_paste_style">Вставить стиль</string>
     <string name="text_alignment">Выравнивание</string>
     <string name="track_track">Отслеживание</string>
@@ -1867,6 +1866,7 @@
     <string name="ai_model_grain">Модель AI Enhance для зерна</string>
     <string name="ai_model_cartoon">Модель AI Enhance для мультфильмов</string>
     <string name="ai_model_cutout">AI-удаление фона 2.0</string>
+    <string name="ai_model_noise">Модель шумоподавления</string>
     <string name="ai_model_broken">Файл AI-модели повреждён и удалён. Скачайте его снова.</string>
     <string name="ai_model_download_failed">Не удалось скачать AI-модель. Проверьте подключение и повторите попытку.</string>
     <string name="ai_model_download_wrong">Скачанный файл не является AI-моделью</string>
@@ -1916,6 +1916,7 @@
     <string name="cutout_best">AI-удаление фона 2.0</string>
     <string name="cutout_best_hint">Более аккуратные края вокруг волос и мелких деталей. Загрузит %1$s один раз. Только изображения.</string>
     <string name="cutout_fallback_download">Не удалось скачать AI-удаление фона 2.0, поэтому использован стандартный режим. Проверьте подключение и повторите попытку.</string>
+    <string name="ai_noise_fallback_download">Не удалось скачать модель шумоподавления, поэтому использовано стандартное шумоподавление. Проверьте подключение и повторите попытку.</string>
     <string name="cutout_fallback_failed">AI-удаление фона 2.0 не смогло обработать это изображение, поэтому использован стандартный режим.</string>
     <string name="ai_gpu_warning">На некоторых телефонах это может вызвать зависание. Если телефон зависнет, перезапустите его, и AI снова будет использовать процессор.</string>
     <string name="ai_gpu_failed">Работа AI на графическом чипе не завершилась, поэтому AI теперь использует процессор.</string>
@@ -2033,6 +2034,17 @@
     <string name="track_motion_cancelled">Отслеживание движения отменено. Уже отслеженные кадры сохраняют ключевые кадры.</string>
     <string name="track_motion_unavailable">Отслеживание движения недоступно в этой сборке.</string>
     <string name="track_motion_failed">Не удалось отследить это видео.</string>
+    <string name="face_tracking_pick">Выбрать лицо</string>
+    <string name="face_tracking_again">Отследить снова</string>
+    <string name="face_tracking_none">Лицо ещё не выбрано.</string>
+    <string name="face_tracking_ready">Видео следует за выбранным лицом.</string>
+    <string name="face_tracking_partial">Часть клипа ещё не отслежена.</string>
+    <string name="face_tracking_video_only">Отслеживание лица работает со слоями видео.</string>
+    <string name="face_tracking_tap">Коснитесь лица, за которым должно следовать видео.</string>
+    <string name="face_tracking_looking">Поиск лиц…</string>
+    <string name="face_tracking_none_here">В этом кадре лицо не найдено. Попробуйте другой.</string>
+    <string name="face_tracking_lost">Не удалось отследить лицо в этом клипе.</string>
+    <string name="face_tracking_cancelled">Отслеживание лица отменено.</string>
     <string name="edit_layer_copy_name">%1$s (копия)</string>
     <string name="model_layer_video">Видео</string>
     <string name="ai_video_mask_name">Маска %1$s</string>
@@ -2376,6 +2388,12 @@
         <item quantity="many">Стиль вставлен на %1$s слоёв</item>
         <item quantity="other">Стиль вставлен на %1$s слоёв</item>
     </plurals>
+    <plurals name="structure_transitions_skipped">
+        <item quantity="one">%1$s переход пропущен: нужен клип сразу до или после слоя</item>
+        <item quantity="few">%1$s перехода пропущено: нужен клип сразу до или после слоя</item>
+        <item quantity="many">%1$s переходов пропущено: нужен клип сразу до или после слоя</item>
+        <item quantity="other">%1$s перехода пропущено: нужен клип сразу до или после слоя</item>
+    </plurals>
     <string name="subject_keep_all">Оставить всё</string>
     <string name="subject_hint_photo">Чтобы оставить только человека или предмет, коснитесь его.</string>
     <string name="subject_hint_video">Чтобы оставить только человека или предмет, коснитесь его на первом кадре. Приложение будет отслеживать его в клипе.</string>
@@ -2498,8 +2516,6 @@
     <string name="desk_folder_back">Вернуться ко всем медиа</string>
     <string name="voice_install_espeak">Голоса не найдены. Установите пакет espeak-ng и снова откройте это окно.</string>
     <string name="desk_close_save_failed">Не удалось сохранить последние изменения. Освободите место на диске и нажмите «Повторить». Если закрыть окно без сохранения, AbsentMotion предложит эти изменения снова при следующем запуске.</string>
-    <string name="desk_fonts_missing_title">Шрифтов нет на этом компьютере</string>
-    <string name="desk_fonts_missing_body">В проекте используются шрифты, которых нет на этом компьютере: %1$s. Пока вы не скачаете их из Google Fonts, текст отображается другим шрифтом.</string>
     <string name="desk_export_busy">Другой экспорт ещё выполняется. Дождитесь его окончания или сначала отмените его.</string>
     <string name="desk_export_no_ffmpeg">AbsentMotion не удалось запустить FFmpeg — программу для создания видео- и аудиофайлов. Переустановите AbsentMotion.</string>
     <string name="desk_export_note_software">На этом компьютере не работает ни один аппаратный видеокодировщик, поэтому для экспорта используется более медленный программный кодировщик.</string>
@@ -2882,6 +2898,7 @@
     <string name="added_effect_save_failed">Не удалось сохранить все эффекты.</string>
     <string name="added_effect_remove_failed">Не удалось удалить эффект.</string>
     <string name="community_filter_effects">Эффекты</string>
+    <string name="community_filter_new">Новое</string>
     <string name="added_effect_version">Версия %1$d</string>
     <string name="added_effect_already_added">Уже добавлен</string>
     <string name="added_effect_newer_installed">У вас более новая версия (v%1$d)</string>

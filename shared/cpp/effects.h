@@ -51,6 +51,7 @@ private:
         bool blurred = false;
         bool brightPass = false;
         bool plainBlur = false;
+        bool wide = false;
         bool backdrop = false;
         bool below = false;
         bool extent = false;

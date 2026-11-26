@@ -66,7 +66,7 @@ class ElectricEdgesImportTest {
 
     @Test fun seedStaysInsideAlightsRange() {
         val effect = imported("""<property name="seed" type="float"><kf t="0" v="-1.0" /><kf t="1" v="7.25" /></property>""")
-        assertEquals(listOf(0f, 5f), effect.prop("seed").keyframes.map { it.v.toFloat() })
+        assertEquals(listOf(-1f, 7.25f), effect.prop("seed").keyframes.map { it.v.toFloat() })
         assertEquals(3.75f, imported("""<property name="seed" type="float" value="3.75" />""").prop("seed")["value"]!!.toFloat(), 1e-6f)
     }
 

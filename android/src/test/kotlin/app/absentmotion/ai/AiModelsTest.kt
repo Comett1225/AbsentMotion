@@ -34,8 +34,10 @@ class AiModelsTest {
         }
         val rife = listOf(AiModel.SmoothLow, AiModel.SmoothMedium, AiModel.SmoothHigh)
         assertTrue(rife.all { m -> m.files.all { "/13338e38debe2e400b3eeecf6792312d01a692f9/models/${m.folder}/" in it.url } })
-        assertTrue((AiModel.entries - rife.toSet() - setOf(AiModel.Cutout, AiModel.DetailMax, AiModel.CartoonMax)).all { m -> m.files.all { it.url == MODEL_RELEASE + it.name } })
+        assertTrue((AiModel.entries - rife.toSet() - setOf(AiModel.Cutout, AiModel.DetailMax, AiModel.CartoonMax, AiModel.Noise)).all { m -> m.files.all { it.url == MODEL_RELEASE + it.name } })
         assertTrue(listOf(AiModel.DetailMax, AiModel.CartoonMax).all { model -> model.files.all { it.url == MODEL_RELEASE_5 + it.name } })
+        assertEquals(listOf(MODEL_RELEASE_6 + NOISE_MODEL), AiModel.Noise.files.map { it.url })
+        assertTrue(MODEL_RELEASE_6.endsWith("/releases/download/ai-models-6/"))
         assertTrue(MODEL_RELEASE.endsWith("/releases/download/ai-models-1/"))
         assertNull(AiModel.Grain.param)
         assertEquals("realesr-general-x4v3.param", AiModel.Detail.param)

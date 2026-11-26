@@ -107,6 +107,7 @@ class AlightEditImportTest {
         val e = effects(migration.migrate(Scene.parse(edit)).scene).associateBy { it["id"]!! }
         val shake = e.getValue("absent.autoshake")
         assertEquals(1f, shake.value("pattern")!!.toFloat(), 1e-6f)
+        assertEquals(1f, shake.value("style")!!.toFloat(), 1e-6f)
         assertEquals(listOf("343.000000", "19.000000"), shake.keys("magnitude").map { it["v"] })
         val glow = e.getValue("absent.softglow")
         assertEquals(0.25f, glow.value("blend")!!.toFloat(), 1e-6f)

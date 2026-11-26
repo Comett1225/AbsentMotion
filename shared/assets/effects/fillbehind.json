@@ -2,6 +2,9 @@
  "id": "fillbehind",
  "name": "Fill Behind",
  "category": "blur",
+ "also": [
+  "other"
+ ],
  "since": "3.0.0",
  "description": "Fills the frame behind the layer with a blurred, zoomed copy of itself, the usual fix for a portrait video in a landscape project.",
  "params": [
@@ -182,7 +185,22 @@
      1
     ]
    }
+  },
+  {
+   "id": "edgeStyle",
+   "label": "Style",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "when": {
+    "edgeStyle": [
+     2
+    ]
+   }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform shader blurred;\nuniform float4 screen;\nuniform float blur;\nuniform float feather;\nuniform float saturation;\nuniform float brightness;\nuniform float gamma;\nuniform float fgAlpha;\nuniform float bgAlpha;\nlayout(color) uniform half4 tintColor;\nuniform float tint;\nlayout(color) uniform half4 edgeColor;\nuniform float edgeStrength;\nuniform float scanStrength;\nuniform float scanCount;\nuniform float2 fgOffset;\nuniform float fgScale;\nuniform float2 bgOffset;\nuniform float bgScale;\nuniform float style;\nfloat luma(float3 c) { return dot(c, float3(0.2126, 0.7152, 0.0722)); }\nhalf4 main(float2 coord) {\n    float2 c = size * 0.5;\n    float margin = max(blur, 0.0) * (style > 0.5 ? 1.0 : 0.5);\n    float2 inner = max(size - 2.0 * margin, float2(1.0));\n    float k = max(screen.z / inner.x, screen.w / inner.y) * max(bgScale, 0.01);\n    half4 b = blurred.eval(c + (coord - screen.xy - screen.zw * 0.5 - bgOffset) / k);\n    float3 rgb = b.a > 0.0 ? float3(b.rgb) / float(b.a) : float3(0.0);\n    rgb = clamp(mix(float3(luma(rgb)), rgb, 1.0 + saturation), 0.0, 1.0);\n    float l = luma(rgb);\n    if (l > 0.0) rgb *= pow(l, 1.0 / max(gamma, 0.01)) / l;\n    rgb = brightness < 0.0 ? rgb * (1.0 + brightness) : mix(rgb, float3(1.0), brightness);\n    float3 hue = float3(tintColor.rgb) * luma(rgb) / max(luma(float3(tintColor.rgb)), 0.001);\n    rgb = mix(rgb, hue, clamp(tint, 0.0, 1.0));\n    if (scanStrength > 0.0 && fract((coord.y - screen.y) / screen.w * scanCount) > 0.5) rgb *= 1.0 - clamp(scanStrength, 0.0, 1.0);\n    half4 bg = half4(half3(clamp(rgb, 0.0, 1.0)), 1.0) * half((style > 0.5 ? step(0.0001, float(b.a)) : float(b.a)) * clamp(bgAlpha, 0.0, 1.0));\n    float2 fp = c + (coord - c - fgOffset) / max(fgScale, 0.01);\n    half4 fg = image.eval(fp);\n    float soft = float(blurred.eval(fp).a);\n    float spread = blur > 0.0 ? 1.0 : 0.0;\n    fg *= half(mix(1.0, smoothstep(0.5, 1.0, soft), clamp(feather, 0.0, 1.0) * spread) * clamp(fgAlpha, 0.0, 1.0));\n    float e = clamp(soft * 2.0, 0.0, 1.0) * clamp(edgeStrength, 0.0, 1.0) * float(edgeColor.a) * spread;\n    half4 under = half4(edgeColor.rgb * half(e), half(e)) + bg * half(1.0 - e);\n    return fg + under * (1.0 - fg.a);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform shader blurred;\nuniform float4 screen;\nuniform float blur;\nuniform float feather;\nuniform float saturation;\nuniform float brightness;\nuniform float gamma;\nuniform float fgAlpha;\nuniform float bgAlpha;\nlayout(color) uniform half4 tintColor;\nuniform float tint;\nlayout(color) uniform half4 edgeColor;\nuniform float edgeStrength;\nuniform float scanStrength;\nuniform float scanCount;\nuniform float2 fgOffset;\nuniform float fgScale;\nuniform float2 bgOffset;\nuniform float bgScale;\nuniform float style;\nuniform float edgeStyle;\nfloat luma(float3 c) { return dot(c, float3(0.2126, 0.7152, 0.0722)); }\nhalf4 main(float2 coord) {\n    float2 c = size * 0.5;\n    float margin = max(blur, 0.0) * (style > 0.5 ? 1.0 : 0.5);\n    float2 inner = max(size - 2.0 * margin, float2(1.0));\n    float k = (edgeStyle > 0.5 ? max(screen.z / size.x, screen.w / size.y) * (1.0 + 0.00475 * max(blur, 0.0)) : max(screen.z / inner.x, screen.w / inner.y)) * max(bgScale, 0.01);\n    half4 b = blurred.eval(c + (coord - screen.xy - screen.zw * 0.5 - bgOffset) / k);\n    float3 rgb = b.a > 0.0 ? float3(b.rgb) / float(b.a) : float3(0.0);\n    float grey = edgeStyle > 0.5 ? dot(rgb, float3(0.299, 0.587, 0.114)) : luma(rgb);\n    rgb = clamp(mix(float3(grey), rgb, 1.0 + saturation), 0.0, edgeStyle > 0.5 ? 2.0 : 1.0);\n    float l = luma(rgb);\n    if (l > 0.0) rgb *= pow(l, 1.0 / max(gamma, 0.01)) / l;\n    rgb = edgeStyle > 0.5 ? rgb + brightness : brightness < 0.0 ? rgb * (1.0 + brightness) : mix(rgb, float3(1.0), brightness);\n    float3 hue = float3(tintColor.rgb) * luma(rgb) / max(luma(float3(tintColor.rgb)), 0.001);\n    rgb = mix(rgb, hue, clamp(tint, 0.0, 1.0));\n    if (scanStrength > 0.0 && fract((coord.y - screen.y) / screen.w * scanCount) > 0.5) rgb *= 1.0 - clamp(scanStrength, 0.0, 1.0);\n    half4 bg = half4(half3(clamp(rgb, 0.0, 1.0)), 1.0) * half((style > 0.5 ? step(0.0001, float(b.a)) : float(b.a)) * clamp(bgAlpha, 0.0, 1.0));\n    float2 fp = c + (coord - c - fgOffset) / max(fgScale, 0.01);\n    half4 fg = image.eval(fp);\n    float soft = float(blurred.eval(fp).a);\n    float spread = blur > 0.0 ? 1.0 : 0.0;\n    float2 lo = mix(fp, float2(1e9), step(float2(0.0), screen.xy + 0.5));\n    float2 hi = mix(size - fp, float2(1e9), step(screen.xy + screen.zw - 0.5, size));\n    float rim = min(min(lo.x, lo.y), min(hi.x, hi.y));\n    float edgeAlpha = edgeStyle > 0.5 ? smoothstep(0.0, clamp(feather, 0.0, max(blur, 0.0) / 200.0) * 0.106 * min(size.x, size.y) + 0.0001, rim) : mix(1.0, smoothstep(0.5, 1.0, soft), clamp(feather, 0.0, 1.0) * spread);\n    fg *= half(edgeAlpha * clamp(fgAlpha, 0.0, 1.0));\n    float e = clamp(soft * 2.0, 0.0, 1.0) * clamp(edgeStrength, 0.0, 1.0) * float(edgeColor.a) * spread;\n    half4 under = half4(edgeColor.rgb * half(e), half(e)) + bg * half(1.0 - e);\n    return fg + under * (1.0 - fg.a);\n}\n"
 }

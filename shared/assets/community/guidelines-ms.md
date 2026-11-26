@@ -27,6 +27,7 @@ Segala-galanya pada tab **Komuniti** disemak oleh seseorang sebelum ia dipaparka
 
 - Pastikan ia sesuai untuk semua orang. Orang pelbagai peringkat umur menggunakan AbsentMotion.
 - Bundel projek boleh sehingga 20 MB, pratetap sehingga 1 MB dan kesan sehingga 512 KB.
+- Setiap kesan memerlukan imej kecil yang menunjukkannya, dalam dua saiz: kecil (WebP 192 × 192, pegun atau beranimasi sehingga 3 saat) dan besar (WebP 720 × 720), setiap satu sehingga 150 KB.
 - Item dikongsi di bawah CC BY 4.0: sesiapa sahaja boleh menggunakan dan mengubahnya selagi mereka memberi kredit kepada pembuatnya.
 - Nama pada item anda ialah nama pencipta yang anda taip. Jangan letakkan apa-apa yang peribadi di dalamnya.
 - Penyelenggara memutuskan apa yang dipaparkan, dan boleh menurunkan item pada bila-bila masa.

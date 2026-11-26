@@ -18,6 +18,7 @@ import app.absentmotion.library.CommunityFeed
 import app.absentmotion.model.Scene
 import app.absentmotion.ui.home.CommunityTab
 import app.absentmotion.ui.home.LocalCommunity
+import app.absentmotion.ui.home.sessionAllowed
 import app.absentmotion.ui.home.sessionIndex
 import app.absentmotion.ui.theme.Am
 import com.sun.net.httpserver.HttpServer
@@ -117,6 +118,52 @@ class CommunityFixtureDeskTest {
         } finally {
             engine.close()
             exports.deleteRecursively()
+        }
+    }
+
+    @Test fun screenshotsTheNewPageAndEffectTilesFromAFixtureFolder() {
+        val feed = System.getProperty("am.fixtureFeed")?.let(::File)
+        assumeTrue("pass -PfixtureFeed=<community folder> to run", feed != null)
+        val server = HttpServer.create(InetSocketAddress(InetAddress.getLoopbackAddress(), 0), 0)
+        server.createContext("/") { ex ->
+            val file = feed!!.resolve(ex.requestURI.path.trimStart('/')).canonicalFile
+            val bytes = if (file.isFile && file.path.startsWith(feed.canonicalPath)) file.readBytes() else null
+            ex.sendResponseHeaders(if (bytes != null) 200 else 404, bytes?.size?.toLong() ?: -1L)
+            ex.responseBody.use { if (bytes != null) it.write(bytes) }
+        }
+        server.start()
+        val cache = Desk.context.cacheDir.resolve("community").also { it.deleteRecursively() }
+        val before = CommunityFeed.source to sessionIndex
+        CommunityFeed.source = LocalCommunity("http://127.0.0.1:${server.address.port}/")
+        sessionIndex = null
+        sessionAllowed = true
+        val engine = EngineThread(0xff000000.toInt(), Desk.context)
+        val shots = File("build/ui-shots/community").also { it.mkdirs() }
+        fun pictures() = cache.resolve("thumbs").listFiles { f -> f.isFile && !f.name.endsWith(".part") }.orEmpty().size
+        fun settle(test: ComposeUiTest) = repeat(15) { test.mainClock.advanceTimeBy(200); Thread.sleep(80) }
+        try {
+            for ((name, size) in listOf("phone" to Size(390f, 844f), "desktop" to Size(1280f, 800f))) {
+                cache.deleteRecursively()
+                runSkikoComposeUiTest(size = size) {
+                    setContent { CommunityTab(Modifier.fillMaxSize().background(Am.HomeBg), { engine }) {} }
+                    waitUntil(timeoutMillis = 60_000) { pictures() >= 4 }
+                    settle(this)
+                    ImageIO.write(onAllNodes(isRoot()).onFirst().captureToImage().toAwtImage(), "png", shots.resolve("new-$name.png"))
+                    val seen = pictures()
+                    onAllNodesWithText("Glow, Light & Fire").onFirst().performScrollTo().performClick()
+                    waitUntil(timeoutMillis = 60_000) { pictures() >= seen + 16 }
+                    settle(this)
+                    ImageIO.write(onAllNodes(isRoot()).onFirst().captureToImage().toAwtImage(), "png", shots.resolve("item-$name.png"))
+                    onNodeWithText("Soft Glow").performScrollTo()
+                    settle(this)
+                    ImageIO.write(onAllNodes(isRoot()).onFirst().captureToImage().toAwtImage(), "png", shots.resolve("tiles-$name.png"))
+                }
+            }
+        } finally {
+            CommunityFeed.source = before.first
+            sessionIndex = before.second
+            server.stop(0)
+            engine.close()
         }
     }
 

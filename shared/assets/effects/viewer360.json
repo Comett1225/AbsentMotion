@@ -1,6 +1,9 @@
 {
  "id": "viewer360",
- "name": "360° Viewer",
+ "name": "360º Viewer",
+ "aliases": [
+  "360° Viewer"
+ ],
  "category": "distort",
  "since": "3.0.0",
  "description": "Shows a 360° panorama layer through a virtual camera that you can turn and zoom.",

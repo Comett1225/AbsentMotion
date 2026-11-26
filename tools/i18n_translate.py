@@ -130,6 +130,8 @@ def effect_units():
         units[f'fx:{key}:name'] = (data.get('name', key), 'effect name (short, like an Alight Motion effect name)')
         if data.get('description'):
             units[f'fx:{key}:description'] = (data['description'], f'description of the effect "{data.get("name", key)}" (one short sentence)')
+        for i, alias in enumerate(data.get('aliases') or []):
+            units[f'fx:{key}:alias{i}'] = (alias, f'another name that also finds the effect "{data.get("name", key)}" in search (short, like an effect name)')
         for p in data.get('params', []):
             if p.get('label'):
                 units[f'fx:{key}:{p["id"]}:label'] = (p['label'], f'parameter slider/switch label of the effect "{data.get("name", key)}"')
@@ -164,6 +166,9 @@ def effect_assets(units, translations):
         if parts[0] == 'fxshortcut':
             effect.setdefault('shortcuts', {}).setdefault(parts[2], {})[parts[3]] = value
             continue
+        if len(parts) == 3 and parts[2].startswith('alias'):
+            effect.setdefault('aliases', []).append((int(parts[2][5:]), value))
+            continue
         if len(parts) == 3:
             effect[parts[2]] = value
             continue
@@ -173,6 +178,8 @@ def effect_assets(units, translations):
         else:
             param.setdefault('options', []).append((int(parts[3][6:]), value))
     for effect in out['effects'].values():
+        if 'aliases' in effect:
+            effect['aliases'] = [v for _, v in sorted(effect['aliases'])]
         for param in effect.get('params', {}).values():
             if 'options' in param:
                 param['options'] = [v for _, v in sorted(param['options'])]
@@ -188,6 +195,10 @@ def flatten_effect_asset(data, units):
         for field in ('name', 'description'):
             if effect.get(field):
                 flat[f'fx:{key}:{field}'] = effect[field]
+        aliases = effect.get('aliases') or []
+        if len(aliases) == sum(1 for k in units if k.startswith(f'fx:{key}:alias')):
+            for i, alias in enumerate(aliases):
+                flat[f'fx:{key}:alias{i}'] = alias
         for preset, name in effect.get('presets', {}).items():
             flat[f'fxpreset:{key}:{preset}'] = name
         for shortcut, fields in effect.get('shortcuts', {}).items():

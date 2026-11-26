@@ -1,0 +1,85 @@
+{
+ "id": "spectralmap",
+ "name": "Spectral Map",
+ "category": "color",
+ "since": "5.3.2",
+ "description": "Recolors the picture by brightness through a spectrum of three colors. Repeat runs through it more times, Phase shifts it and Squeeze widens each band.",
+ "params": [
+  {
+   "id": "phase",
+   "label": "Phase",
+   "type": "float",
+   "default": 0,
+   "min": -99,
+   "max": 99,
+   "step": 0.001
+  },
+  {
+   "id": "repeat",
+   "label": "Repeat",
+   "type": "float",
+   "default": 1,
+   "min": 0.1,
+   "max": 10,
+   "step": 0.01
+  },
+  {
+   "id": "alpha",
+   "label": "Alpha",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "squeeze",
+   "label": "Squeeze",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "saturation",
+   "label": "Saturation",
+   "type": "float",
+   "default": 0,
+   "min": -1,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "redColor",
+   "label": "Color 1",
+   "type": "color",
+   "default": "#ffff0000"
+  },
+  {
+   "id": "greenColor",
+   "label": "Color 2",
+   "type": "color",
+   "default": "#ff00ff00"
+  },
+  {
+   "id": "blueColor",
+   "label": "Color 3",
+   "type": "color",
+   "default": "#ff0000ff"
+  },
+  {
+   "id": "reverse",
+   "label": "Reverse",
+   "type": "switch",
+   "default": false
+  },
+  {
+   "id": "scaleBrightness",
+   "label": "Scale Brightness",
+   "type": "switch",
+   "default": false
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float phase;\nuniform float repeat;\nuniform float alpha;\nuniform float squeeze;\nuniform float saturation;\nlayout(color) uniform half4 redColor;\nlayout(color) uniform half4 greenColor;\nlayout(color) uniform half4 blueColor;\nuniform float reverse;\nuniform float scaleBrightness;\nfloat luma(float3 c) { return dot(c, float3(0.2126, 0.7152, 0.0722)); }\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    if (c.a <= 0.0) return c;\n    float3 base = float3(c.rgb) / float(c.a);\n    float x = (reverse > 0.5 ? 1.0 - luma(base) : luma(base)) * repeat + phase;\n    float3 d = abs(fract(float3(x, x - 1.0 / 3.0, x - 2.0 / 3.0) + 0.5) - 0.5);\n    float3 k = clamp(5.0 / 3.0 + 0.235 * squeeze - 4.0 * d, 0.0, 1.0);\n    float4 g = k.x * float4(redColor) + k.y * float4(greenColor) + k.z * float4(blueColor);\n    g.a = min(g.a, 1.0);\n    float3 mapped = scaleBrightness > 0.5 ? g.rgb * luma(base) : g.rgb;\n    float grey = luma(mapped);\n    mapped = grey + (mapped - grey) * (0.5 + 0.5 * clamp(2.0 * saturation + 1.0, 0.0, 2.0));\n    float3 rgb = mix(base, mapped, clamp(alpha, 0.0, 1.0) * g.a);\n    return half4(half3(clamp(rgb, 0.0, 1.0)) * c.a, c.a);\n}\n"
+}

@@ -300,12 +300,7 @@ fun EditorState.removeAudioOfChosen(): Int {
     return ids.size
 }
 
-fun EditorState.pasteStyleOnChosen(parts: Set<StylePart>): Int {
-    val from = copiedLayerForStyle ?: return 0
-    val ids = chosenLayers.map { it.id }
-    if (ids.isNotEmpty()) edit { s -> ids.fold(s) { acc, id -> acc.withPastedStyle(id, sampleMs, from, copiedMediaForStyle, parts) } }
-    return ids.size
-}
+fun EditorState.pasteStyleOnChosen(parts: Set<StylePart>): PastedStyle? = pasteStyleOn(chosenLayers.map { it.id }, parts)
 
 fun EditorState.pasteEffectsOnChosen(): Pair<Int, Int> {
     val ids = chosenLayers.map { it.id }.toSet()

@@ -27,6 +27,7 @@ Everything on the **Community** tab is checked by a person before it goes up. It
 
 - Keep it suitable for everyone. People of all ages use AbsentMotion.
 - Project bundles can be up to 20 MB, presets up to 1 MB and effects up to 512 KB.
+- Every effect needs a thumbnail that shows it, in two sizes: a small one (192 × 192 WebP, still or animated up to 3 seconds) and a large one (720 × 720 WebP), each up to 150 KB.
 - Items are shared under CC BY 4.0: anyone can use and change them as long as they credit who made them.
 - The name on your item is the creator name you type. Don't put anything personal in it.
 - The maintainer decides what goes up, and can take an item down at any time.

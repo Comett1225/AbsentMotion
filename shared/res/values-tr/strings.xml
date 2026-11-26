@@ -1187,8 +1187,6 @@
     <string name="font_source_google">Google Fonts</string>
     <string name="font_google_hint">Tüm Google Fonts içinde aramak için bir ad yazın</string>
     <string name="font_downloads_when_chosen">Seçildiğinde indirilir</string>
-    <string name="fonts_missing_title">Bu telefonda olmayan yazı tipleri</string>
-    <string name="fonts_missing_body">Bu proje, bu telefonda olmayan yazı tipleri kullanıyor: %1$s. Google Fonts\'tan indirene kadar metin başka bir yazı tipiyle görünür.</string>
     <string name="font_favorite">Favori</string>
     <string name="font_category_sans_serif">Sans serif</string>
     <string name="font_category_serif">Serif</string>
@@ -1350,6 +1348,7 @@
     <string name="structure_paste_fill_color">Dolgu ve rengi yapıştır</string>
     <string name="structure_paste_border_shadow">Kenarlık ve gölgeyi yapıştır</string>
     <string name="structure_paste_blending">Opaklık ve karışım modunu yapıştır</string>
+    <string name="structure_paste_motions">Animasyonları ve geçişleri yapıştır</string>
     <string name="structure_paste_style">Stili yapıştır</string>
     <string name="text_alignment">Hizalama</string>
     <string name="track_track">Takip</string>
@@ -1813,6 +1812,7 @@
     <string name="ai_model_grain">AI İyileştirme gren modeli</string>
     <string name="ai_model_cartoon">AI İyileştirme çizgi film modeli</string>
     <string name="ai_model_cutout">AI arka plan kaldırma 2.0</string>
+    <string name="ai_model_noise">Gürültü azaltma modeli</string>
     <string name="ai_model_broken">Bir AI model dosyası hasarlıydı ve silindi. Tekrar indirin.</string>
     <string name="ai_model_download_failed">AI modeli indirilemedi. Bağlantıyı kontrol edip tekrar deneyin.</string>
     <string name="ai_model_download_wrong">İndirilen dosya AI modeli değildi</string>
@@ -1862,6 +1862,7 @@
     <string name="cutout_best">AI arka plan kaldırma 2.0</string>
     <string name="cutout_best_hint">Saç ve ince ayrıntı çevresinde daha temiz kenarlar. %1$s bir kez indirilir. Yalnızca görseller.</string>
     <string name="cutout_fallback_download">AI arka plan kaldırma 2.0 indirilemedi, bu yüzden Standart kullanıldı. Bağlantıyı kontrol edip yeniden deneyin.</string>
+    <string name="ai_noise_fallback_download">Gürültü azaltma modeli indirilemedi, bu yüzden standart gürültü azaltma kullanıldı. Bağlantıyı kontrol edip yeniden deneyin.</string>
     <string name="cutout_fallback_failed">AI arka plan kaldırma 2.0 bu görseli tamamlayamadı, bu yüzden Standart kullanıldı.</string>
     <string name="ai_gpu_warning">Bu, bazı telefonları dondurabilir. Telefon donarsa yeniden başlatın; AI tekrar işlemciyi kullanır.</string>
     <string name="ai_gpu_failed">Grafik yongasındaki AI işlemi tamamlanmadı, AI artık işlemciyi kullanıyor.</string>
@@ -1979,6 +1980,17 @@
     <string name="track_motion_cancelled">Hareket takibi iptal edildi. Takip edilen kareler anahtar karelerini korur.</string>
     <string name="track_motion_unavailable">Hareket takibi bu sürümde kullanılamıyor.</string>
     <string name="track_motion_failed">Bu video izlenemedi.</string>
+    <string name="face_tracking_pick">Yüz Seç</string>
+    <string name="face_tracking_again">Yeniden Takip Et</string>
+    <string name="face_tracking_none">Henüz yüz seçilmedi.</string>
+    <string name="face_tracking_ready">Video seçtiğiniz yüzü takip ediyor.</string>
+    <string name="face_tracking_partial">Klibin bir kısmı henüz takip edilmedi.</string>
+    <string name="face_tracking_video_only">Yüz Takibi video katmanlarında çalışır.</string>
+    <string name="face_tracking_tap">Videonun takip edeceği yüze dokunun.</string>
+    <string name="face_tracking_looking">Yüzler aranıyor…</string>
+    <string name="face_tracking_none_here">Bu karede yüz bulunamadı. Başka bir kare deneyin.</string>
+    <string name="face_tracking_lost">Yüz bu klipte takip edilemedi.</string>
+    <string name="face_tracking_cancelled">Yüz takibi iptal edildi.</string>
     <string name="edit_layer_copy_name">%1$s Kopya</string>
     <string name="model_layer_video">Video</string>
     <string name="ai_video_mask_name">%1$s maskesi</string>
@@ -2310,6 +2322,10 @@
         <item quantity="one">%1$s katmana yapıştırıldı</item>
         <item quantity="other">%1$s katmana yapıştırıldı</item>
     </plurals>
+    <plurals name="structure_transitions_skipped">
+        <item quantity="one">%1$s geçiş atlandı: katmanın hemen önünde veya arkasında bir klip gerekir</item>
+        <item quantity="other">%1$s geçiş atlandı: katmanın hemen önünde veya arkasında bir klip gerekir</item>
+    </plurals>
     <string name="subject_keep_all">Her şeyi koru</string>
     <string name="subject_hint_photo">Yalnızca bir kişiyi veya nesneyi korumak için ona dokun.</string>
     <string name="subject_hint_video">Yalnızca bir kişiyi veya nesneyi korumak için bu ilk karede ona dokun. Uygulama klibin tamamında onu takip eder.</string>
@@ -2428,8 +2444,6 @@
     <string name="desk_folder_back">Tüm medyaya dön</string>
     <string name="voice_install_espeak">Ses bulunamadı. espeak-ng paketini yükleyin, sonra bu pencereyi yeniden açın.</string>
     <string name="desk_close_save_failed">Son değişiklikleriniz kaydedilemedi. Biraz disk alanı boşaltın, sonra Yeniden dene\'ye tıklayın. Kaydetmeden kapatırsanız AbsentMotion bu değişiklikleri bir sonraki açılışta yeniden önerir.</string>
-    <string name="desk_fonts_missing_title">Bu bilgisayarda olmayan yazı tipleri</string>
-    <string name="desk_fonts_missing_body">Bu proje, bu bilgisayarda bulunmayan yazı tipleri kullanıyor: %1$s. Bunları Google Fonts\'tan indirene kadar metin başka bir yazı tipiyle görünür.</string>
     <string name="desk_export_busy">Başka bir dışa aktarma hâlâ sürüyor. Bitmesini bekleyin veya önce iptal edin.</string>
     <string name="desk_export_no_ffmpeg">AbsentMotion, video ve ses dosyaları oluşturmak için kullandığı FFmpeg programını başlatamadı. AbsentMotion uygulamasını yeniden yükleyin.</string>
     <string name="desk_export_note_software">Bu bilgisayarda hiçbir donanım video kodlayıcısı çalışmadığından bu dışa aktarma işleminde daha yavaş olan yazılım kodlayıcısı kullanılır.</string>
@@ -2804,6 +2818,7 @@
     <string name="added_effect_save_failed">Efektlerin hepsi kaydedilemedi.</string>
     <string name="added_effect_remove_failed">Efekt kaldırılamadı.</string>
     <string name="community_filter_effects">Efektler</string>
+    <string name="community_filter_new">Yeni</string>
     <string name="added_effect_version">Sürüm %1$d</string>
     <string name="added_effect_already_added">Zaten eklendi</string>
     <string name="added_effect_newer_installed">Daha yeni bir sürümünüz var (v%1$d)</string>

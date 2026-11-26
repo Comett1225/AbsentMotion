@@ -2,6 +2,9 @@
  "id": "echo",
  "name": "Echo Keyframes",
  "category": "move",
+ "also": [
+  "other"
+ ],
  "since": "3.0.0",
  "native": true,
  "description": "Draws copies of the layer as it was a moment ago, following its animation.",

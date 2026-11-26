@@ -1169,8 +1169,6 @@
     <string name="font_source_google">Google Fonts</string>
     <string name="font_google_hint">Ketik nama untuk mencari di seluruh Google Fonts</string>
     <string name="font_downloads_when_chosen">Diunduh saat dipilih</string>
-    <string name="fonts_missing_title">Font tidak ada di ponsel ini</string>
-    <string name="fonts_missing_body">Proyek ini memakai font yang tidak ada di ponsel ini: %1$s. Teks ditampilkan dengan font lain sampai Anda mengunduhnya dari Google Fonts.</string>
     <string name="font_favorite">Favorit</string>
     <string name="font_category_sans_serif">Sans Serif</string>
     <string name="font_category_serif">Serif</string>
@@ -1330,6 +1328,7 @@
     <string name="structure_paste_fill_color">Tempel Isi &amp; Warna</string>
     <string name="structure_paste_border_shadow">Tempel bingkai &amp; bayangan</string>
     <string name="structure_paste_blending">Tempel Opasitas &amp; Mode Blending</string>
+    <string name="structure_paste_motions">Tempel Animasi &amp; Transisi</string>
     <string name="structure_paste_style">Tempel Gaya</string>
     <string name="text_alignment">Perataan</string>
     <string name="track_track">Lacak</string>
@@ -1786,6 +1785,7 @@
     <string name="ai_model_grain">Model butiran film AI</string>
     <string name="ai_model_cartoon">Model kartun AI</string>
     <string name="ai_model_cutout">Penghapusan latar belakang AI 2.0</string>
+    <string name="ai_model_noise">Model pengurang noise</string>
     <string name="ai_model_broken">File model AI rusak dan telah dihapus. Unduh ulang.</string>
     <string name="ai_model_download_failed">Unduhan model AI gagal. Periksa koneksi dan coba lagi.</string>
     <string name="ai_model_download_wrong">Yang diunduh bukan model AI</string>
@@ -1835,6 +1835,7 @@
     <string name="cutout_best">Penghapusan latar belakang AI 2.0</string>
     <string name="cutout_best_hint">Tepi lebih bersih di sekitar rambut dan detail halus. Mengunduh %1$s sekali. Hanya gambar.</string>
     <string name="cutout_fallback_download">Penghapusan latar belakang AI 2.0 tidak dapat diunduh, jadi Standar digunakan. Periksa koneksi dan coba lagi.</string>
+    <string name="ai_noise_fallback_download">Model pengurang noise tidak dapat diunduh, jadi pengurangan noise standar digunakan. Periksa koneksi dan coba lagi.</string>
     <string name="cutout_fallback_failed">Penghapusan latar belakang AI 2.0 tidak dapat menyelesaikan gambar ini, jadi Standar digunakan.</string>
     <string name="ai_gpu_warning">Ini dapat membuat beberapa ponsel macet. Jika ponsel macet, mulai ulang dan AI akan kembali menggunakan prosesor.</string>
     <string name="ai_gpu_failed">Pemrosesan AI di chip grafis tidak selesai, jadi AI kini memakai prosesor.</string>
@@ -1952,6 +1953,17 @@
     <string name="track_motion_cancelled">Pelacakan dibatalkan. Frame yang sudah dilacak tetap menyimpan keyframe-nya.</string>
     <string name="track_motion_unavailable">Pelacakan gerak tidak tersedia di versi ini.</string>
     <string name="track_motion_failed">Video ini tidak dapat dilacak.</string>
+    <string name="face_tracking_pick">Pilih Wajah</string>
+    <string name="face_tracking_again">Lacak Lagi</string>
+    <string name="face_tracking_none">Belum ada wajah yang dipilih.</string>
+    <string name="face_tracking_ready">Video mengikuti wajah yang dipilih.</string>
+    <string name="face_tracking_partial">Sebagian klip belum dilacak.</string>
+    <string name="face_tracking_video_only">Pelacakan Wajah berfungsi pada lapisan video.</string>
+    <string name="face_tracking_tap">Ketuk wajah yang harus diikuti video.</string>
+    <string name="face_tracking_looking">Mencari wajah…</string>
+    <string name="face_tracking_none_here">Tidak ada wajah di frame ini. Coba frame lain.</string>
+    <string name="face_tracking_lost">Wajah tidak dapat diikuti di klip ini.</string>
+    <string name="face_tracking_cancelled">Pelacakan wajah dibatalkan.</string>
     <string name="edit_layer_copy_name">Salinan %1$s</string>
     <string name="model_layer_video">Video</string>
     <string name="ai_video_mask_name">Masker %1$s</string>
@@ -2277,6 +2289,9 @@
     <plurals name="structure_style_pasted">
         <item quantity="other">Ditempel ke %1$s lapisan</item>
     </plurals>
+    <plurals name="structure_transitions_skipped">
+        <item quantity="other">%1$s transisi dilewati: perlu klip tepat sebelum atau sesudah lapisan</item>
+    </plurals>
     <string name="subject_keep_all">Pertahankan semua</string>
     <string name="subject_hint_photo">Ingin mempertahankan satu orang atau objek saja? Ketuk.</string>
     <string name="subject_hint_video">Ingin mempertahankan satu orang atau objek saja? Ketuk di frame pertama ini. Aplikasi akan mengikutinya sepanjang klip.</string>
@@ -2393,8 +2408,6 @@
     <string name="desk_folder_back">Kembali ke semua media</string>
     <string name="voice_install_espeak">Suara tidak ditemukan. Pasang paket espeak-ng, lalu buka jendela ini lagi.</string>
     <string name="desk_close_save_failed">Perubahan terakhir Anda tidak dapat disimpan. Kosongkan sebagian ruang disk, lalu klik Coba lagi. Jika Anda menutup tanpa menyimpan, AbsentMotion akan menawarkan perubahan ini lagi saat dibuka berikutnya.</string>
-    <string name="desk_fonts_missing_title">Font tidak ada di komputer ini</string>
-    <string name="desk_fonts_missing_body">Proyek ini memakai font yang tidak ada di komputer ini: %1$s. Teks tampil dengan font lain sampai Anda mengunduhnya dari Google Fonts.</string>
     <string name="desk_export_busy">Ekspor lain masih berjalan. Tunggu sampai selesai atau batalkan dulu.</string>
     <string name="desk_export_no_ffmpeg">AbsentMotion tidak dapat menjalankan FFmpeg, program yang digunakan untuk membuat file video dan audio. Instal ulang AbsentMotion.</string>
     <string name="desk_export_note_software">Tidak ada encoder video perangkat keras yang berfungsi di komputer ini, sehingga ekspor ini menggunakan encoder perangkat lunak yang lebih lambat.</string>
@@ -2765,6 +2778,7 @@
     <string name="added_effect_save_failed">Tidak semua efek bisa disimpan.</string>
     <string name="added_effect_remove_failed">Efek tidak bisa dihapus.</string>
     <string name="community_filter_effects">Efek</string>
+    <string name="community_filter_new">Baru</string>
     <string name="added_effect_version">Versi %1$d</string>
     <string name="added_effect_already_added">Sudah ditambahkan</string>
     <string name="added_effect_newer_installed">Kamu punya versi yang lebih baru (v%1$d)</string>

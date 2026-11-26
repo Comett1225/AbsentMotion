@@ -59,6 +59,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.absentmotion.editor.EditorState
+import app.absentmotion.editor.FaceState
+import app.absentmotion.editor.faceState
+import app.absentmotion.editor.pickFace
 import app.absentmotion.editor.FullColor
 import app.absentmotion.editor.KeypadField
 import app.absentmotion.editor.KeypadRequest
@@ -110,6 +113,7 @@ internal fun EffectSettings(state: EditorState, layer: Layer, instance: XmlNode,
             }
         }
     }
+    if (definition.key == "facetrack") FaceTrackRow(state, layer, instance, enabled)
     val mix = definition.key in PieceEffects && (definition.key != "particles" || instance.effectProperty("depth")?.valueAt(layer.t) == "true")
     if (mix && !deskLayout) MixPiecesRow(state, layer, enabled)
     fun raw(param: EffectParam): String =
@@ -516,6 +520,24 @@ private fun EffectPalette(param: EffectParam, raw: String, enabled: Boolean, tar
             }
         }
         PaletteSwatches(colors, Modifier.fillMaxWidth().height(36.dp))
+    }
+}
+
+@Composable
+private fun FaceTrackRow(state: EditorState, layer: Layer, instance: XmlNode, enabled: Boolean) {
+    val index = state.effectIndex
+    val scene = state.scene
+    val face = remember(layer.node, instance, scene.fps) { scene.faceState(layer, instance) }
+    Row(Modifier.fillMaxWidth().height(48.dp).padding(horizontal = 8.dp).alpha(if (enabled) 1f else 0.35f), verticalAlignment = Alignment.CenterVertically) {
+        Text(stringResource(when (face) {
+            FaceState.NotVideo -> R.string.face_tracking_video_only
+            FaceState.NoFace -> R.string.face_tracking_none
+            FaceState.Partial -> R.string.face_tracking_partial
+            FaceState.Ready -> R.string.face_tracking_ready
+        }), Modifier.weight(1f).padding(end = 8.dp), color = Am.Caption, fontSize = 12.sp, lineHeight = 15.sp, maxLines = 2)
+        PaletteButton(stringResource(if (face == FaceState.Partial) R.string.face_tracking_again else R.string.face_tracking_pick), enabled && face != FaceState.NotVideo) {
+            state.pickFace(index, again = face == FaceState.Partial)
+        }
     }
 }
 

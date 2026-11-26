@@ -45,7 +45,22 @@
     "Blink",
     "Steady"
    ]
+  },
+  {
+   "id": "wave",
+   "label": "Style",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "when": {
+    "wave": [
+     2
+    ]
+   }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float speed;\nuniform float intensity;\nuniform float seed;\nuniform float style;\nfloat hash21(float2 p)\n{\n    float3 q = fract(float3(p.xyx) * 0.1031);\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.x + q.y) * q.z);\n}\nhalf4 main(float2 coord)\n{\n    half4 c = image.eval(coord);\n    if (c.a <= 0.001 || speed <= 0.0 || intensity <= 0.0) return c;\n    float f = time * speed;\n    float n = floor(f);\n    float ramp = 0.15;\n    float t = clamp((f - n - (1.0 - ramp)) / ramp, 0.0, 1.0);\n    float r = mix(hash21(float2(mod(n, 4096.0), seed)), hash21(float2(mod(n + 1.0, 4096.0), seed)), t);\n    float keep = clamp(1.0 - intensity * (style > 0.5 ? 0.5 + 0.3 * r : r), 0.0, 1.0);\n    return c * half(style > 0.5 ? keep * keep : keep);\n}"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float speed;\nuniform float intensity;\nuniform float seed;\nuniform float style;\nuniform float wave;\nfloat hash21(float2 p)\n{\n    float3 q = fract(float3(p.xyx) * 0.1031);\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.x + q.y) * q.z);\n}\nfloat3 permute3(float3 x)\n{\n    return mod((x * 34.0 + 1.0) * x, 289.0);\n}\nfloat snoise2(float2 v)\n{\n    float4 C = float4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);\n    float2 i = floor(v + dot(v, C.yy));\n    float2 x0 = v - i + dot(i, C.xx);\n    float2 i1 = x0.x > x0.y ? float2(1.0, 0.0) : float2(0.0, 1.0);\n    float4 x12 = x0.xyxy + C.xxzz;\n    x12.xy -= i1;\n    i = mod(i, 289.0);\n    float3 p = permute3(permute3(i.y + float3(0.0, i1.y, 1.0)) + i.x + float3(0.0, i1.x, 1.0));\n    float3 m = max(0.5 - float3(dot(x0, x0), dot(x12.xy, x12.xy), dot(x12.zw, x12.zw)), 0.0);\n    m = m * m;\n    m = m * m;\n    float3 x = 2.0 * fract(p * C.www) - 1.0;\n    float3 h = abs(x) - 0.5;\n    float3 a0 = x - floor(x + 0.5);\n    m *= 1.79284291400159 - 0.85373472095314 * (a0 * a0 + h * h);\n    float3 g = float3(a0.x * x0.x + h.x * x0.y, a0.yz * x12.xz + h.yz * x12.yw);\n    return 130.0 * dot(m, g);\n}\nhalf4 main(float2 coord)\n{\n    half4 c = image.eval(coord);\n    if (c.a <= 0.001 || speed <= 0.0 || intensity <= 0.0) return c;\n    if (wave > 0.5) {\n        float n = 0.593 + 0.243 * snoise2(float2(time * speed * 0.7, seed * 7.13 + 1.7));\n        return c * half(pow(clamp(1.0 - intensity * n, 0.0, 1.0), 2.55));\n    }\n    float f = time * speed;\n    float n = floor(f);\n    float ramp = 0.15;\n    float t = clamp((f - n - (1.0 - ramp)) / ramp, 0.0, 1.0);\n    float r = mix(hash21(float2(mod(n, 4096.0), seed)), hash21(float2(mod(n + 1.0, 4096.0), seed)), t);\n    float keep = clamp(1.0 - intensity * (style > 0.5 ? 0.5 + 0.3 * r : r), 0.0, 1.0);\n    return c * half(style > 0.5 ? keep * keep : keep);\n}"
 }

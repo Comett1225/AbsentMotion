@@ -1187,8 +1187,6 @@
     <string name="font_source_google">Google Fonts</string>
     <string name="font_google_hint">Mag-type ng pangalan para maghanap sa buong Google Fonts</string>
     <string name="font_downloads_when_chosen">Magda-download kapag pinili</string>
-    <string name="fonts_missing_title">Mga font na wala sa telepono</string>
-    <string name="fonts_missing_body">Gumagamit ang proyektong ito ng mga font na wala sa teleponong ito: %1$s. Iba ang font na ipinapakita sa teksto hanggang i-download mo ang mga ito mula sa Google Fonts.</string>
     <string name="font_favorite">Paborito</string>
     <string name="font_category_sans_serif">Sans Serif</string>
     <string name="font_category_serif">Serif</string>
@@ -1350,6 +1348,7 @@
     <string name="structure_paste_fill_color">I-paste ang fill at kulay</string>
     <string name="structure_paste_border_shadow">I-paste ang frame at anino</string>
     <string name="structure_paste_blending">I-paste ang opacity at blending mode</string>
+    <string name="structure_paste_motions">I-paste ang mga animation at transition</string>
     <string name="structure_paste_style">I-paste ang style</string>
     <string name="text_alignment">Pagkakahanay</string>
     <string name="track_track">Track</string>
@@ -1813,6 +1812,7 @@
     <string name="ai_model_grain">AI Enhance na modelo ng grain</string>
     <string name="ai_model_cartoon">AI Enhance na modelo ng cartoon</string>
     <string name="ai_model_cutout">AI pagtanggal ng background 2.0</string>
+    <string name="ai_model_noise">Modelo ng pagbawas ng ingay</string>
     <string name="ai_model_broken">Nasira ang isang AI model file at na-delete. I-download muli.</string>
     <string name="ai_model_download_failed">Nabigo ang pag-download ng AI model. Suriin ang koneksyon at subukan muli.</string>
     <string name="ai_model_download_wrong">Hindi AI model ang na-download</string>
@@ -1862,6 +1862,7 @@
     <string name="cutout_best">AI pagtanggal ng background 2.0</string>
     <string name="cutout_best_hint">Mas malinis ang mga gilid sa paligid ng buhok at pinong detalye. Magda-download ng %1$s nang isang beses. Mga larawan lang.</string>
     <string name="cutout_fallback_download">Hindi na-download ang AI background removal 2.0, kaya ginamit ang Standard. Suriin ang koneksyon at subukan muli.</string>
+    <string name="ai_noise_fallback_download">Hindi na-download ang modelo ng pagbawas ng ingay, kaya ginamit ang karaniwang pagbawas ng ingay. Suriin ang koneksyon at subukan muli.</string>
     <string name="cutout_fallback_failed">Hindi natapos ng AI background removal 2.0 ang larawang ito, kaya ginamit ang Standard.</string>
     <string name="ai_gpu_warning">Puwedeng mag-freeze ang ilang telepono dahil dito. Kapag nag-freeze ang telepono, i-restart ito at gagamitin ulit ng AI ang processor.</string>
     <string name="ai_gpu_failed">Hindi natapos ang AI work sa graphics chip, kaya processor na ang gamit ng AI ngayon.</string>
@@ -1979,6 +1980,17 @@
     <string name="track_motion_cancelled">Kinansela ang motion tracking. Ang mga na-track nang frame ay may keyframes pa rin.</string>
     <string name="track_motion_unavailable">Hindi available ang motion tracking sa build na ito.</string>
     <string name="track_motion_failed">Hindi masubaybayan ang bidyo na ito.</string>
+    <string name="face_tracking_pick">Pumili ng Mukha</string>
+    <string name="face_tracking_again">I-track Muli</string>
+    <string name="face_tracking_none">Wala pang napiling mukha.</string>
+    <string name="face_tracking_ready">Sinusundan ng video ang mukhang pinili mo.</string>
+    <string name="face_tracking_partial">May bahagi ng clip na hindi pa na-track.</string>
+    <string name="face_tracking_video_only">Gumagana ang Pag-track ng Mukha sa mga video layer.</string>
+    <string name="face_tracking_tap">I-tap ang mukhang dapat sundan ng video.</string>
+    <string name="face_tracking_looking">Naghahanap ng mga mukha…</string>
+    <string name="face_tracking_none_here">Walang nakitang mukha sa frame na ito. Subukan ang iba.</string>
+    <string name="face_tracking_lost">Hindi masundan ang mukha sa clip na ito.</string>
+    <string name="face_tracking_cancelled">Kinansela ang pag-track ng mukha.</string>
     <string name="edit_layer_copy_name">Kopya ng %1$s</string>
     <string name="model_layer_video">Bidyo</string>
     <string name="ai_video_mask_name">mask ng %1$s</string>
@@ -2310,6 +2322,10 @@
         <item quantity="one">Na-paste sa %1$s layer</item>
         <item quantity="other">Na-paste sa %1$s layer</item>
     </plurals>
+    <plurals name="structure_transitions_skipped">
+        <item quantity="one">Nilaktawan ang %1$s transition: kailangan nito ng clip bago o pagkatapos mismo ng layer</item>
+        <item quantity="other">Nilaktawan ang %1$s na transition: kailangan nila ng clip bago o pagkatapos mismo ng layer</item>
+    </plurals>
     <string name="subject_keep_all">Panatilihin ang lahat</string>
     <string name="subject_hint_photo">Para panatilihin lang ang isang tao o bagay, i-tap ito.</string>
     <string name="subject_hint_video">Para panatilihin lang ang isang tao o bagay, i-tap ito sa unang frame. Sinusundan ito ng app sa buong clip.</string>
@@ -2428,8 +2444,6 @@
     <string name="desk_folder_back">Bumalik sa lahat ng media</string>
     <string name="voice_install_espeak">Walang nakitang boses. I-install ang espeak-ng package, tapos buksan muli ang window na ito.</string>
     <string name="desk_close_save_failed">Hindi na-save ang huling mga pagbabago mo. Magbakante ng espasyo sa disk, tapos i-click ang Subukan Muli. Kung isasara mo nang hindi nagse-save, iaalok muli ng AbsentMotion ang mga pagbabagong ito sa susunod na pagbubukas nito.</string>
-    <string name="desk_fonts_missing_title">Mga font na wala sa computer na ito</string>
-    <string name="desk_fonts_missing_body">Gumagamit ang proyektong ito ng mga font na wala sa computer na ito: %1$s. Ipapakita ang teksto sa ibang font hanggang i-download mo ang mga ito mula sa Google Fonts.</string>
     <string name="desk_export_busy">May iba pang export na tumatakbo. Hintayin itong matapos o kanselahin muna.</string>
     <string name="desk_export_no_ffmpeg">Hindi masimulan ng AbsentMotion ang FFmpeg, ang program na ginagamit nito sa paggawa ng mga file ng bidyo at audio. I-install muli ang AbsentMotion.</string>
     <string name="desk_export_note_software">Walang gumaganang hardware video encoder sa computer na ito, kaya ang mas mabagal na software encoder ang gagamitin sa pag-export na ito.</string>
@@ -2804,6 +2818,7 @@
     <string name="added_effect_save_failed">Hindi ma-save ang lahat ng effect.</string>
     <string name="added_effect_remove_failed">Hindi maalis ang effect.</string>
     <string name="community_filter_effects">Mga effect</string>
+    <string name="community_filter_new">Bago</string>
     <string name="added_effect_version">Bersyon %1$d</string>
     <string name="added_effect_already_added">Naidagdag na</string>
     <string name="added_effect_newer_installed">May mas bago kang bersyon (v%1$d)</string>

@@ -27,12 +27,12 @@ class EffectPackTest {
         val declared = Regex("""(layout\s*\(\s*color\s*\)\s*)?uniform\s+(\w+)\s+(\w+)\s*;""")
         for (effect in catalog.definitions) {
             if (effect.native) {
-                assertTrue("${effect.key} is not a built-in", effect.category in setOf("move", "repeat", "text") || effect.id in setOf("absent.blur", "absent.glow", "absent.outline", "absent.motionblur", "absent.smear", "absent.backdrop", "absent.drawingprogress", "absent.stroketaper", "absent.puppet", "absent.particles", "absent.scatter3d", "absent.fracture3d"))
+                assertTrue("${effect.key} is not a built-in", effect.category in setOf("move", "repeat", "text") || effect.id in setOf("absent.blur", "absent.boxblur", "absent.gaussianblur", "absent.strokecolor", "absent.glow", "absent.outline", "absent.motionblur", "absent.smear", "absent.backdrop", "absent.drawingprogress", "absent.stroketaper", "absent.puppet", "absent.particles", "absent.scatter3d", "absent.fracture3d"))
                 assertNull(effect.sksl)
                 continue
             }
             val uniforms = declared.findAll(effect.sksl!!).associate { it.groupValues[3] to (it.groupValues[2] to it.groupValues[1].isNotEmpty()) }
-            val copies = listOf("blurred", "bright").filter { it in uniforms }
+            val copies = listOf("blurred", "bright", "wide", "wider").filter { it in uniforms }
             val blurred = copies.isNotEmpty()
             val expected = mapOf("image" to ("shader" to false), "size" to ("float2" to false), "time" to ("float" to false)) +
                 copies.associateWith { "shader" to false } +
@@ -82,6 +82,12 @@ class EffectPackTest {
     @Test fun onlyLightGlowBlursTheBrightParts() {
         assertEquals(setOf("lightglow"), reads("bright"))
         assertTrue(reads("blurred").containsAll(listOf("darkglow", "edgeglow")))
+    }
+
+    @Test fun deepGlowsNewLookIsOnlyForNewEffects() {
+        val style = catalog.find("absent.deepglow")!!.params.single { it.id == "style" }
+        assertEquals(listOf("1", "0"), listOf(style.default, style.missingDefault).map { it.toFloat().toInt().toString() })
+        assertEquals(setOf("deepglow"), reads("wider"))
     }
 
     @Test fun defaultsLieWithinTheirRange() {

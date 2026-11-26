@@ -41,6 +41,14 @@ add_library(motion_tracker OBJECT tracker/tracker.cpp tracker_jni.cpp)
 set_target_properties(motion_tracker PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_compile_options(motion_tracker PRIVATE -O3 -fvisibility=hidden)
 
+add_library(face_detector OBJECT faces/yunet.cpp faces_jni.cpp)
+set_target_properties(face_detector PROPERTIES POSITION_INDEPENDENT_CODE ON)
+target_compile_options(face_detector PRIVATE -O3 -fvisibility=hidden)
+
+add_library(deep_filter OBJECT deepfilter/deepfilter.cpp)
+set_target_properties(deep_filter PROPERTIES POSITION_INDEPENDENT_CODE ON)
+target_compile_options(deep_filter PRIVATE -O3 -fvisibility=hidden)
+
 add_library(amengine SHARED ndk_images.cpp preview.cpp camera.cpp depth.cpp drawing.cpp effects.cpp easing.cpp engine.cpp gl_yuv.cpp interpolation.cpp jni.cpp model.cpp motion.cpp particles.cpp pieces3d.cpp scene.cpp shapes.cpp styles.cpp text.cpp textanim.cpp warp.cpp xml.cpp denoise_jni.cpp audio_dsp.cpp audio_fx_jni.cpp)
 if(AM_COMPAT)
     target_sources(amengine PRIVATE encoder_copy.cpp)
@@ -60,7 +68,7 @@ list(TRANSFORM SKIA_LIBS APPEND .a)
 target_link_libraries(amengine PRIVATE
     -Wl,--start-group ${SKIA_LIBS} -Wl,--end-group
     -Wl,--gc-sections
-    rnnoise absent_bg motion_tracker m vulkan android nativewindow jnigraphics mediandk EGL GLESv3 log)
+    rnnoise absent_bg motion_tracker face_detector deep_filter m vulkan android nativewindow jnigraphics mediandk EGL GLESv3 log)
 
 set(LAME_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../third_party/lame)
 set(LAME_SOURCES bitstream encoder fft gain_analysis id3tag lame mpglib_interface newmdct presets psymodel quantize

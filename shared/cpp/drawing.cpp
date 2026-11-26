@@ -21,6 +21,7 @@ namespace am {
 namespace {
 
 enum Tool { kPen = 0, kBrush = 1, kFill = 2, kEraser = 3 };
+constexpr float kAlightPenWidth = 0.888f, kAlightPenHardness = 0.88f, kAlightBrushWidth = 0.888f, kAlightBrushHardness = 0.9f;
 
 SkPath StrokedOutline(const FreehandStroke& s) {
     SkPaint p;
@@ -83,9 +84,19 @@ void BuildGeometry(FreehandStroke* s, const std::vector<SkPoint>& pts, const std
 
 }
 
-bool DrawingEffect(const std::string& id) { return id == "absent.drawingprogress" || id == "absent.stroketaper"; }
+bool DrawingEffect(const std::string& id) { return id == "absent.drawingprogress" || id == "absent.stroketaper" || id == "absent.strokecolor"; }
+
+const Anim* StrokeRecolor(const Layer& layer) {
+    static const Anim fallback = [] { Anim a; a.value = {1, 45 / 255.0f, 30 / 255.0f, 246 / 255.0f}; return a; }();
+    const LayerEffect* e = layer.effect("absent.strokecolor");
+    if (!e) return nullptr;
+    const Property* p = e->prop("color");
+    return p ? &p->anim : &fallback;
+}
 
 void ParseStrokes(const XmlNode& drawing, Layer* layer) {
+    const char* look = drawing.attr("strokeLook");
+    const bool alight = look && !strcmp(look, "alight");
     for (const auto& n : drawing.children) {
         if (n->name != "stroke") continue;
         FreehandStroke s;
@@ -125,6 +136,10 @@ void ParseStrokes(const XmlNode& drawing, Layer* layer) {
                 pressure.push_back(std::isfinite(v[2]) ? std::max(0.0f, v[2]) : 1.0f);
             }
         }
+        if (alight && (s.tool == kPen || s.tool == kBrush)) {
+            s.width *= s.tool == kBrush ? kAlightBrushWidth : kAlightPenWidth;
+            s.hardness = std::min(s.hardness, s.tool == kBrush ? kAlightBrushHardness : kAlightPenHardness);
+        }
         BuildGeometry(&s, pts, pressure);
         layer->strokes.push_back(std::move(s));
     }
@@ -136,7 +151,7 @@ float Softness(const FreehandStroke& s) { return (1 - s.hardness) * std::max(s.w
 
 struct Reveal {
     float start = 0, end = 1, taperStart = 0, taperEnd = 1, squeeze = 0;
-    bool tapered = false;
+    bool tapered = false, drawingsOnly = false;
 };
 
 Reveal RevealOf(const Layer& layer, float t) {
@@ -150,6 +165,8 @@ Reveal RevealOf(const Layer& layer, float t) {
         r.taperEnd = std::clamp(e->value("end", t, 1), 0.0f, 1.0f);
         r.squeeze = std::clamp(e->value("squeeze", t, 0), 0.0f, 100.0f);
         r.tapered = r.taperStart > 0 || r.taperEnd < 1;
+        r.drawingsOnly = e->value("style", t, 0) >= 0.5f;
+        if (r.drawingsOnly) r.tapered = r.taperStart < 1 || r.taperEnd < 1;
     }
     return r;
 }
@@ -161,6 +178,7 @@ float Length(const FreehandStroke& s) {
 }
 
 float Taper(const Reveal& r, float u) {
+    if (r.drawingsOnly) return std::clamp(r.taperStart + (r.taperEnd - r.taperStart) * u, 0.0f, 1.0f);
     float f = 1;
     if (r.taperStart > 0 && u < r.taperStart) f = std::min(f, u / r.taperStart);
     if (r.taperEnd < 1 && u > r.taperEnd) f = std::min(f, (1 - u) / (1 - r.taperEnd));
@@ -168,12 +186,13 @@ float Taper(const Reveal& r, float u) {
 }
 
 void Slice(const FreehandStroke& s, float lo, float hi, float step, std::vector<SkPoint>* pts, std::vector<float>* radius,
-           std::vector<float>* along) {
+           std::vector<float>* along, std::vector<float>* index) {
     const auto& p = s.points;
     if (p.size() == 1) {
         pts->push_back(p[0]);
         radius->push_back(s.radius[0]);
         along->push_back(0);
+        index->push_back(0);
         return;
     }
     float a0 = 0;
@@ -186,6 +205,7 @@ void Slice(const FreehandStroke& s, float lo, float hi, float step, std::vector<
                 pts->push_back(p[i] + (p[i + 1] - p[i]) * u);
                 radius->push_back(s.radius[i] + (s.radius[i + 1] - s.radius[i]) * u);
                 along->push_back(a);
+                index->push_back(i + u);
             };
             if (pts->empty()) emit(from);
             const int pieces = step > 0 ? std::max(1, (int)std::ceil((to - from) / step)) : 1;
@@ -214,13 +234,13 @@ template <typename F> void EachPiece(const Layer& layer, float t, F&& draw) {
             continue;
         }
         std::vector<SkPoint> pts;
-        std::vector<float> radius, along;
-        Slice(s, lo, hi, taper ? std::max(length / 200, 1.5f) : 0, &pts, &radius, &along);
+        std::vector<float> radius, along, index;
+        Slice(s, lo, hi, taper ? std::max(length / 200, 1.5f) : 0, &pts, &radius, &along, &index);
         if (pts.empty()) continue;
         if (s.tool == kFill) {
             draw(s, SkPath::Polygon({pts.data(), pts.size()}, true), true);
         } else if (taper) {
-            for (size_t i = 0; i < pts.size(); i++) radius[i] = std::max(0.01f, radius[i] * Taper(r, length > 0 ? along[i] / length : 0));
+            for (size_t i = 0; i < pts.size(); i++) radius[i] = std::max(0.01f, radius[i] * Taper(r, r.drawingsOnly ? index[i] / s.points.size() : length > 0 ? along[i] / length : 0));
             draw(s, Band(pts, radius), true);
         } else if (s.tool == kBrush) {
             draw(s, Band(pts, radius), true);
@@ -259,7 +279,7 @@ SkPath DrawingProgressPath(const Layer& layer, const SkPath& path, float t) {
 
 SkPath TaperedStroke(const Layer& layer, const SkPath& path, float width, float t) {
     const Reveal r = RevealOf(layer, t);
-    if (!r.tapered || !(width > 0)) return SkPath();
+    if (!r.tapered || r.drawingsOnly || !(width > 0)) return SkPath();
     SkPathBuilder out;
     SkPathMeasure contours(path, false);
     do {
@@ -281,6 +301,7 @@ SkPath TaperedStroke(const Layer& layer, const SkPath& path, float width, float 
 }
 
 void DrawDrawing(SkCanvas* canvas, const Layer& layer, float opacity, float t) {
+    const Anim* recolor = StrokeRecolor(layer);
     bool erases = false;
     for (const FreehandStroke& s : layer.strokes) erases |= s.tool == kEraser;
     if (erases) canvas->saveLayer(nullptr, nullptr);
@@ -290,7 +311,9 @@ void DrawDrawing(SkCanvas* canvas, const Layer& layer, float opacity, float t) {
         if (s.tool == kEraser) {
             paint.setBlendMode(SkBlendMode::kClear);
         } else {
-            paint.setColor4f({s.color[1], s.color[2], s.color[3], std::clamp(s.color[0] * opacity, 0.0f, 1.0f)});
+            const float c[4] = {recolor ? recolor->get(0, t, 1) : s.color[0], recolor ? recolor->get(1, t, 1) : s.color[1],
+                                recolor ? recolor->get(2, t, 1) : s.color[2], recolor ? recolor->get(3, t, 1) : s.color[3]};
+            paint.setColor4f({c[1], c[2], c[3], std::clamp(c[0] * opacity, 0.0f, 1.0f)});
         }
         if (!filled) {
             paint.setStyle(SkPaint::kStroke_Style);

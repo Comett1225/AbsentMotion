@@ -3,6 +3,7 @@ package app.absentmotion.compat
 import app.absentmotion.effects.EffectCatalog
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
+import app.absentmotion.model.effects
 import app.absentmotion.model.textSpacing
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -34,8 +35,8 @@ class DefaultsMigrationTest {
     @Test fun leftOutValuesTakeAlightsOwnDefaults() {
         assertEquals(6700f, fx("colortemperature").number("kelvin"), 1e-2f)
         assertEquals(14875f, fx("colortemperature", "temperature" to "14.875").number("kelvin"), 1e-1f)
-        assertEquals(29.4f, fx("gaussianblur").number("strength"), 1e-3f)
-        assertEquals(120.05f, fx("gaussianblur", "strength" to "0.6125").number("strength"), 1e-2f)
+        assertEquals(0.15f, fx("gaussianblur").number("strength"), 1e-5f)
+        assertEquals(0.6125f, fx("gaussianblur", "strength" to "0.6125").number("strength"), 1e-5f)
         assertEquals(1f, fx("voronoi2").number("cellScale"), 1e-5f)
         assertEquals(25.75f, fx("voronoi2", "scale" to "25.75").number("cellScale"), 1e-3f)
         assertEquals(12f / 62f / 0.85f, fx("voronoi", "scale" to "62").number("cellScale"), 1e-4f)
@@ -110,7 +111,8 @@ class DefaultsMigrationTest {
         assertEquals(45f, pitch.number("pitch"), 1e-4f)
         assertEquals(-45f, yaw.number("yaw"), 1e-4f)
         val blur = fx("fastboxblur", "strength" to "0.15", "iter" to "5")
-        assertEquals(48f, blur.number("strength"), 1e-5f)
+        assertEquals(0.15f, blur.number("strength"), 1e-5f)
+        assertEquals(320f, blur.number("scale"), 1e-5f)
         assertEquals(5f, blur.number("iterations"), 1e-5f)
         assertEquals(2f, blur.number("shape"), 1e-5f)
         val fields = arrayOf("lightIntensity" to "0.3", "lightColor" to "#ffdd4455", "lightDepth" to "0.3")
@@ -180,12 +182,11 @@ class DefaultsMigrationTest {
         assertEquals(0.16f, older.number("fill"), 1e-5f)
         val scan = fx("glowscan", "threshold" to "0.625", "radius" to "0.325", "strength" to "0.5375", "fillColor" to "#FF3366CC")
         assertEquals("absent.glowscan", scan["id"])
-        assertEquals(0.625f, scan.number("position"), 1e-5f)
-        assertEquals(81.25f, scan.number("blur"), 1e-3f)
-        assertEquals(0.215f, scan.number("intensity"), 1e-5f)
-        assertEquals(0f, scan.number("width"), 0f)
-        assertEquals(0.02f, scan.number("softness"), 1e-6f)
-        assertEquals("#FF3366CC", scan.value("color"))
+        assertEquals(0.625f, scan.number("threshold"), 1e-5f)
+        assertEquals(0.325f, scan.number("radius"), 1e-5f)
+        assertEquals(0.5375f, scan.number("smoothing"), 1e-5f)
+        assertEquals(1f, scan.number("style"), 0f)
+        assertEquals("#FF3366CC", scan.value("tint")?.uppercase())
     }
 
     @Test fun displacementMapThreeMovesTheLayersBelowLikeTwo() {
@@ -228,13 +229,15 @@ class DefaultsMigrationTest {
         listOf("liftAmount", "gammaAmount", "gainAmount").forEach { assertEquals(0f, tune.number(it), 0f) }
     }
 
-    @Test fun textSpacingStaysAsAlightWroteItAndSpacesTheText() {
+    @Test fun textSpacingBecomesTheBuiltInEffectWithTheValuesAlightWrote() {
         val id = ForeignEffectIds.TEXT_SPACING
         val scene = Scene.parse("""<scene title="p" width="1080" height="1080" fps="30" totalTime="1000"><text id="1" startTime="0" endTime="1000"><content>AB</content>
             <effect id="$id"><property name="letterspacing" type="float" value="0.18" /><property name="linespacing" type="float" value="1.6" /></effect></text></scene>""")
         val result = migration.migrate(scene)
-        assertNull(result.converted.keys.firstOrNull { it.startsWith("textspacing") })
+        assertEquals(1, result.converted["textspacing → Text Spacing"])
+        assertTrue(result.dropped.isEmpty())
         val layer = result.scene.layers.single()
+        assertEquals(listOf("absent.textspacing"), layer.effects.map { it["id"] })
         assertEquals(0.18f, layer.textSpacing("letterspacing", 0f), 1e-6f)
         assertEquals(1.6f, layer.textSpacing("linespacing", 1f), 1e-6f)
     }

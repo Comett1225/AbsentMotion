@@ -1,6 +1,9 @@
 {
  "id": "splittone",
- "name": "Split Tone",
+ "name": "Hot Color",
+ "aliases": [
+  "Split Tone"
+ ],
  "category": "color",
  "description": "Tints the shadows towards one hue and the highlights towards another, keeping black, white and brightness. Shadow Level bends the brightness curve and Highlight Level moves where the highlight colour starts. The Gradient Map style gives each pixel a colour from its brightness alone.",
  "params": [

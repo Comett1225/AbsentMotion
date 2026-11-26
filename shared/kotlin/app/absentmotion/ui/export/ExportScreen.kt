@@ -616,7 +616,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
                     }
                     if (chosen != ExportKind.Package) exported = scene.withMissing(missing.toSet())
                 }
-                val stageKey = if (chosen in StagedKinds && !DESK) app.absentmotion.export.StagedExports.key(exported.toXml(), s, chosen, frame) else null
+                val stageKey = if (chosen in StagedKinds && !DESK) app.absentmotion.export.StagedExports.key(exported, s, chosen, frame, listOf(java.io.File(context.filesDir, "effects-added").lastModified(), java.io.File(context.filesDir, "fonts/google").lastModified(), java.io.File(context.filesDir, "fonts/imported").lastModified(), context.getSharedPreferences("settings", 0).getBoolean(app.absentmotion.fonts.FontLibrary.ANDROID_EMOJI, false)).hashCode().toLong()) else null
                 val (stageExt, stageMime) = when (chosen) {
                     ExportKind.Gif -> "gif" to "image/gif"
                     ExportKind.Frame -> ImageKind.Png.ext to ImageKind.Png.mime
@@ -624,7 +624,7 @@ internal fun ExportScreen(scene: Scene, frame: Int, engine: EngineThread, appSet
                     else -> s.fixedFormat().let { it.container.ext to it.container.mime }
                 }
                 fun staged() = stageKey?.let { app.absentmotion.export.StagedExports.find(context, it, name, stageExt, stageMime) }
-                staged()?.let { ready ->
+                if (!alsoTemplate && preset == null) staged()?.let { ready ->
                     outcome = true
                     phase = Phase.Done(chosen, ExportResult(listOf(ready.uri), ready.mime, ""), ready)
                     return@launch

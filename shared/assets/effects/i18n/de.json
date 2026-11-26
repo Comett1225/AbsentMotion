@@ -16,6 +16,103 @@
   "text": "Text"
  },
  "effects": {
+  "advancedchromakey": {
+   "description": "Entfernt bis zu vier Farben auf einmal. Jede Farbe lässt sich entfernen (Ausschließen) oder vor den anderen Keys schützen (Einschließen), jeweils mit eigenem Schwellenwert, eigener weicher Kante und Luma-Empfindlichkeit. Maske anzeigen zeigt das Behaltene in Rot.",
+   "name": "Erweiterter Chroma-Key",
+   "params": {
+    "c1active": {
+     "label": "Farbe 1"
+    },
+    "c1color": {
+     "label": "Farbe"
+    },
+    "c1feather": {
+     "label": "Weiche Kante"
+    },
+    "c1luma": {
+     "label": "Luma-Empfindlichkeit"
+    },
+    "c1mode": {
+     "label": "Modus",
+     "options": [
+      "Ausschließen",
+      "Einschließen"
+     ]
+    },
+    "c1threshold": {
+     "label": "Schwellenwert"
+    },
+    "c2active": {
+     "label": "Farbe 2"
+    },
+    "c2color": {
+     "label": "Farbe"
+    },
+    "c2feather": {
+     "label": "Weiche Kante"
+    },
+    "c2luma": {
+     "label": "Luma-Empfindlichkeit"
+    },
+    "c2mode": {
+     "label": "Modus",
+     "options": [
+      "Ausschließen",
+      "Einschließen"
+     ]
+    },
+    "c2threshold": {
+     "label": "Schwellenwert"
+    },
+    "c3active": {
+     "label": "Farbe 3"
+    },
+    "c3color": {
+     "label": "Farbe"
+    },
+    "c3feather": {
+     "label": "Weiche Kante"
+    },
+    "c3luma": {
+     "label": "Luma-Empfindlichkeit"
+    },
+    "c3mode": {
+     "label": "Modus",
+     "options": [
+      "Ausschließen",
+      "Einschließen"
+     ]
+    },
+    "c3threshold": {
+     "label": "Schwellenwert"
+    },
+    "c4active": {
+     "label": "Farbe 4"
+    },
+    "c4color": {
+     "label": "Farbe"
+    },
+    "c4feather": {
+     "label": "Weiche Kante"
+    },
+    "c4luma": {
+     "label": "Luma-Empfindlichkeit"
+    },
+    "c4mode": {
+     "label": "Modus",
+     "options": [
+      "Ausschließen",
+      "Einschließen"
+     ]
+    },
+    "c4threshold": {
+     "label": "Schwellenwert"
+    },
+    "showMask": {
+     "label": "Maske anzeigen"
+    }
+   }
+  },
   "ascii": {
    "description": "Wandelt die Ebene in Textkunst aus Buchstaben und Symbolen um: Hellere Bereiche erhalten dichtere Zeichen. „Größe“ legt die Breite der Zeichen auf der Ebene fest, sodass sie sich mit ihr bewegen, drehen und skalieren. „Farbe“ behält die Bildfarben bei oder verwendet eine einzelne Farbe. „Kantenlinien“ zeichnet Konturen mit den Zeichen | - / und \\.",
    "name": "ASCII",
@@ -106,6 +203,13 @@
     },
     "slack": {
      "label": "Spiel"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
     },
     "zshake": {
      "label": "Z-Wackeln"
@@ -625,12 +729,75 @@
       "Mitte",
       "Ecke"
      ]
+    },
+    "alight": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
+    },
+    "alZ": {
+     "label": "Position Z"
+    },
+    "alLight": {
+     "label": "Richtung"
+    },
+    "alElev": {
+     "label": "Höhenwinkel"
+    },
+    "faceStyle": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
+    },
+    "lightStyle": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
+    }
+   }
+  },
+  "boxblur": {
+   "description": "Zeichnet die Ebene weich, indem ein gleichmäßiges Quadrat benachbarter Pixel gemittelt wird. Stärke legt die Reichweite fest; der Gaußsche Weichzeichner ist glatter.",
+   "name": "Box-Weichzeichner",
+   "params": {
+    "iterations": {
+     "label": "Durchläufe"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "shape": {
+     "label": "Form",
+     "options": [
+      "Weich",
+      "Rechteck",
+      "Schneller Boxfilter"
+     ]
+    },
+    "strength": {
+     "label": "Stärke"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
     }
    }
   },
   "brightnesscontrast": {
+   "aliases": [
+    "Helligkeit und Kontrast"
+   ],
    "description": "Passt Helligkeit und Kontrast des Bildes an.",
-   "name": "Helligkeit und Kontrast",
+   "name": "Helligkeit / Kontrast",
    "params": {
     "brightness": {
      "label": "Helligkeit"
@@ -1027,6 +1194,13 @@
       "Klassisch",
       "Hart"
      ]
+    },
+    "alight": {
+     "label": "Anordnung",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
     }
    }
   },
@@ -1096,8 +1270,11 @@
    }
   },
   "colorwheels": {
+   "aliases": [
+    "Lift Gamma Gain"
+   ],
    "description": "Farbräder für Schatten (Lift), Mitteltöne (Gamma) und Lichter (Gain) mit Farbton, Stärke und Pegel. Versatz verschiebt alle Tonwerte. Der Stil „Nach Helligkeit“ gewichtet jedes Farbrad nach der Helligkeit des Pixels.",
-   "name": "Lift Gamma Gain",
+   "name": "Farbabstimmung",
    "params": {
     "gainAmount": {
      "label": "Gain-Anteil"
@@ -1269,6 +1446,13 @@
       "Klassisch",
       "Gestapelt"
      ]
+    },
+    "alight": {
+     "label": "Anordnung",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
     }
    }
   },
@@ -1432,6 +1616,22 @@
       "Klassisch",
       "Standard"
      ]
+    },
+    "alight": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
+    },
+    "alZ": {
+     "label": "Position Z"
+    },
+    "alLight": {
+     "label": "Richtung"
+    },
+    "alElev": {
+     "label": "Höhenwinkel"
     }
    }
   },
@@ -1531,6 +1731,22 @@
       "Klassisch",
       "Standard"
      ]
+    },
+    "alight": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
+    },
+    "alZ": {
+     "label": "Position Z"
+    },
+    "alLight": {
+     "label": "Richtung"
+    },
+    "alElev": {
+     "label": "Höhenwinkel"
     }
    }
   },
@@ -1560,6 +1776,13 @@
     },
     "stretch": {
      "label": "Streckung"
+    },
+    "edgeStyle": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
     }
    }
   },
@@ -1655,6 +1878,22 @@
       "Mitte",
       "Ecke"
      ]
+    },
+    "alight": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
+    },
+    "alZ": {
+     "label": "Position Z"
+    },
+    "alLight": {
+     "label": "Richtung"
+    },
+    "alElev": {
+     "label": "Höhenwinkel"
     }
    }
   },
@@ -1676,6 +1915,13 @@
     },
     "threshold": {
      "label": "Schwellenwert"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
     }
    }
   },
@@ -1754,6 +2000,22 @@
     },
     "vibrance": {
      "label": "Dynamik"
+    },
+    "exposure": {
+     "label": "Belichtung"
+    },
+    "threshold": {
+     "label": "Schwellenwert"
+    },
+    "knee": {
+     "label": "Schwellenwert-Weichheit"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
     }
    }
   },
@@ -2024,8 +2286,11 @@
    }
   },
   "edgedetect": {
+   "aliases": [
+    "Kantenerkennung"
+   ],
    "description": "Zeigt helle Linien an Bildübergängen und dunkle Bereiche an allen anderen Stellen. Tinte zeichnet dunkle Linien auf Weiß; Farbe behält an den Kanten die eigenen Farben des Bildes.",
-   "name": "Kantenerkennung",
+   "name": "Konturen finden",
    "params": {
     "strength": {
      "label": "Stärke"
@@ -2275,6 +2540,22 @@
       "Mitte",
       "Ecke"
      ]
+    },
+    "alight": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
+    },
+    "alZ": {
+     "label": "Position Z"
+    },
+    "alLight": {
+     "label": "Richtung"
+    },
+    "alElev": {
+     "label": "Höhenwinkel"
     }
    }
   },
@@ -2350,8 +2631,11 @@
    }
   },
   "exposure": {
+   "aliases": [
+    "Belichtung"
+   ],
    "description": "Simuliert fotografische Belichtung mit Blendenstufen, Versatz und Gammakorrektur. „Transparente Bereiche aufhellen“ lässt halbtransparente Pixel, etwa an einer unscharfen Kante, über Weiß hinaus aufhellen.",
-   "name": "Belichtung",
+   "name": "Belichtung / Gamma",
    "params": {
     "gamma": {
      "label": "Gamma"
@@ -2364,6 +2648,24 @@
     },
     "stops": {
      "label": "Blendenstufen"
+    }
+   }
+  },
+  "facetrack": {
+   "aliases": [
+    "Gesichtsbewegung"
+   ],
+   "description": "Gesichtsbewegung für Videoebenen: Das Video bewegt und zoomt sich so, dass das gewählte Gesicht an derselben Stelle im Bild bleibt. Tippe auf „Gesicht wählen“ und dann auf ein Gesicht in der Vorschau. Das Gesicht wird einmal durch den ganzen Clip verfolgt und das Ergebnis gespeichert, sodass Vorschau und Export es sofort nutzen. Zoom legt fest, wie groß das Gesicht bleibt (100% ist seine Größe beim Auswählen), Position, wo im Bild es bleibt, und Glättung macht die Bewegung ruhiger.",
+   "name": "Gesichtsverfolgung",
+   "params": {
+    "position": {
+     "label": "Position"
+    },
+    "smoothing": {
+     "label": "Glättung"
+    },
+    "zoom": {
+     "label": "Zoom"
     }
    }
   },
@@ -2437,6 +2739,13 @@
     "edgeStrength": {
      "label": "Kantenstärke"
     },
+    "edgeStyle": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
+    },
     "feather": {
      "label": "Weiche Kante"
     },
@@ -2461,18 +2770,18 @@
     "scanStrength": {
      "label": "Scanlinien-Stärke"
     },
-    "tint": {
-     "label": "Tönung"
-    },
-    "tintColor": {
-     "label": "Tönungsfarbe"
-    },
     "style": {
      "label": "Stil",
      "options": [
       "Klassisch",
       "Standard"
      ]
+    },
+    "tint": {
+     "label": "Tönung"
+    },
+    "tintColor": {
+     "label": "Tönungsfarbe"
     }
    }
   },
@@ -2509,6 +2818,13 @@
      "options": [
       "Blinken",
       "Gleichmäßig"
+     ]
+    },
+    "wave": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
      ]
     }
    }
@@ -2616,6 +2932,16 @@
       "Mitte",
       "Ecke"
      ]
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
+    },
+    "alZ": {
+     "label": "Position Z"
     }
    }
   },
@@ -2629,6 +2955,9 @@
    }
   },
   "fourcolor": {
+   "aliases": [
+    "Vierfarbverlauf"
+   ],
    "description": "Mischt vier Farben an vier Punkten über die Ebene; ihre Position wird in Pixeln von der Ebenenmitte aus angegeben.",
    "name": "Vierfarbverlauf",
    "params": {
@@ -2869,6 +3198,18 @@
     }
    }
   },
+  "gaussianblur": {
+   "description": "Ein glatter, weicher Weichzeichner. Stärke legt die Reichweite fest.",
+   "name": "Gaußscher Weichzeichner",
+   "params": {
+    "scale": {
+     "label": "Skalierung"
+    },
+    "strength": {
+     "label": "Stärke"
+    }
+   }
+  },
   "glass": {
    "description": "Verwandelt die Form der Ebene in abgeschrägtes Glas, das die Ebenen dahinter verzerrt, mit einem Glanzlicht am Rand. Mit „Licht: Weich“ erscheint die Ebene selbst so stark, wie Füllung angibt, und das Glas wird mit Farbe beleuchtet, am hellsten an der Innenkante der Abschrägung, die zum Licht zeigt.",
    "name": "Glas",
@@ -2952,14 +3293,26 @@
    }
   },
   "glowscan": {
-   "description": "Macht nur Ebenenbereiche innerhalb eines Helligkeitsbereichs weich und lässt sie leuchten; animiere Position, um das Leuchten von den Schatten zu den Lichtern zu bewegen.",
+   "description": "Zeichnet eine leuchtende Kontur dort, wo die Helligkeit des Bildes den Schwellenwert kreuzt, wie ein Konturscan.",
    "name": "Leuchtscan",
    "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blend": {
+     "label": "Mischung"
+    },
     "blur": {
      "label": "Weichzeichnen"
     },
     "color": {
      "label": "Leuchtfarbe"
+    },
+    "feather": {
+     "label": "Weiche Kante"
+    },
+    "fill": {
+     "label": "Füllung"
     },
     "intensity": {
      "label": "Intensität"
@@ -2967,11 +3320,30 @@
     "position": {
      "label": "Position"
     },
+    "radius": {
+     "label": "Radius"
+    },
     "show": {
      "label": "Nur Bereich anzeigen"
     },
+    "smoothing": {
+     "label": "Glättung"
+    },
     "softness": {
      "label": "Weichheit"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
+    },
+    "threshold": {
+     "label": "Schwellenwert"
+    },
+    "tint": {
+     "label": "Farbe"
     },
     "width": {
      "label": "Breite"
@@ -3209,6 +3581,13 @@
       "Klassisch",
       "Standard"
      ]
+    },
+    "alight": {
+     "label": "Anordnung",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
     }
    }
   },
@@ -3243,8 +3622,11 @@
    }
   },
   "halftone": {
+   "aliases": [
+    "Halbton"
+   ],
    "description": "Erzeugt Druckpunkte, die in dunklen Bildbereichen größer werden.",
-   "name": "Halbton",
+   "name": "Rasterpunkte",
    "params": {
     "angle": {
      "label": "Winkel"
@@ -3254,6 +3636,13 @@
     },
     "colored": {
      "label": "Farbpunkte"
+    },
+    "edgeStyle": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
     },
     "ink": {
      "label": "Punktfarbe"
@@ -3300,6 +3689,13 @@
      "label": "Stärke"
     },
     "style": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
+    },
+    "edgeStyle": {
      "label": "Stil",
      "options": [
       "Klassisch",
@@ -3407,6 +3803,22 @@
       "Klassisch",
       "Standard"
      ]
+    },
+    "alight": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
+    },
+    "alZ": {
+     "label": "Position Z"
+    },
+    "alLight": {
+     "label": "Richtung"
+    },
+    "alElev": {
+     "label": "Höhenwinkel"
     }
    }
   },
@@ -3431,6 +3843,13 @@
     },
     "seed": {
      "label": "Zufallswert"
+    },
+    "edgeStyle": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
     }
    }
   },
@@ -3489,6 +3908,19 @@
     },
     "stretch": {
      "label": "Streckung"
+    },
+    "lineWidth": {
+     "label": "Linienbreite"
+    },
+    "feather": {
+     "label": "Weiche Kante"
+    },
+    "edgeStyle": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
     }
    }
   },
@@ -3550,6 +3982,14 @@
     },
     "stretch": {
      "label": "Streckung"
+    },
+    "alight": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard",
+      "Bild"
+     ]
     }
    }
   },
@@ -3645,10 +4085,29 @@
       "Mitte",
       "Ecke"
      ]
+    },
+    "alight": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
+    },
+    "alZ": {
+     "label": "Position Z"
+    },
+    "alLight": {
+     "label": "Richtung"
+    },
+    "alElev": {
+     "label": "Höhenwinkel"
     }
    }
   },
   "highlightshadow": {
+   "aliases": [
+    "Lichter und Schatten"
+   ],
    "description": "Stellt helle Lichter wieder her oder verstärkt sie und hellt dunkle Schatten auf oder vertieft sie, abhängig von der Helligkeit jedes Pixels.",
    "name": "Lichter und Schatten",
    "params": {
@@ -3775,6 +4234,22 @@
       "Klassisch",
       "Standard"
      ]
+    },
+    "alight": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
+    },
+    "alZ": {
+     "label": "Position Z"
+    },
+    "alLight": {
+     "label": "Richtung"
+    },
+    "alElev": {
+     "label": "Höhenwinkel"
     }
    }
   },
@@ -3909,12 +4384,31 @@
     }
    }
   },
+  "hueshift": {
+   "description": "Dreht jede Farbe um denselben Winkel auf dem Farbkreis und behält die Helligkeit bei.",
+   "name": "Farbtonverschiebung",
+   "params": {
+    "hue": {
+     "label": "Farbtonverschiebung"
+    }
+   }
+  },
   "innerblur": {
    "description": "Zeichnet das Bild innerhalb der Ebene weich und hält die Kontur scharf.",
    "name": "Innere Weichzeichnung",
    "params": {
     "blur": {
      "label": "Stärke"
+    },
+    "iterations": {
+     "label": "Durchläufe"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
     }
    }
   },
@@ -3994,6 +4488,15 @@
     },
     "invert_alpha": {
      "label": "Alpha invertieren"
+    },
+    "red": {
+     "label": "Rot"
+    },
+    "green": {
+     "label": "Grün"
+    },
+    "blue": {
+     "label": "Blau"
     }
    }
   },
@@ -4060,6 +4563,13 @@
     },
     "segments": {
      "label": "Segmente"
+    },
+    "edgeStyle": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
     }
    }
   },
@@ -4096,9 +4606,23 @@
    }
   },
   "lensflare": {
-   "description": "Legt ein helles Licht mit Lichtschein über das Bild.",
-   "name": "Lichtreflex",
+   "aliases": [
+    "Lichtreflex"
+   ],
+   "description": "Legt ein helles Licht mit Stern, Lichtschein und Reflexionsringen über das Bild.",
+   "name": "Linsenreflex",
    "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blendMode": {
+     "label": "Mischmodus",
+     "options": [
+      "Normal",
+      "Multiplizieren",
+      "Negativ multiplizieren"
+     ]
+    },
     "brightness": {
      "label": "Helligkeit"
     },
@@ -4108,8 +4632,21 @@
     "color": {
      "label": "Farbe"
     },
+    "points": {
+     "label": "Zacken"
+    },
     "radius": {
      "label": "Radius"
+    },
+    "shine": {
+     "label": "Glanz"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
     }
    }
   },
@@ -4274,6 +4811,13 @@
       "Klassisch",
       "Standard"
      ]
+    },
+    "alight": {
+     "label": "Anordnung",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
     }
    }
   },
@@ -4392,6 +4936,14 @@
      "options": [
       "Klassisch",
       "Standard"
+     ]
+    },
+    "weighting": {
+     "label": "Modus",
+     "options": [
+      "Klassisch",
+      "Luma",
+      "RGB"
      ]
     }
    }
@@ -4709,6 +5261,25 @@
       "Mitte",
       "Ecke"
      ]
+    },
+    "alight": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
+    },
+    "alZ": {
+     "label": "Position Z"
+    },
+    "alLight": {
+     "label": "Richtung"
+    },
+    "alElev": {
+     "label": "Höhenwinkel"
+    },
+    "alHeight": {
+     "label": "Höhe"
     }
    }
   },
@@ -4964,6 +5535,13 @@
      ]
     },
     "roll": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
+    },
+    "space": {
      "label": "Stil",
      "options": [
       "Klassisch",
@@ -5328,6 +5906,16 @@
       "Klassisch",
       "Standard"
      ]
+    },
+    "edgeStyle": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
+    },
+    "saturation": {
+     "label": "Sättigung"
     }
    }
   },
@@ -5446,6 +6034,18 @@
       "Klassisch",
       "Standard"
      ]
+    },
+    "angle": {
+     "label": "Winkel"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "repeat": {
+     "label": "Wiederholung"
+    },
+    "mirror": {
+     "label": "Spiegeln"
     }
    }
   },
@@ -5706,6 +6306,22 @@
       "Mitte",
       "Ecke"
      ]
+    },
+    "alight": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
+    },
+    "alZ": {
+     "label": "Position Z"
+    },
+    "alLight": {
+     "label": "Richtung"
+    },
+    "alElev": {
+     "label": "Höhenwinkel"
     }
    }
   },
@@ -5752,6 +6368,13 @@
     },
     "width": {
      "label": "Breite"
+    },
+    "alight": {
+     "label": "Anordnung",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
     }
    }
   },
@@ -5840,6 +6463,13 @@
     },
     "sweep": {
      "label": "Bogenwinkel"
+    },
+    "alight": {
+     "label": "Anordnung",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
     }
    }
   },
@@ -6018,6 +6648,19 @@
     },
     "glossiness": {
      "label": "Glanzschärfe"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
+    },
+    "alLight": {
+     "label": "Richtung"
+    },
+    "alElev": {
+     "label": "Höhenwinkel"
     }
    },
    "shortcuts": {
@@ -6107,8 +6750,11 @@
    }
   },
   "reorient360": {
+   "aliases": [
+    "360°-Kugel ausrichten"
+   ],
    "description": "Dreht eine 360°-Panoramaebene in ihrer Kugel, um den Horizont auszurichten oder die Blickrichtung zu ändern.",
-   "name": "360°-Kugel ausrichten",
+   "name": "360º-Kugel ausrichten",
    "params": {
     "pitch": {
      "label": "Nicken"
@@ -6432,6 +7078,18 @@
     },
     "seed": {
      "label": "Seed"
+    }
+   }
+  },
+  "saturationvibrance": {
+   "description": "Macht Farben kräftiger oder schwächer. Dynamik hebt vor allem die matten Farben sanft an und lässt kräftige Farben in Ruhe.",
+   "name": "Sättigung / Dynamik",
+   "params": {
+    "saturation": {
+     "label": "Sättigung"
+    },
+    "vibrance": {
+     "label": "Dynamik"
     }
    }
   },
@@ -6959,6 +7617,42 @@
     }
    }
   },
+  "spectralmap": {
+   "description": "Färbt das Bild nach Helligkeit über ein Spektrum aus drei Farben um. Wiederholen durchläuft es öfter, Phase verschiebt es und Verengung verbreitert jedes Band.",
+   "name": "Spektrumsumsetzung",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blueColor": {
+     "label": "Farbe 3"
+    },
+    "greenColor": {
+     "label": "Farbe 2"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "redColor": {
+     "label": "Farbe 1"
+    },
+    "repeat": {
+     "label": "Wiederholen"
+    },
+    "reverse": {
+     "label": "Umkehren"
+    },
+    "saturation": {
+     "label": "Sättigung"
+    },
+    "scaleBrightness": {
+     "label": "Helligkeit skalieren"
+    },
+    "squeeze": {
+     "label": "Verengung"
+    }
+   }
+  },
   "spherize": {
    "description": "Wickelt die Ebene mit einer Frontprojektion oder einer äquirektangulären Textur auf eine Kugel.",
    "name": "Kugelung",
@@ -7055,6 +7749,22 @@
       "Mitte",
       "Ecke"
      ]
+    },
+    "alight": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
+    },
+    "alZ": {
+     "label": "Position Z"
+    },
+    "alLight": {
+     "label": "Richtung"
+    },
+    "alElev": {
+     "label": "Höhenwinkel"
     }
    }
   },
@@ -7168,8 +7878,11 @@
    }
   },
   "splittone": {
+   "aliases": [
+    "Split-Toning"
+   ],
    "description": "Tönt die Schatten in einen Farbton und die Lichter in einen anderen, wobei Schwarz, Weiß und Helligkeit erhalten bleiben. Schattenpegel verbiegt die Helligkeitskurve, und Lichterpegel verschiebt, wo die Lichterfarbe beginnt. Der Stil „Verlaufsumsetzung“ gibt jedem Pixel allein anhand seiner Helligkeit eine Farbe.",
-   "name": "Split-Toning",
+   "name": "Heiße Farbe",
    "params": {
     "highlightAmount": {
      "label": "Lichterstärke"
@@ -7284,6 +7997,13 @@
     },
     "shine": {
      "label": "Glanz"
+    },
+    "edgeStyle": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
     }
    }
   },
@@ -7306,20 +8026,17 @@
    }
   },
   "starpolyhedron": {
-   "description": "Setzt die Ebene auf einen Stern aus zwei gekreuzten Pyramiden.",
+   "description": "Legt die Ebene auf einen Stern, dessen Zacken vorne und hinten zu einem Grat ansteigen, mit Licht und Tiefe.",
    "name": "Sternpolyeder",
    "params": {
-    "light": {
-     "label": "Lichtwinkel"
+    "orientA": {
+     "label": "Ausrichtung α"
     },
-    "perspective": {
-     "label": "Perspektive"
+    "orientB": {
+     "label": "Ausrichtung β"
     },
-    "position": {
-     "label": "Position"
-    },
-    "radius": {
-     "label": "Radius"
+    "orientG": {
+     "label": "Ausrichtung γ"
     },
     "rotX": {
      "label": "Rotation X"
@@ -7330,11 +8047,83 @@
     "rotZ": {
      "label": "Rotation Z"
     },
+    "starSize": {
+     "label": "Größe"
+    },
+    "starDepth": {
+     "label": "Tiefe"
+    },
+    "pointLength": {
+     "label": "Zackenlänge"
+    },
+    "smoothing": {
+     "label": "Glättung"
+    },
+    "points": {
+     "label": "Zacken"
+    },
+    "alPos": {
+     "label": "Position"
+    },
+    "alZ": {
+     "label": "Position Z"
+    },
+    "alScale": {
+     "label": "Skalierung"
+    },
+    "intensity": {
+     "label": "Lichtintensität"
+    },
+    "alShine": {
+     "label": "Glanz"
+    },
+    "spec": {
+     "label": "Spiegelglanz"
+    },
+    "alAmbient": {
+     "label": "Umgebungslicht"
+    },
+    "alColor": {
+     "label": "Farbe"
+    },
+    "lightDir": {
+     "label": "Richtung"
+    },
+    "lightDepth": {
+     "label": "Höhenwinkel"
+    },
+    "alMirror": {
+     "label": "Spiegeln"
+    },
+    "alRepeatX": {
+     "label": "Wiederholung X"
+    },
+    "alRepeatY": {
+     "label": "Wiederholung Y"
+    },
+    "alTexAngle": {
+     "label": "Texturwinkel"
+    },
+    "alCrop": {
+     "label": "Zuschnitt"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "position": {
+     "label": "Position"
+    },
     "scale": {
      "label": "Skalierung"
     },
+    "perspective": {
+     "label": "Perspektive"
+    },
     "shading": {
      "label": "Schattierung"
+    },
+    "light": {
+     "label": "Lichtwinkel"
     },
     "shine": {
      "label": "Glanz"
@@ -7390,6 +8179,13 @@
      "options": [
       "Mitte",
       "Ecke"
+     ]
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
      ]
     }
    }
@@ -7506,6 +8302,22 @@
       "Klassisch",
       "Standard"
      ]
+    },
+    "alight": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
+    },
+    "alZ": {
+     "label": "Position Z"
+    },
+    "alLight": {
+     "label": "Richtung"
+    },
+    "alElev": {
+     "label": "Höhenwinkel"
     }
    }
   },
@@ -7518,6 +8330,27 @@
     },
     "grain": {
      "label": "Größe"
+    }
+   }
+  },
+  "streakstrips": {
+   "description": "Schneidet die Ebene in parallele Streifen und zieht in jedem Streifen eine Bildzeile in die Breite, wie ein gestörter Scan.",
+   "name": "Schlierenstreifen",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "angle": {
+     "label": "Winkel"
+    },
+    "count": {
+     "label": "Anzahl"
+    },
+    "maskToLayer": {
+     "label": "Auf Ebene maskieren"
+    },
+    "phase": {
+     "label": "Phase"
     }
    }
   },
@@ -7601,6 +8434,15 @@
     }
    }
   },
+  "strokecolor": {
+   "description": "Färbt die Konturen der Ebene in einer Farbe: den Umriss einer Form oder eines Textes und jeden Stift- und Pinselstrich einer Zeichnung.",
+   "name": "Konturfarbe",
+   "params": {
+    "color": {
+     "label": "Farbe"
+    }
+   }
+  },
   "stroketaper": {
    "description": "Lässt Konturen spitz auslaufen: die Stift- und Pinselstriche einer Freihandzeichnung sowie die Kontur von Linien und Formen (Rahmen & Schatten > Kontur). Von null bis zum Start und vom Ende bis auf null. „Verengung“ macht die Zuspitzung schärfer.",
    "name": "Kontur zuspitzen",
@@ -7613,6 +8455,13 @@
     },
     "start": {
      "label": "Start"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
     }
    }
   },
@@ -7955,6 +8804,18 @@
     "wobbly": "Wackelig"
    }
   },
+  "textspacing": {
+   "description": "Ändert den Abstand zwischen den Buchstaben und zwischen den Zeilen einer Textebene. Zeichenabstand rückt die Buchstaben auseinander oder unter 0% enger zusammen. Zeilenabstand legt fest, wie weit die Zeilen auseinanderliegen: 100% ist normal, 200% verdoppelt ihn. Setze Keyframes auf einen der beiden, um den Abstand zu animieren.",
+   "name": "Textabstand",
+   "params": {
+    "letterspacing": {
+     "label": "Zeichenabstand"
+    },
+    "linespacing": {
+     "label": "Zeilenabstand"
+    }
+   }
+  },
   "texttransform": {
    "description": "Bewegt, skaliert, dreht, blendet aus und tönt Buchstaben, Wörter oder Zeilen innerhalb eines Bereichs. Anker legt fest, ob Skalierung und Rotation von jeder Komponente oder von der Mitte der Ebene ausgehen. Verschiebe den Bereich mit „Phase“, damit die Änderung durch den Text wandert.",
    "name": "Text transformieren",
@@ -8139,6 +9000,13 @@
       "Klassisch",
       "Standard"
      ]
+    },
+    "edgeStyle": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
     }
    }
   },
@@ -8209,6 +9077,13 @@
       "Klassisch",
       "Standard"
      ]
+    },
+    "edgeStyle": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
     }
    }
   },
@@ -8244,8 +9119,11 @@
    }
   },
   "timequant": {
+   "aliases": [
+    "Bildrate"
+   ],
    "description": "Lässt diese Ebene sich mit einer niedrigeren Bildrate bewegen, wie ruckeliges Material oder Stop-Motion.",
-   "name": "Bildrate",
+   "name": "Zeitquantisierung",
    "params": {
     "fps": {
      "label": "Schritte/Sek."
@@ -8363,6 +9241,22 @@
       "Mitte",
       "Ecke"
      ]
+    },
+    "alight": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
+    },
+    "alZ": {
+     "label": "Position Z"
+    },
+    "alLight": {
+     "label": "Richtung"
+    },
+    "alElev": {
+     "label": "Höhenwinkel"
     }
    }
   },
@@ -8409,6 +9303,16 @@
       "Klassisch",
       "Standard"
      ]
+    },
+    "wrapStyle": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
+    },
+    "depth": {
+     "label": "Tiefe"
     }
    }
   },
@@ -8528,6 +9432,9 @@
       "Klassisch",
       "Standard"
      ]
+    },
+    "singleAxis": {
+     "label": "Nur eine Achse"
     }
    }
   },
@@ -8549,6 +9456,13 @@
      "options": [
       "Ebene",
       "Bildschirm"
+     ]
+    },
+    "edgeStyle": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
      ]
     }
    }
@@ -8574,6 +9488,13 @@
      "options": [
       "Grau",
       "Rot"
+     ]
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
      ]
     }
    }
@@ -8656,8 +9577,11 @@
    }
   },
   "viewer360": {
+   "aliases": [
+    "360°-Viewer"
+   ],
    "description": "Zeigt eine 360°-Panoramaebene durch eine virtuelle Kamera, die du drehen und zoomen kannst.",
-   "name": "360°-Viewer",
+   "name": "360º-Viewer",
    "params": {
     "fov": {
      "label": "Sichtfeld"
@@ -8965,6 +9889,94 @@
     },
     "zoom": {
      "label": "Stärke"
+    },
+    "alight": {
+     "label": "Anordnung",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
+    }
+   }
+  },
+  "ring": {
+   "description": "Legt die Ebene um einen Ring mit flachen Seiten, wie ein kurzes Rohr, mit Licht und Tiefe.",
+   "name": "Ring",
+   "params": {
+    "orientA": {
+     "label": "Ausrichtung α"
+    },
+    "orientB": {
+     "label": "Ausrichtung β"
+    },
+    "orientG": {
+     "label": "Ausrichtung γ"
+    },
+    "rotX": {
+     "label": "Drehung X"
+    },
+    "rotY": {
+     "label": "Drehung Y"
+    },
+    "rotZ": {
+     "label": "Drehung Z"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "thickness": {
+     "label": "Breite"
+    },
+    "height": {
+     "label": "Länge"
+    },
+    "smoothing": {
+     "label": "Glättung"
+    },
+    "position": {
+     "label": "Position"
+    },
+    "alZ": {
+     "label": "Position Z"
+    },
+    "scale": {
+     "label": "Skalierung"
+    },
+    "intensity": {
+     "label": "Lichtintensität"
+    },
+    "shine": {
+     "label": "Glanz"
+    },
+    "spec": {
+     "label": "Spiegelglanz"
+    },
+    "ambient": {
+     "label": "Umgebungslicht"
+    },
+    "lightColor": {
+     "label": "Farbe"
+    },
+    "lightDir": {
+     "label": "Richtung"
+    },
+    "lightDepth": {
+     "label": "Höhenwinkel"
+    },
+    "texMirror": {
+     "label": "Spiegeln"
+    },
+    "texRepeatX": {
+     "label": "Wiederholung X"
+    },
+    "texRepeatY": {
+     "label": "Wiederholung Y"
+    },
+    "texAngle": {
+     "label": "Texturwinkel"
+    },
+    "texCrop": {
+     "label": "Zuschnitt"
     }
    }
   }

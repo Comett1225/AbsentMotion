@@ -170,10 +170,10 @@ class GroupAndSnapTest {
         val media = listOf(MediaDeclaration(XmlNode("media", mapOf("uri" to "u1", "filename" to "pic.png", "width" to "40", "height" to "30"))),
             MediaDeclaration(XmlNode("media", mapOf("uri" to "u2", "filename" to "other.png"))))
         val other = scene(layer(5, 0, 999))
-        val pasted = other.withPastedStyle(5, 0, Layer(source), media, setOf(StylePart.ColorFill))
+        val pasted = other.withPastedStyle(listOf(5L), 0, Layer(source), media, setOf(StylePart.ColorFill)).scene
         assertEquals("u1", pasted.layer(5)!!.node["fillImage"])
         assertEquals(40, pasted.media("u1")?.width)
         assertNull(pasted.media("u2"))
-        assertNull(other.withPastedStyle(5, 0, Layer(source), media, setOf(StylePart.Blending)).media("u1"))
+        assertNull(other.withPastedStyle(listOf(5L), 0, Layer(source), media, setOf(StylePart.Blending)).scene.media("u1"))
     }
 }

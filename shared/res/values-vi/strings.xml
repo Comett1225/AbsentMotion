@@ -1169,8 +1169,6 @@
     <string name="font_source_google">Google Fonts</string>
     <string name="font_google_hint">Nhập tên để tìm trong toàn bộ Google Fonts</string>
     <string name="font_downloads_when_chosen">Tải xuống khi chọn</string>
-    <string name="fonts_missing_title">Phông chữ không có trên điện thoại này</string>
-    <string name="fonts_missing_body">Dự án này dùng phông chữ không có trên điện thoại này: %1$s. Văn bản sẽ hiển thị bằng phông chữ khác cho đến khi bạn tải chúng từ Google Fonts.</string>
     <string name="font_favorite">Yêu thích</string>
     <string name="font_category_sans_serif">Sans Serif</string>
     <string name="font_category_serif">Serif</string>
@@ -1330,6 +1328,7 @@
     <string name="structure_paste_fill_color">Dán tô &amp; màu</string>
     <string name="structure_paste_border_shadow">Dán viền &amp; bóng</string>
     <string name="structure_paste_blending">Dán độ mờ &amp; chế độ hòa trộn</string>
+    <string name="structure_paste_motions">Dán hoạt ảnh &amp; chuyển cảnh</string>
     <string name="structure_paste_style">Dán kiểu</string>
     <string name="text_alignment">Căn chỉnh</string>
     <string name="track_track">Theo dõi</string>
@@ -1786,6 +1785,7 @@
     <string name="ai_model_grain">Mô hình hạt phim AI nâng cao</string>
     <string name="ai_model_cartoon">Mô hình hoạt hình AI nâng cao</string>
     <string name="ai_model_cutout">Xóa nền bằng AI 2.0</string>
+    <string name="ai_model_noise">Mô hình giảm nhiễu</string>
     <string name="ai_model_broken">Tệp mô hình AI bị hỏng và đã bị xóa. Hãy tải lại.</string>
     <string name="ai_model_download_failed">Tải mô hình AI thất bại. Kiểm tra kết nối và thử lại.</string>
     <string name="ai_model_download_wrong">Bản tải xuống không phải mô hình AI</string>
@@ -1835,6 +1835,7 @@
     <string name="cutout_best">Xóa nền bằng AI 2.0</string>
     <string name="cutout_best_hint">Viền sạch hơn quanh tóc và chi tiết nhỏ. Tải %1$s một lần. Chỉ dành cho hình ảnh.</string>
     <string name="cutout_fallback_download">Không thể tải Xóa nền bằng AI 2.0 nên đã dùng Tiêu chuẩn. Hãy kiểm tra kết nối và thử lại.</string>
+    <string name="ai_noise_fallback_download">Không thể tải mô hình giảm nhiễu nên đã dùng giảm nhiễu tiêu chuẩn. Hãy kiểm tra kết nối và thử lại.</string>
     <string name="cutout_fallback_failed">Xóa nền bằng AI 2.0 không thể hoàn tất hình ảnh này nên đã dùng Tiêu chuẩn.</string>
     <string name="ai_gpu_warning">Tùy chọn này có thể làm treo một số điện thoại. Nếu điện thoại bị treo, hãy khởi động lại và AI sẽ dùng bộ xử lý trở lại.</string>
     <string name="ai_gpu_failed">AI xử lý trên chip đồ họa không hoàn tất, nên AI giờ dùng bộ xử lý.</string>
@@ -1952,6 +1953,17 @@
     <string name="track_motion_cancelled">Đã hủy theo dõi chuyển động. Các khung hình đã theo dõi vẫn giữ keyframe.</string>
     <string name="track_motion_unavailable">Theo dõi chuyển động không khả dụng trong bản dựng này.</string>
     <string name="track_motion_failed">Không thể theo dõi video này.</string>
+    <string name="face_tracking_pick">Chọn khuôn mặt</string>
+    <string name="face_tracking_again">Theo dõi lại</string>
+    <string name="face_tracking_none">Chưa chọn khuôn mặt nào.</string>
+    <string name="face_tracking_ready">Video đi theo khuôn mặt bạn đã chọn.</string>
+    <string name="face_tracking_partial">Một phần clip chưa được theo dõi.</string>
+    <string name="face_tracking_video_only">Theo dõi khuôn mặt hoạt động trên lớp video.</string>
+    <string name="face_tracking_tap">Chạm vào khuôn mặt mà video sẽ đi theo.</string>
+    <string name="face_tracking_looking">Đang tìm khuôn mặt…</string>
+    <string name="face_tracking_none_here">Không tìm thấy khuôn mặt trong khung hình này. Hãy thử khung khác.</string>
+    <string name="face_tracking_lost">Không thể theo dõi khuôn mặt trong clip này.</string>
+    <string name="face_tracking_cancelled">Đã hủy theo dõi khuôn mặt.</string>
     <string name="edit_layer_copy_name">%1$s (bản sao)</string>
     <string name="model_layer_video">Video</string>
     <string name="ai_video_mask_name">Mặt nạ %1$s</string>
@@ -2277,6 +2289,9 @@
     <plurals name="structure_style_pasted">
         <item quantity="other">Đã dán vào %1$s lớp</item>
     </plurals>
+    <plurals name="structure_transitions_skipped">
+        <item quantity="other">%1$s chuyển cảnh bị bỏ qua: cần một clip ngay trước hoặc ngay sau lớp</item>
+    </plurals>
     <string name="subject_keep_all">Giữ tất cả</string>
     <string name="subject_hint_photo">Để chỉ giữ một người hoặc vật, hãy chạm vào nó.</string>
     <string name="subject_hint_video">Để chỉ giữ một người hoặc vật, hãy chạm vào nó trên khung hình đầu tiên. Ứng dụng sẽ theo dõi nó xuyên suốt clip.</string>
@@ -2393,8 +2408,6 @@
     <string name="desk_folder_back">Quay lại tất cả phương tiện</string>
     <string name="voice_install_espeak">Không tìm thấy giọng nói nào. Hãy cài gói espeak-ng, rồi mở lại cửa sổ này.</string>
     <string name="desk_close_save_failed">Không thể lưu các thay đổi gần nhất của bạn. Hãy giải phóng bớt dung lượng ổ đĩa, rồi nhấp Thử lại. Nếu bạn đóng mà không lưu, AbsentMotion sẽ đề nghị khôi phục các thay đổi này vào lần khởi động tiếp theo.</string>
-    <string name="desk_fonts_missing_title">Phông chữ không có trên máy tính này</string>
-    <string name="desk_fonts_missing_body">Dự án này dùng các phông chữ không có trên máy tính này: %1$s. Văn bản sẽ hiển thị bằng phông chữ khác cho đến khi bạn tải chúng từ Google Fonts.</string>
     <string name="desk_export_busy">Một lần xuất khác vẫn đang chạy. Hãy đợi đến khi xong hoặc hủy nó trước.</string>
     <string name="desk_export_no_ffmpeg">AbsentMotion không thể khởi chạy FFmpeg, chương trình dùng để tạo tệp video và âm thanh. Hãy cài đặt lại AbsentMotion.</string>
     <string name="desk_export_note_software">Không có bộ mã hóa video phần cứng nào hoạt động trên máy tính này, nên lần xuất này dùng bộ mã hóa phần mềm chậm hơn.</string>
@@ -2765,6 +2778,7 @@
     <string name="added_effect_save_failed">Không lưu được tất cả hiệu ứng.</string>
     <string name="added_effect_remove_failed">Không xóa được hiệu ứng.</string>
     <string name="community_filter_effects">Hiệu ứng</string>
+    <string name="community_filter_new">Mới</string>
     <string name="added_effect_version">Phiên bản %1$d</string>
     <string name="added_effect_already_added">Đã thêm</string>
     <string name="added_effect_newer_installed">Bạn có phiên bản mới hơn (v%1$d)</string>

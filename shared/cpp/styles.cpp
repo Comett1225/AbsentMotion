@@ -255,7 +255,7 @@ SkM44 Turn(float degrees) { return SkM44::Rotate({0, 0, 1}, degrees * kRadians);
 
 constexpr int kMaxParentDepth = 16;
 
-SkMatrix MatrixOf(const Placement& p, const Layer& l, float t);
+SkMatrix MatrixOf(const Placement& p, const Layer& l, float t, bool flat = false);
 int Fps();
 
 const Layer* PathSource(const std::vector<Layer>& siblings, const Layer& l) {
@@ -303,9 +303,10 @@ Placement Effective(const std::vector<Layer>& siblings, const Layer& l, double t
     return own;
 }
 
-SkMatrix MatrixOf(const Placement& p, const Layer& l, float t) {
-    SkMatrix m = l.projected ? p.space.asM33() : SkMatrix::Translate(p.location.fX, p.location.fY);
-    if (!l.projected) m.preRotate(p.rotation);
+SkMatrix MatrixOf(const Placement& p, const Layer& l, float t, bool flat) {
+    const bool projected = l.projected && !flat;
+    SkMatrix m = projected ? p.space.asM33() : SkMatrix::Translate(p.location.fX, p.location.fY);
+    if (!projected) m.preRotate(p.rotation);
     m.preSkew(tanf(l.skew.get(0, t, 0)), tanf(l.skew.get(1, t, 0)));
     m.preScale(p.scale.fX, p.scale.fY);
     m.preTranslate(-p.pivot.fX, -p.pivot.fY);
@@ -366,7 +367,8 @@ SkPath DrawStrokeEnd(SkCanvas* canvas, SkPaint paint, SkPoint p, SkVector d, flo
 SkPath DrawStroke(SkCanvas* canvas, const Layer& l, const SkPath& path, float t, float alpha, bool outline = true) {
     const float width = l.stroke.size.get(0, t, 0);
     if (!(width > 0) || path.isEmpty()) return {};
-    const SkColor4f color = ColorAt(l.stroke.color, t, kBlack, alpha);
+    const Anim* recolor = StrokeRecolor(l);
+    const SkColor4f color = ColorAt(recolor ? *recolor : l.stroke.color, t, kBlack, alpha);
     SkPaint paint = StrokePaint(l, width, color);
     const bool ends = (l.stroke.start != "none" || l.stroke.end != "none") && l.stroke.endSize > 0;
     const SkPath tapered = l.kind == "shape" && !l.text ? TaperedStroke(l, path, width, t) : SkPath();
@@ -733,7 +735,7 @@ Drawn DrawBody(SkCanvas* canvas, const Layer& l, double timeMs, float t, const S
     if (edged) {
         const float width = l.stroke.size.get(0, t, 0);
         SkPaint edge;
-        if (width > 0) edge.setImageFilter(EdgeFilter(nullptr, "centered", width / 2, ColorAt(l.stroke.color, t, kBlack, alpha), PixelUnit(canvas)));
+        if (width > 0) edge.setImageFilter(EdgeFilter(nullptr, "centered", width / 2, ColorAt(StrokeRecolor(l) ? *StrokeRecolor(l) : l.stroke.color, t, kBlack, alpha), PixelUnit(canvas)));
         canvas->saveLayer(nullptr, &edge);
     }
     canvas->save();
@@ -1200,7 +1202,8 @@ void DrawParticles(SkCanvas* canvas, const std::vector<Layer>& siblings, const L
 void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Layer& l, double timeMs, float alpha,
                  bool decorate, const MediaPictures& pictures, const std::vector<LayerCopy>* copies) {
     const float t = l.localTime(timeMs);
-    const SkMatrix m = SiblingMatrix(siblings, l, timeMs);
+    const SkMatrix seen = SiblingMatrix(siblings, l, timeMs);
+    SkMatrix m = seen;
     const SkPath path = BodyPath(l, t);
     Drawn drawn;
     const SkPath scenePath = path.makeTransform(m);
@@ -1211,6 +1214,11 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
     const auto order = [&](const LayerEffect& e) { return std::clamp((int)std::lround(Setting(e, "layer", t, 0)), 0, 2); };
     const bool emits = std::any_of(l.effects.begin(), l.effects.end(), Emits);
     const bool alone = emits && std::any_of(l.effects.begin(), l.effects.end(), [&](const LayerEffect& e) { return Emits(e) && order(e) == 2; });
+    SkMatrix flat, projection, unproject;
+    Placement facing;
+    const bool onPlane = effects && l.projected && l.kind != "model" && !copies && !emits && !gEffects->lifted(l) && !gEffects->behind(l) &&
+                         SeenPlacement(l, timeMs, &facing, true) && (flat = MatrixOf(facing, l, t, true)).invert(&unproject) &&
+                         (projection = SkMatrix::Concat(seen, unproject)).invert(&unproject) && projection.isFinite();
     auto own = [&](SkCanvas* canvas) {
         if (!copies) {
             drawn = DrawBody(canvas, l, timeMs, t, m, path, alpha, pictures, bordered);
@@ -1347,9 +1355,19 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
     if (under) below = [&](SkCanvas* canvas) {
         Override plain;
         plain.unitOpacity = true;
+        if (!onPlane) return DrawOne(canvas, siblings, *under, timeMs, pictures, plain);
+        canvas->save();
+        canvas->concat(unproject);
         DrawOne(canvas, siblings, *under, timeMs, pictures, plain);
+        canvas->restore();
     };
-    SkRect effectArea = scenePath.getBounds();
+    if (onPlane) {
+        canvas->save();
+        canvas->concat(projection);
+        m = flat;
+        gGroupDepth++;
+    }
+    SkRect effectArea = onPlane ? path.makeTransform(m).getBounds() : scenePath.getBounds();
     SkMatrix effectMatrix = m;
     if (effects && l.kind == "embedScene" && gEffects->wraps && gEffects->wraps(l)) {
         const SkRect content = DrawnBounds(l, timeMs, m);
@@ -1363,6 +1381,12 @@ void DrawContent(SkCanvas* canvas, const std::vector<Layer>& siblings, const Lay
         }
     }
     if (!effects || !gEffects->draw(canvas, *gScene, l, timeMs, effectArea, effectMatrix, picture, below)) picture(canvas);
+    if (onPlane) {
+        gGroupDepth--;
+        canvas->restore();
+        m = seen;
+        drawn.stroked = drawn.stroked.makeTransform(projection);
+    }
     if (effects && gEffects->lifted(l) && !(gEffects->spills && gEffects->spills(l, timeMs)) && !scenePath.isEmpty()) {
         SkPaint mask;
         mask.setAntiAlias(true);
@@ -1865,6 +1889,8 @@ bool EffectOwnerMatrix(int64_t owner, double timeMs, SkMatrix* matrix) {
 }
 
 int ProjectFps() { return Fps(); }
+
+SkSize ProjectSize() { return gScene ? SkSize::Make(gScene->width, gScene->height) : SkSize::MakeEmpty(); }
 
 const std::vector<Layer>* EffectSiblings() { return gEffectList; }
 

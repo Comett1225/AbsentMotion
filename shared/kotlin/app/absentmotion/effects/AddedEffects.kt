@@ -80,7 +80,12 @@ internal data class AddedEffect(val definition: EffectDefinition, val json: JSON
     )
 }
 
-internal data class AddedEffectPreview(val effect: AddedEffect, val works: Boolean, val picture: ByteArray?)
+internal data class AddedEffectPreview(val effect: AddedEffect, val works: Boolean, val picture: ByteArray?, val hero: ByteArray? = null)
+
+internal fun List<AddedEffectPreview>.withPictures(pictures: Map<String, Pair<ByteArray?, ByteArray?>>) = map { preview ->
+    val (small, large) = pictures[preview.effect.definition.key] ?: return@map preview
+    preview.copy(picture = small ?: preview.picture, hero = large)
+}
 
 internal fun isAddedEffectFile(name: String): Boolean = name.substringAfterLast('.', "").lowercase(Locale.ROOT) in setOf("json", "abmfx")
 
@@ -220,6 +225,7 @@ internal class AddedEffectStore(private val filesDir: File, private val preferen
     private val directory = File(filesDir, "effects-added")
     private fun definition(key: String) = File(directory, "$key.json")
     fun picture(key: String) = File(directory, "$key.webp")
+    fun hero(key: String) = File(directory, "$key.hero.webp")
 
     fun definitions(): List<EffectDefinition> = synchronized(lock) {
         directory.listFiles().orEmpty().filter {
@@ -268,6 +274,7 @@ internal class AddedEffectStore(private val filesDir: File, private val preferen
                 require(json.size <= AddedEffectStoredBytes)
                 changes[definition(key)] = File(staging, "$key.json").apply { writeBytes(json) }
                 changes[picture(key)] = preview.picture?.let { bytes -> File(staging, "$key.webp").apply { writeBytes(bytes) } }
+                changes[hero(key)] = preview.hero?.let { bytes -> File(staging, "$key.hero.webp").apply { writeBytes(bytes) } }
             }
             for (file in changes.keys) if (file.exists()) {
                 check(file.isFile)
@@ -294,6 +301,7 @@ internal class AddedEffectStore(private val filesDir: File, private val preferen
         require(addedEffectKey.matches(key))
         Files.deleteIfExists(definition(key).toPath())
         picture(key).delete()
+        hero(key).delete()
         Unit
     }
 

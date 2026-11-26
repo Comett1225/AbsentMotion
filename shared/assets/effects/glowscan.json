@@ -3,8 +3,120 @@
  "name": "Glow Scan",
  "category": "stylize",
  "since": "3.0.0",
- "description": "Blurs and lights up only the parts of the layer whose brightness falls in a band; animate Position to sweep the glow from shadows to highlights.",
+ "description": "Draws a glowing outline where the picture's brightness crosses the Threshold, like a contour scan.",
  "params": [
+  {
+   "id": "threshold",
+   "label": "Threshold",
+   "type": "float",
+   "default": 0.5,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "when": {
+    "style": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "radius",
+   "label": "Radius",
+   "type": "float",
+   "default": 0.1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "when": {
+    "style": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "feather",
+   "label": "Feather",
+   "type": "float",
+   "default": 2,
+   "min": 0,
+   "max": 10,
+   "step": 0.01,
+   "when": {
+    "style": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "smoothing",
+   "label": "Smoothing",
+   "type": "float",
+   "default": 0.05,
+   "min": 0,
+   "max": 1,
+   "step": 0.001,
+   "when": {
+    "style": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "tint",
+   "label": "Color",
+   "type": "color",
+   "default": "#ff0088ff",
+   "when": {
+    "style": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "blend",
+   "label": "Blend",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true,
+   "when": {
+    "style": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "fill",
+   "label": "Fill",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true,
+   "when": {
+    "style": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "alpha",
+   "label": "Alpha",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true,
+   "when": {
+    "style": [
+     1
+    ]
+   }
+  },
   {
    "id": "blur",
    "label": "Blur",
@@ -13,7 +125,12 @@
    "min": 0,
    "max": 300,
    "step": 0.1,
-   "pixels": true
+   "pixels": true,
+   "when": {
+    "style": [
+     0
+    ]
+   }
   },
   {
    "id": "position",
@@ -23,7 +140,12 @@
    "min": 0,
    "max": 1,
    "step": 0.001,
-   "percent": true
+   "percent": true,
+   "when": {
+    "style": [
+     0
+    ]
+   }
   },
   {
    "id": "width",
@@ -33,7 +155,12 @@
    "min": 0,
    "max": 1,
    "step": 0.001,
-   "percent": true
+   "percent": true,
+   "when": {
+    "style": [
+     0
+    ]
+   }
   },
   {
    "id": "softness",
@@ -43,7 +170,12 @@
    "min": 0,
    "max": 1,
    "step": 0.001,
-   "percent": true
+   "percent": true,
+   "when": {
+    "style": [
+     0
+    ]
+   }
   },
   {
    "id": "intensity",
@@ -52,20 +184,51 @@
    "default": 1,
    "min": 0,
    "max": 5,
-   "step": 0.001
+   "step": 0.001,
+   "when": {
+    "style": [
+     0
+    ]
+   }
   },
   {
    "id": "color",
    "label": "Glow Color",
    "type": "color",
-   "default": "#7fd4ff"
+   "default": "#7fd4ff",
+   "when": {
+    "style": [
+     0
+    ]
+   }
   },
   {
    "id": "show",
    "label": "Show Band Only",
    "type": "switch",
-   "default": false
+   "default": false,
+   "when": {
+    "style": [
+     0
+    ]
+   }
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 1,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "legacyDefault": 0,
+   "when": {
+    "style": [
+     0
+    ]
+   }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform shader blurred;\nuniform float blur;\nuniform float position;\nuniform float width;\nuniform float softness;\nuniform float intensity;\nlayout(color) uniform half4 color;\nuniform float show;\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    half4 soft = blurred.eval(coord);\n    float lum = src.a > 0.0 ? dot(float3(src.rgb) / float(src.a), float3(0.2126, 0.7152, 0.0722)) : 0.0;\n    float half_band = max(width, 0.0) * 0.5;\n    float m = 1.0 - smoothstep(half_band, half_band + max(softness, 0.001), abs(lum - position));\n    m *= float(src.a);\n    float3 glowRgb = float3(soft.rgb) * float3(color.rgb) * max(intensity, 0.0) * m;\n    half4 base = show > 0.5 ? src * half(m) : src;\n    half4 mixed = half4(mix(base.rgb, soft.rgb, half(m)), base.a);\n    return half4(min(mixed.rgb + half3(glowRgb), mixed.a), mixed.a);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform shader blurred;\nuniform float blur;\nuniform float position;\nuniform float width;\nuniform float softness;\nuniform float intensity;\nlayout(color) uniform half4 color;\nuniform float show;\nuniform float threshold;\nuniform float radius;\nuniform float feather;\nuniform float smoothing;\nlayout(color) uniform half4 tint;\nuniform float blend;\nuniform float fill;\nuniform float alpha;\nuniform float style;\nuniform float4 screen;\nhalf4 classic(float2 coord) {\n    half4 src = image.eval(coord);\n    half4 soft = blurred.eval(coord);\n    float lum = src.a > 0.0 ? dot(float3(src.rgb) / float(src.a), float3(0.2126, 0.7152, 0.0722)) : 0.0;\n    float half_band = max(width, 0.0) * 0.5;\n    float m = 1.0 - smoothstep(half_band, half_band + max(softness, 0.001), abs(lum - position));\n    m *= float(src.a);\n    float3 glowRgb = float3(soft.rgb) * float3(color.rgb) * max(intensity, 0.0) * m;\n    half4 base = show > 0.5 ? src * half(m) : src;\n    half4 mixed = half4(mix(base.rgb, soft.rgb, half(m)), base.a);\n    return half4(min(mixed.rgb + half3(glowRgb), mixed.a), mixed.a);\n}\nhalf4 standard(float2 coord) {\n    half4 src = image.eval(coord);\n    float2 q = (coord - screen.xy) * 0.5 - 0.5;\n    float2 i0 = floor(q);\n    float2 f = q - i0;\n    float2 c0 = 2.0 * i0 + 1.0 + screen.xy;\n    half4 sm = mix(mix(blurred.eval(c0), blurred.eval(c0 + float2(2.0, 0.0)), half(f.x)),\n                   mix(blurred.eval(c0 + float2(0.0, 2.0)), blurred.eval(c0 + float2(2.0, 2.0)), half(f.x)), half(f.y));\n    float3 c = sm.a > 0.0 ? float3(sm.rgb) / float(sm.a) : float3(0.0);\n    float l = dot(c, float3(0.2126, 0.7152, 0.0722));\n    float mid = 1.1 * threshold - 0.05;\n    float s0 = max(0.412 * radius * pow(max(mid, 0.0) / 0.5, 0.74), 0.0001);\n    float t = (l - mid - 0.31 * radius * radius) / s0;\n    float e = abs(l - mid) <= 0.5 * radius + 0.0015 ? 2.0 * pow(exp(-t * t), 0.5 * max(feather, 0.0)) * float(src.a) : 0.0;\n    float3 k = float3(tint.rgb) / max(float(tint.a), 0.0001);\n    float3 cl = pow(clamp(c, 0.0, 1.0), float3(1.5));\n    float3 own = cl / max(dot(cl, float3(0.2126, 0.7152, 0.0722)), 0.0001);\n    float3 hue = mix(own, k, clamp(blend, 0.0, 1.0));\n    float ea = e * max(alpha, 0.0);\n    float over = max(ea - 1.0, 0.0) / 0.85;\n    float3 lit = min(float3(1.0), min(float3(1.0), ea * hue) + over * over * (1.0 - min(float3(1.0), ea * hue)));\n    float3 b = e > 0.0 ? clamp(c, 0.0, 1.0) * float(src.a) : float3(src.rgb) * clamp(fill, 0.0, 1.0);\n    float3 rgb = 1.0 - (1.0 - b) * (1.0 - lit * float(src.a));\n    return half4(half3(min(rgb, float3(src.a))), src.a);\n}\nhalf4 main(float2 coord) {\n    return style > 0.5 ? standard(coord) : classic(coord);\n}\n"
 }

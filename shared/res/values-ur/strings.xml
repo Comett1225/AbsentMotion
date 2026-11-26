@@ -1187,8 +1187,6 @@
     <string name="font_source_google">Google Fonts</string>
     <string name="font_google_hint">تمام Google Fonts میں تلاش کرنے کے لیے نام ٹائپ کریں</string>
     <string name="font_downloads_when_chosen">منتخب کرنے پر ڈاؤن لوڈ ہوں گے</string>
-    <string name="fonts_missing_title">اس فون پر فونٹس موجود نہیں</string>
-    <string name="fonts_missing_body">یہ پروجیکٹ ایسے فونٹس استعمال کرتا ہے جو اس فون پر نہیں ہیں: %1$s۔ جب تک آپ انہیں Google Fonts سے ڈاؤن لوڈ نہیں کرتے، ٹیکسٹ کسی دوسرے فونٹ میں دکھائی دے گا۔</string>
     <string name="font_favorite">پسندیدہ</string>
     <string name="font_category_sans_serif">سینز سیرف</string>
     <string name="font_category_serif">سیرف</string>
@@ -1350,6 +1348,7 @@
     <string name="structure_paste_fill_color">فل اور رنگ پیسٹ کریں</string>
     <string name="structure_paste_border_shadow">فریم اور شیڈو پیسٹ کریں</string>
     <string name="structure_paste_blending">اوپیسٹی اور بلینڈنگ موڈ پیسٹ کریں</string>
+    <string name="structure_paste_motions">اینیمیشنز اور ٹرانزیشنز پیسٹ کریں</string>
     <string name="structure_paste_style">اسٹائل پیسٹ کریں</string>
     <string name="text_alignment">الائنمنٹ</string>
     <string name="track_track">ٹریک</string>
@@ -1813,6 +1812,7 @@
     <string name="ai_model_grain">‏AI اینہانس گرین ماڈل</string>
     <string name="ai_model_cartoon">‏AI اینہانس کارٹون ماڈل</string>
     <string name="ai_model_cutout">‏AI بیک گراؤنڈ ریموول 2.0</string>
+    <string name="ai_model_noise">شور کم کرنے کا ماڈل</string>
     <string name="ai_model_broken">ایک AI ماڈل فائل خراب ہو گئی اور حذف ہو گئی۔ اسے دوبارہ ڈاؤن لوڈ کریں۔</string>
     <string name="ai_model_download_failed">‏AI ماڈل ڈاؤن لوڈ ناکام ہو گیا۔ کنکشن چیک کریں اور دوبارہ کوشش کریں۔</string>
     <string name="ai_model_download_wrong">ڈاؤن لوڈ AI ماڈل نہیں تھا۔</string>
@@ -1862,6 +1862,7 @@
     <string name="cutout_best">‏AI بیک گراؤنڈ ریموول 2.0</string>
     <string name="cutout_best_hint">بالوں اور باریک تفصیلات کے کنارے زیادہ صاف۔ ایک بار %1$s ڈاؤن لوڈ کرتا ہے۔ صرف تصاویر کے لیے۔</string>
     <string name="cutout_fallback_download">‏AI بیک گراؤنڈ ریموول 2.0 ڈاؤن لوڈ نہیں ہو سکا، اس لیے اسٹینڈرڈ استعمال ہوا۔ کنکشن چیک کریں اور دوبارہ کوشش کریں۔</string>
+    <string name="ai_noise_fallback_download">شور کم کرنے کا ماڈل ڈاؤن لوڈ نہیں ہو سکا، اس لیے اسٹینڈرڈ شور کم کرنا استعمال ہوا۔ کنکشن چیک کریں اور دوبارہ کوشش کریں۔</string>
     <string name="cutout_fallback_failed">‏AI بیک گراؤنڈ ریموول 2.0 یہ تصویر مکمل نہیں کر سکا، اس لیے اسٹینڈرڈ استعمال ہوا۔</string>
     <string name="ai_gpu_warning">یہ کچھ فونز کو ہینگ کر سکتا ہے۔ اگر فون ہینگ ہو جائے تو اسے ری اسٹارٹ کریں، AI دوبارہ پروسیسر استعمال کرے گا۔</string>
     <string name="ai_gpu_failed">گرافکس چپ پر AI کام مکمل نہیں ہوا، اس لیے AI اب پروسیسر استعمال کر رہا ہے۔</string>
@@ -1979,6 +1980,17 @@
     <string name="track_motion_cancelled">ٹریکنگ منسوخ ہو گئی۔ پہلے سے ٹریک کیے گئے فریم اپنی کی فریمز رکھتے ہیں۔</string>
     <string name="track_motion_unavailable">اس بلڈ میں موشن ٹریکنگ دستیاب نہیں ہے۔</string>
     <string name="track_motion_failed">اس ویڈیو کو ٹریک نہیں کیا جا سکا۔</string>
+    <string name="face_tracking_pick">چہرہ چنیں</string>
+    <string name="face_tracking_again">دوبارہ ٹریک کریں</string>
+    <string name="face_tracking_none">ابھی کوئی چہرہ نہیں چنا گیا۔</string>
+    <string name="face_tracking_ready">ویڈیو آپ کے چنے ہوئے چہرے کے ساتھ چلتی ہے۔</string>
+    <string name="face_tracking_partial">کلپ کا کچھ حصہ ابھی ٹریک نہیں ہوا۔</string>
+    <string name="face_tracking_video_only">فیس ٹریکنگ ویڈیو لیئرز پر کام کرتی ہے۔</string>
+    <string name="face_tracking_tap">اس چہرے پر ٹیپ کریں جس کے ساتھ ویڈیو چلے۔</string>
+    <string name="face_tracking_looking">چہرے تلاش کیے جا رہے ہیں…</string>
+    <string name="face_tracking_none_here">اس فریم میں کوئی چہرہ نہیں ملا۔ کوئی اور فریم آزمائیں۔</string>
+    <string name="face_tracking_lost">اس کلپ میں چہرہ ٹریک نہیں ہو سکا۔</string>
+    <string name="face_tracking_cancelled">فیس ٹریکنگ منسوخ ہو گئی۔</string>
     <string name="edit_layer_copy_name">‏%1$s کاپی</string>
     <string name="model_layer_video">ویڈیو</string>
     <string name="ai_video_mask_name">‏%1$s ماسک</string>
@@ -2310,6 +2322,10 @@
         <item quantity="one">‏%1$s لیئر پر پیسٹ کر دیا گیا</item>
         <item quantity="other">‏%1$s لیئرز پر پیسٹ کر دیا گیا</item>
     </plurals>
+    <plurals name="structure_transitions_skipped">
+        <item quantity="one">‏%1$s ٹرانزیشن چھوڑ دیا گیا: اس کے لیے لیئر سے بالکل پہلے یا بعد میں ایک کلپ چاہیے</item>
+        <item quantity="other">‏%1$s ٹرانزیشنز چھوڑ دیے گئے: ان کے لیے لیئر سے بالکل پہلے یا بعد میں ایک کلپ چاہیے</item>
+    </plurals>
     <string name="subject_keep_all">سب کچھ رکھیں</string>
     <string name="subject_hint_photo">صرف ایک شخص یا چیز رکھنے کے لیے اس پر ٹیپ کریں۔</string>
     <string name="subject_hint_video">صرف ایک شخص یا چیز رکھنے کے لیے اسے اس پہلے فریم پر ٹیپ کریں۔ ایپ پوری کلپ میں اسے ٹریک کرتی ہے۔</string>
@@ -2428,8 +2444,6 @@
     <string name="desk_folder_back">تمام میڈیا پر واپس جائیں</string>
     <string name="voice_install_espeak">کوئی وائس نہیں ملی۔ espeak-ng پیکج انسٹال کریں، پھر یہ ونڈو دوبارہ کھولیں۔</string>
     <string name="desk_close_save_failed">آپ کی آخری تبدیلیاں محفوظ نہیں ہو سکیں۔ ڈسک پر کچھ جگہ خالی کریں، پھر دوبارہ کوشش کریں پر کلک کریں۔ اگر آپ محفوظ کیے بغیر بند کریں گے تو AbsentMotion اگلی بار شروع ہونے پر یہ تبدیلیاں دوبارہ پیش کرے گا۔</string>
-    <string name="desk_fonts_missing_title">یہ فونٹس اس کمپیوٹر پر نہیں ہیں</string>
-    <string name="desk_fonts_missing_body">یہ پروجیکٹ ایسے فونٹس استعمال کرتا ہے جو اس کمپیوٹر پر نہیں ہیں: %1$s۔ جب تک آپ انہیں Google Fonts سے ڈاؤن لوڈ نہیں کرتے، ٹیکسٹ کسی دوسرے فونٹ میں دکھایا جاتا ہے۔</string>
     <string name="desk_export_busy">ایک اور ایکسپورٹ ابھی جاری ہے۔ اس کے ختم ہونے تک انتظار کریں یا پہلے اسے منسوخ کریں۔</string>
     <string name="desk_export_no_ffmpeg">‏AbsentMotion ویڈیو اور آڈیو فائلیں بنانے والا پروگرام FFmpeg شروع نہیں کر سکا۔ AbsentMotion دوبارہ انسٹال کریں۔</string>
     <string name="desk_export_note_software">اس کمپیوٹر پر کوئی ہارڈویئر ویڈیو انکوڈر کام نہیں کرتا، اس لیے اس ایکسپورٹ میں سست سافٹ ویئر انکوڈر استعمال ہوگا۔</string>
@@ -2804,6 +2818,7 @@
     <string name="added_effect_save_failed">سب ایفیکٹس محفوظ نہیں ہو سکے۔</string>
     <string name="added_effect_remove_failed">ایفیکٹ ہٹایا نہیں جا سکا۔</string>
     <string name="community_filter_effects">ایفیکٹس</string>
+    <string name="community_filter_new">نیا</string>
     <string name="added_effect_version">ورژن %1$d</string>
     <string name="added_effect_already_added">پہلے سے شامل ہے</string>
     <string name="added_effect_newer_installed">آپ کے پاس نیا ورژن ہے (v%1$d)</string>

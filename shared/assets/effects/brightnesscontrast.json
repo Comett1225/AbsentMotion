@@ -1,6 +1,9 @@
 {
  "id": "brightnesscontrast",
- "name": "Brightness & Contrast",
+ "name": "Brightness / Contrast",
+ "aliases": [
+  "Brightness & Contrast"
+ ],
  "category": "color",
  "description": "Adjusts the brightness and contrast of the image.",
  "params": [

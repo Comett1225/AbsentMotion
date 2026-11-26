@@ -168,7 +168,7 @@ internal fun EditorState.dropsOnLeave(mode: DrawingMode): Boolean {
     return mode.created && when (mode) {
         is FreehandMode -> layer.strokes.isNullOrEmpty()
         is PointMode -> layer.contours?.all { it.knots.isEmpty() } == true
-        is TrackMode -> false
+        is TrackMode, is FaceMode -> false
     }
 }
 
@@ -183,6 +183,11 @@ fun EditorState.leaveDrawing() {
     if (mode is TrackMode) {
         mode.job?.cancel()
         mode.apply?.targetId?.takeIf { scene.layer(it) != null }?.let { selectedId = it }
+    }
+    if (mode is FaceMode) {
+        mode.job?.cancel()
+        previewChange = null
+        return
     }
     panel = EditorPanel.Tools
 }

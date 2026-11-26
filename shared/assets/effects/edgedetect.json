@@ -1,6 +1,9 @@
 {
  "id": "edgedetect",
- "name": "Edge Detect",
+ "name": "Find Edges",
+ "aliases": [
+  "Edge Detect"
+ ],
  "category": "stylize",
  "description": "Bright lines where the picture changes, dark elsewhere. Ink draws dark lines on white; Color keeps the picture's own colors on the edges.",
  "params": [

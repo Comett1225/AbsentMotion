@@ -127,8 +127,8 @@ class DeskAddedEffectsTest {
                     creatorTile.performScrollTo().assertIsDisplayed()
                     val creatorBounds = creatorTile.fetchSemanticsNode().boundsInRoot
                     val addedBounds = added.fetchSemanticsNode().boundsInRoot
-                    assertTrue(creatorBounds.top > addedBounds.top ||
-                        creatorBounds.top == addedBounds.top && creatorBounds.left > addedBounds.left)
+                    assertTrue(creatorBounds.top < addedBounds.top ||
+                        creatorBounds.top == addedBounds.top && creatorBounds.left < addedBounds.left)
                     creatorTile.performClick()
                     effectTile.assertIsDisplayed()
                     back.performClick()

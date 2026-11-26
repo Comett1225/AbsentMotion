@@ -1169,8 +1169,6 @@
     <string name="font_source_google">Google Fonts</string>
     <string name="font_google_hint">พิมพ์ชื่อเพื่อค้นหาใน Google Fonts ทั้งหมด</string>
     <string name="font_downloads_when_chosen">ดาวน์โหลดเมื่อเลือก</string>
-    <string name="fonts_missing_title">ไม่มีฟอนต์ในเครื่องนี้</string>
-    <string name="fonts_missing_body">โปรเจกต์นี้ใช้ฟอนต์ที่ไม่มีในเครื่องนี้: %1$s ข้อความจะแสดงด้วยฟอนต์อื่นจนกว่าคุณจะดาวน์โหลดจาก Google Fonts</string>
     <string name="font_favorite">รายการโปรด</string>
     <string name="font_category_sans_serif">ซานส์เซอริฟ</string>
     <string name="font_category_serif">เซอริฟ</string>
@@ -1330,6 +1328,7 @@
     <string name="structure_paste_fill_color">วางการเติมและสี</string>
     <string name="structure_paste_border_shadow">วางขอบและเงา</string>
     <string name="structure_paste_blending">วางความทึบและโหมดผสม</string>
+    <string name="structure_paste_motions">วางแอนิเมชันและทรานซิชัน</string>
     <string name="structure_paste_style">วางสไตล์</string>
     <string name="text_alignment">การจัดแนว</string>
     <string name="track_track">แทร็ก</string>
@@ -1786,6 +1785,7 @@
     <string name="ai_model_grain">โมเดลเกรน AI Enhance</string>
     <string name="ai_model_cartoon">โมเดลการ์ตูน AI Enhance</string>
     <string name="ai_model_cutout">การลบพื้นหลังด้วย AI 2.0</string>
+    <string name="ai_model_noise">โมเดลลดเสียงรบกวน</string>
     <string name="ai_model_broken">ไฟล์โมเดล AI เสียหายและถูกลบแล้ว ดาวน์โหลดอีกครั้ง</string>
     <string name="ai_model_download_failed">ดาวน์โหลดโมเดล AI ไม่สำเร็จ ตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง</string>
     <string name="ai_model_download_wrong">ไฟล์ที่ดาวน์โหลดไม่ใช่โมเดล AI</string>
@@ -1835,6 +1835,7 @@
     <string name="cutout_best">การลบพื้นหลังด้วย AI 2.0</string>
     <string name="cutout_best_hint">ขอบเรียบเนียนขึ้นบริเวณเส้นผมและรายละเอียดเล็ก ๆ ดาวน์โหลด %1$s หนึ่งครั้ง ใช้ได้กับรูปภาพเท่านั้น</string>
     <string name="cutout_fallback_download">ดาวน์โหลดการลบพื้นหลังด้วย AI 2.0 ไม่สำเร็จ จึงใช้โหมดมาตรฐาน โปรดตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง</string>
+    <string name="ai_noise_fallback_download">ดาวน์โหลดโมเดลลดเสียงรบกวนไม่สำเร็จ จึงใช้การลดเสียงรบกวนแบบมาตรฐาน โปรดตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง</string>
     <string name="cutout_fallback_failed">การลบพื้นหลังด้วย AI 2.0 ประมวลผลรูปนี้ไม่สำเร็จ จึงใช้โหมดมาตรฐาน</string>
     <string name="ai_gpu_warning">อาจทำให้โทรศัพท์บางรุ่นค้าง หากเครื่องค้าง ให้รีสตาร์ท AI จะกลับไปใช้โปรเซสเซอร์</string>
     <string name="ai_gpu_failed">งาน AI บนชิปกราฟิกไม่สำเร็จ AI จึงสลับไปใช้โปรเซสเซอร์แทน</string>
@@ -1952,6 +1953,17 @@
     <string name="track_motion_cancelled">ยกเลิกการติดตามแล้ว เฟรมที่ติดตามแล้วยังคงมีคีย์เฟรมอยู่</string>
     <string name="track_motion_unavailable">การติดตามการเคลื่อนไหวไม่พร้อมใช้งานในเวอร์ชันนี้</string>
     <string name="track_motion_failed">ไม่สามารถติดตามวิดีโอนี้ได้</string>
+    <string name="face_tracking_pick">เลือกใบหน้า</string>
+    <string name="face_tracking_again">ติดตามอีกครั้ง</string>
+    <string name="face_tracking_none">ยังไม่ได้เลือกใบหน้า</string>
+    <string name="face_tracking_ready">วิดีโอจะตามใบหน้าที่เลือกไว้</string>
+    <string name="face_tracking_partial">บางส่วนของคลิปยังไม่ได้ติดตาม</string>
+    <string name="face_tracking_video_only">การติดตามใบหน้าใช้ได้กับเลเยอร์วิดีโอ</string>
+    <string name="face_tracking_tap">แตะใบหน้าที่ต้องการให้วิดีโอตาม</string>
+    <string name="face_tracking_looking">กำลังหาใบหน้า…</string>
+    <string name="face_tracking_none_here">ไม่พบใบหน้าในเฟรมนี้ ลองเฟรมอื่น</string>
+    <string name="face_tracking_lost">ไม่สามารถติดตามใบหน้าในคลิปนี้ได้</string>
+    <string name="face_tracking_cancelled">ยกเลิกการติดตามใบหน้าแล้ว</string>
     <string name="edit_layer_copy_name">สำเนา %1$s</string>
     <string name="model_layer_video">วิดีโอ</string>
     <string name="ai_video_mask_name">มาสก์ %1$s</string>
@@ -2277,6 +2289,9 @@
     <plurals name="structure_style_pasted">
         <item quantity="other">วางสไตล์ลงบน %1$s เลเยอร์แล้ว</item>
     </plurals>
+    <plurals name="structure_transitions_skipped">
+        <item quantity="other">ข้าม %1$s ทรานซิชัน: ต้องมีคลิปอยู่ก่อนหรือหลังเลเยอร์พอดี</item>
+    </plurals>
     <string name="subject_keep_all">เก็บทุกอย่าง</string>
     <string name="subject_hint_photo">หากต้องการเก็บไว้เพียงคนหรือสิ่งเดียว ให้แตะที่สิ่งนั้น</string>
     <string name="subject_hint_video">หากต้องการเก็บไว้เพียงคนหรือสิ่งเดียว ให้แตะที่สิ่งนั้นบนเฟรมแรกนี้ แอปจะติดตามไปตลอดคลิป</string>
@@ -2393,8 +2408,6 @@
     <string name="desk_folder_back">กลับไปยังสื่อทั้งหมด</string>
     <string name="voice_install_espeak">ไม่พบเสียงพูด ติดตั้งแพ็กเกจ espeak-ng แล้วเปิดหน้าต่างนี้อีกครั้ง</string>
     <string name="desk_close_save_failed">บันทึกการเปลี่ยนแปลงล่าสุดของคุณไม่ได้ โปรดเพิ่มพื้นที่ว่างในดิสก์ แล้วคลิก ลองอีกครั้ง หากปิดโดยไม่บันทึก AbsentMotion จะเสนอการเปลี่ยนแปลงเหล่านี้ให้อีกครั้งเมื่อเปิดครั้งถัดไป</string>
-    <string name="desk_fonts_missing_title">ไม่มีฟอนต์บนคอมพิวเตอร์เครื่องนี้</string>
-    <string name="desk_fonts_missing_body">โปรเจกต์นี้ใช้ฟอนต์ที่ไม่มีในคอมพิวเตอร์เครื่องนี้: %1$s ข้อความจะแสดงด้วยฟอนต์อื่นจนกว่าคุณจะดาวน์โหลดจาก Google Fonts</string>
     <string name="desk_export_busy">มีการส่งออกอื่นกำลังทำงานอยู่ รอให้เสร็จหรือยกเลิกก่อน</string>
     <string name="desk_export_no_ffmpeg">AbsentMotion ไม่สามารถเริ่ม FFmpeg ซึ่งเป็นโปรแกรมที่ใช้สร้างไฟล์วิดีโอและเสียงได้ โปรดติดตั้ง AbsentMotion อีกครั้ง</string>
     <string name="desk_export_note_software">ไม่มีตัวเข้ารหัสวิดีโอแบบฮาร์ดแวร์ที่ใช้งานได้บนคอมพิวเตอร์นี้ การส่งออกครั้งนี้จึงใช้ตัวเข้ารหัสแบบซอฟต์แวร์ที่ช้ากว่า</string>
@@ -2765,6 +2778,7 @@
     <string name="added_effect_save_failed">บันทึกเอฟเฟกต์บางรายการไม่ได้</string>
     <string name="added_effect_remove_failed">นำเอฟเฟกต์ออกไม่ได้</string>
     <string name="community_filter_effects">เอฟเฟกต์</string>
+    <string name="community_filter_new">ใหม่</string>
     <string name="added_effect_version">เวอร์ชัน %1$d</string>
     <string name="added_effect_already_added">เพิ่มไว้แล้ว</string>
     <string name="added_effect_newer_installed">คุณมีเวอร์ชันที่ใหม่กว่า (v%1$d)</string>

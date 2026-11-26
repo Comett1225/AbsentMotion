@@ -2,6 +2,9 @@
  "id": "mosaic",
  "name": "Mosaic",
  "category": "stylize",
+ "also": [
+  "blur"
+ ],
  "since": "3.0.0",
  "description": "Divides the layer into squares and fills each one with its average color.",
  "params": [

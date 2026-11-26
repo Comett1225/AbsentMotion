@@ -27,6 +27,7 @@ Tout ce qui figure dans l’onglet **Communauté** est vérifié par une personn
 
 - Restez adapté à tout le monde. Des personnes de tous âges utilisent AbsentMotion.
 - Les paquets de projet peuvent atteindre 20 MB, les préréglages 1 MB et les effets 512 KB.
+- Chaque effet a besoin d'une miniature qui le montre, en deux tailles : une petite (WebP 192 × 192, fixe ou animée jusqu'à 3 secondes) et une grande (WebP 720 × 720), chacune jusqu'à 150 KB.
 - Les éléments sont partagés sous CC BY 4.0 : chacun peut les utiliser et les modifier à condition de citer qui les a créés.
 - Le nom affiché sur votre élément est le nom de créateur que vous saisissez. N’y mettez rien de personnel.
 - Le mainteneur décide de ce qui est mis en ligne et peut retirer un élément à tout moment.

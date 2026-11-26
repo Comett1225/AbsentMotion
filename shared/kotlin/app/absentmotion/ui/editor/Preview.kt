@@ -144,7 +144,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
     val scene = state.scene
     val editingText = state.livePanel == EditorPanel.EditText
     val mediaRevision by state.engine.mediaRevision.collectAsState()
-    val fixedView = state.drawing is app.absentmotion.editor.TrackMode
+    val fixedView = state.drawing is app.absentmotion.editor.TrackMode || state.drawing is app.absentmotion.editor.FaceMode
     val viewZoom = if (fixedView) 1f else state.canvasZoom
     val viewPan = if (fixedView) Offset.Zero else state.canvasPan
     val (scale, dx, dy) = previewFrame(size.width.toFloat(), size.height.toFloat(), with(LocalDensity.current) { reserveEnd.toPx() }, scene.width.toFloat(), scene.height.toFloat(), viewZoom, viewPan)
@@ -467,7 +467,7 @@ fun Preview(state: EditorState, modifier: Modifier = Modifier, reserveEnd: Dp = 
                                 val to = inLayer(position)
                                 val width = adjustBox?.let { it[2] - it[0] } ?: 0f
                                 val height = adjustBox?.let { it[3] - it[1] } ?: 0f
-                                if (from != null && to != null && width > 0f && height > 0f) adjusting.move(to.x - from.x, to.y - from.y, width, height)
+                                if (!adjusting.scene && from != null && to != null && width > 0f && height > 0f) adjusting.move(to.x - from.x, to.y - from.y, width, height)
                                 else (step / currentScale).let { adjusting.move(it.x, it.y, state.scene.width.toFloat(), state.scene.height.toFloat()) }
                             }
                         } else if (moved && cropFrom != null && startQuad != null && cropGrab >= 0 && fingers == 1) {

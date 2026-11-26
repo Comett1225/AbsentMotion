@@ -1,6 +1,9 @@
 {
  "id": "exposure",
- "name": "Exposure",
+ "name": "Exposure / Gamma",
+ "aliases": [
+  "Exposure"
+ ],
  "category": "color",
  "description": "Simulates photographic exposure with stops, offset, and gamma correction. Brighten See-Through Parts lets partly transparent pixels, such as a blurred edge, brighten past white.",
  "params": [

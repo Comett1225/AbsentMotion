@@ -2,6 +2,9 @@
  "id": "channelremaphsv",
  "name": "Channel Remap (HSV)",
  "category": "color",
+ "also": [
+  "other"
+ ],
  "since": "3.0.0",
  "description": "Rebuilds hue, saturation, value and alpha from other channels of the layer.",
  "params": [

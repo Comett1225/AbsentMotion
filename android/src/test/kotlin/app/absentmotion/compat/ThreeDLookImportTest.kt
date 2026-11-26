@@ -38,7 +38,7 @@ class ThreeDLookImportTest {
     private fun p(name: String, type: String, value: String) = """<property name="$name" type="$type" value="$value" />"""
 
     @Test fun untouchedSolidsGetAlightsSoftLightAndTiledPicture() {
-        for (id in listOf("box", "cube2", "cylinder", "hexprism", "octahedron", "torus", "spherize2")) {
+        for (id in listOf("triprism")) {
             val e = migrate(alight(id))
             assertEquals(id, 2f, e.floats("lighting")[0])
             assertEquals(id, 0.027f, e.floats("ambient")[0], 1e-6f)
@@ -50,12 +50,74 @@ class ThreeDLookImportTest {
             assertEquals(id, 1f, e.floats("texMode")[0])
         }
         assertEquals(2f, migrate(alight("extrude")).floats("lighting")[0])
+        for (id in listOf("heart", "heart2")) {
+            val heart = migrate(alight(id))
+            assertEquals(id, listOf(1f, 550f, 2.5f, 1f), listOf("alight", "alZ", "heartSize", "shading").map { heart.floats(it)[0] })
+            near(listOf(0f, 76f), heart.floats("position"))
+        }
         val star = migrate(alight("starprism"))
-        assertEquals(listOf(0f, 0.64f), listOf("shine", "shading").map { star.floats(it)[0] })
+        assertEquals(listOf(1f, 250f, 0.8f, 1f), listOf("alight", "alZ", "shine", "shading").map { star.floats(it)[0] })
+        near(listOf(100f, -75f), star.floats("alLight"))
+        assertEquals(listOf(1.5f, 0.2f, 0.547f), listOf("radius", "depth", "inner").map { star.floats(it)[0] })
+    }
+
+    @Test fun cubeUsesAlightsCameraAndLight() {
+        val e = migrate(alight("cube2"))
+        assertEquals(1f, e.floats("alight")[0])
+        assertEquals(600f, e.floats("alZ")[0], 1e-6f)
+        near(listOf(0f, 100f), e.floats("position"))
+        assertEquals(0.1f, e.floats("ambient")[0], 1e-6f)
+        assertEquals(1f, e.floats("shading")[0], 1e-6f)
+        assertEquals(30f, e.floats("glossiness")[0], 1e-4f)
+        assertEquals(45f, e.floats("light")[0], 1e-6f)
+        assertEquals(3.8654f, e.floats("lightHeight")[0], 1e-4f)
+        val moved = migrate(alight("cube2", p("position", "vec3", "-40,150,900") + p("lightDir", "vec2", "0,-50") + p("lightDepth", "float", "200") + p("lightIntensity", "float", "1.6")))
+        near(listOf(-40f, 150f), moved.floats("position"))
+        assertEquals(900f, moved.floats("alZ")[0], 1e-4f)
+        assertEquals(90f, moved.floats("light")[0], 1e-4f)
+        assertEquals(16.4f, moved.floats("lightHeight")[0], 1e-3f)
+        assertEquals(1.6f, moved.floats("shading")[0], 1e-6f)
+        near(listOf(75f, -75f), e.floats("alLight"))
+        assertEquals(100f, e.floats("alElev")[0], 1e-6f)
+        near(listOf(0f, -50f), moved.floats("alLight"))
+        assertEquals(200f, moved.floats("alElev")[0], 1e-4f)
+    }
+
+    @Test fun oldCubeIsABoxWithThePictureStretchedOverEachFace() {
+        val e = migrate(alight("cube"))
+        assertEquals("absent.box", e["id"])
+        near(listOf(1f, 1f, 2f, 100f, 2f), listOf("alight", "faceStyle", "texMode", "alZ", "scale").map { e.floats(it)[0] })
+        near(listOf(0.5f, 0.5f, 0.5f, 0.895f, 0.021f), listOf("width", "height", "depth", "shading", "shine").map { e.floats(it)[0] })
+        near(listOf(0f, 100f), e.floats("position"))
+        val sized = migrate(alight("cube", p("width", "float", "2") + p("height", "float", "0.5") + p("enableLight", "bool", "false")))
+        near(listOf(1f, 0.25f, 1f, 0f, 1f), listOf("width", "height", "shading", "shine", "lightStyle").map { sized.floats(it)[0] })
+        assertEquals(150f, migrate(alight("cube", p("zdist", "float", "0.5"))).floats("alZ")[0], 1e-4f)
+    }
+
+    @Test fun hexagonalPrismStandsUpInAlightsCamera() {
+        val e = migrate(alight("hexprism"))
+        assertEquals(1f, e.floats("alight")[0])
+        assertEquals(500f, e.floats("alZ")[0], 1e-6f)
+        near(listOf(0f, 55f), e.floats("position"))
+        assertEquals(listOf(1f, 3f), listOf("radius", "depth").map { e.floats(it)[0] })
+        val sized = migrate(alight("hexprism", p("radius", "float", "1.6") + p("height", "float", "1.5")))
+        assertEquals(listOf(1.6f, 1.5f), listOf("radius", "depth").map { sized.floats(it)[0] })
+    }
+
+    @Test fun ellipsoidUsesAlightsCameraAndItsOwnHeight() {
+        val e = migrate(alight("ellipsoid"))
+        assertEquals(1f, e.floats("alight")[0])
+        assertEquals(550f, e.floats("alZ")[0], 1e-6f)
+        near(listOf(0f, 80f), e.floats("position"))
+        assertEquals(2.5f, e.floats("radius")[0], 1e-6f)
+        val moved = migrate(alight("ellipsoid", p("position", "vec3", "30,-20,700") + p("radius", "float", "1.5")))
+        near(listOf(30f, 80f), moved.floats("position"))
+        assertEquals(700f, moved.floats("alZ")[0], 1e-4f)
+        assertEquals(1.5f, moved.floats("radius")[0], 1e-6f)
     }
 
     @Test fun alightsLightSettingsBecomeTheSoftLight() {
-        val r = result(alight("cylinder", p("shadingType", "int", "1") + p("lightIntensity", "float", "1.25") + p("ambient", "float", "0.325") +
+        val r = result(alight("triprism", p("shadingType", "int", "1") + p("lightIntensity", "float", "1.25") + p("ambient", "float", "0.325") +
             p("spec", "float", "60") + p("shine", "float", "0.85") + p("lightColor", "color", "#FF3366CC") + p("lightDir", "vec2", "115,-100") + p("lightDepth", "float", "275")))
         val e = r.scene.node.children.single { it.name == "shape" }.children.single { it.name == "effect" }
         assertEquals(1f, e.floats("shading")[0], 1e-5f)
@@ -102,30 +164,32 @@ class ThreeDLookImportTest {
         assertEquals(1.3333f, zoomed.floats("frame")[0], 1e-4f)
     }
 
-    @Test fun untouchedPlusIsASmallLowCrossWithoutTheLayer() {
+    @Test fun untouchedPlusUsesAlightsCameraWithoutTheLayer() {
         val e = migrate(alight("plus"))
         assertEquals("false", e.text("keep"))
-        assertEquals(listOf(0f, 13.5f), e.floats("position"))
-        assertEquals(0.36f, e.floats("reach")[0], 1e-6f)
-        assertEquals(0.18f, e.floats("thickness")[0], 1e-6f)
+        assertEquals(listOf(1f, 500f, 1f), listOf("alight", "alZ", "scale").map { e.floats(it)[0] })
+        assertEquals(listOf(0f, 55f), e.floats("position"))
+        assertEquals(1f, e.floats("reach")[0], 1e-6f)
+        assertEquals(0.5f, e.floats("thickness")[0], 1e-6f)
     }
 
-    @Test fun untouchedPyramidShowsAnEdgeFromSlightlyAbove() {
+    @Test fun pyramidUsesAlightsCameraWithAnEdgeFacingYou() {
         val e = migrate(alight("pyramid"))
-        assertEquals(listOf(-8.45f, 44.69f, 5.97f, 1f), listOf("rotX", "rotY", "rotZ", "scale").map { e.floats(it)[0] })
-        assertEquals(0.69f, e.floats("base")[0], 1e-6f)
-        assertEquals(0.5f, e.floats("perspective")[0], 1e-6f)
-        assertEquals(0.95f, e.floats("height")[0], 1e-6f)
+        assertEquals(listOf(0f, 0f, 0f, 3f), listOf("rotX", "rotY", "rotZ", "scale").map { e.floats(it)[0] })
+        assertEquals(listOf(1f, 500f, 1f, 1f), listOf("alight", "alZ", "base", "height").map { e.floats(it)[0] })
+        near(listOf(0f, 55f), e.floats("position"))
         assertEquals(1.5f, migrate(alight("pyramid", p("scale", "float", "1.5"))).floats("scale")[0], 1e-6f)
     }
 
-    @Test fun starPolyhedronBecomesAPointedStar() {
-        val e = migrate(alight("starpoly"))
-        assertEquals("absent.starprism", e["id"])
-        assertEquals(listOf(1f, 5f, 0.89f, 0.5f), listOf("starStyle", "points", "radius", "inner").map { e.floats(it)[0] })
+    @Test fun starPolyhedronKeepsAlightsSettings() {
+        val e = migrate(alight("starpoly", p("size", "float", "0.5") + p("height", "float", "0.5") + p("pointLength", "float", "1") +
+            p("position", "vec3", "0,100,500") + p("scale", "float", "3")))
+        assertEquals("absent.starpolyhedron", e["id"])
+        near(listOf(1f, 50f, 50f, 100f, 500f, 3f), listOf("style", "starSize", "starDepth", "pointLength", "alZ", "alScale").map { e.floats(it)[0] })
+        near(listOf(0f, 100f), e.floats("alPos"))
         val seven = migrate(alight("starpoly", p("pointCount", "float", "7") + p("pointLength", "float", "2")))
         assertEquals(7f, seven.floats("points")[0], 1e-6f)
-        assertEquals(1.78f, seven.floats("radius")[0], 1e-5f)
+        assertEquals(200f, seven.floats("pointLength")[0], 1e-4f)
     }
 
     @Test fun oldSpherizeSwitchesItsDirectLightWithAlightsLightSwitch() {
@@ -176,26 +240,28 @@ class ThreeDLookImportTest {
         assertTrue(plain.children.none { it["name"] == "pivotDepth" })
     }
 
-    @Test fun untouchedStarPrismIsAFatterStarWithThePictureOnItsBoundingBox() {
-        val e = migrate(alight("starprism"))
-        near(listOf(0.5f, 1.0515f, 1.1056f), listOf("inner", "texRepeatX", "texRepeatY").map { e.floats(it)[0] })
-        near(listOf(0f, -0.0527f), e.floats("texOffset"))
+    @Test fun starPrismIsAFatterStarWithItsOwnSizeAndRepeats() {
+        val e = migrate(alight("starprism", p("size", "float", "2") + p("thickness", "float", "0.4")))
+        near(listOf(0.547f, 3f, 0.4f), listOf("inner", "radius", "depth").map { e.floats(it)[0] })
         val tiled = migrate(alight("starprism", p("texRepeatX", "float", "2") + p("texRepeatY", "float", "3")))
-        near(listOf(2.103f, 3.3168f), listOf("texRepeatX", "texRepeatY").map { tiled.floats(it)[0] })
+        near(listOf(2f, 3f), listOf("texRepeatX", "texRepeatY").map { tiled.floats(it)[0] })
     }
 
-    @Test fun spherizeTwoWrapsThePictureRoundTheGlobe() {
-        assertEquals(1f, migrate(alight("spherize2")).floats("projection")[0])
+    @Test fun spherizeTwoWrapsThePictureRoundTheGlobeInAlightsCamera() {
+        val e = migrate(alight("spherize2"))
+        assertEquals(listOf(1f, 1f, 550f, 2.5f), listOf("projection", "alight", "alZ", "radius").map { e.floats(it)[0] })
+        near(listOf(0f, 80f), e.floats("position"))
     }
 
-    @Test fun untouchedOctahedronSitsLowerAndALittleLarger() {
+    @Test fun octahedronUsesAlightsCameraAndSize() {
         val e = migrate(alight("octahedron"))
-        near(listOf(0f, 12.6f), e.floats("position"))
-        assertEquals(0.99f, e.floats("radius")[0], 1e-6f)
+        near(listOf(0f, 55f), e.floats("position"))
+        assertEquals(listOf(1f, 500f, 3f), listOf("alight", "alZ", "radius").map { e.floats(it)[0] })
+        assertEquals(2f, migrate(alight("octahedron", p("size", "float", "2"))).floats("radius")[0], 1e-6f)
     }
 
     @Test fun untouchedPageCurlRollsTheBottomRightCorner() {
         val e = migrate(alight("pagecurl"))
-        near(listOf(0.3647f, 0.15f, 56f, 0f, 1f), listOf("progress", "radius", "angle", "backAlpha", "roll").map { e.floats(it)[0] })
+        near(listOf(0.4f, 0.1f, 38f, 0f, 1f, 1f), listOf("progress", "radius", "angle", "backAlpha", "roll", "space").map { e.floats(it)[0] })
     }
 }

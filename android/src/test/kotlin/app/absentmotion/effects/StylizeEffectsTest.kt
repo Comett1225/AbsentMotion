@@ -44,7 +44,7 @@ class StylizeEffectsTest {
             }
         }
         assertEquals("Hz", effect("blink").params.single { it.id == "frequency" }.unit)
-        assertEquals(listOf("Frequency", "Strength", "Seed", "Mode"), effect("flicker").params.map { it.label })
+        assertEquals(listOf("Frequency", "Strength", "Seed", "Mode", "Style"), effect("flicker").params.map { it.label })
         assertEquals(20f, effect("sharpen").params.first().max)
         assertEquals(10f, effect("sharpen").params.single { it.id == "radius" }.max)
         assertEquals(4f, effect("rays").params.single { it.id == "reach" }.max)
@@ -72,7 +72,7 @@ class StylizeEffectsTest {
         val result = migration.migrate(source)
         val effects = result.scene.node.children.single().children
         assertEquals("2.000000", values(effects[0], "name")["frequency"])
-        assertEquals(mapOf("speed" to "7.000000", "intensity" to "0.750000", "seed" to "0.000000", "style" to "1.000000"), values(effects[1], "name"))
+        assertEquals(mapOf("speed" to "7.000000", "intensity" to "0.750000", "seed" to "0.000000", "style" to "1.000000", "wave" to "1.000000"), values(effects[1], "name"))
         assertEquals("#ffff5566", values(effects[2], "name")["color"])
         assertEquals("1.000000", values(effects[2], "name")["opacity"])
         assertEquals("absent.checker", effects[3]["id"])

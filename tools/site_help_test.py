@@ -238,6 +238,23 @@ class WebsiteSearchTest(unittest.TestCase):
         self.assertNotIn("ld+json", self.files["getting-started.html"].decode())
         self.assertIn("assets/og.png", self.files)
 
+    def test_moved_effect_pages_redirect_to_the_new_page(self):
+        site = dict(self.files)
+        sb.add_moved(site, sb.load_effects(), True)
+        stub = site["effects/framerate.html"].decode()
+        self.assertIn('content="0; url=timequantization"', stub)
+        self.assertIn('<link rel="canonical" href="%seffects/timequantization">' % sb.SITE_URL, stub)
+        self.assertNotIn(sb.SITE_URL + "effects/framerate", site["sitemap.xml"].decode())
+        english = sb.Site("app")
+        app = english.build()
+        locale = make(english, "ar", locale_data(english, "ar"))
+        app.update(sb.Site("app", locale, english).build(), **{"assets/rtl.css": sb.RTL_CSS.encode()})
+        sb.add_moved(app, english.effects, False)
+        for path in ("effects/liftgammagain.html", "ar/effects/liftgammagain.html"):
+            self.assertIn('content="0; url=colortune.html"', app[path].decode())
+        self.assertIn('<html lang="ar" dir="rtl">', app["ar/effects/framerate.html"].decode())
+        self.assertEqual([], sb.check_links(site, "site") + sb.check_links(app, "app") + sb.check_app_html(app))
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=1)

@@ -221,7 +221,9 @@ class FontLibrary(context: Context) {
             localFile(name)?.let { return@withLock it }
             if (System.currentTimeMillis() - (failed[name] ?: 0L) < 60_000) return@withLock null
             runCatching {
-                val css = request("https://fonts.googleapis.com/css2?family=${Uri.encode(font.family)}:ital,wght@${if (font.italic) 1 else 0},${font.weight}") { it.reader().readText() }
+                val css = styleCss(font) ?: renderFile(name)?.let { return@withLock it }
+                    ?: googleFonts().firstOrNull { GoogleFonts.key(it.family) == GoogleFonts.key(font.family) }?.nearest(font.weight, font.italic)?.takeIf { it != font }?.let(::styleCss)
+                    ?: error(AppText.get(R.string.font_err_unavailable))
                 val fontUrl = Regex("url\\((https://fonts\\.gstatic\\.com/[^)]+)\\)").find(css)?.groupValues?.get(1) ?: error(AppText.get(R.string.font_err_unavailable))
                 val temporary = File.createTempFile("download-", ".font", cache)
                 try {
@@ -232,15 +234,23 @@ class FontLibrary(context: Context) {
                     fontRevision.update { it + 1 }
                     destination
                 } finally { temporary.delete() }
-            }.onSuccess { failed.remove(name) }.getOrElse { failed[name] = System.currentTimeMillis(); null }
+            }.onSuccess { failed.remove(name) }.getOrElse { if (it is app.absentmotion.platform.MobileDataRefused) mobileRefused = true; failed[name] = System.currentTimeMillis(); null }
         }
     }
-    suspend fun fetchMissing(scene: Scene): List<String> =
-        scene.fontNames().filter { FontName.parse(it).source == "googlefonts" && resolve(it, download = true) == null }
+    @Volatile private var mobileRefused = false
+    private fun styleCss(font: FontName): String? = runCatching {
+        request("https://fonts.googleapis.com/css2?family=${Uri.encode(font.family)}:ital,wght@${if (font.italic) 1 else 0},${font.weight}") { it.reader().readText() }
+    }.getOrElse { if (it is app.absentmotion.platform.MobileDataRefused) throw it else null }
+    suspend fun fetchMissing(scene: Scene, again: (suspend () -> Boolean)? = null): List<String> {
+        val missing = scene.fontNames().filter { FontName.parse(it).source == "googlefonts" && resolve(it, download = true) == null }
+        if (missing.isEmpty() || again?.invoke() != true) return missing
+        missing.forEach { failed.remove(it) }
+        return missing.filter { resolve(it, download = true) == null }
+    }
     private fun <T> request(url: String, read: (java.io.InputStream) -> T): T {
         val target = URL(url)
         require(target.protocol == "https" && target.host in listOf("fonts.googleapis.com", "fonts.gstatic.com", "fonts.google.com"))
-        app.absentmotion.platform.MobileData.check()
+        app.absentmotion.platform.MobileData.check(quiet = mobileRefused)
         val connection = target.openConnection() as HttpsURLConnection
         connection.instanceFollowRedirects = false
         connection.connectTimeout = 10000

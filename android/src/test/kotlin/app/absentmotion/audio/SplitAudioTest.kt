@@ -99,6 +99,41 @@ class SplitAudioTest {
         assertTrue(later.drop(half + 1000).maxOf { abs(it) } > 0.4f)
     }
 
+    @Test fun aSplitClipWhoseSecondDecoderFailsComesBackWhilePlaying() {
+        var scene = sceneXml("""<audio id="1" src="tone" startTime="0" endTime="3999" outTime="30000"/>""")
+        val (first, second) = scene.splitAt(scene.layer(1)!!, 45, 2)!!
+        scene = scene.update(1) { first }.add(second)
+        val clips = AudioClip.of(scene)
+        val secondOpens = java.util.concurrent.atomic.AtomicInteger()
+        val failures = java.util.concurrent.atomic.AtomicInteger()
+        val streams = HashMap<Long, LayerStream>()
+        val rack = FxRack(RATE) { _, _ -> null }
+        val out = FloatArray(2 * FRAME)
+        val dt = 1000.0 / RATE
+        val heard = mutableListOf<Double>()
+        val begin = System.nanoTime()
+        try {
+            for (i in 0 until 2500 * RATE / 1000 / FRAME) {
+                val t0 = 1000.0 + i * FRAME * dt
+                streams.keepFor(clips, t0, { false }) { clip ->
+                    if (clip.id == 2L && secondOpens.incrementAndGet() == 1) { failures.incrementAndGet(); throw IllegalStateException("codec busy") }
+                    Tone(440.0)
+                }
+                mixStreams(clips, out, FRAME, t0, RATE, Resampler.ULTRA, rack) { c -> streams[c.id]?.takeIf { it.uri == c.uri } }
+                if ((0 until 2 * FRAME).any { abs(out[it]) > 0.05f }) heard += t0
+                val wait = begin + (i + 1) * FRAME * 1_000_000_000L / RATE - System.nanoTime()
+                if (wait > 0) Thread.sleep(wait / 1_000_000, (wait % 1_000_000).toInt())
+            }
+        } finally {
+            streams.values.forEach { it.close() }
+        }
+        assertEquals(1, failures.get())
+        val firstAfterCut = heard.firstOrNull { it >= 1500.0 }
+        assertTrue("no sound after the cut", firstAfterCut != null)
+        assertTrue("sound came back only at $firstAfterCut ms", firstAfterCut!! < 2500.0)
+        assertTrue("sound stopped again after the cut", heard.count { it >= 2500.0 } >= (3500 - 2500) * RATE / 1000 / FRAME - 1)
+    }
+
     @Test fun aStreamOpenedDeepInItsMediaPlaysInsteadOfStayingSilent() {
         val source = Tone(440.0)
         val stream = LayerStream("tone", 4500.0 - LayerStream.LEAD_MS) { source }

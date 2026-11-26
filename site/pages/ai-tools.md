@@ -80,6 +80,8 @@ Select a sound clip and tap **AI** in the tool grid (or **Reduce Noise** in the 
 - **Wind and rumble**: "Cuts low rumble and wind, then cleans up the rest."
 - **Music or mixed sound**: "A gentle clean-up that keeps more of the original."
 
+**Amount** sets how much of the noise is taken out; lower it to keep a little of the room sound. The first time, the button says **Download and start** and the noise model (about 4.1 MB) is downloaded once; if it cannot be downloaded, the built-in noise reduction is used.
+
 Tap **Start**. The cleaned sound is saved as a new audio file for the clip, in mono, and the original stays untouched: the clip's effect list shows a **Reduce Noise** row with an AI badge and a button to bring back the original. For a video, use **Extract Audio** first and then clean the new audio layer.
 
 ## Enhance (video)
@@ -132,7 +134,7 @@ Each level has its own model, downloaded once (about 11 MB) after the app has sh
 |---|---|---|---|
 | Speech model for captions | After you confirm the download | about 264 MB Standard, or 874 MB Higher precision | Hugging Face |
 | Background removal model | The first time you remove a background | about 3 MB | this project's GitHub releases |
-| Noise reduction | Never: it is inside the app | | |
+| Noise reduction model | The first time you reduce noise, after you tap Download and start | about 4.1 MB | this project's GitHub releases |
 | AI Enhance models | The first time you use Enhance, after you tap Download and start | about 2.4 MB (cartoon 1.3 MB, film grain 2.4 MB more) | this project's GitHub releases |
 | AI Enhance Max models | The first time you choose Max for an image, computers only | about 32 MB Realistic or 8.6 MB Anime and cartoon | this project's GitHub releases |
 | AI background removal 2.0 | The first time you remove a background with AI background removal 2.0 | about 62 MB | this project's GitHub releases |

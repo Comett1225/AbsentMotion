@@ -30,14 +30,12 @@ class AlightKeyAndLookImportTest {
             <property name="haloSpread" type="float" value="42.5" /><property name="clip" type="float" value="0.5" /><property name="progress" type="float" value="0.75" />
             <property name="fstr" type="float" value="0.265" /><property name="freq" type="float" value="20" /><property name="blendMode" type="int" value="1" /></effect>""")
         assertEquals("absent.energybeam", beam["id"])
-        assertEquals(-160f / 6f, beam.floats("from")[0], 0.02f)
-        assertEquals(-225f / 6f, beam.floats("from")[1], 0.02f)
-        assertEquals(240f / 6f, beam.floats("to")[0], 0.02f)
-        assertEquals(175f / 6f, beam.floats("to")[1], 0.02f)
+        assertEquals(listOf(-160f, -225f), beam.floats("from"))
+        assertEquals(listOf(240f, 175f), beam.floats("to"))
         assertEquals("#FF3366CC", beam.value("color"))
         assertEquals("#FF112233", beam.value("haloColor"))
-        assertEquals(listOf(6f, 0.75f, 1f, 0.475f, 42.5f, 0.5f, 0.75f, 0.265f, 6f, 0f),
-            listOf("width", "dim", "glow", "halo", "haloWidth", "span", "progress", "wiggle", "frequency", "blend").map { beam.floats(it)[0] })
+        listOf(36f, 0.75f, 0f, 2.5f, 0.475f, 42.5f, 0.5f, 1f, 0.265f, 6f, 0f).zip(listOf("width", "opacity", "dim", "glow", "halo", "haloWidth", "span", "progress", "wiggle", "frequency", "blend"))
+            .forEach { (want, name) -> assertEquals(name, want, beam.floats(name)[0], 1e-4f) }
     }
 
     @Test fun lumaStamperTurnsClipsIntoBlackAndWhitePoints() {
@@ -75,8 +73,8 @@ class AlightKeyAndLookImportTest {
             <property name="lineWidth" type="float" value="0.5" /><property name="feather" type="float" value="0.25" /><property name="angle" type="float" value="900" /></effect>""")
         assertEquals("absent.hexgrid", hex["id"])
         assertEquals(listOf(40f, -25f), hex.floats("offset"))
-        assertEquals(listOf(60f, 2f, 1f, 0.75f, 1f, 0.15f, 0.25f, 180f),
-            listOf("cell", "stretch", "colors", "opacity", "blend", "gap", "feather", "angle").map { hex.floats(it)[0] })
+        listOf(33f, 2f, 0f, 0.75f, 1f, 0.5f, 0.25f, 180f, 1f).zip(listOf("cell", "stretch", "colors", "opacity", "blend", "gap", "feather", "angle", "alight"))
+            .forEach { (want, name) -> assertEquals(name, want, hex.floats(name)[0], 1e-4f) }
         assertEquals(listOf("#FF3366CC", "#FF112233", "#FF445566"), listOf("color1", "color2", "color3").map { hex.value(it) })
         assertTrue(dropped.isEmpty())
     }

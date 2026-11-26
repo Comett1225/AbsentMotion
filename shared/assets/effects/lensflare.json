@@ -1,14 +1,18 @@
 {
  "id": "lensflare",
- "name": "Light Flare",
+ "name": "Lens Flare",
  "category": "stylize",
- "description": "A bright light with a halo, laid over the picture.",
+ "description": "A bright light with a star, a halo and rings of reflections, laid over the picture.",
  "params": [
   {
    "id": "center",
    "label": "Center",
    "type": "point",
    "default": [
+    0.75,
+    0.25
+   ],
+   "legacyDefault": [
     0.3,
     0.3
    ],
@@ -20,26 +24,107 @@
    "id": "radius",
    "label": "Radius",
    "type": "float",
-   "default": 0.25,
-   "min": 0.01,
-   "max": 2,
+   "default": 1,
+   "legacyDefault": 0.25,
+   "min": 0,
+   "max": 5,
    "step": 0.01
   },
   {
    "id": "brightness",
    "label": "Brightness",
    "type": "float",
-   "default": 1,
+   "default": 3,
+   "legacyDefault": 1,
    "min": 0,
-   "max": 4,
+   "max": 10,
    "step": 0.01
+  },
+  {
+   "id": "shine",
+   "label": "Shine",
+   "type": "float",
+   "default": -0.8,
+   "min": -1,
+   "max": 1,
+   "step": 0.01,
+   "when": {
+    "style": [
+     1
+    ]
+   }
   },
   {
    "id": "color",
    "label": "Color",
    "type": "color",
-   "default": "#ffffe0b0"
+   "default": "#ff2d1ef6",
+   "legacyDefault": "#ffffe0b0"
+  },
+  {
+   "id": "points",
+   "label": "Points",
+   "type": "float",
+   "default": 6,
+   "min": 0,
+   "max": 24,
+   "step": 1,
+   "when": {
+    "style": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "alpha",
+   "label": "Alpha",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true,
+   "when": {
+    "style": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "blendMode",
+   "label": "Blending Mode",
+   "type": "choice",
+   "default": 2,
+   "options": [
+    "Normal",
+    "Multiply",
+    "Screen"
+   ],
+   "when": {
+    "style": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 1,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "legacyDefault": 0,
+   "when": {
+    "style": [
+     0
+    ]
+   }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 center;\nuniform float radius;\nuniform float brightness;\nlayout(color) uniform half4 color;\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    float d = distance(coord, center * size) / max(radius * max(size.x, size.y), 0.0001);\n    float light = brightness * (exp(-d * d * 6) + 0.35 * exp(-(d - 1) * (d - 1) * 60));\n    half3 rgb = c.rgb + color.rgb * half(light);\n    return half4(rgb, max(c.a, max(rgb.r, max(rgb.g, rgb.b))));\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float2 center;\nuniform float radius;\nuniform float brightness;\nlayout(color) uniform half4 color;\nuniform float shine;\nuniform float points;\nuniform float alpha;\nuniform float blendMode;\nuniform float style;\nhalf4 classic(float2 coord) {\n    half4 c = image.eval(coord);\n    float d = distance(coord, center * size) / max(radius * max(size.x, size.y), 0.0001);\n    float light = brightness * (exp(-d * d * 6) + 0.35 * exp(-(d - 1) * (d - 1) * 60));\n    half3 rgb = c.rgb + color.rgb * half(light);\n    return half4(rgb, max(c.a, max(rgb.r, max(rgb.g, rgb.b))));\n}\nfloat ghost(float2 p, float2 c, float r, float a, float b, float w, float e) {\n    float d = distance(p, c);\n    return a * (1.0 - smoothstep(r - e, r + e, d)) + (d < r + e ? b * exp(-((d - r + w) / w) * ((d - r + w) / w)) : 0.0);\n}\nfloat byShine(float a, float b, float c, float d) {\n    float t = clamp(shine, -0.8, 0.5);\n    return t < -0.4 ? mix(a, b, (t + 0.8) / 0.4) : t < 0.0 ? mix(b, c, (t + 0.4) / 0.4) : mix(c, d, t / 0.5);\n}\nfloat flareValue(float2 coord) {\n    float s = 0.5 * min(size.x, size.y);\n    float near = length(center * size - 0.5 * size) / max(s, 0.0001);\n    float grow = max(0.689 - 0.405 * near, 0.05) / 0.403;\n    float ringR = max(radius * s * (0.72 + 0.4 * shine) * grow, 0.0001);\n    float2 d = coord - center * size;\n    float r = length(d);\n    float u = r / ringR;\n    float u0 = s * (0.337 * radius - 0.019) * byShine(1.0, 1.155, 1.28, 1.37) ;\n    float lam = max(s * 0.0565 * radius * byShine(1.0, 1.0, 0.77, 0.655) , 0.0001);\n    float c = 1.0 - exp(-exp((u0 - r) / lam)) + byShine(0.45, 0.287, 0.229, 0.224) * pow(grow, -1.3) * exp(-0.5 * (u - 1.0) * (u - 1.0) / 0.0004) + byShine(0.12, 0.0, 0.0, 0.0) * (1.0 - smoothstep(1.0, 1.14, u)) * smoothstep(0.95, 1.0, u);\n    float x = min(u, 0.97) - 0.75;\n    float inner = byShine(-2.018, -0.993, -0.299, 0.598) * x * x + byShine(0.428, 0.008, -0.136, -0.07) * x + byShine(0.1225, 0.1357, 0.1094, 0.0631);\n    float outer = byShine(0.128, 0.102, 0.084, 0.082);\n    float umin = byShine(0.658, 0.565, 0.493, 0.425);\n    float h = pow(grow, -0.5) * mix(inner, outer, smoothstep(0.97, 1.05, u)) * smoothstep(umin - 0.01, umin + 0.09, u) * (1.0 - smoothstep(ringR + 0.02 * s, ringR + 0.062 * s, r)) + byShine(0.0, 0.034, 0.051, 0.055) * exp(-0.5 * (u - 1.0) * (u - 1.0) / 0.0004) + 0.016 * exp(-(u - 1.2) / 0.1) * smoothstep(1.12, 1.2, u) * byShine(1.0, 0.0, 0.0, 0.0);\n    float n = max(floor(points + 0.5), 1.0);\n    float sector = 6.2831853 / n;\n    float a = atan(d.y, d.x) + 1.5707963;\n    float delta = a - sector * floor(a / sector + 0.5);\n    float across = r * abs(sin(delta));\n    float pr = max(radius * s * 0.403 * max(1.0 + 0.323 * (0.708 - near), 0.2), 0.0001);\n    float up = r / pr;\n    float edge = r * sin(min(sqrt(max(1.0 - up, 0.0) / 7.2) * 6.0 / n, 1.5));\n    float petal = up < 1.0 ? 1.0 - smoothstep(-0.025 * pr, 0.025 * pr, across - edge) : 0.0;\n    float sigma = 0.069 * pr;\n    float streak = up > 0.9 ? min(1.0, 0.67 * pow(max(brightness, 0.0), 0.13) * exp(-(up - 1.057) / (0.09 * sqrt(max(brightness, 0.01))))) * exp(-across * across / (sigma * sigma)) : 0.0;\n    float spike = points >= 0.5 ? max(petal, streak) : 0.0;\n    float2 mid = 0.5 * size;\n    float2 axis = center * size - mid;\n    float unit = radius * s / 1080.0;\n    float g = 0.0;\n    g += ghost(coord, mid + 0.1430 * axis, unit * 85.00, 0.0521, 0.0224, unit * 7.16, unit * 7.86);\n    g += ghost(coord, mid + 0.0355 * axis, unit * 49.20, 0.0562, 0.0151, unit * 7.79, unit * 9.05);\n    g += ghost(coord, mid + -0.1273 * axis, unit * 35.00, 0.0390, 0.0172, unit * 6.00, unit * 5.61);\n    g += ghost(coord, mid + -0.4827 * axis, unit * 148.28, 0.0479, 0.0175, unit * 13.82, unit * 11.10);\n    g += ghost(coord, mid + -0.7822 * axis, unit * 232.84, 0.0465, 0.0211, unit * 37.18, unit * 40.57);\n    g += ghost(coord, mid + -0.6246 * axis, unit * 79.15, 0.1054, 0.0000, unit * 7.00, unit * 109.21);\n    g += ghost(coord, mid + -0.9952 * axis, unit * 165.17, 0.0767, 0.0035, unit * 27.78, unit * 25.96);\n    g += ghost(coord, mid + -1.1322 * axis, unit * 156.96, 0.0870, 0.0230, unit * 25.15, unit * 171.87);\n    g += ghost(coord, mid + 0.5943 * axis, unit * 140.72, 0.0753, 0.0387, unit * 23.03, unit * 13.84);\n    g += ghost(coord, mid + 0.4508 * axis, unit * 26.64, 0.2179, 0.1237, unit * 1.69, unit * 62.53);\n    float2 q = coord - (mid - 0.643 * axis);\n    float rq = length(q);\n    float aq = atan(q.y, q.x) + 1.5707963;\n    float dq = aq - sector * floor(aq / sector + 0.5);\n    float dw = aq + 0.5 * sector - sector * floor((aq + 0.5 * sector) / sector + 0.5);\n    float sw = max(unit * 1.2, 0.6);\n    float rays = points >= 0.5 ? 0.45 * exp(-rq / (60.0 * unit)) * exp(-pow(rq * sin(dq) / sw, 2.0)) + 0.13 * exp(-rq / (80.0 * unit)) * exp(-pow(rq * sin(dw) / sw, 2.0)) : 0.0;\n    float v = 1.0 - (1.0 - clamp(c, 0.0, 1.0)) * (1.0 - clamp(min(brightness, 3.0) * h, 0.0, 1.0)) * (1.0 - spike) * (1.0 - clamp(brightness * (g + rays), 0.0, 1.0));\n    return clamp(v, 0.0, 1.0);\n}\nhalf4 standard(float2 coord) {\n    half4 base = image.eval(coord);\n    float v = coord.x >= 0.0 && coord.y >= 0.0 && coord.x <= size.x && coord.y <= size.y ? flareValue(coord) : 0.0;\n    float3 tint = float3(color.rgb) / max(float(color.a), 0.0001);\n    float top = max(max(tint.r, tint.g), tint.b);\n    float3 k = (tint + 0.189) / (top + 0.189);\n    float3 f = min(float3(v), k * v * max(1.0, 3.4 * v));\n    float a = clamp(alpha, 0.0, 1.0);\n    float3 b = float3(base.rgb);\n    float cover = pow(v, 0.5 + 0.4 * v * v);\n    float3 rgb = blendMode < 0.5 ? f * a + b * (1.0 - a * cover) : blendMode < 1.5 ? b * mix(float3(1.0), f, a) : b + f * a * (1.0 - b);\n    return half4(half3(rgb), blendMode > 0.5 && blendMode < 1.5 ? base.a : max(base.a, half(a * (blendMode < 0.5 ? cover : v))));\n}\nhalf4 main(float2 coord) {\n    return style > 0.5 ? standard(coord) : classic(coord);\n}\n",
+ "aliases": [
+  "Light Flare"
+ ]
 }

@@ -30,6 +30,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.DisposableEffect
@@ -398,8 +399,10 @@ private fun TimelineSurface(view: TimelineView, modifier: Modifier, content: @Co
 @Composable
 private fun DesktopTimelineMenu(view: TimelineView) {
     var stretch by remember { mutableStateOf<Set<Long>?>(null) }
+    var styleAt by remember { mutableStateOf<Offset?>(null) }
     val scope = rememberCoroutineScope()
     stretch?.let { StretchSheet(view.state, it) { stretch = null } }
+    styleAt?.let { p -> Box(Modifier.offset { IntOffset(p.x.roundToInt(), p.y.roundToInt()) }) { PasteStyleMenu(view.state, chosen = MultiSelect.active) { styleAt = null } } }
     val at = view.menuAt ?: return
     val state = view.state
     val id = view.menuId
@@ -413,6 +416,8 @@ private fun DesktopTimelineMenu(view: TimelineView) {
                 DropdownMenuItem(colors = menuColors, text = { Text(stringResource(R.string.crash_copy), fontSize = 14.sp) }, onClick = { close { state.copySelected() } })
             }
             DropdownMenuItem(colors = menuColors, text = { Text(stringResource(R.string.downloader_paste), fontSize = 14.sp) }, enabled = state.canPaste, onClick = { close { state.pasteLayer() } })
+            if (id != null) DropdownMenuItem(colors = menuColors, text = { Text(stringResource(R.string.menu_paste_style), fontSize = 14.sp) }, enabled = state.canPaste, onClick = { close { styleAt = at } },
+                trailingIcon = { Icon(ChromeIcons.ChevronRight, null, Modifier.size(16.dp), tint = Am.OnDarkDim) })
             if (id != null) {
                 DropdownMenuItem(colors = menuColors, text = { Text(stringResource(R.string.home_duplicate), fontSize = 14.sp) }, onClick = { close { state.duplicateChosen() } })
                 DropdownMenuItem(colors = menuColors, text = { Text(stringResource(R.string.timeline_split), fontSize = 14.sp) }, onClick = { close { state.split() } })

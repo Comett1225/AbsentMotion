@@ -1,0 +1,7 @@
+Face Tracking and Text Spacing effects.
+New effects from Alight Motion; Lens Flare and Glow Scan rebuilt.
+Much stronger Reduce Noise and a smoother Deep Glow.
+Community: New page, effect tiles and thumbnails.
+Paste Style pastes effects, animations and transitions.
+Fonts download on their own; split sound no longer goes silent.
+181 Alight Motion effects now look the same, with settings and keyframes kept.

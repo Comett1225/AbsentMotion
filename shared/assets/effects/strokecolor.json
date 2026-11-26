@@ -1,0 +1,16 @@
+{
+ "id": "strokecolor",
+ "name": "Stroke Color",
+ "category": "stylize",
+ "since": "5.3.2",
+ "native": true,
+ "description": "Paints the layer's strokes in one color: the outline of a shape or text, and every pen and brush stroke of a drawing.",
+ "params": [
+  {
+   "id": "color",
+   "label": "Color",
+   "type": "color",
+   "default": "#ff2d1ef6"
+  }
+ ]
+}

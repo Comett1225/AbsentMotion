@@ -9,8 +9,8 @@ import java.security.MessageDigest
 class StagedExport(val file: File, val uri: Uri, val name: String, val ext: String, val mime: String)
 
 object StagedExports {
-    fun key(xml: String, settings: ExportSettings, kind: ExportKind, frame: Int): String =
-        MessageDigest.getInstance("SHA-256").digest((xml + "\n" + settings + "\n" + kind + (if (kind == ExportKind.Frame || kind == ExportKind.FrameAs) "@$frame" else "")).toByteArray())
+    fun key(scene: app.absentmotion.model.Scene, settings: ExportSettings, kind: ExportKind, frame: Int, effects: Long = 0L): String =
+        MessageDigest.getInstance("SHA-256").digest((scene.node.copy(attrs = scene.node.attrs - "modifiedTime").toXml() + "\n" + settings + "\n" + kind + (if (kind == ExportKind.Frame || kind == ExportKind.FrameAs) "@$frame" else "") + "\n" + app.absentmotion.BuildConfig.VERSION_CODE + ":" + effects).toByteArray())
             .joinToString("") { "%02x".format(it) }.take(32)
 
     fun find(context: Context, key: String, name: String, ext: String, mime: String): StagedExport? {

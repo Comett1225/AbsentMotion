@@ -48,7 +48,22 @@
    "max": 1,
    "step": 0.001,
    "percent": true
+  },
+  {
+   "id": "style",
+   "label": "Style",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "when": {
+    "style": [
+     2
+    ]
+   }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform shader blurred;\nuniform float blur;\nuniform float threshold;\nlayout(color) uniform half4 color;\nuniform float blend;\nuniform float alpha;\nfloat luma(float3 c) { return dot(c, float3(0.2126, 0.7152, 0.0722)); }\nhalf4 main(float2 coord) {\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    half4 b = blurred.eval(coord);\n    float lb = b.a > 0.0 ? luma(float3(b.rgb) / float(b.a)) : 1.0;\n    float dark = clamp((threshold - lb) / max(threshold, 0.001), 0.0, 1.0) * clamp(float(b.a), 0.0, 1.0);\n    float3 base = float3(src.rgb) / float(src.a);\n    float3 shade = mix(base * float3(color.rgb), float3(color.rgb), 1.0 - clamp(blend, 0.0, 1.0));\n    float3 rgb = mix(base, shade, dark * clamp(alpha, 0.0, 1.0));\n    return half4(half3(rgb) * src.a, src.a);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform shader blurred;\nuniform float blur;\nuniform float threshold;\nlayout(color) uniform half4 color;\nuniform float blend;\nuniform float alpha;\nuniform float style;\nuniform float4 screen;\nfloat luma(float3 c) { return dot(c, float3(0.2126, 0.7152, 0.0722)); }\nfloat4 shaded(float2 at, float2 cell, float3 k) {\n    float4 c = float4(image.eval(at));\n    return float4(c.rgb * (1.0 - clamp(alpha, 0.0, 1.0) * float(blurred.eval(cell).r) * k), c.a);\n}\nhalf4 standard(float2 coord) {\n    float2 shift = fract(-screen.xy * 0.5);\n    float2 q = coord * 0.5 + shift - 0.5;\n    float2 i0 = floor(q);\n    float2 f = q - i0;\n    float2 cell = i0 + 0.5;\n    float2 at = 2.0 * (cell - shift);\n    float3 k = 1.0 - clamp(blend, 0.0, 1.0) * float3(color.rgb);\n    float4 top = mix(shaded(at, cell, k), shaded(at + float2(2.0, 0.0), cell + float2(1.0, 0.0), k), f.x);\n    float4 low = mix(shaded(at + float2(0.0, 2.0), cell + float2(0.0, 1.0), k), shaded(at + float2(2.0, 2.0), cell + float2(1.0, 1.0), k), f.x);\n    return half4(mix(top, low, f.y));\n}\nhalf4 main(float2 coord) {\n    if (style > 0.5) return standard(coord);\n    half4 src = image.eval(coord);\n    if (src.a <= 0.0) return src;\n    half4 b = blurred.eval(coord);\n    float lb = b.a > 0.0 ? luma(float3(b.rgb) / float(b.a)) : 1.0;\n    float dark = clamp((threshold - lb) / max(threshold, 0.001), 0.0, 1.0) * clamp(float(b.a), 0.0, 1.0);\n    float3 base = float3(src.rgb) / float(src.a);\n    float3 shade = mix(base * float3(color.rgb), float3(color.rgb), 1.0 - clamp(blend, 0.0, 1.0));\n    float3 rgb = mix(base, shade, dark * clamp(alpha, 0.0, 1.0));\n    return half4(half3(rgb) * src.a, src.a);\n}\n"
 }

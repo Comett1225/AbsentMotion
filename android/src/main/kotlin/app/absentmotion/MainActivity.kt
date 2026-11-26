@@ -162,8 +162,6 @@ class MainActivity : ComponentActivity() {
     private var recovered by mutableStateOf<RecoveryOffer?>(null)
     private var crashed by mutableStateOf<CrashEntry?>(null)
     private var importFailed by mutableStateOf<String?>(null)
-    private var fontOffer by mutableStateOf<Pair<EditorState, List<String>>?>(null)
-    private val fontsDeclined = HashSet<String>()
     private var engineProblem by mutableStateOf<String?>(null)
     private var problemShown by mutableStateOf(false)
     private var elementNav: ((String) -> Unit)? = null
@@ -366,16 +364,6 @@ class MainActivity : ComponentActivity() {
                         containerColor = Am.Card,
                     )
                 }
-                fontOffer?.takeIf { it.first === open }?.let { (state, names) ->
-                    AlertDialog(
-                        onDismissRequest = { declineFonts(state) },
-                        title = { Text(stringResource(R.string.fonts_missing_title)) },
-                        text = { Text(stringResource(R.string.fonts_missing_body, names.joinToString(", ") { FontName.parse(it).label })) },
-                        confirmButton = { DialogPill(stringResource(R.string.update_download)) { downloadFonts(names) } },
-                        dismissButton = { DialogPill(stringResource(R.string.update_not_now), primary = false, editor = true) { declineFonts(state) } },
-                        containerColor = Am.Field, titleContentColor = Am.OnDark, textContentColor = Am.OnDark,
-                    )
-                }
                 if (saveFailed && open != null) AlertDialog(
                     onDismissRequest = { saveFailed = false },
                     text = { Text(stringResource(R.string.home_close_save_failed)) },
@@ -570,25 +558,14 @@ class MainActivity : ComponentActivity() {
             reports
         }
 
-    private fun offerFonts(state: EditorState) {
+    private fun installFonts(state: EditorState) {
         val library = engine.fonts ?: return
-        if (state.projectId in fontsDeclined) return
-        lifecycleScope.launch {
-            val missing = withContext(Dispatchers.IO) { library.fetchMissing(state.project) }
-            if (missing.isNotEmpty() && editor === state) fontOffer = state to missing
-        }
-    }
-
-    private fun declineFonts(state: EditorState) {
-        fontsDeclined += state.projectId
-        fontOffer = null
-    }
-
-    private fun downloadFonts(names: List<String>) {
-        fontOffer = null
-        val library = engine.fonts ?: return
-        lifecycleScope.launch {
-            if (names.count { library.resolve(it, download = true) == null } > 0) Toast.makeText(this@MainActivity, getString(R.string.font_load_failed_body), Toast.LENGTH_LONG).show()
+        lifecycleScope.launch(Dispatchers.IO) {
+            library.fetchMissing(state.project) {
+                kotlinx.coroutines.delay(30_000)
+                while (editor === state && Updater.online(this@MainActivity) == false) kotlinx.coroutines.delay(5_000)
+                editor === state
+            }
         }
     }
 
@@ -697,7 +674,7 @@ class MainActivity : ComponentActivity() {
         addedEffects.confirmMissing(scene, id)
         cameFromEditor = true
         val saver = ProjectSaver(id, store, recovery, failed = { runOnUiThread { Toast.makeText(this, getString(R.string.home_save_project_failed), Toast.LENGTH_LONG).show() } })
-        return EditorState(id, scene, store, engine, settings, saver).also { editor = it; offerFonts(it) }
+        return EditorState(id, scene, store, engine, settings, saver).also { editor = it; installFonts(it) }
     }
 
     private fun collectMedia(id: String) {

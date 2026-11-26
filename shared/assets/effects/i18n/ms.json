@@ -16,6 +16,103 @@
   "text": "Teks"
  },
  "effects": {
+  "advancedchromakey": {
+   "description": "Membuang sehingga empat warna sekali gus. Setiap warna boleh dibuang (Kecualikan) atau dilindungi daripada kunci lain (Sertakan), dengan Ambang, Lembutan dan Kepekaan Luma sendiri. Tunjuk Topeng menunjukkan bahagian yang kekal dalam warna merah.",
+   "name": "Kunci Kroma Lanjutan",
+   "params": {
+    "c1active": {
+     "label": "Warna 1"
+    },
+    "c1color": {
+     "label": "Warna"
+    },
+    "c1feather": {
+     "label": "Kelembutan"
+    },
+    "c1luma": {
+     "label": "Kepekaan Luma"
+    },
+    "c1mode": {
+     "label": "Mod",
+     "options": [
+      "Kecualikan",
+      "Sertakan"
+     ]
+    },
+    "c1threshold": {
+     "label": "Ambang"
+    },
+    "c2active": {
+     "label": "Warna 2"
+    },
+    "c2color": {
+     "label": "Warna"
+    },
+    "c2feather": {
+     "label": "Kelembutan"
+    },
+    "c2luma": {
+     "label": "Kepekaan Luma"
+    },
+    "c2mode": {
+     "label": "Mod",
+     "options": [
+      "Kecualikan",
+      "Sertakan"
+     ]
+    },
+    "c2threshold": {
+     "label": "Ambang"
+    },
+    "c3active": {
+     "label": "Warna 3"
+    },
+    "c3color": {
+     "label": "Warna"
+    },
+    "c3feather": {
+     "label": "Kelembutan"
+    },
+    "c3luma": {
+     "label": "Kepekaan Luma"
+    },
+    "c3mode": {
+     "label": "Mod",
+     "options": [
+      "Kecualikan",
+      "Sertakan"
+     ]
+    },
+    "c3threshold": {
+     "label": "Ambang"
+    },
+    "c4active": {
+     "label": "Warna 4"
+    },
+    "c4color": {
+     "label": "Warna"
+    },
+    "c4feather": {
+     "label": "Kelembutan"
+    },
+    "c4luma": {
+     "label": "Kepekaan Luma"
+    },
+    "c4mode": {
+     "label": "Mod",
+     "options": [
+      "Kecualikan",
+      "Sertakan"
+     ]
+    },
+    "c4threshold": {
+     "label": "Ambang"
+    },
+    "showMask": {
+     "label": "Tunjuk Topeng"
+    }
+   }
+  },
   "ascii": {
    "description": "Menukar lapisan menjadi seni teks yang dibuat daripada huruf dan simbol: bahagian yang lebih cerah mendapat aksara yang lebih penuh. Saiz menetapkan lebar setiap aksara pada lapisan, jadi aksara bergerak, berputar dan berskala bersamanya. Warna mengekalkan warna asal imej atau menggunakan satu warna, dan Garis Tepi melukis garis luar dengan aksara | - / dan \\.",
    "name": "ASCII",
@@ -106,6 +203,13 @@
     },
     "slack": {
      "label": "Kelonggaran"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
     },
     "zshake": {
      "label": "Gegaran Z"
@@ -625,12 +729,75 @@
       "Pusat",
       "Penjuru"
      ]
+    },
+    "alight": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
+    },
+    "alZ": {
+     "label": "Kedudukan Z"
+    },
+    "alLight": {
+     "label": "Arah"
+    },
+    "alElev": {
+     "label": "Ketinggian"
+    },
+    "faceStyle": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
+    },
+    "lightStyle": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
+    }
+   }
+  },
+  "boxblur": {
+   "description": "Mengaburkan lapisan dengan purata segi empat sama piksel berdekatan. Kekuatan menetapkan sejauh mana kabur itu; Kabur Gaussian lebih licin.",
+   "name": "Kabur Kotak",
+   "params": {
+    "iterations": {
+     "label": "Lelaran"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shape": {
+     "label": "Bentuk",
+     "options": [
+      "Licin",
+      "Kotak",
+      "Kotak pantas"
+     ]
+    },
+    "strength": {
+     "label": "Kekuatan"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
     }
    }
   },
   "brightnesscontrast": {
+   "aliases": [
+    "Kecerahan & Kontras"
+   ],
    "description": "Melaraskan kecerahan dan kontras imej.",
-   "name": "Kecerahan & Kontras",
+   "name": "Kecerahan / Kontras",
    "params": {
     "brightness": {
      "label": "Kecerahan"
@@ -1027,6 +1194,13 @@
       "Klasik",
       "Keras"
      ]
+    },
+    "alight": {
+     "label": "Susun Atur",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
     }
    }
   },
@@ -1096,8 +1270,11 @@
    }
   },
   "colorwheels": {
+   "aliases": [
+    "Lift Gamma Gain"
+   ],
    "description": "Roda warna untuk bayang (lift), nada pertengahan (gamma) dan sorotan (gain): rona, sejauh mana hendak ditolak, dan tahap. Ofset mengalihkan semua ton. Gaya Ikut Kecerahan memberi pemberat setiap roda mengikut kecerahan piksel.",
-   "name": "Lift Gamma Gain",
+   "name": "Penalaan Warna",
    "params": {
     "gainAmount": {
      "label": "Jumlah Gain"
@@ -1269,6 +1446,13 @@
       "Klasik",
       "Bertindan"
      ]
+    },
+    "alight": {
+     "label": "Susun Atur",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
     }
    }
   },
@@ -1432,6 +1616,22 @@
       "Klasik",
       "Standard"
      ]
+    },
+    "alight": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
+    },
+    "alZ": {
+     "label": "Kedudukan Z"
+    },
+    "alLight": {
+     "label": "Arah"
+    },
+    "alElev": {
+     "label": "Ketinggian"
     }
    }
   },
@@ -1531,6 +1731,22 @@
       "Klasik",
       "Standard"
      ]
+    },
+    "alight": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
+    },
+    "alZ": {
+     "label": "Kedudukan Z"
+    },
+    "alLight": {
+     "label": "Arah"
+    },
+    "alElev": {
+     "label": "Ketinggian"
     }
    }
   },
@@ -1560,6 +1776,13 @@
     },
     "stretch": {
      "label": "Regang"
+    },
+    "edgeStyle": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
     }
    }
   },
@@ -1655,6 +1878,22 @@
       "Pusat",
       "Penjuru"
      ]
+    },
+    "alight": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
+    },
+    "alZ": {
+     "label": "Kedudukan Z"
+    },
+    "alLight": {
+     "label": "Arah"
+    },
+    "alElev": {
+     "label": "Ketinggian"
     }
    }
   },
@@ -1676,6 +1915,13 @@
     },
     "threshold": {
      "label": "Ambang"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
     }
    }
   },
@@ -1754,6 +2000,22 @@
     },
     "vibrance": {
      "label": "Kesegaran"
+    },
+    "exposure": {
+     "label": "Pendedahan"
+    },
+    "threshold": {
+     "label": "Ambang"
+    },
+    "knee": {
+     "label": "Kelembutan Ambang"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
     }
    }
   },
@@ -2024,8 +2286,11 @@
    }
   },
   "edgedetect": {
+   "aliases": [
+    "Kesan Tepi"
+   ],
    "description": "Garis terang di tempat gambar berubah, gelap di tempat lain. Dakwat melukis garis gelap di atas putih; Warna mengekalkan warna asal gambar pada tepi.",
-   "name": "Kesan Tepi",
+   "name": "Cari Tepi",
    "params": {
     "strength": {
      "label": "Kekuatan"
@@ -2275,6 +2540,22 @@
       "Pusat",
       "Penjuru"
      ]
+    },
+    "alight": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
+    },
+    "alZ": {
+     "label": "Kedudukan Z"
+    },
+    "alLight": {
+     "label": "Arah"
+    },
+    "alElev": {
+     "label": "Ketinggian"
     }
    }
   },
@@ -2350,8 +2631,11 @@
    }
   },
   "exposure": {
+   "aliases": [
+    "Pendedahan"
+   ],
    "description": "Tiru pendedahan fotografi dengan stop, ofset dan pembetulan gama. Cerahkan Bahagian Lut Sinar membolehkan piksel separa lut sinar, seperti tepi yang kabur, menjadi lebih cerah melepasi putih.",
-   "name": "Pendedahan",
+   "name": "Pendedahan / Gama",
    "params": {
     "gamma": {
      "label": "Gama"
@@ -2364,6 +2648,24 @@
     },
     "stops": {
      "label": "Stop"
+    }
+   }
+  },
+  "facetrack": {
+   "aliases": [
+    "Gerakan Wajah"
+   ],
+   "description": "Gerakan wajah untuk lapisan video: video bergerak dan mengezum supaya wajah yang dipilih kekal di tempat yang sama dalam bingkai. Ketik Pilih Wajah, kemudian ketik satu wajah pada pratonton. Wajah dijejak sekali sepanjang klip dan hasilnya disimpan, jadi pratonton dan eksport terus menggunakannya. Zum menetapkan saiz wajah yang dikekalkan (100% ialah saiznya semasa dipilih), Kedudukan ialah tempatnya kekal dalam bingkai, dan Pelicinan menjadikan gerakan lebih stabil.",
+   "name": "Penjejakan Wajah",
+   "params": {
+    "position": {
+     "label": "Kedudukan"
+    },
+    "smoothing": {
+     "label": "Pelicinan"
+    },
+    "zoom": {
+     "label": "Zum"
     }
    }
   },
@@ -2437,6 +2739,13 @@
     "edgeStrength": {
      "label": "Kekuatan Tepi"
     },
+    "edgeStyle": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
+    },
     "feather": {
      "label": "Lembut tepi"
     },
@@ -2461,18 +2770,18 @@
     "scanStrength": {
      "label": "Kekuatan Garis Imbas"
     },
-    "tint": {
-     "label": "Tona"
-    },
-    "tintColor": {
-     "label": "Warna Tona"
-    },
     "style": {
      "label": "Gaya",
      "options": [
       "Klasik",
       "Standard"
      ]
+    },
+    "tint": {
+     "label": "Tona"
+    },
+    "tintColor": {
+     "label": "Warna Tona"
     }
    }
   },
@@ -2509,6 +2818,13 @@
      "options": [
       "Kelip",
       "Stabil"
+     ]
+    },
+    "wave": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
      ]
     }
    }
@@ -2616,6 +2932,16 @@
       "Pusat",
       "Penjuru"
      ]
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
+    },
+    "alZ": {
+     "label": "Kedudukan Z"
     }
    }
   },
@@ -2629,6 +2955,9 @@
    }
   },
   "fourcolor": {
+   "aliases": [
+    "Kecerunan Empat Warna"
+   ],
    "description": "Mencampurkan empat warna yang diletakkan pada empat titik (dalam piksel dari pusat lapisan) di atas lapisan.",
    "name": "Kecerunan Empat Warna",
    "params": {
@@ -2869,6 +3198,18 @@
     }
    }
   },
+  "gaussianblur": {
+   "description": "Kabur yang licin dan lembut. Kekuatan menetapkan sejauh mana kabur itu.",
+   "name": "Kabur Gaussian",
+   "params": {
+    "scale": {
+     "label": "Skala"
+    },
+    "strength": {
+     "label": "Kekuatan"
+    }
+   }
+  },
   "glass": {
    "description": "Menukar bentuk lapisan menjadi kaca berbevel yang membiaskan lapisan di belakangnya, dengan sorotan di sepanjang tepinya. Cahaya Lembut memaparkan lapisan mengikut Isi dan menyinari kaca dengan Warna, paling terang di sepanjang tepi dalam bevel yang menghadap cahaya.",
    "name": "Kaca",
@@ -2952,14 +3293,26 @@
    }
   },
   "glowscan": {
-   "description": "Mengaburkan dan menerangi hanya bahagian lapisan yang kecerahannya berada dalam satu jalur; animasikan Kedudukan untuk menyapu kilau dari bayang ke sorotan.",
+   "description": "Melukis garis bercahaya di tempat kecerahan gambar melintasi Ambang, seperti imbasan kontur.",
    "name": "Imbas Kilau",
    "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blend": {
+     "label": "Campuran"
+    },
     "blur": {
      "label": "Kabur"
     },
     "color": {
      "label": "Warna Kilau"
+    },
+    "feather": {
+     "label": "Pelembut"
+    },
+    "fill": {
+     "label": "Isi"
     },
     "intensity": {
      "label": "Keamatan"
@@ -2967,11 +3320,30 @@
     "position": {
      "label": "Kedudukan"
     },
+    "radius": {
+     "label": "Jejari"
+    },
     "show": {
      "label": "Tunjuk Jalur Sahaja"
     },
+    "smoothing": {
+     "label": "Pelicinan"
+    },
     "softness": {
      "label": "Kelembutan"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
+    },
+    "threshold": {
+     "label": "Ambang"
+    },
+    "tint": {
+     "label": "Warna"
     },
     "width": {
      "label": "Lebar"
@@ -3209,6 +3581,13 @@
       "Klasik",
       "Standard"
      ]
+    },
+    "alight": {
+     "label": "Susun Atur",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
     }
    }
   },
@@ -3243,8 +3622,11 @@
    }
   },
   "halftone": {
+   "aliases": [
+    "Halfton"
+   ],
    "description": "Titik cetakan yang membesar di bahagian gelap imej.",
-   "name": "Halfton",
+   "name": "Titik Halfton",
    "params": {
     "angle": {
      "label": "Sudut"
@@ -3254,6 +3636,13 @@
     },
     "colored": {
      "label": "Titik Warna"
+    },
+    "edgeStyle": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
     },
     "ink": {
      "label": "Warna titik"
@@ -3300,6 +3689,13 @@
      "label": "Kekuatan"
     },
     "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
+    },
+    "edgeStyle": {
      "label": "Gaya",
      "options": [
       "Klasik",
@@ -3407,6 +3803,22 @@
       "Klasik",
       "Standard"
      ]
+    },
+    "alight": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
+    },
+    "alZ": {
+     "label": "Kedudukan Z"
+    },
+    "alLight": {
+     "label": "Arah"
+    },
+    "alElev": {
+     "label": "Ketinggian"
     }
    }
   },
@@ -3431,6 +3843,13 @@
     },
     "seed": {
      "label": "Benih"
+    },
+    "edgeStyle": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
     }
    }
   },
@@ -3489,6 +3908,19 @@
     },
     "stretch": {
      "label": "Regangan"
+    },
+    "lineWidth": {
+     "label": "Lebar Garis"
+    },
+    "feather": {
+     "label": "Lembut tepi"
+    },
+    "edgeStyle": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
     }
    }
   },
@@ -3550,6 +3982,14 @@
     },
     "stretch": {
      "label": "Regangan"
+    },
+    "alight": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard",
+      "Gambar"
+     ]
     }
    }
   },
@@ -3645,12 +4085,31 @@
       "Pusat",
       "Penjuru"
      ]
+    },
+    "alight": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
+    },
+    "alZ": {
+     "label": "Kedudukan Z"
+    },
+    "alLight": {
+     "label": "Arah"
+    },
+    "alElev": {
+     "label": "Ketinggian"
     }
    }
   },
   "highlightshadow": {
+   "aliases": [
+    "Sorotan & Bayang"
+   ],
    "description": "Memulihkan atau menguatkan sorotan terang serta mengangkat atau mendalamkan bayang gelap, berdasarkan kecerahan setiap piksel.",
-   "name": "Sorotan & Bayang",
+   "name": "Sorotan dan Bayang",
    "params": {
     "highlights": {
      "label": "Sorotan"
@@ -3775,6 +4234,22 @@
       "Klasik",
       "Standard"
      ]
+    },
+    "alight": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
+    },
+    "alZ": {
+     "label": "Kedudukan Z"
+    },
+    "alLight": {
+     "label": "Arah"
+    },
+    "alElev": {
+     "label": "Ketinggian"
     }
    }
   },
@@ -3909,12 +4384,31 @@
     }
    }
   },
+  "hueshift": {
+   "description": "Memutar setiap warna pada roda warna dengan sudut yang sama dan mengekalkan kecerahan.",
+   "name": "Anjakan Rona",
+   "params": {
+    "hue": {
+     "label": "Anjakan Rona"
+    }
+   }
+  },
   "innerblur": {
    "description": "Mengkaburkan imej di dalam lapisan sambil mengekalkan garis luarnya tajam.",
    "name": "Kabur Dalam",
    "params": {
     "blur": {
      "label": "Kekuatan"
+    },
+    "iterations": {
+     "label": "Lelaran"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
     }
    }
   },
@@ -3994,6 +4488,15 @@
     },
     "invert_alpha": {
      "label": "Songsang Alfa"
+    },
+    "red": {
+     "label": "Merah"
+    },
+    "green": {
+     "label": "Hijau"
+    },
+    "blue": {
+     "label": "Biru"
     }
    }
   },
@@ -4060,6 +4563,13 @@
     },
     "segments": {
      "label": "Segmen"
+    },
+    "edgeStyle": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
     }
    }
   },
@@ -4096,9 +4606,23 @@
    }
   },
   "lensflare": {
-   "description": "Cahaya terang dengan halo, ditindih pada gambar.",
-   "name": "Suar Cahaya",
+   "aliases": [
+    "Suar Cahaya"
+   ],
+   "description": "Cahaya terang dengan bintang, halo dan gelang pantulan di atas gambar.",
+   "name": "Suar Kanta",
    "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blendMode": {
+     "label": "Mod campuran",
+     "options": [
+      "Normal",
+      "Darab",
+      "Skrin"
+     ]
+    },
     "brightness": {
      "label": "Kecerahan"
     },
@@ -4108,8 +4632,21 @@
     "color": {
      "label": "Warna"
     },
+    "points": {
+     "label": "Bucu"
+    },
     "radius": {
      "label": "Jejari"
+    },
+    "shine": {
+     "label": "Kilauan"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
     }
    }
   },
@@ -4274,6 +4811,13 @@
       "Klasik",
       "Standard"
      ]
+    },
+    "alight": {
+     "label": "Susun Atur",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
     }
    }
   },
@@ -4392,6 +4936,14 @@
      "options": [
       "Klasik",
       "Standard"
+     ]
+    },
+    "weighting": {
+     "label": "Mod",
+     "options": [
+      "Klasik",
+      "Luma",
+      "RGB"
      ]
     }
    }
@@ -4709,6 +5261,25 @@
       "Pusat",
       "Penjuru"
      ]
+    },
+    "alight": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
+    },
+    "alZ": {
+     "label": "Kedudukan Z"
+    },
+    "alLight": {
+     "label": "Arah"
+    },
+    "alElev": {
+     "label": "Ketinggian"
+    },
+    "alHeight": {
+     "label": "Tinggi"
     }
    }
   },
@@ -4964,6 +5535,13 @@
      ]
     },
     "roll": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
+    },
+    "space": {
      "label": "Gaya",
      "options": [
       "Klasik",
@@ -5328,6 +5906,16 @@
       "Klasik",
       "Standard"
      ]
+    },
+    "edgeStyle": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
+    },
+    "saturation": {
+     "label": "Ketepuan"
     }
    }
   },
@@ -5446,6 +6034,18 @@
       "Klasik",
       "Standard"
      ]
+    },
+    "angle": {
+     "label": "Sudut"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "repeat": {
+     "label": "Ulang"
+    },
+    "mirror": {
+     "label": "Cermin"
     }
    }
   },
@@ -5706,6 +6306,22 @@
       "Pusat",
       "Penjuru"
      ]
+    },
+    "alight": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
+    },
+    "alZ": {
+     "label": "Kedudukan Z"
+    },
+    "alLight": {
+     "label": "Arah"
+    },
+    "alElev": {
+     "label": "Ketinggian"
     }
    }
   },
@@ -5752,6 +6368,13 @@
     },
     "width": {
      "label": "Lebar"
+    },
+    "alight": {
+     "label": "Susun Atur",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
     }
    }
   },
@@ -5840,6 +6463,13 @@
     },
     "sweep": {
      "label": "Sapuan"
+    },
+    "alight": {
+     "label": "Susun Atur",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
     }
    }
   },
@@ -6018,6 +6648,19 @@
     },
     "glossiness": {
      "label": "Kekilatan"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
+    },
+    "alLight": {
+     "label": "Arah"
+    },
+    "alElev": {
+     "label": "Ketinggian"
     }
    },
    "shortcuts": {
@@ -6107,8 +6750,11 @@
    }
   },
   "reorient360": {
+   "aliases": [
+    "Orientasi semula sfera 360°"
+   ],
    "description": "Memutar lapisan panorama 360° di dalam sferanya untuk meratakan ufuk atau menukar arah hadapan.",
-   "name": "Orientasi semula sfera 360°",
+   "name": "Orientasi semula sfera 360º",
    "params": {
     "pitch": {
      "label": "Pitch"
@@ -6432,6 +7078,18 @@
     },
     "seed": {
      "label": "Benih"
+    }
+   }
+  },
+  "saturationvibrance": {
+   "description": "Menjadikan warna lebih kuat atau lebih lemah. Kerancakan menaikkan warna pudar dengan lembut dan membiarkan warna kuat.",
+   "name": "Ketepuan / Kerancakan",
+   "params": {
+    "saturation": {
+     "label": "Ketepuan"
+    },
+    "vibrance": {
+     "label": "Kesegaran"
     }
    }
   },
@@ -6959,6 +7617,42 @@
     }
    }
   },
+  "spectralmap": {
+   "description": "Mewarna semula gambar mengikut kecerahan dengan spektrum tiga warna. Ulang melaluinya lebih kerap, Fasa mengalihkannya dan Mampatan meluaskan setiap jalur.",
+   "name": "Peta Spektrum",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blueColor": {
+     "label": "Warna 3"
+    },
+    "greenColor": {
+     "label": "Warna 2"
+    },
+    "phase": {
+     "label": "Fasa"
+    },
+    "redColor": {
+     "label": "Warna 1"
+    },
+    "repeat": {
+     "label": "Ulangan"
+    },
+    "reverse": {
+     "label": "Songsang"
+    },
+    "saturation": {
+     "label": "Ketepuan"
+    },
+    "scaleBrightness": {
+     "label": "Skala Kecerahan"
+    },
+    "squeeze": {
+     "label": "Himpit"
+    }
+   }
+  },
   "spherize": {
    "description": "Membalut lapisan pada sfera menggunakan unjuran hadapan atau tekstur ekuisegi empat tepat.",
    "name": "Bulatkan",
@@ -7055,6 +7749,22 @@
       "Pusat",
       "Penjuru"
      ]
+    },
+    "alight": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
+    },
+    "alZ": {
+     "label": "Kedudukan Z"
+    },
+    "alLight": {
+     "label": "Arah"
+    },
+    "alElev": {
+     "label": "Ketinggian"
     }
    }
   },
@@ -7168,8 +7878,11 @@
    }
   },
   "splittone": {
+   "aliases": [
+    "Tona Terpisah"
+   ],
    "description": "Mewarnakan bayang ke satu rona dan sorotan ke rona lain, sambil mengekalkan hitam, putih dan kecerahan. Tahap Bayang membengkokkan lengkung kecerahan dan Tahap Sorotan mengalihkan tempat warna sorotan bermula. Gaya Peta Gradien memberi setiap piksel warna daripada kecerahannya sahaja.",
-   "name": "Tona Terpisah",
+   "name": "Warna Panas",
    "params": {
     "highlightAmount": {
      "label": "Amaun Sorotan"
@@ -7284,6 +7997,13 @@
     },
     "shine": {
      "label": "Kilauan"
+    },
+    "edgeStyle": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
     }
    }
   },
@@ -7306,20 +8026,17 @@
    }
   },
   "starpolyhedron": {
-   "description": "Meletakkan lapisan pada bintang yang diperbuat daripada dua piramid bersilang.",
+   "description": "Meletakkan lapisan pada bintang yang hujungnya naik ke rabung di depan dan belakang, dengan cahaya dan kedalaman.",
    "name": "Polihedron bintang",
    "params": {
-    "light": {
-     "label": "Sudut Cahaya"
+    "orientA": {
+     "label": "Orientasi α"
     },
-    "perspective": {
-     "label": "Perspektif"
+    "orientB": {
+     "label": "Orientasi β"
     },
-    "position": {
-     "label": "Kedudukan"
-    },
-    "radius": {
-     "label": "Jejari"
+    "orientG": {
+     "label": "Orientasi γ"
     },
     "rotX": {
      "label": "Putaran X"
@@ -7330,11 +8047,83 @@
     "rotZ": {
      "label": "Putaran Z"
     },
+    "starSize": {
+     "label": "Saiz"
+    },
+    "starDepth": {
+     "label": "Kedalaman"
+    },
+    "pointLength": {
+     "label": "Panjang Hujung"
+    },
+    "smoothing": {
+     "label": "Pelicinan"
+    },
+    "points": {
+     "label": "Bucu"
+    },
+    "alPos": {
+     "label": "Kedudukan"
+    },
+    "alZ": {
+     "label": "Kedudukan Z"
+    },
+    "alScale": {
+     "label": "Skala"
+    },
+    "intensity": {
+     "label": "Keamatan cahaya"
+    },
+    "alShine": {
+     "label": "Kilauan"
+    },
+    "spec": {
+     "label": "Spekulariti"
+    },
+    "alAmbient": {
+     "label": "Ambien"
+    },
+    "alColor": {
+     "label": "Warna"
+    },
+    "lightDir": {
+     "label": "Arah"
+    },
+    "lightDepth": {
+     "label": "Ketinggian"
+    },
+    "alMirror": {
+     "label": "Cermin"
+    },
+    "alRepeatX": {
+     "label": "Ulang X"
+    },
+    "alRepeatY": {
+     "label": "Ulang Y"
+    },
+    "alTexAngle": {
+     "label": "Sudut Tekstur"
+    },
+    "alCrop": {
+     "label": "Pangkas"
+    },
+    "radius": {
+     "label": "Jejari"
+    },
+    "position": {
+     "label": "Kedudukan"
+    },
     "scale": {
      "label": "Skala"
     },
+    "perspective": {
+     "label": "Perspektif"
+    },
     "shading": {
      "label": "Lorekan"
+    },
+    "light": {
+     "label": "Sudut Cahaya"
     },
     "shine": {
      "label": "Kilauan"
@@ -7390,6 +8179,13 @@
      "options": [
       "Pusat",
       "Penjuru"
+     ]
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
      ]
     }
    }
@@ -7506,6 +8302,22 @@
       "Klasik",
       "Standard"
      ]
+    },
+    "alight": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
+    },
+    "alZ": {
+     "label": "Kedudukan Z"
+    },
+    "alLight": {
+     "label": "Arah"
+    },
+    "alElev": {
+     "label": "Ketinggian"
     }
    }
   },
@@ -7518,6 +8330,27 @@
     },
     "grain": {
      "label": "Saiz"
+    }
+   }
+  },
+  "streakstrips": {
+   "description": "Memotong lapisan kepada jalur selari dan meregangkan satu garis gambar merentasi setiap jalur, seperti imbasan yang rosak.",
+   "name": "Jalur Coretan",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "angle": {
+     "label": "Sudut"
+    },
+    "count": {
+     "label": "Bilangan"
+    },
+    "maskToLayer": {
+     "label": "Topeng Ke Lapisan"
+    },
+    "phase": {
+     "label": "Fasa"
     }
    }
   },
@@ -7601,6 +8434,15 @@
     }
    }
   },
+  "strokecolor": {
+   "description": "Mewarnakan garisan lapisan dengan satu warna: garis luar bentuk atau teks, dan setiap lakaran pen dan berus dalam lukisan.",
+   "name": "Warna Garisan",
+   "params": {
+    "color": {
+     "label": "Warna"
+    }
+   }
+  },
   "stroketaper": {
    "description": "Menipiskan lejang sehingga runcing: lejang pen dan berus lukisan bebas, serta Lejang pada garisan dan bentuk (Sempadan & Bayang > Lejang). Dari kosong hingga Mula, dan dari Tamat hingga kosong. Himpit menjadikan penirusan lebih tajam.",
    "name": "Lejang Menirus",
@@ -7613,6 +8455,13 @@
     },
     "start": {
      "label": "Mula"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
     }
    }
   },
@@ -7955,6 +8804,18 @@
     "wobbly": "Goyah"
    }
   },
+  "textspacing": {
+   "description": "Mengubah jarak antara huruf dan antara baris dalam lapisan teks. Jarak Huruf menjarakkan huruf, atau merapatkannya di bawah 0%. Jarak Baris menetapkan sejauh mana baris dijarakkan: 100% ialah biasa dan 200% menggandakannya. Tetapkan bingkai kunci pada salah satu untuk menganimasikan jarak.",
+   "name": "Jarak Teks",
+   "params": {
+    "letterspacing": {
+     "label": "Jarak Huruf"
+    },
+    "linespacing": {
+     "label": "Jarak Baris"
+    }
+   }
+  },
   "texttransform": {
    "description": "Menggerakkan, menskala, memutar, memudarkan dan mewarnakan huruf, perkataan atau baris dalam julat. Penambat menetapkan sama ada penskalaan dan putaran menggunakan setiap komponen atau pusat lapisan. Gerakkan julat dengan Fasa supaya perubahan merentasi teks.",
    "name": "Transformasi Teks",
@@ -8139,6 +9000,13 @@
       "Klasik",
       "Standard"
      ]
+    },
+    "edgeStyle": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
     }
    }
   },
@@ -8209,6 +9077,13 @@
       "Klasik",
       "Standard"
      ]
+    },
+    "edgeStyle": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
     }
    }
   },
@@ -8244,8 +9119,11 @@
    }
   },
   "timequant": {
+   "aliases": [
+    "Kadar Bingkai"
+   ],
    "description": "Menjadikan lapisan ini bergerak pada kadar bingkai lebih rendah, seperti rakaman tersekat-sekat atau gerak henti.",
-   "name": "Kadar Bingkai",
+   "name": "Pengkuantuman Masa",
    "params": {
     "fps": {
      "label": "Langkah/saat"
@@ -8363,6 +9241,22 @@
       "Pusat",
       "Penjuru"
      ]
+    },
+    "alight": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
+    },
+    "alZ": {
+     "label": "Kedudukan Z"
+    },
+    "alLight": {
+     "label": "Arah"
+    },
+    "alElev": {
+     "label": "Ketinggian"
     }
    }
   },
@@ -8409,6 +9303,16 @@
       "Klasik",
       "Standard"
      ]
+    },
+    "wrapStyle": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
+    },
+    "depth": {
+     "label": "Kedalaman"
     }
    }
   },
@@ -8528,6 +9432,9 @@
       "Klasik",
       "Standard"
      ]
+    },
+    "singleAxis": {
+     "label": "Satu Paksi"
     }
    }
   },
@@ -8549,6 +9456,13 @@
      "options": [
       "Lapisan",
       "Skrin"
+     ]
+    },
+    "edgeStyle": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
      ]
     }
    }
@@ -8574,6 +9488,13 @@
      "options": [
       "Kelabu",
       "Merah"
+     ]
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
      ]
     }
    }
@@ -8656,8 +9577,11 @@
    }
   },
   "viewer360": {
+   "aliases": [
+    "Pemapar 360°"
+   ],
    "description": "Memaparkan lapisan panoram 360° melalui kamera maya yang boleh diputar dan dizum.",
-   "name": "Pemapar 360°",
+   "name": "Pemapar 360º",
    "params": {
     "fov": {
      "label": "Medan Pandangan"
@@ -8965,6 +9889,94 @@
     },
     "zoom": {
      "label": "Kekuatan"
+    },
+    "alight": {
+     "label": "Susun Atur",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
+    }
+   }
+  },
+  "ring": {
+   "description": "Membalut lapisan pada cincin bersisi rata, seperti paip pendek, dengan cahaya dan kedalaman.",
+   "name": "Cincin",
+   "params": {
+    "orientA": {
+     "label": "Orientasi α"
+    },
+    "orientB": {
+     "label": "Orientasi β"
+    },
+    "orientG": {
+     "label": "Orientasi γ"
+    },
+    "rotX": {
+     "label": "Putaran X"
+    },
+    "rotY": {
+     "label": "Putaran Y"
+    },
+    "rotZ": {
+     "label": "Putaran Z"
+    },
+    "radius": {
+     "label": "Jejari"
+    },
+    "thickness": {
+     "label": "Lebar"
+    },
+    "height": {
+     "label": "Panjang"
+    },
+    "smoothing": {
+     "label": "Pelicinan"
+    },
+    "position": {
+     "label": "Kedudukan"
+    },
+    "alZ": {
+     "label": "Kedudukan Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "intensity": {
+     "label": "Keamatan cahaya"
+    },
+    "shine": {
+     "label": "Kilauan"
+    },
+    "spec": {
+     "label": "Spekulariti"
+    },
+    "ambient": {
+     "label": "Ambien"
+    },
+    "lightColor": {
+     "label": "Warna"
+    },
+    "lightDir": {
+     "label": "Arah"
+    },
+    "lightDepth": {
+     "label": "Ketinggian"
+    },
+    "texMirror": {
+     "label": "Cermin"
+    },
+    "texRepeatX": {
+     "label": "Ulang X"
+    },
+    "texRepeatY": {
+     "label": "Ulang Y"
+    },
+    "texAngle": {
+     "label": "Sudut Tekstur"
+    },
+    "texCrop": {
+     "label": "Pangkas"
     }
    }
   }

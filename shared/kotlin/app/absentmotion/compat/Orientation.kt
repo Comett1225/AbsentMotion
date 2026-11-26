@@ -134,8 +134,8 @@ internal class Orientation(private val quat: XmlNode?, private val spin: XmlNode
     }
 
     companion object {
-        private const val TOLERANCE = 0.75
-        private const val MAX_DEPTH = 4
+        private const val TOLERANCE = 0.05
+        private const val MAX_DEPTH = 6
         private val IDENTITY = doubleArrayOf(0.0, 0.0, 0.0, 1.0)
 
         private fun property(id: String, value: String) = XmlNode("property", linkedMapOf("name" to id, "type" to "float", "value" to value))

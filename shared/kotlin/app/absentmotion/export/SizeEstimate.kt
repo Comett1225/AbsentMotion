@@ -1,27 +1,54 @@
 package app.absentmotion.export
 
+import android.media.MediaExtractor
+import android.media.MediaFormat
+import android.os.Build
 import app.absentmotion.engine.EngineThread
 import app.absentmotion.model.Scene
 import java.io.File
 import java.io.RandomAccessFile
+import java.nio.ByteBuffer
 
 internal const val SizeSampleWindows = 5
 internal const val SizeSampleMostWindows = 12
 internal const val SizeSamplePixels = 640_000_000L
+internal const val SizeSampleStartFrames = 240
+
+internal fun sizeSampleStart(fps: Int): Int = fps.coerceAtLeast(1).let { window -> (SizeSampleStartFrames + window - 1) / window * window }
 
 internal fun videoSizeSample(frames: Int, fps: Int, framePixels: Long = 0): IntArray? {
     val window = fps.coerceAtLeast(1)
+    val start = sizeSampleStart(window)
     val gops = frames / window
     val most = (SizeSamplePixels / (2L * window * framePixels).coerceAtLeast(1)).toInt().coerceIn(SizeSampleWindows, SizeSampleMostWindows)
     val windows = (gops / 3).coerceIn(SizeSampleWindows, most)
-    if (frames <= 2 * windows * window) return null
-    val picked = (0 until windows).map { i -> ((i + 0.5) * gops / windows).toInt().coerceIn(0, gops - 1) }.distinct()
-    val once = picked.flatMap { g -> (g * window until (g + 1) * window) }
-    return (once + once).toIntArray()
+    if (frames <= start + windows * window) return null
+    val first = start / window
+    val later = gops - first
+    val picked = (0 until windows).map { i -> first + ((i + 0.5) * later / windows).toInt() }.distinct()
+    return (List(start) { it } + picked.flatMap { g -> (g * window until (g + 1) * window) }).toIntArray()
 }
 
-internal fun videoBytesFromSample(sampledBytes: Long, sampledFrames: Int, frames: Int): Long =
-    if (sampledFrames <= 0 || sampledFrames >= frames) sampledBytes else (sampledBytes.toDouble() * frames / sampledFrames).toLong()
+internal fun videoBytesFromSample(sampledBytes: Long, spreadBytes: Long, spreadFrames: Int, restFrames: Int): Long =
+    sampledBytes - spreadBytes + (spreadBytes.toDouble() * restFrames / spreadFrames).toLong()
+
+internal fun videoBytesFrom(file: File, fromUs: Long): Long {
+    val extractor = MediaExtractor()
+    try {
+        extractor.setDataSource(file.path)
+        extractor.selectTrack(0)
+        val buffer by lazy { ByteBuffer.allocate(extractor.getTrackFormat(0).run { if (containsKey(MediaFormat.KEY_MAX_INPUT_SIZE)) getInteger(MediaFormat.KEY_MAX_INPUT_SIZE) else 1 shl 24 }) }
+        val packets = ArrayList<Pair<Long, Long>>()
+        while (extractor.sampleTime >= 0) {
+            packets += extractor.sampleTime to if (Build.VERSION.SDK_INT >= 28) extractor.sampleSize else extractor.readSampleData(buffer, 0).toLong()
+            extractor.advance()
+        }
+        val first = packets.minOf { it.first }
+        return packets.filter { it.first - first >= fromUs }.sumOf { it.second }
+    } finally {
+        extractor.release()
+    }
+}
 
 internal fun audioTrackBytes(scene: Scene, s: ExportSettings, hasAudio: Boolean): Long =
     if (!hasAudio) 0L else (s.audio.bitrateKbps * 1000L / 8.0 * (scene.totalTime + 1) / 1000.0).toLong()
@@ -34,7 +61,10 @@ internal suspend fun measureVideoBytes(engine: EngineThread, scene: Scene, s: Ex
     val file = File(cacheDir, "size-sample-${System.nanoTime()}.${f.container.ext}")
     val video = try {
         RandomAccessFile(file, "rw").use { exportVideo(engine, scene, scene.toXml(), f, it.fd, null, sample = sample) {} }
-        videoBytesFromSample(file.length(), sample?.size ?: frames, frames)
+        if (sample == null) file.length() else {
+            val start = sizeSampleStart(f.fps)
+            videoBytesFromSample(file.length(), videoBytesFrom(file, ((start - 0.5) * 1_000_000 / f.fps).toLong()), sample.size - start, frames - start)
+        }
     } finally {
         file.delete()
     }

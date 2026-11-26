@@ -27,6 +27,7 @@ Mọi thứ trên tab **Cộng đồng** đều được một người kiểm t
 
 - Hãy giữ nội dung phù hợp với mọi người. Mọi lứa tuổi đều dùng AbsentMotion.
 - Gói dự án có thể nặng tới 20 MB, preset tới 1 MB và hiệu ứng tới 512 KB.
+- Mỗi hiệu ứng cần một ảnh thu nhỏ thể hiện nó, ở hai kích thước: nhỏ (WebP 192 × 192, ảnh tĩnh hoặc động tối đa 3 giây) và lớn (WebP 720 × 720), mỗi ảnh tối đa 150 KB.
 - Các mục được chia sẻ theo CC BY 4.0: ai cũng có thể dùng và chỉnh sửa miễn là ghi công người tạo ra chúng.
 - Tên trên mục của bạn là tên người sáng tạo mà bạn nhập. Đừng đưa bất cứ thông tin cá nhân nào vào đó.
 - Người bảo trì quyết định những gì được đăng và có thể gỡ một mục xuống bất cứ lúc nào.

@@ -62,7 +62,8 @@ class EffectRecommendationsTest {
         assertEquals(setOf("5.3.0", "5.3.1"), newestLine(listOf("5.0.0", "5.2.3", "5.3.0", "5.3.1", "4.4.0")))
         assertEquals(setOf("5.4.0"), newestLine(listOf("5.3.0", "5.3.2", "5.4.0")))
         assertEquals(setOf("5.10.0"), newestLine(listOf("5.9.0", "5.10.0")))
-        assertEquals(setOf("cartoon", "channelmixer", "coloradjust", "difference", "differencematte", "outline", "vortexblur", "warpblur"),
+        assertEquals(setOf("advancedchromakey", "boxblur", "cartoon", "channelmixer", "coloradjust", "difference", "differencematte", "facetrack", "gaussianblur", "hueshift", "outline",
+            "ring", "saturationvibrance", "spectralmap", "streakstrips", "strokecolor", "textspacing", "vortexblur", "warpblur"),
             catalog.definitions.filter(catalog::isNew).mapTo(HashSet()) { it.key })
     }
 

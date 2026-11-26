@@ -29,6 +29,8 @@ internal const val MODEL_RELEASE = "$HOME_PAGE/releases/download/ai-models-1/"
 internal const val MODEL_RELEASE_2 = "$HOME_PAGE/releases/download/ai-models-2/"
 internal const val MODEL_RELEASE_3 = "$HOME_PAGE/releases/download/ai-models-3/"
 internal const val MODEL_RELEASE_5 = "$HOME_PAGE/releases/download/ai-models-5/"
+internal const val MODEL_RELEASE_6 = "$HOME_PAGE/releases/download/ai-models-6/"
+internal const val NOISE_MODEL = "deepfilternet3.amdf"
 
 internal object AddonRelease {
     @Volatile var base = "$HOME_PAGE/releases/download/ai-models-4/"
@@ -71,7 +73,9 @@ internal enum class AiModel(val folder: String, @StringRes val title: Int, val l
     Cutout("cutout-2", R.string.ai_model_cutout, "AbsentMotion cut-out (Apache-2.0)", 79.0, listOf(
         hosted(CUTOUT_PARAM_768, 19_350, "f5f6b00c7d7e313590c4150252bce38d292b51a77cc46f887175afe2a8577c48", MODEL_RELEASE_3),
         hosted(CUTOUT_PARAM_1024, 19_356, "12cbc7eb86afccbee2dbcd79bee799171ee4adcf4d59f1ff0e9278341885b262", MODEL_RELEASE_3),
-        hosted("absent-cutout.bin", 64_875_088, "14d86bb8fa66fc57d900dcf8bba6c823008917bcf2db4207188ba844957acff7", MODEL_RELEASE_3)));
+        hosted("absent-cutout.bin", 64_875_088, "14d86bb8fa66fc57d900dcf8bba6c823008917bcf2db4207188ba844957acff7", MODEL_RELEASE_3))),
+    Noise("deepfilternet3", R.string.ai_model_noise, "DeepFilterNet3 (MIT or Apache-2.0)", 0.35, listOf(
+        hosted(NOISE_MODEL, 4_297_222, "ed99240a1f8c60b13c6419f56762fbc86c2925dd6df98ad653553b3c316b7aa5", MODEL_RELEASE_6)));
 
     val bytes: Long get() = files.sumOf { it.bytes }
     val param: String? get() = files.firstOrNull { it.name.endsWith(".param") }?.name

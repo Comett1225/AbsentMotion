@@ -1,6 +1,9 @@
 {
  "id": "fourcolor",
- "name": "Four-Color Gradient",
+ "name": "Four-color Gradient",
+ "aliases": [
+  "Four-Color Gradient"
+ ],
  "category": "color",
  "description": "Blends four colors placed at four points (in pixels from the layer's center) over the layer.",
  "params": [

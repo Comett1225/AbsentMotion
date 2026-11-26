@@ -248,6 +248,21 @@
      0
     ]
    }
+  },
+  {
+   "id": "alight",
+   "label": "Layout",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "when": {
+    "alight": [
+     2
+    ]
+   }
   }
  ]
 }

@@ -16,6 +16,103 @@
   "text": "Văn bản"
  },
  "effects": {
+  "advancedchromakey": {
+   "description": "Xóa tối đa bốn màu cùng lúc. Mỗi màu có thể bị xóa (Loại trừ) hoặc được bảo vệ khỏi các khóa khác (Bao gồm), với ngưỡng, làm mềm và độ nhạy độ sáng riêng. Hiện mặt nạ cho thấy phần được giữ lại bằng màu đỏ.",
+   "name": "Phông xanh nâng cao",
+   "params": {
+    "c1active": {
+     "label": "Màu 1"
+    },
+    "c1color": {
+     "label": "Màu"
+    },
+    "c1feather": {
+     "label": "Làm mềm"
+    },
+    "c1luma": {
+     "label": "Độ nhạy độ sáng"
+    },
+    "c1mode": {
+     "label": "Chế độ",
+     "options": [
+      "Loại trừ",
+      "Bao gồm"
+     ]
+    },
+    "c1threshold": {
+     "label": "Ngưỡng"
+    },
+    "c2active": {
+     "label": "Màu 2"
+    },
+    "c2color": {
+     "label": "Màu"
+    },
+    "c2feather": {
+     "label": "Làm mềm"
+    },
+    "c2luma": {
+     "label": "Độ nhạy độ sáng"
+    },
+    "c2mode": {
+     "label": "Chế độ",
+     "options": [
+      "Loại trừ",
+      "Bao gồm"
+     ]
+    },
+    "c2threshold": {
+     "label": "Ngưỡng"
+    },
+    "c3active": {
+     "label": "Màu 3"
+    },
+    "c3color": {
+     "label": "Màu"
+    },
+    "c3feather": {
+     "label": "Làm mềm"
+    },
+    "c3luma": {
+     "label": "Độ nhạy độ sáng"
+    },
+    "c3mode": {
+     "label": "Chế độ",
+     "options": [
+      "Loại trừ",
+      "Bao gồm"
+     ]
+    },
+    "c3threshold": {
+     "label": "Ngưỡng"
+    },
+    "c4active": {
+     "label": "Màu 4"
+    },
+    "c4color": {
+     "label": "Màu"
+    },
+    "c4feather": {
+     "label": "Làm mềm"
+    },
+    "c4luma": {
+     "label": "Độ nhạy độ sáng"
+    },
+    "c4mode": {
+     "label": "Chế độ",
+     "options": [
+      "Loại trừ",
+      "Bao gồm"
+     ]
+    },
+    "c4threshold": {
+     "label": "Ngưỡng"
+    },
+    "showMask": {
+     "label": "Hiện mặt nạ"
+    }
+   }
+  },
   "ascii": {
    "description": "Biến lớp thành tranh chữ làm từ chữ cái và ký hiệu: phần càng sáng thì ký tự càng đậm đặc. Kích thước đặt độ rộng của mỗi ký tự trên lớp, nên các ký tự di chuyển, xoay và đổi tỷ lệ cùng lớp. Màu giữ nguyên màu gốc của ảnh hoặc dùng một màu duy nhất, còn Đường cạnh vẽ đường viền bằng các ký tự | - / và \\.",
    "name": "ASCII",
@@ -106,6 +203,13 @@
     },
     "slack": {
      "label": "Độ lỏng"
+    },
+    "style": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
     },
     "zshake": {
      "label": "Rung Z"
@@ -625,12 +729,75 @@
       "Tâm",
       "Góc"
      ]
+    },
+    "alight": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
+    },
+    "alZ": {
+     "label": "Vị trí Z"
+    },
+    "alLight": {
+     "label": "Hướng"
+    },
+    "alElev": {
+     "label": "Độ cao"
+    },
+    "faceStyle": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
+    },
+    "lightStyle": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
+    }
+   }
+  },
+  "boxblur": {
+   "description": "Làm mờ lớp bằng cách lấy trung bình một ô vuông đều các điểm ảnh xung quanh. Cường độ quyết định độ mờ lan xa đến đâu; Làm mờ Gauss mịn hơn.",
+   "name": "Làm mờ hộp",
+   "params": {
+    "iterations": {
+     "label": "Số vòng lặp"
+    },
+    "scale": {
+     "label": "Tỷ lệ"
+    },
+    "shape": {
+     "label": "Hình dạng",
+     "options": [
+      "Mượt",
+      "Hộp",
+      "Hộp nhanh"
+     ]
+    },
+    "strength": {
+     "label": "Cường độ"
+    },
+    "style": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
     }
    }
   },
   "brightnesscontrast": {
+   "aliases": [
+    "Độ sáng & tương phản"
+   ],
    "description": "Điều chỉnh độ sáng và độ tương phản của hình ảnh.",
-   "name": "Độ sáng & tương phản",
+   "name": "Độ sáng / tương phản",
    "params": {
     "brightness": {
      "label": "Độ sáng"
@@ -1027,6 +1194,13 @@
       "Cổ điển",
       "Sắc nét"
      ]
+    },
+    "alight": {
+     "label": "Bố cục",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
     }
    }
   },
@@ -1096,8 +1270,11 @@
    }
   },
   "colorwheels": {
+   "aliases": [
+    "Lift Gamma Gain"
+   ],
    "description": "Bánh xe màu cho vùng tối (lift), vùng trung gian (gamma) và vùng sáng (gain): tông màu, mức đẩy tông màu và độ mạnh. Dịch chuyển mọi tông màu. Kiểu Theo độ sáng tính mỗi bánh xe theo độ sáng của điểm ảnh.",
-   "name": "Lift Gamma Gain",
+   "name": "Tinh chỉnh màu",
    "params": {
     "gainAmount": {
      "label": "Mức Gain"
@@ -1269,6 +1446,13 @@
       "Cổ điển",
       "Xếp chồng"
      ]
+    },
+    "alight": {
+     "label": "Bố cục",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
     }
    }
   },
@@ -1432,6 +1616,22 @@
       "Cổ điển",
       "Tiêu chuẩn"
      ]
+    },
+    "alight": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
+    },
+    "alZ": {
+     "label": "Vị trí Z"
+    },
+    "alLight": {
+     "label": "Hướng"
+    },
+    "alElev": {
+     "label": "Độ cao"
     }
    }
   },
@@ -1531,6 +1731,22 @@
       "Cổ điển",
       "Tiêu chuẩn"
      ]
+    },
+    "alight": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
+    },
+    "alZ": {
+     "label": "Vị trí Z"
+    },
+    "alLight": {
+     "label": "Hướng"
+    },
+    "alElev": {
+     "label": "Độ cao"
     }
    }
   },
@@ -1560,6 +1776,13 @@
     },
     "stretch": {
      "label": "Kéo giãn"
+    },
+    "edgeStyle": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
     }
    }
   },
@@ -1655,6 +1878,22 @@
       "Tâm",
       "Góc"
      ]
+    },
+    "alight": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
+    },
+    "alZ": {
+     "label": "Vị trí Z"
+    },
+    "alLight": {
+     "label": "Hướng"
+    },
+    "alElev": {
+     "label": "Độ cao"
     }
    }
   },
@@ -1676,6 +1915,13 @@
     },
     "threshold": {
      "label": "Ngưỡng"
+    },
+    "style": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
     }
    }
   },
@@ -1754,6 +2000,22 @@
     },
     "vibrance": {
      "label": "Độ sống động"
+    },
+    "exposure": {
+     "label": "Phơi sáng"
+    },
+    "threshold": {
+     "label": "Ngưỡng"
+    },
+    "knee": {
+     "label": "Độ mềm ngưỡng"
+    },
+    "style": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
     }
    }
   },
@@ -2024,8 +2286,11 @@
    }
   },
   "edgedetect": {
+   "aliases": [
+    "Phát hiện cạnh"
+   ],
    "description": "Đường sáng ở nơi hình ảnh thay đổi, tối ở những chỗ khác. Mực vẽ đường tối trên nền trắng; Màu giữ màu gốc của hình ảnh ở các cạnh.",
-   "name": "Phát hiện cạnh",
+   "name": "Tìm cạnh",
    "params": {
     "strength": {
      "label": "Cường độ"
@@ -2275,6 +2540,22 @@
       "Tâm",
       "Góc"
      ]
+    },
+    "alight": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
+    },
+    "alZ": {
+     "label": "Vị trí Z"
+    },
+    "alLight": {
+     "label": "Hướng"
+    },
+    "alElev": {
+     "label": "Độ cao"
     }
    }
   },
@@ -2350,8 +2631,11 @@
    }
   },
   "exposure": {
+   "aliases": [
+    "Phơi sáng"
+   ],
    "description": "Mô phỏng phơi sáng nhiếp ảnh với số stop, độ lệch và hiệu chỉnh gamma. Làm sáng phần trong suốt cho phép các điểm ảnh trong suốt một phần, như mép bị làm mờ, sáng hơn cả màu trắng.",
-   "name": "Phơi sáng",
+   "name": "Phơi sáng / Gamma",
    "params": {
     "gamma": {
      "label": "Gamma"
@@ -2364,6 +2648,24 @@
     },
     "stops": {
      "label": "Số stop"
+    }
+   }
+  },
+  "facetrack": {
+   "aliases": [
+    "Chuyển động khuôn mặt"
+   ],
+   "description": "Chuyển động theo khuôn mặt cho lớp video: video dịch chuyển và thu phóng để khuôn mặt bạn chọn luôn ở cùng một chỗ trong khung hình. Chạm Chọn khuôn mặt, rồi chạm vào một khuôn mặt trên bản xem trước. Khuôn mặt được theo dõi một lần trong suốt clip và kết quả được giữ lại, nên bản xem trước và khi xuất dùng được ngay. Thu phóng đặt kích thước khuôn mặt được giữ (100% là kích thước lúc bạn chọn), Vị trí là chỗ nó ở trong khung hình, và Độ mượt giúp chuyển động ổn định hơn.",
+   "name": "Theo dõi khuôn mặt",
+   "params": {
+    "position": {
+     "label": "Vị trí"
+    },
+    "smoothing": {
+     "label": "Độ mượt"
+    },
+    "zoom": {
+     "label": "Thu phóng"
     }
    }
   },
@@ -2437,6 +2739,13 @@
     "edgeStrength": {
      "label": "Độ mạnh viền"
     },
+    "edgeStyle": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
+    },
     "feather": {
      "label": "Độ mềm"
     },
@@ -2461,18 +2770,18 @@
     "scanStrength": {
      "label": "Độ mạnh đường quét"
     },
-    "tint": {
-     "label": "Độ phủ màu"
-    },
-    "tintColor": {
-     "label": "Màu phủ"
-    },
     "style": {
      "label": "Kiểu",
      "options": [
       "Cổ điển",
       "Tiêu chuẩn"
      ]
+    },
+    "tint": {
+     "label": "Độ phủ màu"
+    },
+    "tintColor": {
+     "label": "Màu phủ"
     }
    }
   },
@@ -2509,6 +2818,13 @@
      "options": [
       "Nháy",
       "Ổn định"
+     ]
+    },
+    "wave": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
      ]
     }
    }
@@ -2616,6 +2932,16 @@
       "Tâm",
       "Góc"
      ]
+    },
+    "style": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
+    },
+    "alZ": {
+     "label": "Vị trí Z"
     }
    }
   },
@@ -2629,6 +2955,9 @@
    }
   },
   "fourcolor": {
+   "aliases": [
+    "Chuyển màu bốn màu"
+   ],
    "description": "Hòa trộn bốn màu đặt tại bốn điểm (tính bằng pixel từ tâm lớp) lên lớp.",
    "name": "Chuyển màu bốn màu",
    "params": {
@@ -2869,6 +3198,18 @@
     }
    }
   },
+  "gaussianblur": {
+   "description": "Một kiểu làm mờ mịn và mềm. Cường độ quyết định độ mờ lan xa đến đâu.",
+   "name": "Làm mờ Gauss",
+   "params": {
+    "scale": {
+     "label": "Tỷ lệ"
+    },
+    "strength": {
+     "label": "Cường độ"
+    }
+   }
+  },
   "glass": {
    "description": "Biến hình dạng của lớp thành kính vát cạnh, bẻ cong các lớp phía sau và có điểm sáng dọc theo viền. Khi Ánh sáng là Mềm, lớp hiện ra theo mức Tô và kính được chiếu sáng bằng Màu, sáng nhất dọc theo mép trong của phần vát cạnh hướng về phía ánh sáng.",
    "name": "Kính",
@@ -2952,14 +3293,26 @@
    }
   },
   "glowscan": {
-   "description": "Chỉ làm nhòe và phát sáng những phần của lớp có độ sáng nằm trong một dải; tạo hiệu ứng cho Vị trí để quét ánh sáng từ vùng tối đến vùng sáng.",
+   "description": "Vẽ đường viền phát sáng ở nơi độ sáng của hình ảnh vượt qua Ngưỡng, giống như quét đường đồng mức.",
    "name": "Quét phát sáng",
    "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blend": {
+     "label": "Hòa trộn"
+    },
     "blur": {
      "label": "Độ nhòe"
     },
     "color": {
      "label": "Màu phát sáng"
+    },
+    "feather": {
+     "label": "Độ mềm"
+    },
+    "fill": {
+     "label": "Tô"
     },
     "intensity": {
      "label": "Cường độ"
@@ -2967,11 +3320,30 @@
     "position": {
      "label": "Vị trí"
     },
+    "radius": {
+     "label": "Bán kính"
+    },
     "show": {
      "label": "Chỉ hiện dải"
     },
+    "smoothing": {
+     "label": "Độ mượt"
+    },
     "softness": {
      "label": "Độ mềm"
+    },
+    "style": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
+    },
+    "threshold": {
+     "label": "Ngưỡng"
+    },
+    "tint": {
+     "label": "Màu"
     },
     "width": {
      "label": "Độ rộng"
@@ -3209,6 +3581,13 @@
       "Cổ điển",
       "Tiêu chuẩn"
      ]
+    },
+    "alight": {
+     "label": "Bố cục",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
     }
    }
   },
@@ -3243,8 +3622,11 @@
    }
   },
   "halftone": {
+   "aliases": [
+    "Halftone"
+   ],
    "description": "Các điểm tram lớn dần ở nơi hình ảnh tối.",
-   "name": "Halftone",
+   "name": "Điểm bán sắc",
    "params": {
     "angle": {
      "label": "Góc"
@@ -3254,6 +3636,13 @@
     },
     "colored": {
      "label": "Chấm màu"
+    },
+    "edgeStyle": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
     },
     "ink": {
      "label": "Màu điểm"
@@ -3300,6 +3689,13 @@
      "label": "Cường độ"
     },
     "style": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
+    },
+    "edgeStyle": {
      "label": "Kiểu",
      "options": [
       "Cổ điển",
@@ -3407,6 +3803,22 @@
       "Cổ điển",
       "Tiêu chuẩn"
      ]
+    },
+    "alight": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
+    },
+    "alZ": {
+     "label": "Vị trí Z"
+    },
+    "alLight": {
+     "label": "Hướng"
+    },
+    "alElev": {
+     "label": "Độ cao"
     }
    }
   },
@@ -3431,6 +3843,13 @@
     },
     "seed": {
      "label": "Hạt giống"
+    },
+    "edgeStyle": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
     }
    }
   },
@@ -3489,6 +3908,19 @@
     },
     "stretch": {
      "label": "Kéo giãn"
+    },
+    "lineWidth": {
+     "label": "Độ rộng đường"
+    },
+    "feather": {
+     "label": "Làm mềm viền"
+    },
+    "edgeStyle": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
     }
    }
   },
@@ -3550,6 +3982,14 @@
     },
     "stretch": {
      "label": "Kéo giãn"
+    },
+    "alight": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn",
+      "Hình ảnh"
+     ]
     }
    }
   },
@@ -3645,12 +4085,31 @@
       "Tâm",
       "Góc"
      ]
+    },
+    "alight": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
+    },
+    "alZ": {
+     "label": "Vị trí Z"
+    },
+    "alLight": {
+     "label": "Hướng"
+    },
+    "alElev": {
+     "label": "Độ cao"
     }
    }
   },
   "highlightshadow": {
+   "aliases": [
+    "Vùng sáng & vùng tối"
+   ],
    "description": "Phục hồi hoặc tăng độ sáng của vùng sáng và nâng sáng hoặc làm tối sâu vùng tối, dựa trên độ sáng của từng pixel.",
-   "name": "Vùng sáng & vùng tối",
+   "name": "Vùng sáng và vùng tối",
    "params": {
     "highlights": {
      "label": "Vùng sáng"
@@ -3775,6 +4234,22 @@
       "Cổ điển",
       "Tiêu chuẩn"
      ]
+    },
+    "alight": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
+    },
+    "alZ": {
+     "label": "Vị trí Z"
+    },
+    "alLight": {
+     "label": "Hướng"
+    },
+    "alElev": {
+     "label": "Độ cao"
     }
    }
   },
@@ -3909,12 +4384,31 @@
     }
    }
   },
+  "hueshift": {
+   "description": "Xoay mọi màu trên bánh xe màu cùng một góc và giữ nguyên độ sáng.",
+   "name": "Dịch sắc độ",
+   "params": {
+    "hue": {
+     "label": "Dịch sắc độ"
+    }
+   }
+  },
   "innerblur": {
    "description": "Làm mờ hình ảnh bên trong lớp nhưng vẫn giữ đường viền sắc nét.",
    "name": "Làm mờ bên trong",
    "params": {
     "blur": {
      "label": "Cường độ"
+    },
+    "iterations": {
+     "label": "Số vòng lặp"
+    },
+    "style": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
     }
    }
   },
@@ -3994,6 +4488,15 @@
     },
     "invert_alpha": {
      "label": "Đảo alpha"
+    },
+    "red": {
+     "label": "Đỏ"
+    },
+    "green": {
+     "label": "Lục"
+    },
+    "blue": {
+     "label": "Lam"
     }
    }
   },
@@ -4060,6 +4563,13 @@
     },
     "segments": {
      "label": "Số đoạn"
+    },
+    "edgeStyle": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
     }
    }
   },
@@ -4096,9 +4606,23 @@
    }
   },
   "lensflare": {
-   "description": "Nguồn sáng mạnh kèm quầng sáng phủ lên hình ảnh.",
-   "name": "Lóe sáng",
+   "aliases": [
+    "Lóe sáng"
+   ],
+   "description": "Ánh sáng chói với hình ngôi sao, quầng sáng và các vòng phản chiếu, đặt lên trên hình ảnh.",
+   "name": "Lóa ống kính",
    "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blendMode": {
+     "label": "Chế độ hòa trộn",
+     "options": [
+      "Bình thường",
+      "Nhân",
+      "Màn hình"
+     ]
+    },
     "brightness": {
      "label": "Độ sáng"
     },
@@ -4108,8 +4632,21 @@
     "color": {
      "label": "Màu"
     },
+    "points": {
+     "label": "Số điểm"
+    },
     "radius": {
      "label": "Bán kính"
+    },
+    "shine": {
+     "label": "Độ lấp lánh"
+    },
+    "style": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
     }
    }
   },
@@ -4274,6 +4811,13 @@
       "Cổ điển",
       "Tiêu chuẩn"
      ]
+    },
+    "alight": {
+     "label": "Bố cục",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
     }
    }
   },
@@ -4392,6 +4936,14 @@
      "options": [
       "Cổ điển",
       "Tiêu chuẩn"
+     ]
+    },
+    "weighting": {
+     "label": "Chế độ",
+     "options": [
+      "Cổ điển",
+      "Luma",
+      "RGB"
      ]
     }
    }
@@ -4709,6 +5261,25 @@
       "Tâm",
       "Góc"
      ]
+    },
+    "alight": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
+    },
+    "alZ": {
+     "label": "Vị trí Z"
+    },
+    "alLight": {
+     "label": "Hướng"
+    },
+    "alElev": {
+     "label": "Độ cao"
+    },
+    "alHeight": {
+     "label": "Chiều cao"
     }
    }
   },
@@ -4964,6 +5535,13 @@
      ]
     },
     "roll": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
+    },
+    "space": {
      "label": "Kiểu",
      "options": [
       "Cổ điển",
@@ -5328,6 +5906,16 @@
       "Cổ điển",
       "Tiêu chuẩn"
      ]
+    },
+    "edgeStyle": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
+    },
+    "saturation": {
+     "label": "Độ bão hòa"
     }
    }
   },
@@ -5446,6 +6034,18 @@
       "Cổ điển",
       "Tiêu chuẩn"
      ]
+    },
+    "angle": {
+     "label": "Góc"
+    },
+    "scale": {
+     "label": "Tỷ lệ"
+    },
+    "repeat": {
+     "label": "Lặp lại"
+    },
+    "mirror": {
+     "label": "Lật gương"
     }
    }
   },
@@ -5706,6 +6306,22 @@
       "Tâm",
       "Góc"
      ]
+    },
+    "alight": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
+    },
+    "alZ": {
+     "label": "Vị trí Z"
+    },
+    "alLight": {
+     "label": "Hướng"
+    },
+    "alElev": {
+     "label": "Độ cao"
     }
    }
   },
@@ -5752,6 +6368,13 @@
     },
     "width": {
      "label": "Độ rộng"
+    },
+    "alight": {
+     "label": "Bố cục",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
     }
    }
   },
@@ -5840,6 +6463,13 @@
     },
     "sweep": {
      "label": "Độ quét"
+    },
+    "alight": {
+     "label": "Bố cục",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
     }
    }
   },
@@ -6018,6 +6648,19 @@
     },
     "glossiness": {
      "label": "Độ sắc nét điểm sáng"
+    },
+    "style": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
+    },
+    "alLight": {
+     "label": "Hướng"
+    },
+    "alElev": {
+     "label": "Độ cao"
     }
    },
    "shortcuts": {
@@ -6107,8 +6750,11 @@
    }
   },
   "reorient360": {
+   "aliases": [
+    "Định hướng lại hình cầu 360°"
+   ],
    "description": "Xoay một lớp toàn cảnh 360° bên trong hình cầu của nó, để cân đường chân trời hoặc đổi hướng phía trước.",
-   "name": "Định hướng lại hình cầu 360°",
+   "name": "Định hướng lại hình cầu 360º",
    "params": {
     "pitch": {
      "label": "Góc dọc"
@@ -6432,6 +7078,18 @@
     },
     "seed": {
      "label": "Hạt giống"
+    }
+   }
+  },
+  "saturationvibrance": {
+   "description": "Làm màu đậm hơn hoặc nhạt hơn. Độ rực tăng nhẹ các màu xỉn và để nguyên các màu đậm.",
+   "name": "Độ bão hòa / Độ rực",
+   "params": {
+    "saturation": {
+     "label": "Độ bão hòa"
+    },
+    "vibrance": {
+     "label": "Độ sống động"
     }
    }
   },
@@ -6959,6 +7617,42 @@
     }
    }
   },
+  "spectralmap": {
+   "description": "Tô lại ảnh theo độ sáng bằng một dải quang phổ ba màu. Lặp lại chạy qua nhiều lần hơn, Pha dịch nó và Nén làm mỗi dải rộng ra.",
+   "name": "Bản đồ quang phổ",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blueColor": {
+     "label": "Màu 3"
+    },
+    "greenColor": {
+     "label": "Màu 2"
+    },
+    "phase": {
+     "label": "Pha"
+    },
+    "redColor": {
+     "label": "Màu 1"
+    },
+    "repeat": {
+     "label": "Số lần lặp"
+    },
+    "reverse": {
+     "label": "Đảo ngược"
+    },
+    "saturation": {
+     "label": "Độ bão hòa"
+    },
+    "scaleBrightness": {
+     "label": "Nhân độ sáng"
+    },
+    "squeeze": {
+     "label": "Siết"
+    }
+   }
+  },
   "spherize": {
    "description": "Bọc lớp lên hình cầu bằng phép chiếu trực diện hoặc kết cấu equirectangular.",
    "name": "Tạo cầu",
@@ -7055,6 +7749,22 @@
       "Tâm",
       "Góc"
      ]
+    },
+    "alight": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
+    },
+    "alZ": {
+     "label": "Vị trí Z"
+    },
+    "alLight": {
+     "label": "Hướng"
+    },
+    "alElev": {
+     "label": "Độ cao"
     }
    }
   },
@@ -7168,8 +7878,11 @@
    }
   },
   "splittone": {
+   "aliases": [
+    "Tách tông"
+   ],
    "description": "Nhuộm vùng tối sang một tông màu và vùng sáng sang tông khác, giữ nguyên đen, trắng và độ sáng. Cấp độ vùng tối uốn đường cong độ sáng và Cấp độ vùng sáng dời điểm bắt đầu màu vùng sáng. Kiểu Bản đồ chuyển màu cho mỗi điểm ảnh một màu chỉ từ độ sáng của nó.",
-   "name": "Tách tông",
+   "name": "Màu nóng",
    "params": {
     "highlightAmount": {
      "label": "Mức vùng sáng"
@@ -7284,6 +7997,13 @@
     },
     "shine": {
      "label": "Độ lấp lánh"
+    },
+    "edgeStyle": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
     }
    }
   },
@@ -7306,20 +8026,17 @@
    }
   },
   "starpolyhedron": {
-   "description": "Đặt lớp lên một ngôi sao tạo từ hai kim tự tháp chéo nhau.",
+   "description": "Đặt lớp lên một ngôi sao có các cánh nhô lên thành gờ ở phía trước và phía sau, có ánh sáng và chiều sâu.",
    "name": "Đa diện sao",
    "params": {
-    "light": {
-     "label": "Góc ánh sáng"
+    "orientA": {
+     "label": "Hướng α"
     },
-    "perspective": {
-     "label": "Phối cảnh"
+    "orientB": {
+     "label": "Hướng β"
     },
-    "position": {
-     "label": "Vị trí"
-    },
-    "radius": {
-     "label": "Bán kính"
+    "orientG": {
+     "label": "Hướng γ"
     },
     "rotX": {
      "label": "Xoay X"
@@ -7330,11 +8047,83 @@
     "rotZ": {
      "label": "Xoay Z"
     },
+    "starSize": {
+     "label": "Kích thước"
+    },
+    "starDepth": {
+     "label": "Độ sâu"
+    },
+    "pointLength": {
+     "label": "Độ dài cánh"
+    },
+    "smoothing": {
+     "label": "Độ mượt"
+    },
+    "points": {
+     "label": "Số điểm"
+    },
+    "alPos": {
+     "label": "Vị trí"
+    },
+    "alZ": {
+     "label": "Vị trí Z"
+    },
+    "alScale": {
+     "label": "Tỷ lệ"
+    },
+    "intensity": {
+     "label": "Cường độ sáng"
+    },
+    "alShine": {
+     "label": "Độ bóng"
+    },
+    "spec": {
+     "label": "Độ phản xạ"
+    },
+    "alAmbient": {
+     "label": "Ánh sáng môi trường"
+    },
+    "alColor": {
+     "label": "Màu"
+    },
+    "lightDir": {
+     "label": "Hướng"
+    },
+    "lightDepth": {
+     "label": "Độ cao"
+    },
+    "alMirror": {
+     "label": "Lật gương"
+    },
+    "alRepeatX": {
+     "label": "Lặp lại X"
+    },
+    "alRepeatY": {
+     "label": "Lặp lại Y"
+    },
+    "alTexAngle": {
+     "label": "Góc kết cấu"
+    },
+    "alCrop": {
+     "label": "Xén"
+    },
+    "radius": {
+     "label": "Bán kính"
+    },
+    "position": {
+     "label": "Vị trí"
+    },
     "scale": {
      "label": "Tỷ lệ"
     },
+    "perspective": {
+     "label": "Phối cảnh"
+    },
     "shading": {
      "label": "Đổ bóng"
+    },
+    "light": {
+     "label": "Góc ánh sáng"
     },
     "shine": {
      "label": "Độ bóng"
@@ -7390,6 +8179,13 @@
      "options": [
       "Tâm",
       "Góc"
+     ]
+    },
+    "style": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
      ]
     }
    }
@@ -7506,6 +8302,22 @@
       "Cổ điển",
       "Tiêu chuẩn"
      ]
+    },
+    "alight": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
+    },
+    "alZ": {
+     "label": "Vị trí Z"
+    },
+    "alLight": {
+     "label": "Hướng"
+    },
+    "alElev": {
+     "label": "Độ cao"
     }
    }
   },
@@ -7518,6 +8330,27 @@
     },
     "grain": {
      "label": "Kích thước"
+    }
+   }
+  },
+  "streakstrips": {
+   "description": "Cắt lớp thành các dải song song và kéo giãn một đường của hình ảnh trên mỗi dải, giống như bản quét bị lỗi.",
+   "name": "Dải kéo vệt",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "angle": {
+     "label": "Góc"
+    },
+    "count": {
+     "label": "Số lượng"
+    },
+    "maskToLayer": {
+     "label": "Mặt nạ theo lớp"
+    },
+    "phase": {
+     "label": "Pha"
     }
    }
   },
@@ -7601,6 +8434,15 @@
     }
    }
   },
+  "strokecolor": {
+   "description": "Tô các nét của lớp bằng một màu: viền của hình hoặc chữ, và mọi nét bút và cọ của bản vẽ.",
+   "name": "Màu nét viền",
+   "params": {
+    "color": {
+     "label": "Màu"
+    }
+   }
+  },
   "stroketaper": {
    "description": "Làm các nét thuôn dần thành một điểm: nét bút và cọ của hình vẽ tay, cùng Nét của đường và hình (Viền & bóng > Nét). Từ không có gì đến Bắt đầu, và từ Kết thúc về không. Siết giúp phần thuôn nhọn hơn.",
    "name": "Thuôn nét",
@@ -7613,6 +8455,13 @@
     },
     "start": {
      "label": "Bắt đầu"
+    },
+    "style": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
     }
    }
   },
@@ -7955,6 +8804,18 @@
     "wobbly": "Lảo đảo"
    }
   },
+  "textspacing": {
+   "description": "Thay đổi khoảng cách giữa các chữ cái và giữa các dòng của lớp văn bản. Khoảng cách chữ giãn các chữ ra xa nhau, hoặc kéo chúng sát lại khi dưới 0%. Khoảng cách dòng đặt độ xa giữa các dòng: 100% là bình thường và 200% là gấp đôi. Đặt keyframe cho một trong hai để tạo chuyển động cho khoảng cách.",
+   "name": "Giãn cách văn bản",
+   "params": {
+    "letterspacing": {
+     "label": "Khoảng cách chữ"
+    },
+    "linespacing": {
+     "label": "Khoảng cách dòng"
+    }
+   }
+  },
   "texttransform": {
    "description": "Di chuyển, thu phóng, xoay, làm mờ dần và nhuộm màu chữ cái, từ hoặc dòng trong một phạm vi. Anchor đặt việc thu phóng và xoay dùng từng thành phần hay tâm của lớp. Di chuyển phạm vi bằng Pha để thay đổi lan dần qua văn bản.",
    "name": "Biến đổi văn bản",
@@ -8139,6 +9000,13 @@
       "Cổ điển",
       "Tiêu chuẩn"
      ]
+    },
+    "edgeStyle": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
     }
    }
   },
@@ -8209,6 +9077,13 @@
       "Cổ điển",
       "Tiêu chuẩn"
      ]
+    },
+    "edgeStyle": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
     }
    }
   },
@@ -8244,8 +9119,11 @@
    }
   },
   "timequant": {
+   "aliases": [
+    "Tốc độ khung hình"
+   ],
    "description": "Làm lớp này chuyển động ở tốc độ khung hình thấp hơn, giống như cảnh quay bị giật hoặc stop-motion.",
-   "name": "Tốc độ khung hình",
+   "name": "Lượng tử hóa thời gian",
    "params": {
     "fps": {
      "label": "Bước/giây"
@@ -8363,6 +9241,22 @@
       "Tâm",
       "Góc"
      ]
+    },
+    "alight": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
+    },
+    "alZ": {
+     "label": "Vị trí Z"
+    },
+    "alLight": {
+     "label": "Hướng"
+    },
+    "alElev": {
+     "label": "Độ cao"
     }
    }
   },
@@ -8409,6 +9303,16 @@
       "Cổ điển",
       "Tiêu chuẩn"
      ]
+    },
+    "wrapStyle": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
+    },
+    "depth": {
+     "label": "Độ sâu"
     }
    }
   },
@@ -8528,6 +9432,9 @@
       "Cổ điển",
       "Tiêu chuẩn"
      ]
+    },
+    "singleAxis": {
+     "label": "Một trục"
     }
    }
   },
@@ -8549,6 +9456,13 @@
      "options": [
       "Lớp",
       "Màn hình"
+     ]
+    },
+    "edgeStyle": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
      ]
     }
    }
@@ -8574,6 +9488,13 @@
      "options": [
       "Xám",
       "Đỏ"
+     ]
+    },
+    "style": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
      ]
     }
    }
@@ -8656,8 +9577,11 @@
    }
   },
   "viewer360": {
+   "aliases": [
+    "Trình xem 360°"
+   ],
    "description": "Hiển thị lớp toàn cảnh 360° qua một máy ảnh ảo mà bạn có thể xoay và thu phóng.",
-   "name": "Trình xem 360°",
+   "name": "Trình xem 360º",
    "params": {
     "fov": {
      "label": "Trường nhìn"
@@ -8965,6 +9889,94 @@
     },
     "zoom": {
      "label": "Cường độ"
+    },
+    "alight": {
+     "label": "Bố cục",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
+    }
+   }
+  },
+  "ring": {
+   "description": "Quấn lớp quanh một chiếc vòng có mặt phẳng, như một đoạn ống ngắn, có ánh sáng và chiều sâu.",
+   "name": "Vòng",
+   "params": {
+    "orientA": {
+     "label": "Hướng α"
+    },
+    "orientB": {
+     "label": "Hướng β"
+    },
+    "orientG": {
+     "label": "Hướng γ"
+    },
+    "rotX": {
+     "label": "Xoay X"
+    },
+    "rotY": {
+     "label": "Xoay Y"
+    },
+    "rotZ": {
+     "label": "Xoay Z"
+    },
+    "radius": {
+     "label": "Bán kính"
+    },
+    "thickness": {
+     "label": "Chiều rộng"
+    },
+    "height": {
+     "label": "Độ dài"
+    },
+    "smoothing": {
+     "label": "Độ mượt"
+    },
+    "position": {
+     "label": "Vị trí"
+    },
+    "alZ": {
+     "label": "Vị trí Z"
+    },
+    "scale": {
+     "label": "Tỷ lệ"
+    },
+    "intensity": {
+     "label": "Cường độ sáng"
+    },
+    "shine": {
+     "label": "Độ bóng"
+    },
+    "spec": {
+     "label": "Độ phản xạ"
+    },
+    "ambient": {
+     "label": "Ánh sáng môi trường"
+    },
+    "lightColor": {
+     "label": "Màu"
+    },
+    "lightDir": {
+     "label": "Hướng"
+    },
+    "lightDepth": {
+     "label": "Độ cao"
+    },
+    "texMirror": {
+     "label": "Lật gương"
+    },
+    "texRepeatX": {
+     "label": "Lặp lại X"
+    },
+    "texRepeatY": {
+     "label": "Lặp lại Y"
+    },
+    "texAngle": {
+     "label": "Góc kết cấu"
+    },
+    "texCrop": {
+     "label": "Xén"
     }
    }
   }

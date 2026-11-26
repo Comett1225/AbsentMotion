@@ -2,6 +2,9 @@
  "id": "smoothedges",
  "name": "Smooth Edges",
  "category": "key",
+ "also": [
+  "stylize"
+ ],
  "since": "4.0.0",
  "description": "Rounds and smooths the edges of the opaque parts of the layer without changing the colors inside. Mask To Layer only lets the edges move inward.",
  "params": [

@@ -2,6 +2,9 @@
  "id": "rgbsplit",
  "name": "RGB Split",
  "category": "stylize",
+ "also": [
+  "color"
+ ],
  "description": "Splits the red, green and blue channels: the Center channel stays put and the other two shift in opposite directions along Angle. Light adds the shifted colors, Dark keeps them solid, Mask keeps only where all three overlap and Luma makes the fringes as opaque as they are bright. Average makes each spot as opaque as the share of channels that cover it.",
  "params": [
   {

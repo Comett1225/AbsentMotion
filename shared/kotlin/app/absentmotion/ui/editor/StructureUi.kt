@@ -55,6 +55,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
@@ -64,6 +65,7 @@ import app.absentmotion.editor.EffectClipboard
 import app.absentmotion.editor.pasteEffectsOnChosen
 import app.absentmotion.editor.MultiSelect
 import app.absentmotion.editor.StylePart
+import app.absentmotion.editor.PastedStyle
 import app.absentmotion.editor.copiedLayerForStyle
 import app.absentmotion.editor.pasteStyleOnChosen
 import app.absentmotion.editor.removeAudioOfChosen
@@ -400,7 +402,8 @@ private val AlignNames = listOf(
 
 internal val PasteLabels = mapOf(
     StylePart.ColorFill to R.string.structure_paste_fill_color, StylePart.BorderShadow to R.string.structure_paste_border_shadow,
-    StylePart.Blending to R.string.structure_paste_blending,
+    StylePart.Blending to R.string.structure_paste_blending, StylePart.Effects to R.string.effects_paste_effects,
+    StylePart.Motions to R.string.structure_paste_motions,
 )
 
 @Composable
@@ -465,8 +468,15 @@ internal fun MultiTopBar(state: EditorState, modifier: Modifier) {
     }
 }
 
-internal fun styleToast(context: Context, n: Int) {
-    Toast.makeText(context, context.resources.getQuantityString(R.plurals.structure_style_pasted, n, n.toString()), Toast.LENGTH_SHORT).show()
+internal fun styleToast(context: Context, pasted: PastedStyle?, onto: Boolean = true) {
+    val resources = context.resources
+    val n = pasted?.layers ?: 0
+    val lines = listOfNotNull(
+        resources.getQuantityString(R.plurals.structure_style_pasted, n, n.toString()).takeIf { onto },
+        pasted?.skipped?.takeIf { it > 0 }?.let { resources.getQuantityString(R.plurals.effects_paste_skipped, it, it.toString()) },
+        pasted?.unpaired?.takeIf { it > 0 }?.let { resources.getQuantityString(R.plurals.structure_transitions_skipped, it, it.toString()) },
+    ) + pasted?.notes.orEmpty().map { it.resolve(context) }
+    if (lines.isNotEmpty()) Toast.makeText(context, lines.joinToString("\n"), if (lines.size > 1) Toast.LENGTH_LONG else Toast.LENGTH_SHORT).show()
 }
 
 internal fun pasteEffectsOnSelection(state: EditorState, context: Context) {
@@ -497,8 +507,8 @@ internal fun ChoiceList(items: List<String>, onDismiss: () -> Unit, below: Boole
                 .verticalScroll(rememberScrollState()),
         ) {
             items.forEachIndexed { i, label ->
-                Box(Modifier.fillMaxWidth().height(40.dp).clickable { onPick(i); onDismiss() }.padding(horizontal = 14.dp), contentAlignment = Alignment.CenterStart) {
-                    Text(label, color = Am.OnDark, fontSize = 15.sp, maxLines = 1)
+                Box(Modifier.fillMaxWidth().heightIn(min = 40.dp).clickable { onPick(i); onDismiss() }.padding(horizontal = 14.dp, vertical = 6.dp), contentAlignment = Alignment.CenterStart) {
+                    Text(label, color = Am.OnDark, fontSize = 15.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 }
             }
         }
@@ -528,10 +538,12 @@ internal fun MultiParentMenu(state: EditorState, below: Boolean = false, onDismi
 }
 
 @Composable
-internal fun PasteStyleMenu(state: EditorState, onDismiss: () -> Unit) {
+internal fun PasteStyleMenu(state: EditorState, chosen: Boolean = false, onDismiss: () -> Unit) {
     val parts = StylePart.entries
+    val context = LocalContext.current
     ChoiceList(parts.map { stringResource(PasteLabels.getValue(it)) } + stringResource(R.string.structure_paste_style), onDismiss) { i ->
-        state.pasteStyle(if (i < parts.size) setOf(parts[i]) else parts.toSet())
+        val picked = if (i < parts.size) setOf(parts[i]) else parts.toSet()
+        styleToast(context, if (chosen) state.pasteStyleOnChosen(picked) else state.pasteStyle(picked), onto = chosen)
     }
 }
 

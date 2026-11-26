@@ -39,6 +39,7 @@ import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.FreehandMode
 import app.absentmotion.editor.PointMode
 import app.absentmotion.editor.TrackMode
+import app.absentmotion.editor.FaceMode
 import app.absentmotion.editor.leaveDrawing
 import app.absentmotion.editor.shapeKeyFrames
 import app.absentmotion.editor.toggleShapeKey
@@ -102,6 +103,7 @@ internal fun DrawingEditor(state: EditorState) {
                 is FreehandMode -> FreehandOverlay(state, mode, Modifier.fillMaxSize())
                 is PointMode -> PointOverlay(state, mode, Modifier.fillMaxSize())
                 is TrackMode -> TrackOverlay(state, mode, Modifier.fillMaxSize())
+                is FaceMode -> FaceOverlay(state, mode, Modifier.fillMaxSize())
             }
             if (mode is FreehandMode && deskLayout) ZoomGroup(state, Modifier.align(Alignment.BottomEnd).padding(12.dp))
         }
@@ -111,6 +113,7 @@ internal fun DrawingEditor(state: EditorState) {
                 is FreehandMode -> FreehandPanel(mode, wide = maxWidth >= 700.dp)
                 is PointMode -> PointPanel(state, mode)
                 is TrackMode -> TrackPanel(state, mode)
+                is FaceMode -> FacePanel(state, mode)
             }
         }
     }
@@ -163,15 +166,16 @@ internal fun PointTopBar(state: EditorState, mode: PointMode, modifier: Modifier
 @Composable
 private fun DrawingBar(state: EditorState, mode: DrawingMode, modifier: Modifier) {
     val cell = Modifier.width(40.dp).fillMaxHeight()
+    val catalog by state.engine.effects.collectAsState()
     Row(modifier.background(Bar), verticalAlignment = Alignment.CenterVertically) {
         BarButton(ChromeIcons.Back, stringResource(R.string.draw_back), cell) { state.leaveDrawing() }
         Text(
-            stringResource(
+            if (mode is FaceMode) catalog.find(app.absentmotion.editor.FACE_EFFECT)?.name.orEmpty() else stringResource(
                 when { mode is TrackMode -> R.string.draw_title_track_motion; mode is PointMode && mode.vector -> R.string.add_quick_pen_tool; mode is PointMode -> R.string.draw_title_edit_points; else -> R.string.add_quick_freehand_brush },
             ),
             Modifier.weight(1f), color = Am.OnDark, fontSize = 15.sp, maxLines = 1,
         )
-        val busy = (mode as? TrackMode)?.running == true
+        val busy = (mode as? TrackMode)?.running == true || (mode as? FaceMode)?.running == true
         BarButton(ChromeIcons.Undo, stringResource(R.string.draw_undo), cell, enabled = state.canUndo && !busy) { state.undo() }
         BarButton(ChromeIcons.Redo, stringResource(R.string.draw_redo), cell, enabled = state.canRedo && !busy) { state.redo() }
     }
@@ -180,7 +184,7 @@ private fun DrawingBar(state: EditorState, mode: DrawingMode, modifier: Modifier
 @Composable
 private fun DrawingTimeBar(state: EditorState, mode: DrawingMode, modifier: Modifier) {
     val layer = state.scene.layer(mode.layerId)
-    val locked = (mode as? TrackMode)?.let { it.running || it.lostFrame != null } == true
+    val locked = (mode as? TrackMode)?.let { it.running || it.lostFrame != null } == true || (mode as? FaceMode)?.running == true
     val first = layer?.let { state.scene.firstShownFrame(it.startTime) } ?: 0
     val last = layer?.let { state.scene.lastShownFrame(it.endTime) } ?: 0
     val cell = Modifier.width(48.dp).fillMaxHeight()

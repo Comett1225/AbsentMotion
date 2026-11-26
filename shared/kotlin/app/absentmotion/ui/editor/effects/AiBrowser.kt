@@ -299,6 +299,8 @@ internal fun AiVideoDialog(tools: AiTools, scene: Scene) {
 @Composable
 internal fun AiNoiseDialog(tools: AiTools) {
     if (tools.noiseSetup == null) return
+    val context = LocalContext.current
+    val missing = if (app.absentmotion.ai.AiModel.revision >= 0 && app.absentmotion.ai.AiModel.Noise.installed(context)) 0L else app.absentmotion.ai.AiModel.Noise.bytes
     AlertDialog(onDismissRequest = { tools.noiseSetup = null },
         title = { Text(stringResource(AiAction.Noise.title), color = Am.OnDark) },
         text = {
@@ -317,9 +319,13 @@ internal fun AiNoiseDialog(tools: AiTools) {
                         }
                     }
                 }
+                Box(Modifier.padding(top = 8.dp)) {
+                    EdgeSlider(stringResource(R.string.audio_param_amount), tools.noiseAmount, 0..100) { tools.noiseAmount = it }
+                }
+                if (missing > 0) Text(stringResource(R.string.ai_download_once, formatBytes(missing)), color = Am.Caption, fontSize = 12.sp, lineHeight = 17.sp)
             }
         },
-        confirmButton = { DialogPill(stringResource(R.string.start)) { tools.apply(AiAction.Noise, confirmed = true) } },
+        confirmButton = { DialogPill(stringResource(if (missing > 0) R.string.ai_download_and_start else R.string.start)) { tools.apply(AiAction.Noise, confirmed = true) } },
         dismissButton = { DialogPill(stringResource(R.string.cancel), primary = false, editor = true) { tools.noiseSetup = null } },
         containerColor = Am.Field)
 }

@@ -1,0 +1,45 @@
+{
+ "id": "facetrack",
+ "name": "Face Tracking",
+ "aliases": [
+  "Face Motion"
+ ],
+ "category": "move",
+ "since": "5.3.2",
+ "native": true,
+ "description": "Face motion for video layers: the video moves and zooms so the face you pick stays in the same spot of the frame. Tap Pick Face, then tap a face on the preview. The face is followed through the clip once and the result is kept, so the preview and the export use it right away. Zoom sets how big the face is kept (100% is its size when you picked it), Position is where in the frame it stays, and Smoothing makes the movement steadier.",
+ "params": [
+  {
+   "id": "zoom",
+   "label": "Zoom",
+   "type": "float",
+   "default": 1,
+   "min": 0.1,
+   "max": 10,
+   "step": 0.01,
+   "percent": true
+  },
+  {
+   "id": "position",
+   "label": "Position",
+   "type": "point",
+   "default": [
+    0.5,
+    0.5
+   ],
+   "min": 0,
+   "max": 1,
+   "step": 0.01
+  },
+  {
+   "id": "smoothing",
+   "label": "Smoothing",
+   "type": "float",
+   "default": 0.3,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true
+  }
+ ]
+}

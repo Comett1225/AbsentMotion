@@ -21,7 +21,7 @@ constexpr double kTau = 6.283185307179586;
 const char* const kMotionIds[] = {"absent.autoshake", "absent.randomdisplace", "absent.randomjitter", "absent.oscillate",
                                   "absent.swing", "absent.spin", "absent.pulsesize", "absent.pulseopacity",
                                   "absent.echo", "absent.videofeedback", "absent.timequant", "absent.shutterblur", "absent.motionblur", "absent.movealongpath",
-                                  "absent.scaleassist", "absent.parenthelper"};
+                                  "absent.scaleassist", "absent.parenthelper", "absent.facetrack"};
 
 thread_local bool gFastShutter = false;
 thread_local bool gShutterAnyTime = false;
@@ -210,6 +210,7 @@ float Lerp(float a, float b, float u) { return a + (b - a) * u; }
 struct Spot {
     SkPoint at = {0, 0};
     float turn = 0, size = 1, u = 0;
+    bool grows = false;
     SkMatrix outer = SkMatrix::I();
 };
 
@@ -256,7 +257,8 @@ void Ranged(const Layer& l, const LayerEffect& e, float t, std::vector<Spot> spo
         c.outer = s->outer;
         auto random = [&](int channel) { return (float)(Unit(seed, index * 5 + channel) * 2 - 1); };
         c.shiftMs = -delay * 1000.0 * index;
-        c.local = SkMatrix::Translate(s->at.fX + shift.fX * w + randomX * random(0), s->at.fY + shift.fY * w + randomY * random(1));
+        const float grow = s->grows ? Lerp(1, scale, w) : 1.0f;
+        c.local = SkMatrix::Translate(s->at.fX * grow + shift.fX * w + randomX * random(0), s->at.fY * grow + shift.fY * w + randomY * random(1));
         c.local.preRotate(s->turn + turn * w + randomTurn * random(2));
         const float k = s->size * Lerp(1, scale, w) * std::max(0.0f, 1 + randomScale * random(3));
         c.local.preScale(k, k);
@@ -295,12 +297,14 @@ void Basic(const LayerEffect& e, float t, std::vector<RepeatCopy>* out) {
 void Linear(const LayerEffect& e, float t, std::vector<Spot>* spots) {
     const int n = CountOf(e, t, 5, 150);
     const SkPoint span = {ParamAt(e, "position", 0, t, 500), ParamAt(e, "position", 1, t, 0)};
+    const bool alight = Param(e, "alight", t, 0) >= 0.5f;
     for (int i = 0; i < n; i++) {
         Spot s;
         s.u = Along(i, n);
         const float from = Param(e, "style", t, 0) >= 0.5f ? (n > 1 ? s.u : 0.0f) : s.u - 0.5f;
         s.at = {from * span.fX, from * span.fY};
         if (n == 1) s.u = 0;
+        if (alight) s.u = (i + 1.5f) / (n + 1);
         spots->push_back(s);
     }
 }
@@ -311,12 +315,13 @@ void Grid(const LayerEffect& e, float t, std::vector<Spot>* spots, int most) {
     const float stagger = Param(e, "stagger", t, 0);
     const int total = n * n;
     const bool corner = Param(e, "style", t, 0) >= 0.5f;
+    const bool alight = Param(e, "alight", t, 0) >= 0.5f;
     for (int row = 0; row < n; row++) {
         for (int col = 0; col < n; col++) {
             Spot s;
             const float x = corner ? (float)col / n : Along(col, n) - 0.5f, y = corner ? (float)row / n : Along(row, n) - 0.5f;
             s.at = {x * span.fX + (row % 2 ? stagger : 0), y * span.fY};
-            s.u = total > 1 ? (float)(row * n + col) / (total - 1) : 0;
+            s.u = alight ? (row * n + col + 1.5f) / (total + 1) : total > 1 ? (float)(row * n + col) / (total - 1) : 0;
             spots->push_back(s);
         }
     }
@@ -328,14 +333,16 @@ void Radial(const LayerEffect& e, float t, std::vector<Spot>* spots) {
     const float angle = Param(e, "angle", t, 0), sweep = Param(e, "sweep", t, 360);
     const float size = std::max(Param(e, "scale", t, 1), 0.0f);
     const bool round = std::fabs(sweep) >= 360 - 1e-3f;
+    const bool alight = Param(e, "alight", t, 0) >= 0.5f;
     for (int i = 0; i < n; i++) {
         Spot s;
-        const float a = angle + (n > 1 ? sweep * i / (round ? n : n - 1) : 0);
+        const float a = alight ? angle + (360 - sweep) / 2 + sweep * i / n : angle + (n > 1 ? sweep * i / (round ? n : n - 1) : 0);
         const double r = a * kTau / 360;
         s.at = {(float)(std::sin(r) * radius), (float)(-std::cos(r) * radius)};
         s.turn = a + orientation + (Param(e, "style", t, 0) >= 0.5f ? 180.0f : 0.0f);
         s.size = size;
-        s.u = n > 1 ? (float)i / (n - 1) : 0;
+        s.u = alight ? (i + 1.5f) / (n + 1) : n > 1 ? (float)i / (n - 1) : 0;
+        s.grows = alight;
         spots->push_back(s);
     }
 }
@@ -500,6 +507,27 @@ void Scatter(const Layer& l, const LayerEffect& e, float t, const RepeatSpace& s
     for (const auto& f : found) out->push_back(f.second);
 }
 
+void FaceTrack(const Layer& l, const LayerEffect& e, float t, Placement* p) {
+    const Anim* path = Find(e, "facepath");
+    const Anim* base = Find(e, "facebase");
+    if (!path || path->keys.empty() || !base || base->value.size() < 3) return;
+    const float size = base->value[0], width = base->value[1], height = base->value[2];
+    const float now = path->get(2, t, size);
+    const SkSize frame = ProjectSize();
+    if (!(size > 0) || !(now > 0) || width < 1 || height < 1 || frame.isEmpty()) return;
+    const SkRect bounds = ShapePath(l, t).getBounds();
+    if (bounds.isEmpty()) return;
+    const SkRect media = MediaRect(l, bounds, (int)width, (int)height);
+    const SkPoint face = {media.left() + path->get(0, t, 0.5f) * media.width(), media.top() + path->get(1, t, 0.5f) * media.height()};
+    const float k = std::clamp(Param(e, "zoom", t, 1) * size / now, 0.01f, 100.0f);
+    p->scale = {p->scale.fX * k, p->scale.fY * k};
+    SkMatrix m = SkMatrix::RotateDeg(p->rotation);
+    m.preSkew(tanf(l.skew.get(0, t, 0)), tanf(l.skew.get(1, t, 0)));
+    m.preScale(p->scale.fX, p->scale.fY);
+    const SkVector offset = m.mapVector(face.fX - p->pivot.fX, face.fY - p->pivot.fY);
+    p->location = {Param(e, "position", t, 0.5f, 0) * frame.width() - offset.fX, Param(e, "position", t, 0.5f, 1) * frame.height() - offset.fY};
+}
+
 }
 
 bool MotionEffect(const std::string& id) {
@@ -522,8 +550,9 @@ void ApplyMotion(const Layer& l, double timeMs, Placement* p) {
             const double x = Integral(e, "frequency", l, s, 2) + Param(e, "evolution", t, 0);
             const float seed = Param(e, "seed", t, 0), m = Param(e, "magnitude", t, 50), angle = Param(e, "angle", t, 45);
             const bool standard = Param(e, "pattern", t, 0) > 0.5f;
-            const double along = standard ? Noise(x, seed, true) : Noise(x, Plane(seed, 0));
-            const double across = standard ? Noise(x + 7.225, seed - 8.075, true) : Noise(x, Plane(seed, 1));
+            const bool alight = Param(e, "style", t, 0) > 0.5f;
+            const double along = alight ? Noise(x, seed) : standard ? Noise(x, seed, true) : Noise(x, Plane(seed, 0));
+            const double across = alight ? Noise(x - 12.6135, seed - 56.9425) : standard ? Noise(x + 7.225, seed - 8.075, true) : Noise(x, Plane(seed, 1));
             const double depth = standard ? Noise(x + 3.61, seed + 5.27, true) : Noise(x, Plane(seed, 2));
             p->location += Toward(angle, m * along) + Toward(angle + 90, m * Param(e, "slack", t, 0.25f) * across);
             p->z += (float)(Param(e, "zshake", t, 0) * depth);
@@ -557,6 +586,8 @@ void ApplyMotion(const Layer& l, double timeMs, Placement* p) {
             const float lo = Param(e, "shrink", t, 0.9f), hi = Param(e, "grow", t, 1.1f);
             const float k = (float)std::max(0.0, (lo + hi) / 2 + (hi - lo) / 2 * w);
             p->scale = {p->scale.fX * k, p->scale.fY * k};
+        } else if (id == "facetrack") {
+            FaceTrack(l, e, t, p);
         } else if (id == "scaleassist") {
             const float s = Param(e, "scale", t, 1), damp = Param(e, "damp", t, 1);
             const long axis = std::lround(Param(e, "axis", t, 3));

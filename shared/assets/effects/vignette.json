@@ -2,6 +2,9 @@
  "id": "vignette",
  "name": "Vignette",
  "category": "stylize",
+ "also": [
+  "key"
+ ],
  "description": "Darkens the layer toward its edges outside a rounded shape: Size sets the shape, Roundness how round it is, Feather how soft its edge is, Strength how dark it gets and Tint how much it takes on Color. Punch Out makes the edges transparent instead.",
  "params": [
   {

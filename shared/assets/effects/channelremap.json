@@ -2,6 +2,9 @@
  "id": "channelremap",
  "name": "Channel Remap (RGB)",
  "category": "color",
+ "also": [
+  "other"
+ ],
  "since": "3.0.0",
  "description": "Rebuilds each color channel from another channel of the layer, for false color or for moving luminance into alpha.",
  "params": [

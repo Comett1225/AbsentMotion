@@ -97,7 +97,7 @@
  {
   "name": "Halftone Lines",
   "id": "halftonelines",
-  "measured": "similar"
+  "measured": "same"
  },
  {
   "name": "Inner Blur",
@@ -105,7 +105,7 @@
   "measured": "same"
  },
  {
-  "name": "invert",
+  "name": "Invert",
   "id": "invert",
   "measured": "same"
  },
@@ -162,7 +162,7 @@
  {
   "name": "Pixelate",
   "id": "pixelate2",
-  "measured": "close"
+  "measured": "same"
  },
  {
   "name": "Polar Displacement Map",
@@ -467,7 +467,7 @@
  {
   "name": "Auto-Shake",
   "id": "shake2",
-  "measured": "similar"
+  "measured": "same"
  },
  {
   "name": "Block Dissolve",
@@ -522,17 +522,17 @@
  {
   "name": "Contour Strips",
   "id": "contourstrips",
-  "measured": "similar"
+  "measured": "close"
  },
  {
   "name": "Curl",
   "id": "curl",
-  "measured": "similar"
+  "measured": "same"
  },
  {
   "name": "Dark Glow",
   "id": "darkglow",
-  "measured": "similar"
+  "measured": "same"
  },
  {
   "name": "Directional Blur",
@@ -572,10 +572,10 @@
  {
   "name": "Fill Behind",
   "id": "fillbehind",
-  "measured": "close"
+  "measured": "same"
  },
  {
-  "name": "findedges",
+  "name": "Find Edges",
   "id": "findedges",
   "measured": "same"
  },
@@ -592,7 +592,7 @@
  {
   "name": "Halftone Dots",
   "id": "halftonedots",
-  "measured": "close"
+  "measured": "same"
  },
  {
   "name": "Hexagon Tile Rotate",
@@ -622,12 +622,12 @@
  {
   "name": "Kaleidoscope",
   "id": "kaleidoscope",
-  "measured": "similar"
+  "measured": "same"
  },
  {
   "name": "Lens Flare",
   "id": "lensflare",
-  "measured": "similar"
+  "measured": "close"
  },
  {
   "name": "Lightning",
@@ -700,24 +700,25 @@
   "measured": "same"
  },
  {
-  "name": "polar",
+  "name": "Polar Coordinates",
   "id": "polar",
-  "measured": "similar"
+  "measured": "same"
  },
  {
   "name": "Precise/Fast Box Blur",
   "id": "fastboxblur",
-  "measured": "same"
+  "measured": "same",
+  "hidden": true
  },
  {
   "name": "Radial Rays",
   "id": "radialrays",
-  "measured": "similar"
+  "measured": "same"
  },
  {
   "name": "Radial Shadow",
   "id": "radialshadow2",
-  "measured": "similar"
+  "measured": "same"
  },
  {
   "name": "Radial Wipe",
@@ -757,7 +758,7 @@
  {
   "name": "Star",
   "id": "star",
-  "measured": "similar"
+  "measured": "same"
  },
  {
   "name": "Starfield",
@@ -787,7 +788,7 @@
  {
   "name": "Swirl",
   "id": "swirl4",
-  "measured": "similar"
+  "measured": "same"
  },
  {
   "name": "swirl2",
@@ -842,7 +843,7 @@
  {
   "name": "Unsharp Mask",
   "id": "unsharpmask",
-  "measured": "close"
+  "measured": "same"
  },
  {
   "name": "Wave Warp",
@@ -857,7 +858,8 @@
  {
   "name": "Denoise",
   "id": "denoise",
-  "measured": "unmeasured"
+  "measured": "unmeasured",
+  "hidden": true
  },
  {
   "name": "Echo Keyframes",
@@ -867,12 +869,12 @@
  {
   "name": "Grid Repeat",
   "id": "repeat.grid",
-  "measured": "similar"
+  "measured": "same"
  },
  {
   "name": "Linear Repeat",
   "id": "repeat.line",
-  "measured": "close"
+  "measured": "same"
  },
  {
   "name": "Move Along Path",
@@ -882,7 +884,7 @@
  {
   "name": "Radial Repeat",
   "id": "repeat.radial",
-  "measured": "similar"
+  "measured": "same"
  },
  {
   "name": "Repeat",
@@ -892,7 +894,7 @@
  {
   "name": "Repeat Along Path",
   "id": "repeat.path",
-  "measured": "close"
+  "measured": "same"
  },
  {
   "name": "Scatter Field",
@@ -905,14 +907,14 @@
   "measured": "same"
  },
  {
-  "name": "360-reorient-sphere",
+  "name": "360º Reorient Sphere",
   "id": "360-reorient-sphere",
   "measured": "similar"
  },
  {
   "name": "Box",
   "id": "box",
-  "measured": "similar"
+  "measured": "same"
  },
  {
   "name": "boxblur",
@@ -935,14 +937,15 @@
   "measured": "similar"
  },
  {
-  "name": "bumpmap2",
+  "name": "Bump Map",
   "id": "bumpmap2",
   "measured": "similar"
  },
  {
   "name": "cartoon",
   "id": "cartoon",
-  "measured": "similar"
+  "measured": "similar",
+  "hidden": true
  },
  {
   "name": "checkerdissolve",
@@ -950,17 +953,18 @@
   "measured": "similar"
  },
  {
-  "name": "chromakey-adv",
+  "name": "Advanced Chroma Key",
   "id": "chromakey-adv",
   "measured": "same"
  },
  {
   "name": "chromaticvortexblur",
   "id": "chromaticvortexblur",
-  "measured": "similar"
+  "measured": "close",
+  "hidden": true
  },
  {
-  "name": "chromaticzoomblur",
+  "name": "Chromatic Zoom Blur",
   "id": "chromaticzoomblur",
   "measured": "same"
  },
@@ -972,10 +976,11 @@
  {
   "name": "coloradj",
   "id": "coloradj",
-  "measured": "same"
+  "measured": "same",
+  "hidden": true
  },
  {
-  "name": "colorbalance",
+  "name": "Color Balance",
   "id": "colorbalance",
   "measured": "same"
  },
@@ -985,7 +990,7 @@
   "measured": "same"
  },
  {
-  "name": "colorize",
+  "name": "Colorize",
   "id": "colorize",
   "measured": "same"
  },
@@ -1002,27 +1007,29 @@
  {
   "name": "cube",
   "id": "cube",
-  "measured": "similar"
+  "measured": "close"
  },
  {
   "name": "Cube",
   "id": "cube2",
-  "measured": "close"
+  "measured": "same"
  },
  {
   "name": "Cylinder",
   "id": "cylinder",
-  "measured": "similar"
+  "measured": "same"
  },
  {
   "name": "diff",
   "id": "diff",
-  "measured": "same"
+  "measured": "same",
+  "hidden": true
  },
  {
   "name": "differencematte",
   "id": "differencematte",
-  "measured": "same"
+  "measured": "same",
+  "hidden": true
  },
  {
   "name": "displacemap",
@@ -1032,17 +1039,12 @@
  {
   "name": "Ellipsoid",
   "id": "ellipsoid",
-  "measured": "similar"
+  "measured": "same"
  },
  {
-  "name": "energybeam",
+  "name": "Energy Beam",
   "id": "energybeam",
   "measured": "similar"
- },
- {
-  "name": "facemotion",
-  "id": "facemotion",
-  "measured": "unmeasured"
  },
  {
   "name": "findedges-edgeglow",
@@ -1080,32 +1082,28 @@
   "measured": "similar"
  },
  {
-  "name": "glass2",
+  "name": "Glass",
   "id": "glass2",
   "measured": "similar"
  },
  {
-  "name": "Glow",
-  "id": "glow",
-  "measured": "same"
- },
- {
-  "name": "glowscan",
+  "name": "Glow Scan",
   "id": "glowscan",
-  "measured": "similar"
+  "measured": "same"
  },
  {
   "name": "gradientdisplace",
   "id": "gradientdisplace",
-  "measured": "unmeasured"
+  "measured": "unmeasured",
+  "hidden": true
  },
  {
-  "name": "gradientmap",
+  "name": "Gradient Map",
   "id": "gradientmap",
   "measured": "same"
  },
  {
-  "name": "grunge",
+  "name": "Grunge",
   "id": "grunge",
   "measured": "similar"
  },
@@ -1122,22 +1120,22 @@
  {
   "name": "Hexagonal Prism",
   "id": "hexprism",
-  "measured": "similar"
+  "measured": "same"
  },
  {
-  "name": "hexarray",
+  "name": "Hexagon Array",
   "id": "hexarray",
-  "measured": "similar"
+  "measured": "close"
  },
  {
-  "name": "hextile",
+  "name": "Hexagon Tiling",
   "id": "hextile",
   "measured": "similar"
  },
  {
   "name": "Hollow Box",
   "id": "hollowbox",
-  "measured": "close"
+  "measured": "same"
  },
  {
   "name": "irridescence",
@@ -1145,7 +1143,7 @@
   "measured": "similar"
  },
  {
-  "name": "irridescence2",
+  "name": "Iridescence",
   "id": "irridescence2",
   "measured": "similar"
  },
@@ -1155,39 +1153,34 @@
   "measured": "same"
  },
  {
-  "name": "lensblur2",
+  "name": "Lens Blur",
   "id": "lensblur2",
   "measured": "same"
  },
  {
-  "name": "lumastamper",
+  "name": "Luma Stamper",
   "id": "lumastamper",
   "measured": "same"
  },
  {
-  "name": "mattechoke",
+  "name": "Matte Choker",
   "id": "mattechoke",
   "measured": "same"
  },
  {
-  "name": "mattechoke",
-  "id": "mattechoke",
-  "measured": "same"
- },
- {
-  "name": "mattefringe",
+  "name": "Matte Fringe",
   "id": "mattefringe",
   "measured": "same"
  },
  {
-  "name": "mirror",
+  "name": "Mirror",
   "id": "mirror",
   "measured": "same"
  },
  {
   "name": "Octahedron",
   "id": "octahedron",
-  "measured": "similar"
+  "measured": "same"
  },
  {
   "name": "oscillate",
@@ -1197,22 +1190,25 @@
  {
   "name": "outline",
   "id": "outline",
-  "measured": "similar"
+  "measured": "similar",
+  "hidden": true
  },
  {
   "name": "outlinebad",
   "id": "outlinebad",
-  "measured": "same"
+  "measured": "same",
+  "hidden": true
  },
  {
   "name": "outlinebasic",
   "id": "outlinebasic",
-  "measured": "same"
+  "measured": "same",
+  "hidden": true
  },
  {
   "name": "Page Curl",
   "id": "pagecurl",
-  "measured": "similar"
+  "measured": "close"
  },
  {
   "name": "Parenting Helper",
@@ -1222,12 +1218,13 @@
  {
   "name": "perlindisplace",
   "id": "perlindisplace",
-  "measured": "similar"
+  "measured": "similar",
+  "hidden": true
  },
  {
   "name": "Pyramid",
   "id": "pyramid",
-  "measured": "similar"
+  "measured": "same"
  },
  {
   "name": "Raster Extrude",
@@ -1237,17 +1234,19 @@
  {
   "name": "rgb-gamma",
   "id": "rgb-gamma",
-  "measured": "same"
+  "measured": "same",
+  "hidden": true
  },
  {
   "name": "rgb-mixer",
   "id": "rgb-mixer",
-  "measured": "same"
+  "measured": "same",
+  "hidden": true
  },
  {
   "name": "Ring",
   "id": "ring",
-  "measured": "similar"
+  "measured": "same"
  },
  {
   "name": "Scale Assist",
@@ -1262,7 +1261,8 @@
  {
   "name": "shadow",
   "id": "shadow",
-  "measured": "same"
+  "measured": "same",
+  "hidden": true
  },
  {
   "name": "spherize",
@@ -1272,10 +1272,10 @@
  {
   "name": "Spherize",
   "id": "spherize2",
-  "measured": "similar"
+  "measured": "same"
  },
  {
-  "name": "spill-cleanup",
+  "name": "Key Spill Cleaner",
   "id": "spill-cleanup",
   "measured": "same"
  },
@@ -1287,7 +1287,7 @@
  {
   "name": "Star Prism",
   "id": "starprism",
-  "measured": "similar"
+  "measured": "same"
  },
  {
   "name": "starfield",
@@ -1295,44 +1295,48 @@
   "measured": "similar"
  },
  {
-  "name": "streakstrips",
+  "name": "Streak Strips",
   "id": "streakstrips",
-  "measured": "similar"
+  "measured": "close"
  },
  {
   "name": "Three-axis Cross",
   "id": "plus",
-  "measured": "close"
+  "measured": "same"
  },
  {
   "name": "Torus",
   "id": "torus",
-  "measured": "similar"
+  "measured": "same"
  },
  {
   "name": "triprism",
   "id": "triprism",
-  "measured": "similar"
+  "measured": "similar",
+  "hidden": true
  },
  {
   "name": "triprism2",
   "id": "triprism2",
-  "measured": "similar"
+  "measured": "similar",
+  "hidden": true
  },
  {
   "name": "Tunnel",
   "id": "tunnel",
-  "measured": "similar"
+  "measured": "close"
  },
  {
   "name": "volumetricclouds",
   "id": "volumetricclouds",
-  "measured": "similar"
+  "measured": "similar",
+  "hidden": true
  },
  {
   "name": "vortexblur",
   "id": "vortexblur",
-  "measured": "similar"
+  "measured": "close",
+  "hidden": true
  },
  {
   "name": "vrcombined",
@@ -1340,12 +1344,12 @@
   "measured": "unmeasured"
  },
  {
-  "name": "vrplayer",
+  "name": "360º Viewer",
   "id": "vrplayer",
   "measured": "unmeasured"
  },
  {
-  "name": "warpblur",
+  "name": "Warp Blur",
   "id": "warpblur",
   "measured": "similar"
  },
@@ -1365,18 +1369,48 @@
   "measured": "same"
  },
  {
-  "name": "internal.smoothbevel",
+  "name": "Smooth Bevel",
   "id": "internal.smoothbevel",
   "measured": "same"
  },
  {
-  "name": "drawing.progress",
+  "name": "Drawing Progress",
   "id": "drawing.progress",
   "measured": "same"
  },
  {
-  "name": "drawing.stroketaper",
+  "name": "Stroke Taper",
   "id": "drawing.stroketaper",
-  "measured": "close"
+  "measured": "same"
+ },
+ {
+  "name": "deepglow",
+  "id": "deepglow",
+  "hidden": true
+ },
+ {
+  "name": "dropshadow.custom",
+  "id": "dropshadow.custom",
+  "hidden": true
+ },
+ {
+  "name": "fourcolorgradientnew",
+  "id": "fourcolorgradientnew",
+  "hidden": true
+ },
+ {
+  "name": "hsl",
+  "id": "hsl",
+  "hidden": true
+ },
+ {
+  "name": "Text Spacing",
+  "id": "textspacing",
+  "measured": "same"
+ },
+ {
+  "name": "Stroke Color",
+  "id": "drawing.strokecolor",
+  "measured": "same"
  }
 ]

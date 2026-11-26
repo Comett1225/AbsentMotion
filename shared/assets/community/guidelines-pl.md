@@ -27,6 +27,7 @@ Wszystko na karcie **Społeczność** jest sprawdzane przez człowieka, zanim si
 
 - Dbaj o to, by treści nadawały się dla wszystkich. AbsentMotion używają ludzie w każdym wieku.
 - Pakiety projektów mogą mieć do 20 MB, presety do 1 MB, a efekty do 512 KB.
+- Każdy efekt potrzebuje miniatury, która go pokazuje, w dwóch rozmiarach: małej (WebP 192 × 192, nieruchomej lub animowanej do 3 sekund) i dużej (WebP 720 × 720), każda do 150 KB.
 - Elementy są udostępniane na licencji CC BY 4.0: każdy może ich używać i zmieniać, jeśli podadzą autora.
 - Nazwa przy Twoim elemencie to nazwa twórcy, którą wpisujesz. Nie wpisuj tam niczego osobistego.
 - Opiekun projektu decyduje, co się pojawi, i może w każdej chwili usunąć element.

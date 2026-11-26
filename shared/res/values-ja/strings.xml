@@ -1169,8 +1169,6 @@
     <string name="font_source_google">Google Fonts</string>
     <string name="font_google_hint">名前を入力してGoogle Fonts全体を検索</string>
     <string name="font_downloads_when_chosen">選択時にダウンロード</string>
-    <string name="fonts_missing_title">この端末にないフォント</string>
-    <string name="fonts_missing_body">このプロジェクトには、この端末にないフォントが使われています：%1$s。Google Fontsからダウンロードするまで、テキストは別のフォントで表示されます。</string>
     <string name="font_favorite">お気に入り</string>
     <string name="font_category_sans_serif">サンセリフ</string>
     <string name="font_category_serif">セリフ</string>
@@ -1330,6 +1328,7 @@
     <string name="structure_paste_fill_color">塗りと色を貼り付け</string>
     <string name="structure_paste_border_shadow">枠線と影を貼り付け</string>
     <string name="structure_paste_blending">不透明度とブレンドモードを貼り付け</string>
+    <string name="structure_paste_motions">アニメーションとトランジションを貼り付け</string>
     <string name="structure_paste_style">スタイルを貼り付け</string>
     <string name="text_alignment">配置</string>
     <string name="track_track">トラック</string>
@@ -1786,6 +1785,7 @@
     <string name="ai_model_grain">AI高画質化グレインモデル</string>
     <string name="ai_model_cartoon">AI高画質化カートゥーンモデル</string>
     <string name="ai_model_cutout">AI背景除去 2.0</string>
+    <string name="ai_model_noise">ノイズ低減モデル</string>
     <string name="ai_model_broken">AIモデルファイルが破損したため削除しました。もう一度ダウンロードしてください。</string>
     <string name="ai_model_download_failed">AIモデルのダウンロードに失敗しました。接続を確認して、もう一度お試しください。</string>
     <string name="ai_model_download_wrong">ダウンロードされたのはAIモデルではありません</string>
@@ -1835,6 +1835,7 @@
     <string name="cutout_best">AI背景除去 2.0</string>
     <string name="cutout_best_hint">髪や細部の輪郭がよりきれいに。%1$sを一度だけダウンロード。画像のみ対応。</string>
     <string name="cutout_fallback_download">AI背景除去 2.0をダウンロードできなかったため、標準を使用しました。接続を確認して再試行してください。</string>
+    <string name="ai_noise_fallback_download">ノイズ低減モデルをダウンロードできなかったため、標準のノイズ低減を使用しました。接続を確認して再試行してください。</string>
     <string name="cutout_fallback_failed">AI背景除去 2.0でこの画像を処理できなかったため、標準を使用しました。</string>
     <string name="ai_gpu_warning">一部のスマートフォンではフリーズする可能性があります。フリーズした場合は再起動してください。AIは再びプロセッサを使用します。</string>
     <string name="ai_gpu_failed">GPUでのAI処理が完了しなかったため、AIはプロセッサを使用します。</string>
@@ -1952,6 +1953,17 @@
     <string name="track_motion_cancelled">トラッキングをキャンセルしました。追跡済みのフレームのキーフレームは保持されます。</string>
     <string name="track_motion_unavailable">このビルドではモーショントラッキングを利用できません。</string>
     <string name="track_motion_failed">この動画をトラッキングできませんでした。</string>
+    <string name="face_tracking_pick">顔を選ぶ</string>
+    <string name="face_tracking_again">再トラッキング</string>
+    <string name="face_tracking_none">まだ顔が選ばれていません。</string>
+    <string name="face_tracking_ready">動画は選んだ顔に合わせて動きます。</string>
+    <string name="face_tracking_partial">クリップの一部はまだトラッキングされていません。</string>
+    <string name="face_tracking_video_only">顔トラッキングは動画レイヤーで使えます。</string>
+    <string name="face_tracking_tap">動画が追う顔をタップしてください。</string>
+    <string name="face_tracking_looking">顔を探しています…</string>
+    <string name="face_tracking_none_here">このフレームに顔が見つかりません。別のフレームを試してください。</string>
+    <string name="face_tracking_lost">このクリップでは顔を追えませんでした。</string>
+    <string name="face_tracking_cancelled">顔トラッキングをキャンセルしました。</string>
     <string name="edit_layer_copy_name">%1$sのコピー</string>
     <string name="model_layer_video">動画</string>
     <string name="ai_video_mask_name">%1$sのマスク</string>
@@ -2277,6 +2289,9 @@
     <plurals name="structure_style_pasted">
         <item quantity="other">%1$s個のレイヤーに貼り付けました</item>
     </plurals>
+    <plurals name="structure_transitions_skipped">
+        <item quantity="other">%1$s個のトランジションをスキップしました：レイヤーの直前か直後にクリップが必要です</item>
+    </plurals>
     <string name="subject_keep_all">すべて保持</string>
     <string name="subject_hint_photo">1人または1つのものだけを残すには、それをタップします。</string>
     <string name="subject_hint_video">1人または1つのものだけを残すには、この最初のフレームでそれをタップします。アプリがクリップ全体を通して追跡します。</string>
@@ -2393,8 +2408,6 @@
     <string name="desk_folder_back">すべてのメディアに戻る</string>
     <string name="voice_install_espeak">音声が見つかりません。espeak-ngパッケージをインストールしてから、このウィンドウをもう一度開いてください。</string>
     <string name="desk_close_save_failed">最後の変更を保存できませんでした。ディスクの空き容量を確保してから「再試行」をクリックしてください。保存せずに閉じた場合、AbsentMotionは次回起動時にこれらの変更を再度提示します。</string>
-    <string name="desk_fonts_missing_title">このパソコンにないフォント</string>
-    <string name="desk_fonts_missing_body">このプロジェクトでは、このパソコンにないフォントを使用しています：%1$s。Google Fontsからダウンロードするまで、テキストは別のフォントで表示されます。</string>
     <string name="desk_export_busy">別の書き出しがまだ実行中です。完了するまで待つか、先にキャンセルしてください。</string>
     <string name="desk_export_no_ffmpeg">動画と音声のファイル作成に使用するFFmpegをAbsentMotionが起動できませんでした。AbsentMotionを再インストールしてください。</string>
     <string name="desk_export_note_software">このコンピューターではハードウェア動画エンコーダーが使用できないため、今回の書き出しには低速なソフトウェアエンコーダーを使用します。</string>
@@ -2765,6 +2778,7 @@
     <string name="added_effect_save_failed">一部のエフェクトを保存できませんでした。</string>
     <string name="added_effect_remove_failed">エフェクトを削除できませんでした。</string>
     <string name="community_filter_effects">エフェクト</string>
+    <string name="community_filter_new">新着</string>
     <string name="added_effect_version">バージョン %1$d</string>
     <string name="added_effect_already_added">追加済み</string>
     <string name="added_effect_newer_installed">より新しいバージョンがあります（v%1$d）</string>

@@ -45,6 +45,59 @@
    "step": 0.01
   },
   {
+   "id": "angle",
+   "label": "Angle",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.5,
+   "when": {
+    "style": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "scale",
+   "label": "Scale",
+   "type": "float",
+   "default": 1,
+   "min": 0.01,
+   "max": 10,
+   "step": 0.01,
+   "when": {
+    "style": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "repeat",
+   "label": "Repeat",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 100,
+   "step": 0.01,
+   "when": {
+    "style": [
+     1
+    ]
+   }
+  },
+  {
+   "id": "mirror",
+   "label": "Mirror",
+   "type": "switch",
+   "default": false,
+   "when": {
+    "style": [
+     1
+    ]
+   }
+  },
+  {
    "id": "style",
    "label": "Style",
    "type": "choice",
@@ -60,5 +113,5 @@
    }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float amount;\nuniform float direction;\nuniform float middle;\nuniform float radius;\nuniform float style;\nhalf4 main(float2 coord) {\n    float2 c = size * 0.5;\n    float r = 0.5 * min(size.x, size.y);\n    float2 q;\n    if (direction < 0.5) {\n        float2 d = coord - c;\n        float t = (dot(d, d) > 0.0 ? atan(d.x, -d.y) : 0.0) / 6.2831853 + 0.5;\n        float v = (length(d) - max(radius, 0.0) * r) / r;\n        q = middle > 0.5 ? float2(fract(1.25 - t) * size.x, (1.0 - v) * size.y) : float2(t * size.x, v * size.y);\n        if (style > 0.5) q.x = q.x * (size.x - 2.5) / size.x + 1.5;\n    } else {\n        float t = (middle > 0.5 ? 0.75 - coord.x / size.x : coord.x / size.x - 0.5) * 6.2831853;\n        float k = ((middle > 0.5 ? 1.0 - coord.y / size.y : coord.y / size.y) + max(radius, 0.0)) * r;\n        q = c + float2(sin(t), -cos(t)) * k;\n    }\n    float2 at = mix(coord, q, clamp(amount, 0.0, 1.0));\n    if (at.x < 0.0 || at.y < 0.0 || at.x > size.x || at.y > size.y) return half4(0.0);\n    return image.eval(at);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float amount;\nuniform float direction;\nuniform float middle;\nuniform float radius;\nuniform float style;\nuniform float angle;\nuniform float scale;\nuniform float repeat;\nuniform float mirror;\nhalf4 main(float2 coord) {\n    float2 c = size * 0.5;\n    float r = 0.5 * min(size.x, size.y);\n    float2 q;\n    if (direction < 0.5) {\n        float2 d = coord - c;\n        float t = (dot(d, d) > 0.0 ? atan(d.x, -d.y) : 0.0) / 6.2831853 + 0.5;\n        float v = (length(d) / max(scale, 0.0001) - max(radius, 0.0) * r) / r;\n        float a = repeat * ((middle > 0.5 ? 1.25 - t : t) - angle / 360.0);\n        float u = mirror > 0.5 ? 1.0 - abs(1.0 - 2.0 * fract(a)) : middle > 0.5 || repeat != 1.0 || angle != 0.0 ? fract(a) : a;\n        q = middle > 0.5 ? float2(u * size.x, (1.0 - v) * size.y) : float2(u * size.x, v * size.y);\n        if (style > 0.5) q.x = q.x * (size.x - 2.5) / size.x + 1.5;\n    } else {\n        float t = (middle > 0.5 ? 0.75 - coord.x / size.x : coord.x / size.x - 0.5) * 6.2831853;\n        float k = ((middle > 0.5 ? 1.0 - coord.y / size.y : coord.y / size.y) + max(radius, 0.0)) * r;\n        q = c + float2(sin(t), -cos(t)) * k;\n    }\n    float2 at = mix(coord, q, clamp(amount, 0.0, 1.0));\n    if (at.x < 0.0 || at.y < 0.0 || at.x > size.x || at.y > size.y) return half4(0.0);\n    return image.eval(at);\n}\n"
 }

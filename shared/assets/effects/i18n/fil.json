@@ -16,6 +16,103 @@
   "text": "Teksto"
  },
  "effects": {
+  "advancedchromakey": {
+   "description": "Nag-aalis ng hanggang apat na kulay nang sabay. Maaaring alisin ang bawat kulay (Exclude) o protektahan mula sa ibang key (Include), na may sariling Threshold, Feather at Luma Sensitivity. Ipinapakita ng Show Mask nang pula ang natitira.",
+   "name": "Advanced Chroma Key",
+   "params": {
+    "c1active": {
+     "label": "Kulay 1"
+    },
+    "c1color": {
+     "label": "Kulay"
+    },
+    "c1feather": {
+     "label": "Feather"
+    },
+    "c1luma": {
+     "label": "Luma Sensitivity"
+    },
+    "c1mode": {
+     "label": "Mode",
+     "options": [
+      "Exclude",
+      "Include"
+     ]
+    },
+    "c1threshold": {
+     "label": "Threshold"
+    },
+    "c2active": {
+     "label": "Kulay 2"
+    },
+    "c2color": {
+     "label": "Kulay"
+    },
+    "c2feather": {
+     "label": "Feather"
+    },
+    "c2luma": {
+     "label": "Luma Sensitivity"
+    },
+    "c2mode": {
+     "label": "Mode",
+     "options": [
+      "Exclude",
+      "Include"
+     ]
+    },
+    "c2threshold": {
+     "label": "Threshold"
+    },
+    "c3active": {
+     "label": "Kulay 3"
+    },
+    "c3color": {
+     "label": "Kulay"
+    },
+    "c3feather": {
+     "label": "Feather"
+    },
+    "c3luma": {
+     "label": "Luma Sensitivity"
+    },
+    "c3mode": {
+     "label": "Mode",
+     "options": [
+      "Exclude",
+      "Include"
+     ]
+    },
+    "c3threshold": {
+     "label": "Threshold"
+    },
+    "c4active": {
+     "label": "Kulay 4"
+    },
+    "c4color": {
+     "label": "Kulay"
+    },
+    "c4feather": {
+     "label": "Feather"
+    },
+    "c4luma": {
+     "label": "Luma Sensitivity"
+    },
+    "c4mode": {
+     "label": "Mode",
+     "options": [
+      "Exclude",
+      "Include"
+     ]
+    },
+    "c4threshold": {
+     "label": "Threshold"
+    },
+    "showMask": {
+     "label": "Ipakita ang Mask"
+    }
+   }
+  },
   "ascii": {
    "description": "Ginagawang text art ang layer, gawa sa mga letra at simbolo: mas buong character ang inilalagay sa mas maliliwanag na bahagi. Itinatakda ng Laki kung gaano kalapad ang bawat character sa layer, kaya gumagalaw, umiikot at nagsi-scale ang mga character kasama nito. Pinapanatili ng Kulay ang sariling kulay ng larawan o gumagamit ng isang kulay lang, at gumuguhit ang Mga linya ng gilid ng mga outline gamit ang mga character na | - / at \\.",
    "name": "ASCII",
@@ -106,6 +203,13 @@
     },
     "slack": {
      "label": "Luwag"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
     },
     "zshake": {
      "label": "Z shake"
@@ -625,12 +729,75 @@
       "Gitna",
       "Sulok"
      ]
+    },
+    "alight": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
+    },
+    "alZ": {
+     "label": "Posisyon Z"
+    },
+    "alLight": {
+     "label": "Direksyon"
+    },
+    "alElev": {
+     "label": "Elevation"
+    },
+    "faceStyle": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
+    },
+    "lightStyle": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
+    }
+   }
+  },
+  "boxblur": {
+   "description": "Pinalalabo ang layer sa pag-average ng pantay na parisukat ng mga katabing pixel. Itinatakda ng Strength kung gaano kalayo ang labo; mas makinis ang Gaussian Blur.",
+   "name": "Box Blur",
+   "params": {
+    "iterations": {
+     "label": "Mga pag-ulit"
+    },
+    "scale": {
+     "label": "Scale"
+    },
+    "shape": {
+     "label": "Hugis",
+     "options": [
+      "Makinis",
+      "Kahon",
+      "Mabilis na kahon"
+     ]
+    },
+    "strength": {
+     "label": "Lakas"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
     }
    }
   },
   "brightnesscontrast": {
+   "aliases": [
+    "Liwanag at kontrast"
+   ],
    "description": "Inaayos ang liwanag at kontrast ng larawan.",
-   "name": "Liwanag at kontrast",
+   "name": "Liwanag / kontrast",
    "params": {
     "brightness": {
      "label": "Liwanag"
@@ -1027,6 +1194,13 @@
       "Klasiko",
       "Matalas"
      ]
+    },
+    "alight": {
+     "label": "Ayos",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
     }
    }
   },
@@ -1096,8 +1270,11 @@
    }
   },
   "colorwheels": {
+   "aliases": [
+    "Lift gamma gain"
+   ],
    "description": "Mga color wheel para sa shadows (lift), midtones (gamma), at highlights (gain): isang hue, kung gaano kalayo itulak, at isang level. Inililipat ng Offset ang lahat ng tono. Sa estilong Ayon sa Liwanag, tinitimbang ang bawat gulong ayon sa liwanag ng pixel.",
-   "name": "Lift gamma gain",
+   "name": "Pag-tune ng Kulay",
    "params": {
     "gainAmount": {
      "label": "Dami ng gain"
@@ -1269,6 +1446,13 @@
       "Klasiko",
       "Patong-patong"
      ]
+    },
+    "alight": {
+     "label": "Ayos",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
     }
    }
   },
@@ -1432,6 +1616,22 @@
       "Klasiko",
       "Karaniwan"
      ]
+    },
+    "alight": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
+    },
+    "alZ": {
+     "label": "Posisyon Z"
+    },
+    "alLight": {
+     "label": "Direksyon"
+    },
+    "alElev": {
+     "label": "Elevation"
     }
    }
   },
@@ -1531,6 +1731,22 @@
       "Klasiko",
       "Karaniwan"
      ]
+    },
+    "alight": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
+    },
+    "alZ": {
+     "label": "Posisyon Z"
+    },
+    "alLight": {
+     "label": "Direksyon"
+    },
+    "alElev": {
+     "label": "Elevation"
     }
    }
   },
@@ -1560,6 +1776,13 @@
     },
     "stretch": {
      "label": "I-stretch"
+    },
+    "edgeStyle": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
     }
    }
   },
@@ -1655,6 +1878,22 @@
       "Gitna",
       "Sulok"
      ]
+    },
+    "alight": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
+    },
+    "alZ": {
+     "label": "Posisyon Z"
+    },
+    "alLight": {
+     "label": "Direksyon"
+    },
+    "alElev": {
+     "label": "Elevation"
     }
    }
   },
@@ -1676,6 +1915,13 @@
     },
     "threshold": {
      "label": "Threshold"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
     }
    }
   },
@@ -1754,6 +2000,22 @@
     },
     "vibrance": {
      "label": "Vibrance"
+    },
+    "exposure": {
+     "label": "Exposure"
+    },
+    "threshold": {
+     "label": "Threshold"
+    },
+    "knee": {
+     "label": "Lambot ng threshold"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
     }
    }
   },
@@ -2024,8 +2286,11 @@
    }
   },
   "edgedetect": {
+   "aliases": [
+    "Pag-detect ng gilid"
+   ],
    "description": "Maliwanag na linya kung saan nagbabago ang larawan, madilim sa iba. Gumuguhit ang Tinta ng madidilim na linya sa puti; pinananatili ng Kulay ang sariling mga kulay ng larawan sa mga gilid.",
-   "name": "Pag-detect ng gilid",
+   "name": "Hanapin ang Gilid",
    "params": {
     "strength": {
      "label": "Lakas"
@@ -2275,6 +2540,22 @@
       "Gitna",
       "Sulok"
      ]
+    },
+    "alight": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
+    },
+    "alZ": {
+     "label": "Posisyon Z"
+    },
+    "alLight": {
+     "label": "Direksyon"
+    },
+    "alElev": {
+     "label": "Elevation"
     }
    }
   },
@@ -2350,8 +2631,11 @@
    }
   },
   "exposure": {
+   "aliases": [
+    "Exposure"
+   ],
    "description": "Ginagaya ang exposure ng litrato gamit ang stops, offset, at gamma correction. Pinapayagan ng Paliwanagin ang Malinaw na Bahagi na lumiwanag nang lampas sa puti ang mga bahagyang malinaw na pixel, gaya ng malabong gilid.",
-   "name": "Exposure",
+   "name": "Exposure / Gamma",
    "params": {
     "gamma": {
      "label": "Gamma"
@@ -2364,6 +2648,24 @@
     },
     "stops": {
      "label": "Stops"
+    }
+   }
+  },
+  "facetrack": {
+   "aliases": [
+    "Galaw ng Mukha"
+   ],
+   "description": "Galaw ng mukha para sa mga video layer: gumagalaw at nag-zoom ang video para manatili sa iisang puwesto ng frame ang mukhang pinili mo. I-tap ang Pumili ng Mukha, saka mag-tap ng mukha sa preview. Isang beses lang sinusundan ang mukha sa buong clip at itinatabi ang resulta, kaya agad itong ginagamit ng preview at ng export. Itinatakda ng Zoom kung gaano kalaki ang mukha (100% ang laki nito noong pinili mo), ng Posisyon kung saan ito mananatili sa frame, at pinapatatag ng Pagpapakinis ang galaw.",
+   "name": "Pag-track ng Mukha",
+   "params": {
+    "position": {
+     "label": "Posisyon"
+    },
+    "smoothing": {
+     "label": "Pagpapakinis"
+    },
+    "zoom": {
+     "label": "Zoom"
     }
    }
   },
@@ -2437,6 +2739,13 @@
     "edgeStrength": {
      "label": "Lakas ng gilid"
     },
+    "edgeStyle": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
+    },
     "feather": {
      "label": "Feather"
     },
@@ -2461,18 +2770,18 @@
     "scanStrength": {
      "label": "Lakas ng scan line"
     },
-    "tint": {
-     "label": "Tint"
-    },
-    "tintColor": {
-     "label": "Kulay ng tint"
-    },
     "style": {
      "label": "Estilo",
      "options": [
       "Klasiko",
       "Karaniwan"
      ]
+    },
+    "tint": {
+     "label": "Tint"
+    },
+    "tintColor": {
+     "label": "Kulay ng tint"
     }
    }
   },
@@ -2509,6 +2818,13 @@
      "options": [
       "Kumurap",
       "Tuloy-tuloy"
+     ]
+    },
+    "wave": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
      ]
     }
    }
@@ -2616,6 +2932,16 @@
       "Gitna",
       "Sulok"
      ]
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
+    },
+    "alZ": {
+     "label": "Posisyon Z"
     }
    }
   },
@@ -2629,6 +2955,9 @@
    }
   },
   "fourcolor": {
+   "aliases": [
+    "Gradient na apat na kulay"
+   ],
    "description": "Hinahalo ang apat na kulay na inilagay sa apat na punto (sa pixel mula sa gitna ng layer) sa ibabaw ng layer.",
    "name": "Gradient na apat na kulay",
    "params": {
@@ -2869,6 +3198,18 @@
     }
    }
   },
+  "gaussianblur": {
+   "description": "Isang makinis at malambot na labo. Itinatakda ng Strength kung gaano kalayo ang labo.",
+   "name": "Gaussian Blur",
+   "params": {
+    "scale": {
+     "label": "Scale"
+    },
+    "strength": {
+     "label": "Lakas"
+    }
+   }
+  },
   "glass": {
    "description": "Ginagawang beveled na salamin ang hugis ng layer na nagbabaluktot sa mga layer sa likod nito, na may highlight sa gilid. Kapag Malambot ang Ilaw, ipinapakita ang layer ayon sa Fill at iniilawan ang salamin ng Kulay, pinakamaliwanag sa panloob na gilid ng bevel na nakaharap sa ilaw.",
    "name": "Salamin",
@@ -2952,14 +3293,26 @@
    }
   },
   "glowscan": {
-   "description": "Binubur at pinapaliwanag lang ang mga bahagi ng layer na ang liwanag ay nasa isang banda; i-animate ang Posisyon para i-sweep ang glow mula anino hanggang highlight.",
+   "description": "Gumuguhit ng kumikinang na balangkas kung saan tumatawid ang liwanag ng larawan sa Threshold, parang contour scan.",
    "name": "Glow Scan",
    "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blend": {
+     "label": "Blend"
+    },
     "blur": {
      "label": "Blur"
     },
     "color": {
      "label": "Kulay ng glow"
+    },
+    "feather": {
+     "label": "Feather"
+    },
+    "fill": {
+     "label": "Fill"
     },
     "intensity": {
      "label": "Intensity"
@@ -2967,11 +3320,30 @@
     "position": {
      "label": "Posisyon"
     },
+    "radius": {
+     "label": "Radius"
+    },
     "show": {
      "label": "Band lang ang ipakita"
     },
+    "smoothing": {
+     "label": "Smoothing"
+    },
     "softness": {
      "label": "Lambot"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
+    },
+    "threshold": {
+     "label": "Threshold"
+    },
+    "tint": {
+     "label": "Kulay"
     },
     "width": {
      "label": "Lapad"
@@ -3209,6 +3581,13 @@
       "Klasiko",
       "Karaniwan"
      ]
+    },
+    "alight": {
+     "label": "Ayos",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
     }
    }
   },
@@ -3243,8 +3622,11 @@
    }
   },
   "halftone": {
+   "aliases": [
+    "Halftone"
+   ],
    "description": "Mga naka-print na tuldok na lumalaki kung saan madilim ang larawan.",
-   "name": "Halftone",
+   "name": "Mga Tuldok ng Halftone",
    "params": {
     "angle": {
      "label": "Anggulo"
@@ -3254,6 +3636,13 @@
     },
     "colored": {
      "label": "May Kulay na Tuldok"
+    },
+    "edgeStyle": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
     },
     "ink": {
      "label": "Kulay ng tuldok"
@@ -3300,6 +3689,13 @@
      "label": "Lakas"
     },
     "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
+    },
+    "edgeStyle": {
      "label": "Estilo",
      "options": [
       "Klasiko",
@@ -3407,6 +3803,22 @@
       "Klasiko",
       "Karaniwan"
      ]
+    },
+    "alight": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
+    },
+    "alZ": {
+     "label": "Posisyon Z"
+    },
+    "alLight": {
+     "label": "Direksyon"
+    },
+    "alElev": {
+     "label": "Elevation"
     }
    }
   },
@@ -3431,6 +3843,13 @@
     },
     "seed": {
      "label": "Seed"
+    },
+    "edgeStyle": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
     }
    }
   },
@@ -3489,6 +3908,19 @@
     },
     "stretch": {
      "label": "Stretch"
+    },
+    "lineWidth": {
+     "label": "Lapad ng linya"
+    },
+    "feather": {
+     "label": "Feather"
+    },
+    "edgeStyle": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
     }
    }
   },
@@ -3550,6 +3982,14 @@
     },
     "stretch": {
      "label": "Inat"
+    },
+    "alight": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan",
+      "Larawan"
+     ]
     }
    }
   },
@@ -3645,10 +4085,29 @@
       "Gitna",
       "Sulok"
      ]
+    },
+    "alight": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
+    },
+    "alZ": {
+     "label": "Posisyon Z"
+    },
+    "alLight": {
+     "label": "Direksyon"
+    },
+    "alElev": {
+     "label": "Elevation"
     }
    }
   },
   "highlightshadow": {
+   "aliases": [
+    "Highlights at Shadows"
+   ],
    "description": "Binabawi o pinapalakas ang maliwanag na highlight at itinataas o pinapalalim ang madilim na anino, batay sa liwanag ng bawat pixel.",
    "name": "Highlights at Shadows",
    "params": {
@@ -3775,6 +4234,22 @@
       "Klasiko",
       "Karaniwan"
      ]
+    },
+    "alight": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
+    },
+    "alZ": {
+     "label": "Posisyon Z"
+    },
+    "alLight": {
+     "label": "Direksyon"
+    },
+    "alElev": {
+     "label": "Elevation"
     }
    }
   },
@@ -3909,12 +4384,31 @@
     }
    }
   },
+  "hueshift": {
+   "description": "Iniikot ang bawat kulay sa color wheel nang parehong anggulo at pinananatili ang liwanag.",
+   "name": "Pagbabago ng hue",
+   "params": {
+    "hue": {
+     "label": "Pagbabago ng hue"
+    }
+   }
+  },
   "innerblur": {
    "description": "Binablabo ang larawan sa loob ng layer habang nananatiling matalas ang outline nito.",
    "name": "Blur sa loob",
    "params": {
     "blur": {
      "label": "Lakas"
+    },
+    "iterations": {
+     "label": "Mga pag-ulit"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
     }
    }
   },
@@ -3994,6 +4488,15 @@
     },
     "invert_alpha": {
      "label": "Baliktarin ang alpha"
+    },
+    "red": {
+     "label": "Pula"
+    },
+    "green": {
+     "label": "Berde"
+    },
+    "blue": {
+     "label": "Asul"
     }
    }
   },
@@ -4060,6 +4563,13 @@
     },
     "segments": {
      "label": "Mga segment"
+    },
+    "edgeStyle": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
     }
    }
   },
@@ -4096,9 +4606,23 @@
    }
   },
   "lensflare": {
-   "description": "Isang maliwanag na ilaw na may halo, inilalagay sa ibabaw ng larawan.",
-   "name": "Flare ng ilaw",
+   "aliases": [
+    "Flare ng ilaw"
+   ],
+   "description": "Isang maliwanag na ilaw na may bituin, halo at mga singsing ng repleksyon, na nakapatong sa larawan.",
+   "name": "Lens Flare",
    "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blendMode": {
+     "label": "Blending mode",
+     "options": [
+      "Normal",
+      "Multiply",
+      "Screen"
+     ]
+    },
     "brightness": {
      "label": "Kaliwanagan"
     },
@@ -4108,8 +4632,21 @@
     "color": {
      "label": "Kulay"
     },
+    "points": {
+     "label": "Puntos"
+    },
     "radius": {
      "label": "Radius"
+    },
+    "shine": {
+     "label": "Kislap"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
     }
    }
   },
@@ -4274,6 +4811,13 @@
       "Klasiko",
       "Karaniwan"
      ]
+    },
+    "alight": {
+     "label": "Ayos",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
     }
    }
   },
@@ -4392,6 +4936,14 @@
      "options": [
       "Klasiko",
       "Karaniwan"
+     ]
+    },
+    "weighting": {
+     "label": "Mode",
+     "options": [
+      "Klasiko",
+      "Luma",
+      "RGB"
      ]
     }
    }
@@ -4709,6 +5261,25 @@
       "Gitna",
       "Sulok"
      ]
+    },
+    "alight": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
+    },
+    "alZ": {
+     "label": "Posisyon Z"
+    },
+    "alLight": {
+     "label": "Direksyon"
+    },
+    "alElev": {
+     "label": "Elevation"
+    },
+    "alHeight": {
+     "label": "Taas"
     }
    }
   },
@@ -4964,6 +5535,13 @@
      ]
     },
     "roll": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
+    },
+    "space": {
      "label": "Estilo",
      "options": [
       "Klasiko",
@@ -5328,6 +5906,16 @@
       "Klasiko",
       "Karaniwan"
      ]
+    },
+    "edgeStyle": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
+    },
+    "saturation": {
+     "label": "Saturation"
     }
    }
   },
@@ -5446,6 +6034,18 @@
       "Klasiko",
       "Karaniwan"
      ]
+    },
+    "angle": {
+     "label": "Angulo"
+    },
+    "scale": {
+     "label": "Iskala"
+    },
+    "repeat": {
+     "label": "Ulitin"
+    },
+    "mirror": {
+     "label": "Mirror"
     }
    }
   },
@@ -5706,6 +6306,22 @@
       "Gitna",
       "Sulok"
      ]
+    },
+    "alight": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
+    },
+    "alZ": {
+     "label": "Posisyon Z"
+    },
+    "alLight": {
+     "label": "Direksyon"
+    },
+    "alElev": {
+     "label": "Elevation"
     }
    }
   },
@@ -5752,6 +6368,13 @@
     },
     "width": {
      "label": "Lapad"
+    },
+    "alight": {
+     "label": "Ayos",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
     }
    }
   },
@@ -5840,6 +6463,13 @@
     },
     "sweep": {
      "label": "Sweep"
+    },
+    "alight": {
+     "label": "Ayos",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
     }
    }
   },
@@ -6018,6 +6648,19 @@
     },
     "glossiness": {
      "label": "Kintab"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
+    },
+    "alLight": {
+     "label": "Direksyon"
+    },
+    "alElev": {
+     "label": "Elevation"
     }
    },
    "shortcuts": {
@@ -6107,8 +6750,11 @@
    }
   },
   "reorient360": {
+   "aliases": [
+    "360° Reorient Sphere"
+   ],
    "description": "Pinaiikot ang 360° panorama layer sa loob ng sphere nito para patagin ang horizon o baguhin ang harapan.",
-   "name": "360° Reorient Sphere",
+   "name": "360º Reorient Sphere",
    "params": {
     "pitch": {
      "label": "Pitch"
@@ -6432,6 +7078,18 @@
     },
     "seed": {
      "label": "Seed"
+    }
+   }
+  },
+  "saturationvibrance": {
+   "description": "Pinalalakas o pinahihina ang mga kulay. Ang Vibrance ay mas banayad na pagpapalakas sa mapupusyaw na kulay at hindi ginagalaw ang matitingkad.",
+   "name": "Saturation / Vibrance",
+   "params": {
+    "saturation": {
+     "label": "Saturation"
+    },
+    "vibrance": {
+     "label": "Vibrance"
     }
    }
   },
@@ -6959,6 +7617,42 @@
     }
    }
   },
+  "spectralmap": {
+   "description": "Kinukulayan muli ang larawan ayon sa liwanag gamit ang spectrum ng tatlong kulay. Mas maraming ulit sa Repeat, inuusog ito ng Phase at pinalalapad ng Squeeze ang bawat banda.",
+   "name": "Spectral Map",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "blueColor": {
+     "label": "Kulay 3"
+    },
+    "greenColor": {
+     "label": "Kulay 2"
+    },
+    "phase": {
+     "label": "Phase"
+    },
+    "redColor": {
+     "label": "Kulay 1"
+    },
+    "repeat": {
+     "label": "Ulitin"
+    },
+    "reverse": {
+     "label": "Baliktarin"
+    },
+    "saturation": {
+     "label": "Saturation"
+    },
+    "scaleBrightness": {
+     "label": "I-scale ang liwanag"
+    },
+    "squeeze": {
+     "label": "Squeeze"
+    }
+   }
+  },
   "spherize": {
    "description": "Binabalot ang layer sa isang sphere gamit ang front projection o equirectangular texture.",
    "name": "Spherize",
@@ -7055,6 +7749,22 @@
       "Gitna",
       "Sulok"
      ]
+    },
+    "alight": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
+    },
+    "alZ": {
+     "label": "Posisyon Z"
+    },
+    "alLight": {
+     "label": "Direksyon"
+    },
+    "alElev": {
+     "label": "Elevation"
     }
    }
   },
@@ -7168,8 +7878,11 @@
    }
   },
   "splittone": {
+   "aliases": [
+    "Hatiin ang Tono"
+   ],
    "description": "Kinukulayan ang mga anino at highlight sa magkaibang hue, pinapanatili ang itim, puti at liwanag. Binabaluktot ng Level ng Anino ang kurba ng liwanag at inililipat ng Level ng Highlight kung saan nagsisimula ang kulay ng highlight. Sa estilong Gradient Map, kulay mula sa liwanag lang ang ibinibigay sa bawat pixel.",
-   "name": "Hatiin ang Tono",
+   "name": "Mainit na Kulay",
    "params": {
     "highlightAmount": {
      "label": "Dami ng Highlight"
@@ -7284,6 +7997,13 @@
     },
     "shine": {
      "label": "Kislap"
+    },
+    "edgeStyle": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
     }
    }
   },
@@ -7306,20 +8026,17 @@
    }
   },
   "starpolyhedron": {
-   "description": "Inilalagay ang layer sa isang bituin na gawa sa dalawang pyramid na nagsalubong.",
+   "description": "Inilalagay ang layer sa isang bituin na ang mga dulo ay umaangat sa isang gulugod sa harap at likod, na may liwanag at lalim.",
    "name": "Bituing Polyhedron",
    "params": {
-    "light": {
-     "label": "Anggulo ng ilaw"
+    "orientA": {
+     "label": "Orientation α"
     },
-    "perspective": {
-     "label": "Perspective"
+    "orientB": {
+     "label": "Orientation β"
     },
-    "position": {
-     "label": "Posisyon"
-    },
-    "radius": {
-     "label": "Radius"
+    "orientG": {
+     "label": "Orientation γ"
     },
     "rotX": {
      "label": "Rotation X"
@@ -7330,11 +8047,83 @@
     "rotZ": {
      "label": "Rotation Z"
     },
+    "starSize": {
+     "label": "Laki"
+    },
+    "starDepth": {
+     "label": "Lalim"
+    },
+    "pointLength": {
+     "label": "Haba ng Dulo"
+    },
+    "smoothing": {
+     "label": "Pagpapakinis"
+    },
+    "points": {
+     "label": "Puntos"
+    },
+    "alPos": {
+     "label": "Posisyon"
+    },
+    "alZ": {
+     "label": "Posisyon Z"
+    },
+    "alScale": {
+     "label": "Iskala"
+    },
+    "intensity": {
+     "label": "Lakas ng ilaw"
+    },
+    "alShine": {
+     "label": "Kinang"
+    },
+    "spec": {
+     "label": "Specularity"
+    },
+    "alAmbient": {
+     "label": "Ambient"
+    },
+    "alColor": {
+     "label": "Kulay"
+    },
+    "lightDir": {
+     "label": "Direksyon"
+    },
+    "lightDepth": {
+     "label": "Elevation"
+    },
+    "alMirror": {
+     "label": "Mirror"
+    },
+    "alRepeatX": {
+     "label": "Ulitin X"
+    },
+    "alRepeatY": {
+     "label": "Ulitin Y"
+    },
+    "alTexAngle": {
+     "label": "Anggulo ng texture"
+    },
+    "alCrop": {
+     "label": "Crop"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "position": {
+     "label": "Posisyon"
+    },
     "scale": {
      "label": "Scale"
     },
+    "perspective": {
+     "label": "Perspective"
+    },
     "shading": {
      "label": "Shading"
+    },
+    "light": {
+     "label": "Anggulo ng ilaw"
     },
     "shine": {
      "label": "Kinang"
@@ -7390,6 +8179,13 @@
      "options": [
       "Gitna",
       "Sulok"
+     ]
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
      ]
     }
    }
@@ -7506,6 +8302,22 @@
       "Klasiko",
       "Karaniwan"
      ]
+    },
+    "alight": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
+    },
+    "alZ": {
+     "label": "Posisyon Z"
+    },
+    "alLight": {
+     "label": "Direksyon"
+    },
+    "alElev": {
+     "label": "Elevation"
     }
    }
   },
@@ -7518,6 +8330,27 @@
     },
     "grain": {
      "label": "Laki"
+    }
+   }
+  },
+  "streakstrips": {
+   "description": "Hinahati ang layer sa magkakaagapay na piraso at binabanat ang isang linya ng larawan sa bawat piraso, parang sirang scan.",
+   "name": "Streak Strips",
+   "params": {
+    "alpha": {
+     "label": "Alpha"
+    },
+    "angle": {
+     "label": "Angulo"
+    },
+    "count": {
+     "label": "Bilang"
+    },
+    "maskToLayer": {
+     "label": "I-mask sa layer"
+    },
+    "phase": {
+     "label": "Phase"
     }
    }
   },
@@ -7601,6 +8434,15 @@
     }
    }
   },
+  "strokecolor": {
+   "description": "Kinukulayan ng iisang kulay ang mga stroke ng layer: ang outline ng hugis o teksto, at bawat stroke ng pen at brush sa isang drawing.",
+   "name": "Kulay ng Stroke",
+   "params": {
+    "color": {
+     "label": "Kulay"
+    }
+   }
+  },
   "stroketaper": {
    "description": "Pinapanipis ang mga stroke hanggang maging matulis: ang pen at brush strokes ng freehand drawing, at ang Stroke ng mga linya at hugis (Frame at Anino > Stroke). Mula wala hanggang Simula, at mula Wakas pababa sa wala. Pinapatalas ng Squeeze ang taper.",
    "name": "Pagnipis ng Stroke",
@@ -7613,6 +8455,13 @@
     },
     "start": {
      "label": "Simula"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
     }
    }
   },
@@ -7955,6 +8804,18 @@
     "wobbly": "Pasuray-suray"
    }
   },
+  "textspacing": {
+   "description": "Binabago ang espasyo sa pagitan ng mga letra at ng mga linya ng isang text layer. Pinaglalayo ng Espasyo ng letra ang mga letra, o pinaglalapit ang mga ito kapag mas mababa sa 0%. Itinatakda ng Espasyo ng linya kung gaano kalayo ang mga linya sa isa't isa: normal ang 100% at dinodoble ito ng 200%. Mag-keyframe ng alinman sa dalawa para i-animate ang espasyo.",
+   "name": "Espasyo ng Teksto",
+   "params": {
+    "letterspacing": {
+     "label": "Espasyo ng letra"
+    },
+    "linespacing": {
+     "label": "Espasyo ng linya"
+    }
+   }
+  },
   "texttransform": {
    "description": "Ginagalaw, pinalalaki, pinapaikot, pinapakupas at kinukulayan ang mga letra, salita o linya sa loob ng isang range. Itinatakda ng Anchor kung bawat component o ang gitna ng layer ang gagamitin sa scaling at rotation. Ilipat ang range gamit ang Phase para gumalaw ang pagbabago sa buong teksto.",
    "name": "Transform ng Teksto",
@@ -8139,6 +9000,13 @@
       "Klasiko",
       "Karaniwan"
      ]
+    },
+    "edgeStyle": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
     }
    }
   },
@@ -8209,6 +9077,13 @@
       "Klasiko",
       "Karaniwan"
      ]
+    },
+    "edgeStyle": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
     }
    }
   },
@@ -8244,8 +9119,11 @@
    }
   },
   "timequant": {
+   "aliases": [
+    "Frame Rate"
+   ],
    "description": "Ginagawang mas mababa ang frame rate ng layer na ito, para magmukhang choppy o stop-motion ang bidyo.",
-   "name": "Frame Rate",
+   "name": "Time Quantization",
    "params": {
     "fps": {
      "label": "Hakbang/seg"
@@ -8363,6 +9241,22 @@
       "Gitna",
       "Sulok"
      ]
+    },
+    "alight": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
+    },
+    "alZ": {
+     "label": "Posisyon Z"
+    },
+    "alLight": {
+     "label": "Direksyon"
+    },
+    "alElev": {
+     "label": "Elevation"
     }
    }
   },
@@ -8409,6 +9303,16 @@
       "Klasiko",
       "Karaniwan"
      ]
+    },
+    "wrapStyle": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
+    },
+    "depth": {
+     "label": "Lalim"
     }
    }
   },
@@ -8528,6 +9432,9 @@
       "Klasiko",
       "Karaniwan"
      ]
+    },
+    "singleAxis": {
+     "label": "Iisang axis"
     }
    }
   },
@@ -8549,6 +9456,13 @@
      "options": [
       "Layer",
       "Screen"
+     ]
+    },
+    "edgeStyle": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
      ]
     }
    }
@@ -8574,6 +9488,13 @@
      "options": [
       "Gray",
       "Pula"
+     ]
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
      ]
     }
    }
@@ -8656,8 +9577,11 @@
    }
   },
   "viewer360": {
+   "aliases": [
+    "360° Viewer"
+   ],
    "description": "Ipinapakita ang 360° panorama layer sa pamamagitan ng virtual na kamera na maaari mong paikutin at i-zoom.",
-   "name": "360° Viewer",
+   "name": "360º Viewer",
    "params": {
     "fov": {
      "label": "Field of view"
@@ -8965,6 +9889,94 @@
     },
     "zoom": {
      "label": "Lakas"
+    },
+    "alight": {
+     "label": "Ayos",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
+    }
+   }
+  },
+  "ring": {
+   "description": "Ibinabalot ang layer sa isang singsing na may patag na mga gilid, parang maikling tubo, na may liwanag at lalim.",
+   "name": "Singsing",
+   "params": {
+    "orientA": {
+     "label": "Orientation α"
+    },
+    "orientB": {
+     "label": "Orientation β"
+    },
+    "orientG": {
+     "label": "Orientation γ"
+    },
+    "rotX": {
+     "label": "Rotasyon X"
+    },
+    "rotY": {
+     "label": "Rotasyon Y"
+    },
+    "rotZ": {
+     "label": "Rotasyon Z"
+    },
+    "radius": {
+     "label": "Radius"
+    },
+    "thickness": {
+     "label": "Lapad"
+    },
+    "height": {
+     "label": "Haba"
+    },
+    "smoothing": {
+     "label": "Pagpapakinis"
+    },
+    "position": {
+     "label": "Posisyon"
+    },
+    "alZ": {
+     "label": "Posisyon Z"
+    },
+    "scale": {
+     "label": "Iskala"
+    },
+    "intensity": {
+     "label": "Lakas ng ilaw"
+    },
+    "shine": {
+     "label": "Kinang"
+    },
+    "spec": {
+     "label": "Specularity"
+    },
+    "ambient": {
+     "label": "Ambient"
+    },
+    "lightColor": {
+     "label": "Kulay"
+    },
+    "lightDir": {
+     "label": "Direksyon"
+    },
+    "lightDepth": {
+     "label": "Elevation"
+    },
+    "texMirror": {
+     "label": "Mirror"
+    },
+    "texRepeatX": {
+     "label": "Ulitin X"
+    },
+    "texRepeatY": {
+     "label": "Ulitin Y"
+    },
+    "texAngle": {
+     "label": "Anggulo ng texture"
+    },
+    "texCrop": {
+     "label": "Crop"
     }
    }
   }

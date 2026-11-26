@@ -125,6 +125,7 @@ internal object DeskEncoders {
         name.endsWith("_videotoolbox") -> listOf("-maxrate", "${bitrate.toLong() * 10 / 7}", "-bufsize", "${bitrate.toLong() * 2}")
         name == "libvpx-vp9" || exact && name in setOf("libx264", "libx265") -> listOf("-minrate", "$bitrate", "-maxrate", "$bitrate", "-bufsize", "$bitrate")
         name == "libx264" -> listOf("-maxrate", "$bitrate", "-bufsize", "${bitrate.toLong() * 2}")
+        name.endsWith("_amf") -> listOf("-rc", "vbr_latency")
         else -> emptyList()
     }
 

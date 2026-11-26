@@ -43,7 +43,7 @@ class NoiseProceduralImportTest {
     }
 
     @Test fun blockNoiseKeepsTheSizeOfANegativeStretch() {
-        close(listOf(10f, -10f), migrate("blocknoise2", "stretch" to "41,-24").numbers("stretch"))
+        close(listOf(41f, -24f), migrate("blocknoise2", "stretch" to "41,-24").numbers("stretch"))
         close(listOf(2f, 0.5f), migrate("blocknoise2", "stretch" to "2,0.5").numbers("stretch"))
     }
 

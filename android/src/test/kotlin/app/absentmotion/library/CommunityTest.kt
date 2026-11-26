@@ -211,6 +211,34 @@ class CommunityTest {
         assertTrue(index.effectPacks(listOf(colour.copy(version = 3))).isEmpty())
     }
 
+    @Test fun effectThumbnailsMustSitInTheItemFolderWithTheRightKindAndSize() {
+        fun entry(thumbnail: Any, hero: Any) = org.json.JSONObject().put("id", "alice.glow").put("name", "Glow").put("version", 1)
+            .put("thumbnail", thumbnail).put("hero", hero).toString()
+        val folder = "effects/glow-pack/thumbs"
+        val entries = listOf(
+            entry("$folder/glow.webp", "$folder/glow.hero.webp"),
+            entry("effects/other/thumbs/glow.webp", "$folder/glow.png"),
+            entry("$folder/../glow.webp", 42),
+        )
+        val item = parseCommunityIndex("""{"format":"absentmotion-community","version":2,"items":[
+            {"kind":"effect","name":"glow-pack","file":"effects/glow-pack/glow-pack.abmfx","bytes":20,"sha256":"$shaA","contents":[${entries.joinToString()}]}]}""", 52).items.single()
+        assertEquals(CommunityEffectContent("alice.glow", "Glow", 1, "$folder/glow.webp", "$folder/glow.hero.webp"), item.contents[0])
+        assertEquals(listOf(null to null, null to null), item.contents.drop(1).map { it.thumbnail to it.hero })
+
+        val webp = "RIFF".toByteArray() + ByteArray(4) + "WEBPVP8X".toByteArray() + ByteArray(10)
+        val animated = webp.copyOf().also { it[20] = 2 }
+        val avif = ByteArray(3) + byteArrayOf(24) + "ftypavifmif1".toByteArray() + ByteArray(10)
+        assertTrue(communityEffectPicture(webp, hero = false))
+        assertTrue(communityEffectPicture(webp, hero = true))
+        assertTrue(communityEffectPicture(animated, hero = false))
+        assertFalse(communityEffectPicture(animated, hero = true))
+        assertFalse(communityEffectPicture(avif, hero = true))
+        assertFalse(communityEffectPicture(avif, hero = false))
+        assertTrue(communityEffectPicture(webp + ByteArray(EFFECT_PICTURE_MAX_BYTES.toInt() - webp.size), hero = false))
+        assertFalse(communityEffectPicture(webp + ByteArray(EFFECT_PICTURE_MAX_BYTES.toInt() - webp.size + 1), hero = false))
+        assertFalse(communityEffectPicture("RIFF".toByteArray(), hero = false))
+    }
+
     @Test fun parseCommunityIndexSkipsBadItemsClipsTextAndFiltersMinVersion() {
         val longTitle = "T".repeat(120)
         val longCreator = "C".repeat(120)
@@ -482,6 +510,21 @@ class CommunityTest {
         val unknown = item("Unknown", added = "")
         val invalid = item("Invalid", added = "2026-02-30")
         assertEquals(listOf(newest, old, unknown, invalid), communityMatches(listOf(unknown, old, invalid, newest)))
+    }
+
+    @Test fun newGroupsItemsByDayInTheUsersTimeZoneNewestFirst() {
+        val late = item("Late", added = "2026-11-24T02:29:06Z")
+        val afternoon = item("Afternoon", added = "2026-11-23T20:00:00Z")
+        val early = item("Early", added = "2026-11-23T03:42:14Z")
+        val dateOnly = item("Date only", added = "2026-11-22")
+        val unknown = item("Unknown", added = "")
+        val all = listOf(unknown, dateOnly, early, afternoon, late)
+        val day = { d: Int -> java.time.LocalDate.of(2026, 11, d) }
+        assertEquals(listOf(day(24) to listOf(late), day(23) to listOf(afternoon, early), day(22) to listOf(dateOnly)),
+            communityDays(all, java.time.ZoneOffset.UTC))
+        assertEquals(listOf(day(23) to listOf(late, afternoon), day(22) to listOf(early, dateOnly)),
+            communityDays(all, java.time.ZoneId.of("America/New_York")))
+        assertTrue(communityDays(listOf(unknown), java.time.ZoneOffset.UTC).isEmpty())
     }
 
     @Test fun aToZUsesTheChosenLocale() {

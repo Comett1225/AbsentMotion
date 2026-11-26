@@ -47,7 +47,7 @@ const char* const kLift = "absent.backdrop";
 const char* const kPuppet = "absent.puppet";
 
 bool BuiltIn(const std::string& id) {
-    return id == "absent.blur" || id == "absent.glow" || id == "absent.smear" || id == "absent.outline" || id == kLift || id == kPuppet;
+    return id == "absent.blur" || id == "absent.boxblur" || id == "absent.gaussianblur" || id == "absent.glow" || id == "absent.smear" || id == "absent.outline" || id == kLift || id == kPuppet;
 }
 
 bool TilesLayer(const std::string& id) {
@@ -56,6 +56,10 @@ bool TilesLayer(const std::string& id) {
 }
 
 bool WrapsLayer(const std::string& id) { return TilesLayer(id) || id == "absent.mirror" || id == "absent.kaleidoscope" || id == "absent.offset"; }
+
+constexpr float kGlowScanSmoothing = 0.0802f;
+constexpr float kGlowScanSharp = 0.92f;
+constexpr float kDarkGlowSpread = 0.14f;
 
 bool KeepsEdges(const std::string& id) {
     return id == "absent.pixelate" || id == "absent.mosaic" || id == "absent.pixeltiles" || id == "absent.ascii" || id == "absent.halftone" ||
@@ -738,6 +742,28 @@ half4 main(float2 p) {
     return SkImageFilters::RuntimeShader(b, std::abs(first) + count * spacing + 1, "image", std::move(input));
 }
 
+sk_sp<SkImageFilter> DeepGlowLight(sk_sp<SkImageFilter> input, float threshold, float knee) {
+    static const sk_sp<SkRuntimeEffect> effect = SkRuntimeEffect::MakeForShader(SkString(R"(
+uniform shader image;
+uniform float threshold;
+uniform float knee;
+half4 main(float2 p) {
+    float4 c = float4(image.eval(p));
+    if (c.a <= 0.0) return half4(0.0);
+    float3 s = clamp(c.rgb / c.a, 0.0, 1.0);
+    float l = dot(s, float3(0.2126, 0.7152, 0.0722));
+    float k = max(knee, 0.0001);
+    float x = clamp(l - threshold + k, 0.0, 2.0 * k);
+    float w = clamp(max(x * x / (4.0 * k), l - threshold) / max(l, 0.0001), 0.0, 1.0);
+    return half4(half3(sqrt(s * s * (s * 0.2 + 0.8) * w) * c.a), half(c.a));
+})")).effect;
+    if (!effect) return input;
+    SkRuntimeShaderBuilder b(effect);
+    b.uniform("threshold") = threshold;
+    b.uniform("knee") = knee;
+    return SkImageFilters::RuntimeShader(b, 0.0f, "image", std::move(input));
+}
+
 sk_sp<SkImageFilter> FeatherAlpha(sk_sp<SkImageFilter> input, float radius, float iterations, const SkRect& screen) {
     static const float lit[20] = {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0};
     static const float inward[20] = {0, 0, 0, 2, -1, 0, 0, 0, 2, -1, 0, 0, 0, 2, -1, 0, 0, 0, 2, -1};
@@ -758,6 +784,12 @@ sk_sp<SkImageFilter> FeatherAlpha(sk_sp<SkImageFilter> input, float radius, floa
 
 sk_sp<SkImageFilter> BuiltInFilter(const std::string& id, const std::function<float(const char*, int, float)>& v,
                                    sk_sp<SkImageFilter> input, const SkRect& screen) {
+    if (id == "absent.boxblur" || id == "absent.gaussianblur") {
+        const float k = v("scale", 0, id == "absent.boxblur" ? 329 : 196);
+        return BuiltInFilter("absent.blur", [&](const char* name, int i, float d) {
+            return strcmp(name, "strength") ? v(name, i, d) : v(name, i, 0.15f) * k;
+        }, std::move(input), screen);
+    }
     if (id == "absent.blur") {
         float sigma = std::max(v("strength", 0, 10), 0.0f) / 3;
         const float shape = v("shape", 0, 0), iterations = std::clamp(v("iterations", 0, 3), 1.0f, 20.0f);
@@ -768,6 +800,13 @@ sk_sp<SkImageFilter> BuiltInFilter(const std::string& id, const std::function<fl
         if (shape > 1.5f) {
             constexpr float baseVariance = 170, passVariance = 445, referencePasses = 5;
             sigma *= std::sqrt((baseVariance + passVariance / iterations) / (baseVariance + passVariance / referencePasses));
+        }
+        if (shape < 0.5f && v("style", 0, 0) > 0.5f) {
+            const int passes = (int)std::lround(iterations);
+            const float reach = std::min(std::max(v("strength", 0, 10), 0.0f) / passes, 128.0f);
+            if (!(reach > 0)) return input;
+            for (int i = 0; i < passes; i++) input = BoxPass(BoxPass(input, reach, {1, 0}, {-0.5f, 0}), reach, {0, 1}, {0, -0.5f});
+            return input;
         }
         if (shape > 0.5f && (shape < 1.5f || iterations <= 1.0f)) {
             const float reach = std::min(shape > 1.5f ? sigma * std::sqrt(3.0f) : sigma, 128.0f);
@@ -1147,6 +1186,7 @@ std::string EffectRuntime::load(const std::string& xml) {
         }
         d.brightPass = result.effect->findChild("bright") != nullptr;
         d.plainBlur = result.effect->findChild("blurred") != nullptr;
+        d.wide = result.effect->findChild("wide") != nullptr && result.effect->findChild("wider") != nullptr;
         d.blurred = d.brightPass || d.plainBlur;
         d.backdrop = result.effect->findChild("backdrop") != nullptr;
         d.below = result.effect->findChild("below") != nullptr;
@@ -1502,24 +1542,42 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
                                    std::max(std::abs(Value(e, defaults, "stretch", 0, t, 1)), std::abs(Value(e, defaults, "stretch", 1, t, 1)));
                 box.outset(std::min(cell, kWrapPixels), std::min(cell, kWrapPixels));
             }
+            if (cells && e.id == "absent.hexagontilerotate" && Value(e, defaults, "edgeStyle", 0, t, 0) > 0.5f) {
+                const float unit = area.height() / (2.475f * std::max(Value(e, defaults, "count", 0, t, 10), 0.5f));
+                box.outset(std::min(unit, kWrapPixels), std::min(unit, kWrapPixels));
+            }
             std::vector<std::string_view> names = {"image"};
-            const float edge = e.id == "absent.pixelate" && Value(e, defaults, "style", 0, t, 0) > 0.5f ? 0.0f : 1.0f;
+            const float edge = (e.id == "absent.pixelate" && Value(e, defaults, "style", 0, t, 0) > 0.5f) || Value(e, defaults, "edgeStyle", 0, t, 0) > 0.5f ? 0.0f : 1.0f;
             std::vector<sk_sp<SkImageFilter>> inputs = {cells ? SkImageFilters::Crop(kept.makeInset(edge, edge), SkTileMode::kMirror, f) : f};
+            sk_sp<SkImageFilter> deepLight;
             if (d->blurred) {
                 const float spread = e.id == "absent.electricedges" ? Value(e, defaults, "strength", 0, t, -1) : -1;
                 const bool edgeLook = e.id == "absent.edgeglow" && Value(e, defaults, "style", 0, t, 0) > 0.5f;
+                const bool scanLook = e.id == "absent.glowscan" && Value(e, defaults, "style", 0, t, 0) > 0.5f;
+                const bool darkLook = e.id == "absent.darkglow" && Value(e, defaults, "style", 0, t, 0) > 0.5f;
+                const bool deepLook = e.id == "absent.deepglow" && Value(e, defaults, "style", 0, t, 0) > 0.5f;
                 const bool redMask = e.id == "absent.unsharpmask" && Value(e, defaults, "showMask", 0, t, 0) > 0.5f &&
                                      Value(e, defaults, "maskColor", 0, t, 0) > 0.5f;
                 const float blur = e.id == "absent.softglow" ? Value(e, defaults, "diffusion", 0, t, 0.1f) * 180 + 3
                                    : e.id == "absent.feather" ? Value(e, defaults, "strength", 0, t, 0.15f) * 283.333f
                                    : e.id == "absent.ominoglass" ? Value(e, defaults, "bevel", 0, t, 0.1f) * 100
+                                   : scanLook ? 3 * std::max(Value(e, defaults, "smoothing", 0, t, 0.05f), 0.0f) * kGlowScanSmoothing * std::min(area.width(), area.height())
                                                               : Value(e, defaults, "blur", 0, t, 0);
                 const float sigma = e.id == "absent.unsharpmask"
                                         ? redMask ? std::max(Value(e, defaults, "blurRadius", 0, t, 0), 0.0f) * 62.5f * std::min(scene.width, scene.height) / 1080.0f : 0
                                     : spread >= 0 ? std::max(spread, 0.02f) * kEdgeSpread * std::hypot((float)scene.width, (float)scene.height)
                                     : edgeLook    ? 40 * std::pow(std::max(Value(e, defaults, "strength", 0, t, 0.1f), 0.0f), 0.8f)
+                                    : scanLook && blur < 3 * kGlowScanSharp ? 0
                                                   : std::max(blur, 0.0f) / 3;
+                const bool passLook = e.id == "absent.innerblur" && Value(e, defaults, "style", 0, t, 0) > 0.5f;
                 auto blurOf = [&](sk_sp<SkImageFilter> source) {
+                    if (passLook) {
+                        const int passes = (int)std::lround(std::clamp(Value(e, defaults, "iterations", 0, t, 2), 1.0f, 20.0f));
+                        const float reach = std::min(std::max(Value(e, defaults, "blur", 0, t, 0), 0.0f) / passes, 128.0f);
+                        if (!(reach > 0)) return source;
+                        for (int i = 0; i < passes; i++) source = BoxPass(BoxPass(source, reach, {1, 0}, {-0.5f, 0}), reach, {0, 1}, {0, -0.5f});
+                        return source;
+                    }
                     return sigma > 0 ? SkImageFilters::Blur(sigma, sigma, SkTileMode::kDecal, source) : source;
                 };
                 if (d->brightPass) {
@@ -1544,13 +1602,34 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
                                                                        Value(e, defaults, "invert", 0, t, 0) > 0.5f, frame, f);
                         inputs.push_back(blurOf(SkImageFilters::Arithmetic(0, 0.5f, 0.5f, 0, true, SkImageFilters::Crop(frame, SkTileMode::kClamp, lit),
                                                                            SkImageFilters::Crop(frame, SkTileMode::kMirror, lit))));
+                    } else if (darkLook) {
+                        const float k = 50.0f, cut = Value(e, defaults, "threshold", 0, t, 0.3f) * k;
+                        const float rows[20] = {-0.2126f * k, -0.7152f * k, -0.0722f * k, 0, cut, -0.2126f * k, -0.7152f * k, -0.0722f * k, 0, cut,
+                                                -0.2126f * k, -0.7152f * k, -0.0722f * k, 0, cut, 0, 0, 0, 1, 0};
+                        SkMatrix down = SkMatrix::Scale(0.5f, 0.5f);
+                        down.postTranslate(area.left() * 0.5f - std::floor(area.left() * 0.5f), area.top() * 0.5f - std::floor(area.top() * 0.5f));
+                        auto dark = SkImageFilters::ColorFilter(SkColorFilters::Matrix(rows),
+                                                                SkImageFilters::MatrixTransform(down, SkSamplingOptions(SkFilterMode::kLinear), f));
+                        const float half = std::max(Value(e, defaults, "blur", 0, t, 0), 0.0f) * kDarkGlowSpread;
+                        inputs.push_back(half > 0 ? SkImageFilters::Blur(half, half, SkTileMode::kDecal, dark) : dark);
                     } else if (e.id == "absent.fringeclean" && Value(e, defaults, "style", 0, t, 0) > 0.5f) {
                         inputs.push_back(blurOf(SkImageFilters::Crop(SkRect::MakeXYWH(-area.left(), -area.top(), scene.width, scene.height), SkTileMode::kClamp, f)));
                     } else if (e.id == "absent.feather" && Value(e, defaults, "style", 0, t, 0) > 0.5f) {
                         inputs.push_back(FeatherAlpha(f, blur, Value(e, defaults, "iter", 0, t, 3),
                                                       SkRect::MakeXYWH(-area.left(), -area.top(), scene.width, scene.height)));
+                    } else if (deepLook) {
+                        deepLight = DeepGlowLight(f, Value(e, defaults, "threshold", 0, t, 0.5f), Value(e, defaults, "knee", 0, t, 0.3f));
+                        const float core = std::max(Value(e, defaults, "blur", 0, t, 0), 0.0f) / 10;
+                        inputs.push_back(core > 0 ? SkImageFilters::Blur(core, core, SkTileMode::kDecal, deepLight) : deepLight);
                     } else inputs.push_back(blurOf(f));
                 }
+            }
+            if (d->wide) {
+                const float sigma = std::max(Value(e, defaults, "blur", 0, t, 0), 0.0f) / 3;
+                names.push_back("wide");
+                inputs.push_back(deepLight && sigma > 0 ? SkImageFilters::Blur(sigma, sigma, SkTileMode::kDecal, deepLight) : SkImageFilters::Empty());
+                names.push_back("wider");
+                inputs.push_back(deepLight && sigma > 0 ? SkImageFilters::Blur(sigma * 3, sigma * 3, SkTileMode::kDecal, deepLight) : SkImageFilters::Empty());
             }
             if (d->backdrop) {
                 names.push_back("backdrop");

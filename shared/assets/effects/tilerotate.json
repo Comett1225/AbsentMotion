@@ -110,7 +110,22 @@
      0
     ]
    }
+  },
+  {
+   "id": "edgeStyle",
+   "label": "Style",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Classic",
+    "Standard"
+   ],
+   "when": {
+    "edgeStyle": [
+     2
+    ]
+   }
   }
  ],
- "sksl": "uniform shader image;\nuniform float2 size;\nuniform float4 screen;\nuniform float time;\nuniform float rotation;\nuniform float2 offset;\nuniform float count;\nuniform float2 stretch;\nuniform float angle;\nuniform float random;\nuniform float seed;\nuniform float screenSpace;\nuniform float edges;\nuniform float style;\nfloat hash12(float2 p) {\n    float3 q = fract(float3(p.xyx) * 0.1031);\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.x + q.y) * q.z);\n}\nfloat2 hash22(float2 p) {\n    float3 q = fract(float3(p.xyx) * float3(0.1031, 0.1030, 0.0973));\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.xx + q.yz) * q.zy);\n}\nhalf4 main(float2 coord) {\n    bool onScreen = screenSpace > 0.5;\n    float cell = (onScreen ? screen.w : size.y) / ((style > 0.5 ? 0.6 : 2.475) * max(count, 0.5));\n    float a = radians(angle);\n    float cs = cos(a);\n    float sn = sin(a);\n    float2 c = (onScreen ? screen.xy + screen.zw * 0.5 : size * 0.5) + offset;\n    float2 p = coord - c;\n    p = float2(cs * p.x + sn * p.y, -sn * p.x + cs * p.y);\n    float2 dims = max(abs(stretch), float2(0.01)) * cell;\n    float2 g = p / dims;\n    float2 n = floor(g);\n    float2 l = (g - n - 0.5) * dims;\n    float r = radians(rotation + random * 360.0 * (hash12(n + seed * 7.31) - 0.5));\n    float rc = cos(r);\n    float rs = sin(r);\n    l = float2(rc * l.x + rs * l.y, -rs * l.x + rc * l.y);\n    float2 q = (n + 0.5) * dims + l;\n    q = float2(cs * q.x - sn * q.y, sn * q.x + cs * q.y) + c;\n    if (edges > 0.5 && (q.x < 0.0 || q.y < 0.0 || q.x > size.x || q.y > size.y)) return half4(0.0);\n    return image.eval(q);\n}\n"
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float4 screen;\nuniform float time;\nuniform float rotation;\nuniform float2 offset;\nuniform float count;\nuniform float2 stretch;\nuniform float angle;\nuniform float random;\nuniform float seed;\nuniform float screenSpace;\nuniform float edges;\nuniform float style;\nuniform float edgeStyle;\nfloat hash12(float2 p) {\n    float3 q = fract(float3(p.xyx) * 0.1031);\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.x + q.y) * q.z);\n}\nfloat2 hash22(float2 p) {\n    float3 q = fract(float3(p.xyx) * float3(0.1031, 0.1030, 0.0973));\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.xx + q.yz) * q.zy);\n}\nhalf4 main(float2 coord) {\n    bool onScreen = screenSpace > 0.5;\n    float cell = (onScreen ? screen.w : size.y) / ((style > 0.5 ? 0.6 : 2.475) * max(count, 0.5));\n    float a = radians(angle);\n    float cs = cos(a);\n    float sn = sin(a);\n    float2 c = (onScreen ? screen.xy + screen.zw * 0.5 : size * 0.5) + offset;\n    float2 p = coord - c;\n    p = float2(cs * p.x + sn * p.y, -sn * p.x + cs * p.y);\n    float2 dims = max(abs(stretch), float2(0.01)) * cell;\n    float2 g = p / dims;\n    float2 n = floor(g);\n    float2 l = (g - n - 0.5) * dims;\n    float r = radians(rotation + random * 360.0 * (hash12(n + seed * 7.31) - 0.5) * (edgeStyle > 0.5 ? 2.0 : 1.0));\n    float rc = cos(r);\n    float rs = sin(r);\n    l = float2(rc * l.x + rs * l.y, -rs * l.x + rc * l.y);\n    float2 q = (n + 0.5) * dims + l;\n    q = float2(cs * q.x - sn * q.y, sn * q.x + cs * q.y) + c;\n    if (edgeStyle > 0.5) {\n        q = screen.xy + screen.zw - abs(mod(q - screen.xy, 2.0 * screen.zw) - screen.zw);\n        q = clamp(q, screen.xy + 0.5, screen.xy + screen.zw - 0.5);\n        float2 w = clamp(q + 0.5, 0.0, 1.0) * clamp(size - q + 0.5, 0.0, 1.0);\n        return image.eval(clamp(q, float2(0.5), size - 0.5)) * half(w.x * w.y);\n    }\n    if (edges > 0.5 && (q.x < 0.0 || q.y < 0.0 || q.x > size.x || q.y > size.y)) return half4(0.0);\n    return image.eval(q);\n}\n"
 }

@@ -3,6 +3,7 @@ package app.absentmotion.compat
 import app.absentmotion.model.finiteFloat
 import app.absentmotion.effects.EffectCatalog
 import app.absentmotion.effects.EffectDefinition
+import app.absentmotion.model.Keyframe
 import app.absentmotion.model.Scene
 import app.absentmotion.model.XmlNode
 import app.absentmotion.model.formatFloats
@@ -52,6 +53,7 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
         val unlessEnabled: String? = null,
         val ignoreWhenDisabled: String? = null,
         val ignoreWhenEnabled: String? = null,
+        val bake: Boolean = false,
     )
 
     class Turn(val quat: String, val spin: String, val to: List<String>, val inverse: Boolean = false, val sphere: Boolean = false)
@@ -89,7 +91,7 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
         val h = scene.node["height"]?.finiteFloat()?.takeIf { it > 0f } ?: 1080f
         var root = visit(scene.node, floatArrayOf(w, h, 0f, w, h, w, h))
         val foreign = root["am"]?.startsWith("com.alightcreative") == true
-        if (foreign) root = root.copy(attrs = root.attrs + ("am" to "app.absentmotion") + ("alightImport" to "true") + ("alightPivots" to "true"), children = root.children.map { heldGroup(pixelText(premulBlend(squaredBlendOpacity(it)))) }).let(::pivotPlaced)
+        if (foreign) root = root.copy(attrs = root.attrs + ("am" to "app.absentmotion") + ("alightImport" to "true") + ("alightPivots" to "true"), children = root.children.map { heldGroup(alightStrokes(pixelText(premulBlend(squaredBlendOpacity(it))))) }).let(::pivotPlaced)
         return Result(if (converted.isEmpty() && !renamed && !foreign) scene else Scene(root), converted, dropped)
     }
 
@@ -160,6 +162,12 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
         else -> node.copy(children = node.children.map(::pixelText))
     }
 
+    private fun alightStrokes(node: XmlNode): XmlNode = when {
+        node.name == "drawing" -> node.with("strokeLook", "alight")
+        node.children.isEmpty() -> node
+        else -> node.copy(children = node.children.map(::alightStrokes))
+    }
+
     private fun premulBlend(node: XmlNode): XmlNode {
         if (node.name !in Scene.LAYER_TAGS) return node
         val layer = if (node.name != "embedScene") node else node.copy(children = node.children.map { s -> if (s.name == "scene") s.copy(children = s.children.map(::premulBlend)) else s })
@@ -194,14 +202,25 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
         fun enabled(key: String) = effect.children.any { it.name == "property" && it["name"] == key &&
             values(it).any { value -> value == "true" || (value.finiteFloat() ?: 0f) > 0f } }
         fun sibling(name: String?) = name?.let { n -> effect.children.firstOrNull { it.name == "property" && it["name"] == n } }
-        fun convertAt(text: String, c: Conversion, component: Int, t: Float) = convertValue(text, c, component,
-            (sibling(c.plus)?.valueAt(t)?.finiteFloat() ?: 0f) * c.plusScale, dims, c.over?.let { length(sibling(it)?.valueAt(t) ?: c.overDefault) } ?: 1f)
+        fun convertAt(text: String, c: Conversion, component: Int, t: Float, keyed: Boolean = false) = convertValue(text, c, component,
+            (sibling(c.plus)?.valueAt(t)?.finiteFloat() ?: 0f) * c.plusScale, dims, c.over?.let { length(sibling(it)?.valueAt(t) ?: c.overDefault) } ?: 1f, !keyed)
         fun linked(source: XmlNode, name: String, type: String, c: Conversion, component: Int): XmlNode {
             val moving = listOfNotNull(sibling(c.plus), sibling(c.over)).filter { it.isKeyframed }
-            if (moving.isEmpty()) return property(source, name, type) { convertAt(it, c, component, 0f) }
+            if (moving.isEmpty() && c.bake && source.isKeyframed) {
+                val keys = source.keyframes
+                return property(source, name, type) { it }.withKeyframes(keys.flatMapIndexed { i, b ->
+                    val a = keys.getOrNull(i - 1)
+                    val between = if (a == null || !b.e.isNullOrEmpty()) emptyList() else (1 until 16).map { k ->
+                        val t = a.t + (b.t - a.t) * k / 16f
+                        Keyframe(t, convertAt(source.valueAt(t) ?: b.v, c, component, 0f, true))
+                    }
+                    between + b.copy(v = convertAt(b.v, c, component, 0f, true))
+                })
+            }
+            if (moving.isEmpty()) return property(source, name, type) { convertAt(it, c, component, 0f, source.isKeyframed) }
             val keys = (listOf(source) + moving).flatMap { it.keyframes }
             return property(source, name, type) { it }.withKeyframes(keys.map { it.t }.distinct().sorted().map { t ->
-                keys.first { it.t == t }.copy(v = convertAt(source.valueAt(t) ?: "", c, component, t))
+                keys.first { it.t == t }.copy(v = convertAt(source.valueAt(t) ?: "", c, component, t, true))
             })
         }
         for (child in effect.children) {
@@ -222,7 +241,7 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
                 if (param != null) {
                     val off = c.gate?.let { gate -> sibling(gate)?.valueAt(0f)?.trim() != "true" } ?: false
                     made[param.id] = if (off) XmlNode("property", mapOf("name" to param.id, "type" to param.type, "value" to "#00000000"))
-                        else if (c.slot >= 0) slotted(made[param.id], child, param.id, param.type, rule.set[param.id] ?: param.default, c.slot) { convertAt(it, c, -1, 0f) }
+                        else if (c.slot >= 0) slotted(made[param.id], child, param.id, param.type, rule.set[param.id] ?: param.default, c.slot) { convertAt(it, c, -1, 0f, child.isKeyframed) }
                         else linked(child, param.id, param.type, c, if (c.component >= 0) c.component else if (split && c.take == 0) i else -1)
                 } else if (c?.neutral == null || values(child).any { !same(if (split) it.split(',').getOrElse(i) { "" } else it, c.neutral) }) {
                     drop(if (split) "$name (${i + 1})" else name)
@@ -296,7 +315,7 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
     private fun length(text: String?): Float =
         text?.split(',')?.mapNotNull { it.trim().finiteFloat() }?.let { hypot(it.getOrElse(0) { 0f }, it.getOrElse(1) { 0f }) }?.takeIf { it > 0f } ?: 1f
 
-    private fun convertValue(text: String, c: Conversion, component: Int, shift: Float, dims: FloatArray, divisor: Float = 1f): String {
+    private fun convertValue(text: String, c: Conversion, component: Int, shift: Float, dims: FloatArray, divisor: Float = 1f, clamp: Boolean = true): String {
         if (c.texts.isNotEmpty()) return textFor(text, c) ?: text
         val t = text.trim().let { s -> if (c.blank != null && s.split(',').all { it.trim().finiteFloat() == 0f }) c.blank else s }
         if (t == "true" || t == "false") return c.values[t]?.let { formatFloats(floatArrayOf(it)) } ?: t
@@ -313,12 +332,12 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
         return formatFloats(FloatArray(numbers.size) { i ->
             val axis = (if (component >= 0) component else i) % 2
             val size = if (c.per == "span") dims.getOrElse(3 + axis) { dims[axis] } else whole
-            val texel = if (c.per == "texture") dims.getOrElse(7 + axis) { 1f } else 1f
+            val texel = when (c.per) { "texture" -> dims.getOrElse(7 + axis) { 1f }; "screenMilli" -> minOf(dims.getOrElse(5) { dims[0] }, dims.getOrElse(6) { dims[1] }) / 1000f; else -> 1f }
             val shown = if (c.relative) numbers[i] * texel / dims[axis] + 0.5f else numbers[i]
             val base = shown * c.signs.getOrElse(i) { 1f } + c.pre.getOrElse(i) { 0f }
             val raised = if (c.power == 1f) base else abs(base).pow(c.power).withSign(base)
             val moved = raised * c.scale * size / divisor + c.offset + shift + if (c.turn) dims.getOrElse(2) { 0f } else 0f
-            (if (c.wrap > 0f) moved.mod(c.wrap) else moved).coerceIn(c.min, c.max)
+            (if (c.wrap > 0f) moved.mod(c.wrap) else moved).let { if (clamp) it.coerceIn(c.min, c.max) else it }
         })
     }
 
@@ -383,6 +402,7 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
             json.optString("unlessEnabled").takeIf { it.isNotEmpty() },
             json.optString("ignoreWhenDisabled").takeIf { it.isNotEmpty() },
             json.optString("ignoreWhenEnabled").takeIf { it.isNotEmpty() },
+            json.optBoolean("bake"),
         )
     }
 }

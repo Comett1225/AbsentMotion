@@ -127,7 +127,7 @@ private fun channel(v: Float): Int = v.roundToInt().coerceIn(0, 255)
 internal val MatteFollowedEffects = setOf(
     "absent.autoshake", "absent.bend", "absent.box", "absent.bulge", "absent.pagecurl", "absent.scatterrepeat",
     "absent.circularripple", "absent.cross", "absent.cube", "absent.curl",
-    "absent.cylinder", "absent.puppet", "absent.displacementmap", "absent.echo", "absent.ellipsoid",
+    "absent.cylinder", "absent.puppet", "absent.displacementmap", "absent.echo", "absent.ellipsoid", "absent.facetrack",
     "absent.flip", "absent.fractalwarp", "absent.glass", "absent.glitch",
     "absent.gridrepeat", "absent.heart", "absent.hexagontilerotate", "absent.hexagontileshift",
     "absent.hexagontiling", "absent.hexprism", "absent.hollowbox", "absent.innerbulge",
@@ -135,7 +135,7 @@ internal val MatteFollowedEffects = setOf(
     "absent.movealongpath", "absent.noisedisplace", "absent.octahedron", "absent.offset",
     "absent.ominoglass", "absent.oscillate", "absent.parenthelper", "absent.polar", "absent.polardisplacement",
     "absent.pulsesize", "absent.pyramid", "absent.radialrepeat",
-    "absent.randomdisplace", "absent.randomjitter", "absent.rasterextrude", "absent.rastertransform", "absent.reorient360",
+    "absent.randomdisplace", "absent.randomjitter", "absent.rasterextrude", "absent.rastertransform", "absent.reorient360", "absent.ring",
     "absent.repeat", "absent.repeatalongpath", "absent.ripple", "absent.scaleassist", "absent.scatter3d", "absent.scatterfield", "absent.fracture3d", "absent.videofeedback",
     "absent.shutterblur", "absent.spherize", "absent.spin", "absent.squeeze",
     "absent.starpolyhedron", "absent.starprism", "absent.stretch", "absent.stretchaxis",

@@ -1,6 +1,9 @@
 {
  "id": "highlightshadow",
- "name": "Highlights & Shadows",
+ "name": "Highlights and Shadows",
+ "aliases": [
+  "Highlights & Shadows"
+ ],
  "category": "color",
  "since": "2.5.0",
  "description": "Recovers or boosts bright highlights and lifts or deepens dark shadows, going by the brightness of each pixel.",

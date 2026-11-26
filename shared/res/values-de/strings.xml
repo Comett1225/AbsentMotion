@@ -1187,8 +1187,6 @@
     <string name="font_source_google">Google Fonts</string>
     <string name="font_google_hint">Gib einen Namen ein, um in ganz Google Fonts zu suchen</string>
     <string name="font_downloads_when_chosen">Wird bei Auswahl heruntergeladen</string>
-    <string name="fonts_missing_title">Schriftarten fehlen auf diesem Handy</string>
-    <string name="fonts_missing_body">Dieses Projekt verwendet Schriftarten, die auf diesem Handy fehlen: %1$s. Der Text wird in einer anderen Schriftart angezeigt, bis du sie von Google Fonts herunterlädst.</string>
     <string name="font_favorite">Favorit</string>
     <string name="font_category_sans_serif">Serifenlos</string>
     <string name="font_category_serif">Serifen</string>
@@ -1350,6 +1348,7 @@
     <string name="structure_paste_fill_color">Füllung &amp; Farbe einfügen</string>
     <string name="structure_paste_border_shadow">Rahmen &amp; Schatten einfügen</string>
     <string name="structure_paste_blending">Deckkraft &amp; Mischmodus einfügen</string>
+    <string name="structure_paste_motions">Animationen &amp; Übergänge einfügen</string>
     <string name="structure_paste_style">Stil einfügen</string>
     <string name="text_alignment">Ausrichtung</string>
     <string name="track_track">Verfolgen</string>
@@ -1813,6 +1812,7 @@
     <string name="ai_model_grain">AI-Verbesserungsmodell für Filmkorn</string>
     <string name="ai_model_cartoon">AI-Verbesserungsmodell für Zeichentrick</string>
     <string name="ai_model_cutout">AI-Hintergrundentfernung 2.0</string>
+    <string name="ai_model_noise">Rauschunterdrückungsmodell</string>
     <string name="ai_model_broken">Eine AI-Modelldatei war beschädigt und wurde gelöscht. Lade sie erneut herunter.</string>
     <string name="ai_model_download_failed">Der Download des AI-Modells ist fehlgeschlagen. Prüfe die Verbindung und versuche es erneut.</string>
     <string name="ai_model_download_wrong">Der Download enthielt nicht das AI-Modell</string>
@@ -1862,6 +1862,7 @@
     <string name="cutout_best">AI-Hintergrundentfernung 2.0</string>
     <string name="cutout_best_hint">Sauberere Kanten bei Haaren und feinen Details. Lädt einmalig %1$s herunter. Nur für Bilder.</string>
     <string name="cutout_fallback_download">AI-Hintergrundentfernung 2.0 konnte nicht heruntergeladen werden, daher wurde Standard verwendet. Prüfe die Verbindung und versuche es erneut.</string>
+    <string name="ai_noise_fallback_download">Das Rauschunterdrückungsmodell konnte nicht heruntergeladen werden, daher wurde die Standard-Rauschreduzierung verwendet. Prüfe die Verbindung und versuche es erneut.</string>
     <string name="cutout_fallback_failed">AI-Hintergrundentfernung 2.0 konnte dieses Bild nicht fertigstellen, daher wurde Standard verwendet.</string>
     <string name="ai_gpu_warning">Dies kann manche Smartphones zum Einfrieren bringen. Starte das Smartphone in diesem Fall neu; AI verwendet dann wieder den Prozessor.</string>
     <string name="ai_gpu_failed">Die AI-Verarbeitung auf dem Grafikchip wurde nicht abgeschlossen, daher verwendet AI nun den Prozessor.</string>
@@ -1979,6 +1980,17 @@
     <string name="track_motion_cancelled">Verfolgung abgebrochen. Bereits verfolgte Bilder behalten ihre Keyframes.</string>
     <string name="track_motion_unavailable">Die Bewegungsverfolgung ist in dieser Version nicht verfügbar.</string>
     <string name="track_motion_failed">Dieses Video konnte nicht verfolgt werden.</string>
+    <string name="face_tracking_pick">Gesicht wählen</string>
+    <string name="face_tracking_again">Erneut verfolgen</string>
+    <string name="face_tracking_none">Noch kein Gesicht gewählt.</string>
+    <string name="face_tracking_ready">Das Video folgt dem gewählten Gesicht.</string>
+    <string name="face_tracking_partial">Ein Teil des Clips ist noch nicht verfolgt.</string>
+    <string name="face_tracking_video_only">Gesichtsverfolgung funktioniert bei Videoebenen.</string>
+    <string name="face_tracking_tap">Tippe auf das Gesicht, dem das Video folgen soll.</string>
+    <string name="face_tracking_looking">Suche nach Gesichtern…</string>
+    <string name="face_tracking_none_here">In diesem Bild wurde kein Gesicht gefunden. Versuche ein anderes.</string>
+    <string name="face_tracking_lost">Das Gesicht konnte in diesem Clip nicht verfolgt werden.</string>
+    <string name="face_tracking_cancelled">Gesichtsverfolgung abgebrochen.</string>
     <string name="edit_layer_copy_name">%1$s Kopie</string>
     <string name="model_layer_video">Video</string>
     <string name="ai_video_mask_name">%1$s Maske</string>
@@ -2310,6 +2322,10 @@
         <item quantity="one">Auf %1$s Ebene eingefügt</item>
         <item quantity="other">Auf %1$s Ebenen eingefügt</item>
     </plurals>
+    <plurals name="structure_transitions_skipped">
+        <item quantity="one">%1$s Übergang übersprungen: Er braucht einen Clip direkt vor oder nach der Ebene</item>
+        <item quantity="other">%1$s Übergänge übersprungen: Sie brauchen einen Clip direkt vor oder nach der Ebene</item>
+    </plurals>
     <string name="subject_keep_all">Alles behalten</string>
     <string name="subject_hint_photo">Um nur eine Person oder einen Gegenstand zu behalten, tippe darauf.</string>
     <string name="subject_hint_video">Um nur eine Person oder einen Gegenstand zu behalten, tippe im ersten Bild darauf. Die App verfolgt sie oder ihn durch den Clip.</string>
@@ -2428,8 +2444,6 @@
     <string name="desk_folder_back">Zurück zu allen Medien</string>
     <string name="voice_install_espeak">Keine Stimmen gefunden. Installiere das Paket espeak-ng und öffne dieses Fenster erneut.</string>
     <string name="desk_close_save_failed">Deine letzten Änderungen konnten nicht gespeichert werden. Gib Speicherplatz frei und klicke auf „Erneut versuchen“. Wenn du ohne Speichern schließt, bietet AbsentMotion diese Änderungen beim nächsten Start erneut an.</string>
-    <string name="desk_fonts_missing_title">Schriftarten auf diesem Computer nicht vorhanden</string>
-    <string name="desk_fonts_missing_body">Dieses Projekt verwendet Schriftarten, die auf diesem Computer fehlen: %1$s. Der Text wird in einer anderen Schriftart angezeigt, bis du sie von Google Fonts herunterlädst.</string>
     <string name="desk_export_busy">Ein anderer Export läuft noch. Warte, bis er abgeschlossen ist, oder brich ihn zuerst ab.</string>
     <string name="desk_export_no_ffmpeg">AbsentMotion konnte FFmpeg nicht starten, das Programm zum Schreiben von Video- und Audiodateien. Installiere AbsentMotion erneut.</string>
     <string name="desk_export_note_software">Auf diesem Computer funktioniert kein Hardware-Video-Encoder. Daher wird für diesen Export der langsamere Software-Encoder verwendet.</string>
@@ -2804,6 +2818,7 @@
     <string name="added_effect_save_failed">Nicht alle Effekte konnten gespeichert werden.</string>
     <string name="added_effect_remove_failed">Der Effekt konnte nicht entfernt werden.</string>
     <string name="community_filter_effects">Effekte</string>
+    <string name="community_filter_new">Neu</string>
     <string name="added_effect_version">Version %1$d</string>
     <string name="added_effect_already_added">Bereits hinzugefügt</string>
     <string name="added_effect_newer_installed">Du hast eine neuere Version (v%1$d)</string>

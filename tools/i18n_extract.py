@@ -208,6 +208,7 @@ def scan_effects():
         if not isinstance(data, dict):
             continue
         rows = [{'line': 0, 'kind': 'effect.' + k, 'text': data[k], 'rewrite': False} for k in ('name', 'description') if isinstance(data.get(k), str)]
+        rows += [{'line': 0, 'kind': 'effect.alias', 'text': a, 'rewrite': False} for a in data.get('aliases') or [] if isinstance(a, str)]
         for p in data.get('params', []):
             if isinstance(p.get('label'), str):
                 rows.append({'line': 0, 'kind': 'param.label', 'text': p['label'], 'rewrite': False})

@@ -1,6 +1,9 @@
 {
  "id": "reorient360",
- "name": "360° Reorient Sphere",
+ "name": "360º Reorient Sphere",
+ "aliases": [
+  "360° Reorient Sphere"
+ ],
  "category": "distort",
  "since": "3.0.0",
  "description": "Turns a 360° panorama layer around inside its sphere, to level the horizon or change where the front is.",

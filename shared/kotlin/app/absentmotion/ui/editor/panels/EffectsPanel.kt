@@ -118,7 +118,7 @@ internal fun EffectsPanel(state: EditorState, modifier: Modifier) {
     val point = active?.takeIf { it.kind == "point" && usable && !pathText }
     val adjust = remember(layer.id, index, point?.id, point?.label) {
         point?.let { param ->
-            PointAdjust(param.label) { dx, dy, width, height ->
+            PointAdjust(param.label, definition?.key == "facetrack") { dx, dy, width, height ->
                 state.editSelected("effect-$index-${param.id}") { current ->
                     val old = (current.effects.getOrNull(index)?.effectProperty(param.id)?.valueAt(current.t) ?: param.missingDefault).split(',').map { it.trim().finiteFloat() ?: 0f }
                     val x = (old.getOrElse(0) { 0f } + if (param.pixels) dx else dx / width).coerceIn(param.min, param.max)

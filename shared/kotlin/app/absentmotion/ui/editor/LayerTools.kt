@@ -173,15 +173,18 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
                 val clipEnd = still?.endTime
                 val past by remember(state, clipEnd) { derivedStateOf { clipEnd != null && state.sampleMs > clipEnd } }
                 val before by remember(state, clipStart) { derivedStateOf { clipStart != null && state.timeMs < clipStart } }
+                if (past) SmallTool(PanelIcons.TrimRight, stringResource(R.string.a11y_extend_end), Modifier.weight(1f), ToolShape.copy(topEnd = Square, bottomEnd = Square)) {
+                    state.moveClipEdges(true, true)
+                }
                 if (!past) SmallTool(PanelIcons.TrimLeft, stringResource(if (before) R.string.a11y_extend_start else R.string.a11y_trim_start), Modifier.weight(1f), ToolShape.copy(topEnd = Square, bottomEnd = Square)) {
                     if (before) state.moveClipEdges(false, true) else state.trimStart()
                 }
-                val middle = when { past -> ToolShape.copy(topEnd = Square, bottomEnd = Square); before -> ToolShape.copy(topStart = Square, bottomStart = Square); else -> RoundedCornerShape(0.dp) }
+                val middle = if (past || before) ToolShape.copy(topStart = Square, bottomStart = Square) else RoundedCornerShape(0.dp)
                 SmallTool(if (past) ChromeIcons.SkipForward else if (before) ChromeIcons.SkipBack else PanelIcons.Split, stringResource(if (past || before) R.string.a11y_move_to_playhead else R.string.a11y_split), Modifier.weight(1f).tutorialTarget("tool_split"), middle) {
                     if (past || before) state.moveClipEdges(past, false) else state.split()
                 }
-                if (!before) SmallTool(PanelIcons.TrimRight, stringResource(if (past) R.string.a11y_extend_end else R.string.a11y_trim_end), Modifier.weight(1f), ToolShape.copy(topStart = Square, bottomStart = Square)) {
-                    if (past) state.moveClipEdges(true, true) else state.trimEnd()
+                if (!before && !past) SmallTool(PanelIcons.TrimRight, stringResource(R.string.a11y_trim_end), Modifier.weight(1f), ToolShape.copy(topStart = Square, bottomStart = Square)) {
+                    state.trimEnd()
                 }
             }
             Spacer(Modifier.width(17.px))

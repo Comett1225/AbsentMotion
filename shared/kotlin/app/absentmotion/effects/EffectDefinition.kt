@@ -110,7 +110,9 @@ data class EffectDefinition(
     val shortcuts: List<EffectShortcut> = emptyList(),
     val shortcut: String? = null,
     val alsoIn: List<String> = emptyList(),
+    val aliases: List<String> = emptyList(),
     val addedPicture: String? = null,
+    val addedHero: String? = null,
     internal val addedAuthor: String = "",
     internal val addedCreator: String = "",
     internal val addedVersion: Long = 1L,
@@ -120,10 +122,10 @@ data class EffectDefinition(
     val available: Boolean get() = status == "ok"
     val isAdded: Boolean get() = id.startsWith(AddedEffectPrefix)
     val thumbnail: String get() = if (isAdded) addedPicture ?: "added/$key.webp" else "thumb/${shortcut ?: key}.webp"
-    val hero: String get() = if (isAdded) thumbnail else "thumb/${shortcut ?: key}.hero.avif"
+    val hero: String get() = if (isAdded) addedHero ?: thumbnail else "thumb/${shortcut ?: key}.hero.avif"
 
     fun shortcutTiles(): List<EffectDefinition> = shortcuts.map { s ->
-        copy(name = s.name, description = s.description, since = s.since ?: since, shortcut = s.key, shortcuts = emptyList(), alsoIn = s.also)
+        copy(name = s.name, description = s.description, since = s.since ?: since, shortcut = s.key, shortcuts = emptyList(), alsoIn = s.also, aliases = emptyList())
     }
 
     fun thumbnail(preset: EffectPreset): String = "thumb/$key.${preset.slug}.webp"
@@ -195,10 +197,13 @@ data class EffectDefinition(
             parsed.forEachIndexed { i, p -> require(p.after == null || parsed.take(i).any { it.id == p.after }) { "$key.${p.id}: after ${p.after} is not an earlier parameter" } }
             val presets = json.optJSONArray("presets") ?: JSONArray()
             val shortcuts = json.optJSONArray("shortcuts") ?: JSONArray()
+            val aliases = json.optJSONArray("aliases") ?: JSONArray()
             return EffectDefinition("absent.$key", key, json.optString("name", key), category, json.optString("description"),
                 parsed, if (native) null else sksl, native, since = json.optString("since").takeIf { it.isNotBlank() },
                 presets = List(presets.length()) { preset(key, parsed, presets.getJSONObject(it)) },
                 page = json.optString("name", key).lowercase(Locale.US).replace(Regex("[^a-z0-9]"), ""),
+                aliases = List(aliases.length()) { aliases.optString(it) }.filter { it.isNotBlank() },
+                alsoIn = (json.optJSONArray("also") ?: JSONArray()).let { a -> List(a.length()) { a.getString(it) } }.onEach { require(it in EffectCatalog.Categories && it != category) { "$key: unknown also category $it" } },
                 shortcuts = List(shortcuts.length()) { i ->
                     shortcuts.getJSONObject(i).let { s ->
                         val also = s.optJSONArray("also") ?: JSONArray()

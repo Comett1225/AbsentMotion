@@ -27,6 +27,7 @@ Alles auf dem Tab **Community** wird von einer Person geprüft, bevor es online 
 
 - Halte es für alle geeignet. Menschen jeden Alters nutzen AbsentMotion.
 - Projektpakete dürfen bis zu 20 MB groß sein, Voreinstellungen bis zu 1 MB und Effekte bis zu 512 KB.
+- Jeder Effekt braucht ein Vorschaubild, das ihn zeigt, in zwei Größen: ein kleines (192 × 192 WebP, unbewegt oder animiert bis 3 Sekunden) und ein großes (720 × 720 WebP), jeweils bis zu 150 KB.
 - Elemente werden unter CC BY 4.0 geteilt: Jeder darf sie nutzen und ändern, solange er nennt, wer sie gemacht hat.
 - Der Name bei deinem Element ist der Creator-Name, den du eingibst. Gib darin nichts Persönliches an.
 - Der Betreiber entscheidet, was veröffentlicht wird, und kann ein Element jederzeit entfernen.

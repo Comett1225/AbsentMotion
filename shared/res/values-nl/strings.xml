@@ -1187,8 +1187,6 @@
     <string name="font_source_google">Google Fonts</string>
     <string name="font_google_hint">Typ een naam om in heel Google Fonts te zoeken</string>
     <string name="font_downloads_when_chosen">Wordt gedownload als je het kiest</string>
-    <string name="fonts_missing_title">Lettertypen niet op deze telefoon</string>
-    <string name="fonts_missing_body">Dit project gebruikt lettertypen die niet op deze telefoon staan: %1$s. De tekst wordt in een ander lettertype getoond tot je ze downloadt via Google Fonts.</string>
     <string name="font_favorite">Favoriet</string>
     <string name="font_category_sans_serif">Schreefloos</string>
     <string name="font_category_serif">Schreef</string>
@@ -1350,6 +1348,7 @@
     <string name="structure_paste_fill_color">Vulling en kleur plakken</string>
     <string name="structure_paste_border_shadow">Rand en schaduw plakken</string>
     <string name="structure_paste_blending">Dekking en overvloeimodus plakken</string>
+    <string name="structure_paste_motions">Animaties en overgangen plakken</string>
     <string name="structure_paste_style">Stijl plakken</string>
     <string name="text_alignment">Uitlijning</string>
     <string name="track_track">Volgen</string>
@@ -1813,6 +1812,7 @@
     <string name="ai_model_grain">Korrelmodel voor AI Verbeteren</string>
     <string name="ai_model_cartoon">Cartoonmodel voor AI Verbeteren</string>
     <string name="ai_model_cutout">AI-achtergrondverwijdering 2.0</string>
+    <string name="ai_model_noise">Model voor ruisvermindering</string>
     <string name="ai_model_broken">Een AI-modelbestand was beschadigd en is verwijderd. Download het opnieuw.</string>
     <string name="ai_model_download_failed">Downloaden van het AI-model mislukt. Controleer de verbinding en probeer het opnieuw.</string>
     <string name="ai_model_download_wrong">De download was niet het AI-model</string>
@@ -1862,6 +1862,7 @@
     <string name="cutout_best">AI-achtergrondverwijdering 2.0</string>
     <string name="cutout_best_hint">Nettere randen rond haar en fijn detail. Downloadt %1$s eenmalig. Alleen afbeeldingen.</string>
     <string name="cutout_fallback_download">AI-achtergrondverwijdering 2.0 kon niet worden gedownload, dus is Standaard gebruikt. Controleer de verbinding en probeer het opnieuw.</string>
+    <string name="ai_noise_fallback_download">Het model voor ruisvermindering kon niet worden gedownload, dus is de standaard ruisvermindering gebruikt. Controleer de verbinding en probeer het opnieuw.</string>
     <string name="cutout_fallback_failed">AI-achtergrondverwijdering 2.0 kon deze afbeelding niet afmaken, dus is Standaard gebruikt.</string>
     <string name="ai_gpu_warning">Hierdoor kunnen sommige telefoons vastlopen. Loopt de telefoon vast, start hem dan opnieuw op; AI gebruikt dan weer de processor.</string>
     <string name="ai_gpu_failed">AI-werk op de grafische chip is niet voltooid, dus AI gebruikt nu de processor.</string>
@@ -1979,6 +1980,17 @@
     <string name="track_motion_cancelled">Volgen geannuleerd. Frames die al zijn gevolgd, behouden hun keyframes.</string>
     <string name="track_motion_unavailable">Bewegingstracking is niet beschikbaar in deze versie.</string>
     <string name="track_motion_failed">Deze video kon niet worden gevolgd.</string>
+    <string name="face_tracking_pick">Gezicht kiezen</string>
+    <string name="face_tracking_again">Opnieuw volgen</string>
+    <string name="face_tracking_none">Nog geen gezicht gekozen.</string>
+    <string name="face_tracking_ready">De video volgt het gekozen gezicht.</string>
+    <string name="face_tracking_partial">Een deel van de clip is nog niet gevolgd.</string>
+    <string name="face_tracking_video_only">Gezicht volgen werkt op videolagen.</string>
+    <string name="face_tracking_tap">Tik op het gezicht dat de video moet volgen.</string>
+    <string name="face_tracking_looking">Gezichten zoeken…</string>
+    <string name="face_tracking_none_here">Geen gezicht gevonden in dit frame. Probeer een ander.</string>
+    <string name="face_tracking_lost">Het gezicht kon in deze clip niet worden gevolgd.</string>
+    <string name="face_tracking_cancelled">Gezicht volgen geannuleerd.</string>
     <string name="edit_layer_copy_name">%1$s kopie</string>
     <string name="model_layer_video">Video</string>
     <string name="ai_video_mask_name">%1$s (masker)</string>
@@ -2310,6 +2322,10 @@
         <item quantity="one">Geplakt op %1$s laag</item>
         <item quantity="other">Geplakt op %1$s lagen</item>
     </plurals>
+    <plurals name="structure_transitions_skipped">
+        <item quantity="one">%1$s overgang overgeslagen: er is een clip direct voor of na de laag nodig</item>
+        <item quantity="other">%1$s overgangen overgeslagen: er is een clip direct voor of na de laag nodig</item>
+    </plurals>
     <string name="subject_keep_all">Alles behouden</string>
     <string name="subject_hint_photo">Tik op een persoon of object om alleen dat te behouden.</string>
     <string name="subject_hint_video">Tik in dit eerste frame op een persoon of object om alleen dat te behouden. De app volgt het door de hele clip.</string>
@@ -2428,8 +2444,6 @@
     <string name="desk_folder_back">Terug naar alle media</string>
     <string name="voice_install_espeak">Geen stemmen gevonden. Installeer het pakket espeak-ng en open dit venster opnieuw.</string>
     <string name="desk_close_save_failed">Je laatste wijzigingen kunnen niet worden opgeslagen. Maak schijfruimte vrij en klik op Opnieuw proberen. Als je sluit zonder op te slaan, biedt AbsentMotion deze wijzigingen bij de volgende start opnieuw aan.</string>
-    <string name="desk_fonts_missing_title">Lettertypen ontbreken op deze computer</string>
-    <string name="desk_fonts_missing_body">Dit project gebruikt lettertypen die niet op deze computer staan: %1$s. De tekst wordt in een ander lettertype getoond totdat je ze downloadt van Google Fonts.</string>
     <string name="desk_export_busy">Er loopt nog een andere export. Wacht tot die klaar is of annuleer hem eerst.</string>
     <string name="desk_export_no_ffmpeg">AbsentMotion kan FFmpeg niet starten, het programma waarmee video- en geluidsbestanden worden geschreven. Installeer AbsentMotion opnieuw.</string>
     <string name="desk_export_note_software">Er werkt geen hardwarematige video-encoder op deze computer, dus deze export gebruikt de langzamere software-encoder.</string>
@@ -2804,6 +2818,7 @@
     <string name="added_effect_save_failed">Kan niet alle effecten opslaan.</string>
     <string name="added_effect_remove_failed">Kan het effect niet verwijderen.</string>
     <string name="community_filter_effects">Effecten</string>
+    <string name="community_filter_new">Nieuw</string>
     <string name="added_effect_version">Versie %1$d</string>
     <string name="added_effect_already_added">Al toegevoegd</string>
     <string name="added_effect_newer_installed">Je hebt een nieuwere versie (v%1$d)</string>

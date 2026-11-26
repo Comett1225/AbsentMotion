@@ -1,0 +1,247 @@
+{
+ "id": "ring",
+ "name": "Ring",
+ "category": "3d",
+ "since": "5.3.2",
+ "description": "Wraps the layer around a ring with flat faces, like a short pipe, with light and depth.",
+ "params": [
+  {
+   "id": "orientA",
+   "label": "Orientation α",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.1
+  },
+  {
+   "id": "orientB",
+   "label": "Orientation β",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.1
+  },
+  {
+   "id": "orientG",
+   "label": "Orientation γ",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.1
+  },
+  {
+   "id": "rotX",
+   "label": "Rotation X",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.1
+  },
+  {
+   "id": "rotY",
+   "label": "Rotation Y",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.1
+  },
+  {
+   "id": "rotZ",
+   "label": "Rotation Z",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.1
+  },
+  {
+   "id": "radius",
+   "label": "Radius",
+   "type": "float",
+   "default": 100,
+   "min": 0,
+   "max": 100000,
+   "step": 0.1
+  },
+  {
+   "id": "thickness",
+   "label": "Width",
+   "type": "float",
+   "default": 10,
+   "min": 0,
+   "max": 100000,
+   "step": 0.1
+  },
+  {
+   "id": "height",
+   "label": "Length",
+   "type": "float",
+   "default": 50,
+   "min": 0,
+   "max": 100000,
+   "step": 0.1
+  },
+  {
+   "id": "smoothing",
+   "label": "Smoothing",
+   "type": "float",
+   "default": 0,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "position",
+   "label": "Position",
+   "type": "point",
+   "default": [
+    0,
+    100
+   ],
+   "min": -100000,
+   "max": 100000,
+   "step": 1
+  },
+  {
+   "id": "alZ",
+   "label": "Position Z",
+   "type": "float",
+   "default": 600,
+   "min": -100000,
+   "max": 100000,
+   "step": 1
+  },
+  {
+   "id": "scale",
+   "label": "Scale",
+   "type": "float",
+   "default": 1,
+   "min": 0.01,
+   "max": 100,
+   "step": 0.01
+  },
+  {
+   "id": "intensity",
+   "label": "Light Intensity",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 10,
+   "step": 0.01,
+   "section": "light"
+  },
+  {
+   "id": "shine",
+   "label": "Shine",
+   "type": "float",
+   "default": 0.8,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "section": "light"
+  },
+  {
+   "id": "spec",
+   "label": "Specularity",
+   "type": "float",
+   "default": 30,
+   "min": 0.1,
+   "max": 500,
+   "step": 0.1,
+   "section": "light"
+  },
+  {
+   "id": "ambient",
+   "label": "Ambient",
+   "type": "float",
+   "default": 0.1,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "section": "light"
+  },
+  {
+   "id": "lightColor",
+   "label": "Color",
+   "type": "color",
+   "default": "#ffffffff",
+   "section": "light"
+  },
+  {
+   "id": "lightDir",
+   "label": "Direction",
+   "type": "point",
+   "default": [
+    75,
+    -75
+   ],
+   "min": -100000,
+   "max": 100000,
+   "step": 1,
+   "section": "light"
+  },
+  {
+   "id": "lightDepth",
+   "label": "Elevation",
+   "type": "float",
+   "default": 100,
+   "min": -100000,
+   "max": 100000,
+   "step": 0.1,
+   "section": "light"
+  },
+  {
+   "id": "texMirror",
+   "label": "Mirror",
+   "type": "switch",
+   "default": false,
+   "section": "texture"
+  },
+  {
+   "id": "texRepeatX",
+   "label": "Repeat X",
+   "type": "float",
+   "default": 1,
+   "min": 0.01,
+   "max": 100,
+   "step": 0.01,
+   "section": "texture"
+  },
+  {
+   "id": "texRepeatY",
+   "label": "Repeat Y",
+   "type": "float",
+   "default": 1,
+   "min": 0.01,
+   "max": 100,
+   "step": 0.01,
+   "section": "texture"
+  },
+  {
+   "id": "texAngle",
+   "label": "Texture Angle",
+   "type": "angle",
+   "default": 0,
+   "min": -3600,
+   "max": 3600,
+   "step": 0.1,
+   "section": "texture"
+  },
+  {
+   "id": "texCrop",
+   "label": "Crop",
+   "type": "float",
+   "default": 1,
+   "min": 0.01,
+   "max": 100,
+   "step": 0.01,
+   "section": "texture"
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float3x3 orient;\nuniform float orientA;\nuniform float orientB;\nuniform float orientG;\nuniform float rotX;\nuniform float rotY;\nuniform float rotZ;\nuniform float radius;\nuniform float thickness;\nuniform float height;\nuniform float smoothing;\nuniform float2 position;\nuniform float alZ;\nuniform float scale;\nuniform float intensity;\nuniform float shine;\nuniform float spec;\nuniform float ambient;\nlayout(color) uniform half4 lightColor;\nuniform float2 lightDir;\nuniform float lightDepth;\nuniform float texMirror;\nuniform float texRepeatX;\nuniform float texRepeatY;\nuniform float texAngle;\nuniform float texCrop;\n\nconst float PI = 3.14159265;\n\nfloat map(float3 p) {\n    float3 q = p * 100.0;\n    float s = smoothing * min(thickness, height) * 0.5;\n    float r = length(q.xz);\n    float2 w = float2(max(r - radius, radius - thickness - r), abs(q.y) - height) + s;\n    return (min(max(w.x, w.y), 0.0) + length(max(w, 0.0)) - s) / 100.0;\n}\n\nfloat3x3 euler(float3 d) {\n    float3 a = radians(d);\n    float cx = cos(a.x), sx = sin(a.x), cy = cos(a.y), sy = sin(a.y), cz = cos(a.z), sz = sin(a.z);\n    return float3x3(cz, -sz, 0.0, sz, cz, 0.0, 0.0, 0.0, 1.0) * float3x3(cy, 0.0, sy, 0.0, 1.0, 0.0, -sy, 0.0, cy) *\n        float3x3(1.0, 0.0, 0.0, 0.0, cx, -sx, 0.0, sx, cx);\n}\n\nfloat3x3 turn() { return euler(float3(orientA, orientB, orientG)) * euler(float3(rotX, rotY, rotZ)); }\n\nfloat4 pic(float2 uv) {\n    return float4(image.eval(clamp(uv * size, float2(0.5), max(size - 0.5, float2(0.5)))));\n}\n\nfloat4 wrap(float2 uv) {\n    float t = radians(texAngle);\n    float2 q = uv - 0.5;\n    q = float2(cos(t) * q.x + sin(t) * q.y, cos(t) * q.y - sin(t) * q.x) * float2(texRepeatX, texRepeatY) + 0.5;\n    float2 f = fract(q);\n    if (texMirror > 0.5) f = mix(f, 1.0 - f, mod(floor(q), 2.0));\n    return pic((f - 0.5) / max(texCrop, 0.0001) + 0.5);\n}\n\nfloat4 alShade(float4 c, float3 n) {\n    float3 l = normalize(float3(lightDir, -4.1 * lightDepth));\n    float d = max(dot(n, l), 0.0);\n    float g = shine * pow(d, max(spec, 0.0001));\n    float3 lc = float3(lightColor.rgb);\n    return float4(c.rgb * (intensity * mix(d, 1.0, ambient) * (1.0 - 0.1 * shine) * (1.0 - g)) * lc + g * lc * c.a, c.a);\n}\n\nfloat3 normal(float3 p, float e) {\n    float2 k = float2(1.0, -1.0);\n    return normalize(k.xyy * map(p + k.xyy * e) + k.yyx * map(p + k.yyx * e) + k.yxy * map(p + k.yxy * e) + k.xxx * map(p + k.xxx * e));\n}\n\nfloat bound() { return length(float2(radius, height)) / 100.0 + 0.01; }\nfloat4 surface(float3 p, float3 n) {\n    float3 q = p * 100.0;\n    float c = max(radius * 4.0 / 3.0, 0.0001);\n    if (abs(n.y) > 0.7) return wrap(float2(0.5 + q.x / c, 0.5 + sign(n.y) * q.z / c));\n    return wrap(float2(0.5 + (atan(-q.x, q.z) - PI) * radius / 200.0, 0.5 + q.y / 200.0));\n}\nhalf4 main(float2 coord) {\n    float f = size.y;\n    float3 rw = normalize(float3((coord - size * 0.5) / (f * max(scale, 0.0001)), 1.0));\n    float3 c = float3(position.x, 100.0 - position.y, alZ + 100.0) / 100.0;\n    float rb = bound() * 1.02 + 0.02;\n    float b = -dot(c, rw);\n    float disc = b * b - dot(c, c) + rb * rb;\n    if (disc <= 0.0) return half4(0.0);\n    float3x3 m = orient * turn();\n    float3 ro = -c * m;\n    float3 rd = rw * m;\n    float far = -b + sqrt(disc);\n    float t = max(-b - sqrt(disc), 0.0);\n    float px = f * scale / rw.z;\n    float best = 1e9;\n    float tb = t;\n    bool hit = false;\n    for (int i = 0; i < 128; i++) {\n        float h = map(ro + rd * t);\n        float g = h * px / max(t, 0.0001);\n        if (g < best) { best = g; tb = t; }\n        if (g < 0.05) { hit = true; break; }\n        t += h * 0.9;\n        if (t > far) break;\n    }\n    if (!hit && best >= 0.5) return half4(0.0);\n    if (!hit) t = tb;\n    float e = max(0.5 * t / px, 0.00005);\n    float3 p = ro + rd * t;\n    float3 n = normal(p, e);\n    if (!hit) p -= n * map(p);\n    float4 col = alShade(surface(p, n), normalize(m * n));\n    return half4(hit ? col : col * (0.5 - best));\n}\n"
+}

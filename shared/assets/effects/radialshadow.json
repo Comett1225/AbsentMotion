@@ -2,6 +2,9 @@
  "id": "radialshadow",
  "name": "Radial Shadow",
  "category": "stylize",
+ "also": [
+  "color"
+ ],
  "since": "3.0.0",
  "description": "Casts long shadows from the opaque parts of the layer, spreading out away from a light point.",
  "params": [

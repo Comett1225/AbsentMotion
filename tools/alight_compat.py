@@ -35,6 +35,8 @@ def build():
             continue
         target = by_id.get(row["id"])
         seen.add(row["id"])
+        if row.get("hidden"):
+            continue
         status = row["measured"] if target else "none"
         table.append((ORDER.index(status), row["name"].lower(), row["name"], effect_name(target) if target else "-", LABELS[status]))
     for short, target in by_id.items():

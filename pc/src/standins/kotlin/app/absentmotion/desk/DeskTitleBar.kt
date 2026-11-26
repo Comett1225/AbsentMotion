@@ -3,6 +3,7 @@ package app.absentmotion.desk
 import androidx.compose.material3.DropdownMenu
 import app.absentmotion.ui.editor.ShortcutItems
 import app.absentmotion.ui.editor.rightClick
+import android.content.Desk
 import android.content.mime
 import app.absentmotion.i18n.AppText
 import android.net.Uri
@@ -77,11 +78,16 @@ import app.absentmotion.editor.deleteChosen
 import app.absentmotion.editor.deleteSelected
 import app.absentmotion.editor.duplicateChosen
 import app.absentmotion.editor.duplicateSelected
+import app.absentmotion.editor.StylePart
+import app.absentmotion.editor.canPaste
 import app.absentmotion.editor.pasteLayer
+import app.absentmotion.editor.pasteStyleOnChosen
 import app.absentmotion.editor.split
 import app.absentmotion.platform.Hint
 import app.absentmotion.platform.linkMediaFolder
 import app.absentmotion.ui.editor.ChromeIcons
+import app.absentmotion.ui.editor.PasteLabels
+import app.absentmotion.ui.editor.styleToast
 import app.absentmotion.ui.editor.TextIcons
 import app.absentmotion.ui.home.BelowAnchor
 import app.absentmotion.ui.home.DeskModals
@@ -342,6 +348,7 @@ fun deskMenus(app: DeskAppState, scope: kotlinx.coroutines.CoroutineScope): List
     val editor = app.editor
     val chosen = editor?.chosenLayers?.isNotEmpty() == true
     val picked = editor?.selectedId != null || MultiSelect.active
+    val style = chosen && editor?.canPaste == true
     val linked = DeskLibrary.folders.also { DeskLibrary.revision.intValue }
     val separator = DeskMenuItem.Separator
     return listOf(
@@ -373,6 +380,10 @@ fun deskMenus(app: DeskAppState, scope: kotlinx.coroutines.CoroutineScope): List
             DeskMenuItem(t(R.string.desk_menu_cut_layer), chosen, action = Shortcut.Cut) { editor?.let { it.copySelected(); if (MultiSelect.active) it.deleteChosen() else it.deleteSelected() } },
             DeskMenuItem(t(R.string.desk_menu_copy_layer), chosen, action = Shortcut.Copy) { editor?.copySelected() },
             DeskMenuItem(t(R.string.desk_menu_paste_layer), editor != null, action = Shortcut.Paste) { editor?.pasteLayer() },
+            DeskMenuItem(t(R.string.menu_paste_style), style, children = (StylePart.entries.map { t(PasteLabels.getValue(it)) to setOf(it) } +
+                (t(R.string.structure_paste_style) to StylePart.entries.toSet())).map { (label, parts) ->
+                DeskMenuItem(label, style) { editor?.let { styleToast(Desk.context, it.pasteStyleOnChosen(parts), onto = MultiSelect.active) } }
+            }),
             DeskMenuItem(t(R.string.home_duplicate), picked, action = Shortcut.Duplicate) { editor?.let { if (MultiSelect.active) it.duplicateChosen() else it.duplicateSelected() } },
             DeskMenuItem(t(R.string.timeline_split), picked, action = Shortcut.Split) { editor?.split() },
             DeskMenuItem(t(R.string.delete), picked, action = Shortcut.Delete) { editor?.let { if (MultiSelect.active) it.deleteChosen() else it.deleteSelected() } },

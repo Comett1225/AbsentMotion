@@ -1,0 +1,212 @@
+{
+ "id": "advancedchromakey",
+ "name": "Advanced Chroma Key",
+ "category": "key",
+ "since": "5.3.2",
+ "description": "Removes up to four colors at once. Each color can be removed (Exclude) or protected from the other keys (Include), with its own Threshold, Feather and Luma Sensitivity. Show Mask shows what is kept in red.",
+ "params": [
+  {
+   "id": "c1active",
+   "label": "Color 1",
+   "type": "switch",
+   "default": true
+  },
+  {
+   "id": "c1mode",
+   "label": "Mode",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Exclude",
+    "Include"
+   ]
+  },
+  {
+   "id": "c1color",
+   "label": "Color",
+   "type": "color",
+   "default": "#ff00ff00"
+  },
+  {
+   "id": "c1threshold",
+   "label": "Threshold",
+   "type": "float",
+   "default": 0.1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "c1feather",
+   "label": "Feather",
+   "type": "float",
+   "default": 0.05,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "c1luma",
+   "label": "Luma Sensitivity",
+   "type": "float",
+   "default": 0.25,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "c2active",
+   "label": "Color 2",
+   "type": "switch",
+   "default": true
+  },
+  {
+   "id": "c2mode",
+   "label": "Mode",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Exclude",
+    "Include"
+   ]
+  },
+  {
+   "id": "c2color",
+   "label": "Color",
+   "type": "color",
+   "default": "#ff00ff00"
+  },
+  {
+   "id": "c2threshold",
+   "label": "Threshold",
+   "type": "float",
+   "default": 0.1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "c2feather",
+   "label": "Feather",
+   "type": "float",
+   "default": 0.05,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "c2luma",
+   "label": "Luma Sensitivity",
+   "type": "float",
+   "default": 0.25,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "c3active",
+   "label": "Color 3",
+   "type": "switch",
+   "default": false
+  },
+  {
+   "id": "c3mode",
+   "label": "Mode",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Exclude",
+    "Include"
+   ]
+  },
+  {
+   "id": "c3color",
+   "label": "Color",
+   "type": "color",
+   "default": "#ff00ff00"
+  },
+  {
+   "id": "c3threshold",
+   "label": "Threshold",
+   "type": "float",
+   "default": 0.1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "c3feather",
+   "label": "Feather",
+   "type": "float",
+   "default": 0.05,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "c3luma",
+   "label": "Luma Sensitivity",
+   "type": "float",
+   "default": 0.25,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "c4active",
+   "label": "Color 4",
+   "type": "switch",
+   "default": false
+  },
+  {
+   "id": "c4mode",
+   "label": "Mode",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Exclude",
+    "Include"
+   ]
+  },
+  {
+   "id": "c4color",
+   "label": "Color",
+   "type": "color",
+   "default": "#ff00ff00"
+  },
+  {
+   "id": "c4threshold",
+   "label": "Threshold",
+   "type": "float",
+   "default": 0.1,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "c4feather",
+   "label": "Feather",
+   "type": "float",
+   "default": 0.05,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "c4luma",
+   "label": "Luma Sensitivity",
+   "type": "float",
+   "default": 0.25,
+   "min": 0,
+   "max": 1,
+   "step": 0.001
+  },
+  {
+   "id": "showMask",
+   "label": "Show Mask",
+   "type": "switch",
+   "default": false
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float c1active;\nuniform float c1mode;\nlayout(color) uniform half4 c1color;\nuniform float c1threshold;\nuniform float c1feather;\nuniform float c1luma;\nuniform float c2active;\nuniform float c2mode;\nlayout(color) uniform half4 c2color;\nuniform float c2threshold;\nuniform float c2feather;\nuniform float c2luma;\nuniform float c3active;\nuniform float c3mode;\nlayout(color) uniform half4 c3color;\nuniform float c3threshold;\nuniform float c3feather;\nuniform float c3luma;\nuniform float c4active;\nuniform float c4mode;\nlayout(color) uniform half4 c4color;\nuniform float c4threshold;\nuniform float c4feather;\nuniform float c4luma;\nuniform float showMask;\nfloat3 yuv(float3 c) {\n    float y = dot(c, float3(0.299, 0.587, 0.114));\n    return float3(y, 0.492 * (c.b - y), 0.877 * (c.r - y));\n}\nfloat keep(float3 p, half4 key, float threshold, float feather, float luma) {\n    if (key.a <= 0.0) return 1.0;\n    float3 e = yuv(p) - yuv(float3(key.rgb));\n    float d = length(float3(luma * e.x, e.yz));\n    float soft = max(feather, 0.0001);\n    return clamp((d - threshold + soft) / soft, 0.0, 1.0);\n}\nvoid slot(float3 p, float active, float mode, half4 key, float threshold, float feather, float luma, inout float cut, inout float hold) {\n    if (active < 0.5) return;\n    float k = keep(p, key, threshold, feather, luma);\n    if (mode > 0.5) hold = max(hold, 1.0 - k); else cut = min(cut, k);\n}\nhalf4 main(float2 coord) {\n    half4 c = image.eval(coord);\n    float3 p = float3(unpremul(c).rgb);\n    float cut = 1.0, hold = 0.0;\n    slot(p, c1active, c1mode, c1color, c1threshold, c1feather, c1luma, cut, hold);\n    slot(p, c2active, c2mode, c2color, c2threshold, c2feather, c2luma, cut, hold);\n    slot(p, c3active, c3mode, c3color, c3threshold, c3feather, c3luma, cut, hold);\n    slot(p, c4active, c4mode, c4color, c4threshold, c4feather, c4luma, cut, hold);\n    float a = max(cut, hold);\n    if (showMask > 0.5) return half4(half(a * c.a), 0.0, 0.0, 1.0);\n    return c * half(a);\n}\n"
+}

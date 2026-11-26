@@ -8,10 +8,10 @@ Export the project from Alight Motion as XML and open it in AbsentMotion. After 
 
 ## In short
 
-- **155** Alight effects look the same and **15** are very close.
-- **99** are converted to a similar effect that does not look identical.
-- **8** are converted but have not been compared side by side yet.
-- Not converted yet: **1**.
+- **181** Alight effects look the same and **12** are very close.
+- **61** are converted to a similar effect that does not look identical.
+- **2** are converted but have not been compared side by side yet.
+- Not converted yet: **0**.
 - **Blending modes:** all of Alight's blending modes come across. Multiply, Subtract, Screen, Lighten and Darken get their opacity converted so they look the same.
 
 Something imports wrong? [Send the project as an Import problem](https://github.com/Comett1225/AbsentMotion/issues/new?template=import_problem.yml): the XML and a screenshot of the same moment in Alight Motion. That is the fastest way to get it fixed.
@@ -20,82 +20,95 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 
 | Alight effect | In AbsentMotion | Result |
 |---|---|---|
+| Advanced Chroma Key | Advanced Chroma Key | Same look |
+| Auto-Shake | Auto-Shake | Same look |
 | Bend | Bend | Same look |
 | Blink | Blink | Same look |
 | blink | Blink | Same look |
-| Box Blur | Blur | Same look |
-| boxblur | Blur | Same look |
-| boxblur2 | Blur | Same look |
-| brightcont | Brightness & Contrast | Same look |
-| Brightness / Contrast | Brightness & Contrast | Same look |
+| Box | Box | Same look |
+| Box Blur | Box Blur | Same look |
+| boxblur | Box Blur | Same look |
+| boxblur2 | Box Blur | Same look |
+| brightcont | Brightness / Contrast | Same look |
+| Brightness / Contrast | Brightness / Contrast | Same look |
 | Channel Remap (HSV) | Channel Remap (HSV) | Same look |
 | Channel Remap (RGB) | Channel Remap (RGB) | Same look |
 | Checker | Checker | Same look |
 | checker | Checker | Same look |
 | Chroma Key | Chroma Key | Same look |
-| chromakey-adv | Chroma Key | Same look |
-| chromaticzoomblur | Chromatic Zoom Blur | Same look |
+| Chromatic Zoom Blur | Chromatic Zoom Blur | Same look |
 | Circular Ripple | Circular Ripple | Same look |
 | circularripple | Circular Ripple | Same look |
+| Color Balance | Color Balance | Same look |
 | Color Temperature | Color Temperature | Same look |
-| Color Tune | Lift Gamma Gain | Same look |
-| coloradj | Color Adjust | Same look |
-| colorbalance | Color Balance | Same look |
-| colorhot2 | Split Tone | Same look |
-| colorize | Colorize | Same look |
+| Color Tune | Color Tune | Same look |
+| colorhot2 | Hot Color | Same look |
+| Colorize | Colorize | Same look |
 | colortint | Colorize | Same look |
-| colortune | Lift Gamma Gain | Same look |
+| colortune | Color Tune | Same look |
 | Contour Gradient | Contour Gradient | Same look |
 | Contour Lines | Contour Lines | Same look |
 | Copy Background | Copy Background | Same look |
 | Count Up/Down | Count Up/Down | Same look |
-| diff | Difference | Same look |
-| differencematte | Difference Matte | Same look |
+| Cube | Cube | Same look |
+| Curl | Curl | Same look |
+| Cylinder | Cylinder | Same look |
+| Dark Glow | Dark Glow | Same look |
 | Directional Blur | Directional Blur | Same look |
 | displacemap | Displacement Map | Same look |
 | displacemap2 | Displacement Map | Same look |
 | Displacement Map | Displacement Map | Same look |
-| drawing.progress | Drawing Progress | Same look |
+| Drawing Progress | Drawing Progress | Same look |
 | Echo Keyframes | Echo Keyframes | Same look |
 | Edge Glow | Edge Glow | Same look |
-| Exposure / Gamma | Exposure | Same look |
+| Ellipsoid | Ellipsoid | Same look |
+| Exposure / Gamma | Exposure / Gamma | Same look |
 | Fade In/Out | Fade In/Out | Same look |
 | Feather | Feather | Same look |
-| findedges | Edge Detect | Same look |
-| findedges-edgeglow | Edge Detect | Same look |
+| Fill Behind | Fill Behind | Same look |
+| Find Edges | Find Edges | Same look |
+| findedges-edgeglow | Find Edges | Same look |
 | Flip Layer | Flip Layer | Same look |
 | flip2 | Flip Layer | Same look |
-| Four-color Gradient | Four-Color Gradient | Same look |
+| Four-color Gradient | Four-color Gradient | Same look |
 | Fractal Ridges | Fractal Ridges | Same look |
-| Gaussian Blur | Blur | Same look |
+| Gaussian Blur | Gaussian Blur | Same look |
 | Glow | Glow | Same look |
+| Glow Scan | Glow Scan | Same look |
+| Gradient Map | Gradient Map | Same look |
 | Gradient Overlay | Gradient Overlay | Same look |
-| gradientmap | Gradient Map | Same look |
 | gradientoverlay | Gradient Overlay | Same look |
 | Grid | Grid | Same look |
 | grid | Grid | Same look |
-| Highlights and Shadows | Highlights & Shadows | Same look |
-| Hot Color | Split Tone | Same look |
-| Hue Shift | Hue & Saturation | Same look |
+| Grid Repeat | Grid Repeat | Same look |
+| Halftone Dots | Halftone Dots | Same look |
+| Halftone Lines | Halftone Lines | Same look |
+| Hexagonal Prism | Hexagonal Prism | Same look |
+| Highlights and Shadows | Highlights and Shadows | Same look |
+| Hollow Box | Hollow Box | Same look |
+| Hot Color | Hot Color | Same look |
+| Hue Shift | Hue Shift | Same look |
 | Inner Blur | Inner Blur | Same look |
 | Inner Glow | Inner Glow | Same look |
 | Inner Pinch/Bulge | Inner Pinch/Bulge | Same look |
-| internal.smoothbevel | Smooth Bevel | Same look |
-| invert | Invert | Same look |
+| Invert | Invert | Same look |
+| Kaleidoscope | Kaleidoscope | Same look |
+| Key Spill Cleaner | Key Spill Cleaner | Same look |
+| Lens Blur | Lens Blur | Same look |
 | lensblur | Lens Blur | Same look |
-| lensblur2 | Lens Blur | Same look |
 | Light Glow | Light Glow | Same look |
+| Linear Repeat | Linear Repeat | Same look |
 | Long Shadow | Long Shadow | Same look |
 | longshadow | Long Shadow | Same look |
 | Luma Key | Luma Key | Same look |
+| Luma Stamper | Luma Stamper | Same look |
 | lumakey | Luma Key | Same look |
 | lumakey2 | Luma Key | Same look |
-| lumastamper | Luma Stamper | Same look |
 | Magnify Background | Magnify Background | Same look |
 | Mask Blur | Mask Blur | Same look |
-| mattechoke | Matte Choker | Same look |
-| mattefringe | Matte Fringe | Same look |
-| mirror | Mirror | Same look |
+| Matte Choker | Matte Choker | Same look |
+| Matte Fringe | Matte Fringe | Same look |
+| Mirror | Mirror | Same look |
 | Motion Blur | Motion Blur | Same look |
 | motionblur | Motion Blur | Same look |
 | motionblur2 | Motion Blur | Same look |
@@ -103,70 +116,83 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Move Along Path | Move Along Path | Same look |
 | movealongpath | Move Along Path | Same look |
 | movealongpath2 | Move Along Path | Same look |
+| Octahedron | Octahedron | Same look |
 | Offset | Offset | Same look |
 | Oscillate | Oscillate | Same look |
 | oscillate | Oscillate | Same look |
 | oscillate2 | Oscillate | Same look |
-| outlinebad | Outline | Same look |
-| outlinebasic | Outline | Same look |
 | Palette Map | Palette Map | Same look |
 | Parenting Helper | Parenting Helper | Same look |
 | Pinch/Bulge | Pinch/Bulge | Same look |
 | pinchbulge | Pinch/Bulge | Same look |
+| Pixelate | Pixelate | Same look |
 | pixelate | Pixelate | Same look |
+| Polar Coordinates | Polar Coordinates | Same look |
 | Polar Displacement Map | Polar Displacement Map | Same look |
 | Posterize | Posterize | Same look |
-| Precise/Fast Box Blur | Blur | Same look |
 | pulsate | Pulse Size | Same look |
 | Pulse Opacity | Pulse Opacity | Same look |
 | Pulse Size | Pulse Size | Same look |
 | pulseopacity | Pulse Opacity | Same look |
+| Pyramid | Pyramid | Same look |
+| Radial Rays | Radial Rays | Same look |
+| Radial Repeat | Radial Repeat | Same look |
+| Radial Shadow | Radial Shadow | Same look |
 | Radial Wipe | Radial Wipe | Same look |
 | radialshadow | Radial Shadow | Same look |
 | Random Displacement | Random Displacement | Same look |
 | Raster Transform | Raster Transform | Same look |
 | Rays | Rays | Same look |
 | Repeat | Repeat | Same look |
+| Repeat Along Path | Repeat Along Path | Same look |
 | Replace Color | Replace Color | Same look |
 | RGB Split | RGB Split | Same look |
-| rgb-gamma | Channel Mixer | Same look |
-| rgb-mixer | Channel Mixer | Same look |
 | ridges | Fractal Ridges | Same look |
+| Ring | Ring | Same look |
 | Roughen Edges | Roughen Edges | Same look |
-| Saturation / Vibrance | Hue & Saturation | Same look |
+| Saturation / Vibrance | Saturation / Vibrance | Same look |
 | Scale Assist | Scale Assist | Same look |
-| shadow | Drop Shadow | Same look |
 | Sharpen | Sharpen | Same look |
 | simplestars | Simple Starfield | Same look |
+| Smooth Bevel | Smooth Bevel | Same look |
 | Smooth Edges | Smooth Edges | Same look |
 | Soft Glow | Soft Glow | Same look |
 | Solid Color | Solid Color | Same look |
 | Solid Matte | Solid Matte | Same look |
-| Spectral Map | Gradient Map | Same look |
-| spill-cleanup | Key Spill Cleaner | Same look |
+| Spectral Map | Spectral Map | Same look |
+| Spherize | Spherize | Same look |
 | Spin | Spin | Same look |
 | Spin Blur | Spin Blur | Same look |
 | spinblur | Spin Blur | Same look |
 | Spot Color | Spot Color | Same look |
 | spotcolor | Spot Color | Same look |
 | Squeeze | Squeeze | Same look |
+| Star | Star | Same look |
+| Star Prism | Star Prism | Same look |
 | stretch | Stretch Axis | Same look |
 | Stretch Axis | Stretch Axis | Same look |
 | Stretch Segment | Stretch Segment | Same look |
 | Stripes | Stripes | Same look |
+| Stroke Color | Stroke Color | Same look |
+| Stroke Taper | Stroke Taper | Same look |
 | Swing | Swing | Same look |
 | swing | Swing | Same look |
+| Swirl | Swirl | Same look |
 | swirl | Swirl | Same look |
 | swirl2 | Swirl | Same look |
 | swirl3 | Swirl | Same look |
 | Text Progress | Text Progress | Same look |
+| Text Spacing | Text Spacing | Same look |
 | Text Transform | Text Transform | Same look |
+| Three-axis Cross | Three-axis Cross | Same look |
 | Threshold | Threshold | Same look |
 | Tiles | Tiles | Same look |
-| Time Quantization | Frame Rate | Same look |
+| Time Quantization | Time Quantization | Same look |
 | Timecode | Timecode | Same look |
+| Torus | Torus | Same look |
 | turbulence | Turbulence | Same look |
 | Turbulent Displace | Turbulent Displace | Same look |
+| Unsharp Mask | Unsharp Mask | Same look |
 | Vignette | Vignette | Same look |
 | Wave Warp | Wave Warp | Same look |
 | wavewarp | Wave Warp | Same look |
@@ -175,126 +201,78 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Zoom Blur | Zoom Blur | Same look |
 | zoomblur | Zoom Blur | Same look |
 | zoomblur2 | Zoom Blur | Same look |
-| Cube | Cube | Very close |
-| drawing.stroketaper | Stroke Taper | Very close |
-| Fill Behind | Fill Behind | Very close |
+| Contour Strips | Contour Strips | Very close |
+| cube | Box | Very close |
 | flip | Flip Layer | Very close |
-| Halftone Dots | Halftone | Very close |
-| Hollow Box | Hollow Box | Very close |
-| Linear Repeat | Linear Repeat | Very close |
-| Pixelate | Pixelate | Very close |
-| Repeat Along Path | Repeat Along Path | Very close |
+| Hexagon Array | Hexagon Array | Very close |
+| Lens Flare | Lens Flare | Very close |
+| Page Curl | Page Curl | Very close |
 | Simple Starfield | Simple Starfield | Very close |
 | Starfield | Starfield | Very close |
 | starfield2 | Starfield | Very close |
-| Three-axis Cross | Three-axis Cross | Very close |
+| Streak Strips | Streak Strips | Very close |
+| Tunnel | Tunnel | Very close |
 | Turbulence | Turbulence | Very close |
-| Unsharp Mask | Unsharp Mask | Very close |
-| 360-reorient-sphere | 360° Reorient Sphere | Similar, not identical |
-| Auto-Shake | Auto-Shake | Similar, not identical |
+| 360º Reorient Sphere | 360º Reorient Sphere | Similar, not identical |
 | Block Dissolve | Block Dissolve | Similar, not identical |
 | Block Noise | Block Noise | Similar, not identical |
 | blocknoise | Block Noise | Similar, not identical |
-| Box | Box | Similar, not identical |
+| Bump Map | Bump Map | Similar, not identical |
 | bumpmap | Bump Map | Similar, not identical |
-| bumpmap2 | Bump Map | Similar, not identical |
-| cartoon | Cartoon | Similar, not identical |
 | checkerdissolve | Block Dissolve | Similar, not identical |
-| chromaticvortexblur | Vortex Blur | Similar, not identical |
 | Clouds | Clouds | Similar, not identical |
 | clouds | Clouds | Similar, not identical |
 | clouds2 | Clouds | Similar, not identical |
 | CMYK Halftone Dots | CMYK Halftone Dots | Similar, not identical |
-| Contour Strips | Contour Strips | Similar, not identical |
-| cube | Cube | Similar, not identical |
-| Curl | Curl | Similar, not identical |
-| Cylinder | Cylinder | Similar, not identical |
-| Dark Glow | Dark Glow | Similar, not identical |
 | Dissolve | Dissolve | Similar, not identical |
 | Dots | Dots | Similar, not identical |
 | dots | Dots | Similar, not identical |
 | Electric Edges | Electric Edges | Similar, not identical |
-| Ellipsoid | Ellipsoid | Similar, not identical |
-| energybeam | Energy Beam | Similar, not identical |
+| Energy Beam | Energy Beam | Similar, not identical |
 | Flicker | Flicker | Similar, not identical |
 | flicker | Flicker | Similar, not identical |
 | Fractal Warp | Fractal Warp | Similar, not identical |
 | fractalwarp | Fractal Warp | Similar, not identical |
 | fractalwarp2 | Fractal Warp | Similar, not identical |
 | fractalwarp3 | Fractal Warp | Similar, not identical |
+| Glass | Glass | Similar, not identical |
 | glass | Glass | Similar, not identical |
-| glass2 | Glass | Similar, not identical |
-| glowscan | Glow Scan | Similar, not identical |
-| Grid Repeat | Grid Repeat | Similar, not identical |
-| grunge | Grunge | Similar, not identical |
-| Halftone Lines | Halftone Lines | Similar, not identical |
+| Grunge | Grunge | Similar, not identical |
 | Heart | Heart | Similar, not identical |
 | heart | Heart | Similar, not identical |
 | Hexagon Tile Rotate | Hexagon Tile Rotate | Similar, not identical |
 | Hexagon Tile Shift | Hexagon Tile Shift | Similar, not identical |
-| Hexagonal Prism | Hexagonal Prism | Similar, not identical |
-| hexarray | Hexagon Array | Similar, not identical |
-| hextile | Hexagon Tiling | Similar, not identical |
+| Hexagon Tiling | Hexagon Tiling | Similar, not identical |
+| Iridescence | Iridescence | Similar, not identical |
 | irridescence | Iridescence | Similar, not identical |
-| irridescence2 | Iridescence | Similar, not identical |
-| Kaleidoscope | Kaleidoscope | Similar, not identical |
-| Lens Flare | Light Flare | Similar, not identical |
 | Lightning | Lightning | Similar, not identical |
 | Linear Streaks | Linear Streaks | Similar, not identical |
 | Mosaic | Mosaic | Similar, not identical |
 | Noise | Noise | Similar, not identical |
 | noise | Noise | Similar, not identical |
 | noise2 | Noise | Similar, not identical |
-| Octahedron | Octahedron | Similar, not identical |
 | Omino Diffusion+ | Omino Diffusion+ | Similar, not identical |
 | Omino Glass | Omino Glass | Similar, not identical |
-| outline | Outline | Similar, not identical |
-| Page Curl | Page Curl | Similar, not identical |
-| perlindisplace | Auto-Shake | Similar, not identical |
-| polar | Polar Coordinates | Similar, not identical |
-| Pyramid | Pyramid | Similar, not identical |
-| Radial Rays | Radial Rays | Similar, not identical |
-| Radial Repeat | Radial Repeat | Similar, not identical |
-| Radial Shadow | Radial Shadow | Similar, not identical |
 | Random Jitter | Random Jitter | Similar, not identical |
 | Raster Extrude | Raster Extrude | Similar, not identical |
 | Ribbon | Ribbon | Similar, not identical |
-| Ring | Torus | Similar, not identical |
 | Scatter Field | Scatter Field | Similar, not identical |
 | Scatter Repeat | Scatter Repeat | Similar, not identical |
 | shake | Auto-Shake | Similar, not identical |
-| Spherize | Spherize | Similar, not identical |
 | spherize | Spherize | Similar, not identical |
 | Spin Streaks | Spin Streaks | Similar, not identical |
-| Star | Star | Similar, not identical |
-| Star Polyhedron | Star Prism | Similar, not identical |
-| Star Prism | Star Prism | Similar, not identical |
+| Star Polyhedron | Star Polyhedron | Similar, not identical |
 | starfield | Starfield | Similar, not identical |
-| streakstrips | Pixelate | Similar, not identical |
-| Swirl | Swirl | Similar, not identical |
 | Text Randomizer | Text Randomizer | Similar, not identical |
 | Tile Rotate | Tile Rotate | Similar, not identical |
 | Tile Shift | Tile Shift | Similar, not identical |
 | tilerotate | Tile Rotate | Similar, not identical |
 | tileshift | Tile Shift | Similar, not identical |
-| Torus | Torus | Similar, not identical |
-| triprism | Star Prism | Similar, not identical |
-| triprism2 | Star Prism | Similar, not identical |
-| Tunnel | Tunnel | Similar, not identical |
 | turbulentdisplace | Turbulent Displace | Similar, not identical |
 | turbulentdisplace2 | Turbulent Displace | Similar, not identical |
-| volumetricclouds | Clouds | Similar, not identical |
 | voronoi | Voronoi Cells | Similar, not identical |
 | Voronoi Cells | Voronoi Cells | Similar, not identical |
-| vortexblur | Vortex Blur | Similar, not identical |
-| warpblur | Warp Blur | Similar, not identical |
+| Warp Blur | Warp Blur | Similar, not identical |
 | Zoom Streaks | Zoom Streaks | Similar, not identical |
-| deepglow | Deep Glow | Converted, not compared yet |
-| Denoise | Denoise | Converted, not compared yet |
-| dropshadow.custom | Drop Shadow | Converted, not compared yet |
-| fourcolorgradientnew | Four-Color Gradient | Converted, not compared yet |
-| gradientdisplace | Solid Matte | Converted, not compared yet |
-| hsl | HSL | Converted, not compared yet |
-| vrcombined | 360° Viewer | Converted, not compared yet |
-| vrplayer | 360° Viewer | Converted, not compared yet |
-| facemotion | - | Not converted yet |
+| 360º Viewer | 360º Viewer | Converted, not compared yet |
+| vrcombined | 360º Viewer | Converted, not compared yet |

@@ -45,9 +45,12 @@ class ColourKeyImportTest {
 
     @Test fun hueShiftTurnsColoursAroundKeepingVideoBrightness() {
         val e = migrate("effects.hueshift", "hue" to "120")
-        close(-120f, e.number("hue"))
-        close(2f, e.number("style"))
-        close(1f, e.number("saturation"))
+        assertEquals("absent.hueshift", e["id"])
+        close(120f, e.number("hue"))
+        val sv = migrate("effects.satvib", "saturation" to "-0.5", "vib" to "1.5")
+        assertEquals("absent.saturationvibrance", sv["id"])
+        close(-0.5f, sv.number("saturation"))
+        close(1.5f, sv.number("vibrance"))
     }
 
     @Test fun colorTintBecomesColorizeKeepingBrightness() {
@@ -109,15 +112,21 @@ class ColourKeyImportTest {
         assertFalse(old.children.any { it["name"] == "high" })
     }
 
+    @Test fun strokeColorImportsAsItsOwnEffect() {
+        val e = migrate("effects.drawing.strokecolor", "color" to "#ff112233")
+        assertEquals("absent.strokecolor", e["id"])
+        assertEquals("#ff112233", e.text("color"))
+        assertTrue(result("effects.drawing.strokecolor", "color" to "#ff112233").dropped.isEmpty())
+    }
+
     @Test fun keysAndColourMapsGetTheirImportOnlyChoices() {
         val chroma = migrate("effects.chromakey")
         close(0f, chroma.number("tolerance"))
         close(0f, chroma.number("softness"))
         val spectral = migrate("spectralmap", "saturation" to "0.25", "squeeze" to "0.31")
-        close(1f, spectral.number("style"))
-        close(1.5f, spectral.number("saturation"))
+        assertEquals("absent.spectralmap", spectral["id"])
+        close(0.25f, spectral.number("saturation"))
         close(0.31f, spectral.number("squeeze"))
-        assertEquals(listOf("#ff0000ff", "#ff00ff00", "#ffff0000"), listOf("color1", "color2", "color3").map { spectral.text(it) })
         val spot = migrate("spotcolor")
         close(1f, spot.number("grey"))
         close(2f, spot.number("choke"))

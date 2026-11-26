@@ -28,7 +28,7 @@ The app asks for the internet permission for these things only:
   Searching fonts loads the list of Google Fonts families from `fonts.google.com` (kept for 7 days); the search runs on the device and nothing you type is sent.
 - **Auto captions.** The first time you generate captions, the app tells you the size of the speech model (about 60 MB, or about 82 MB for High precision) and
   downloads it from Hugging Face (`huggingface.co`). Speech recognition itself runs on the device.
-- **AI Enhance and AI Smooth.** The first time you use one of them, the app tells you the size of the model it needs (about 1 to
+- **AI Enhance, AI Smooth and Reduce Noise.** The first time you use one of them, the app tells you the size of the model it needs (about 1 to
   11 MB) and downloads it from GitHub (`github.com` and `raw.githubusercontent.com`). The AI work itself runs on the device.
 - **AI background removal 2.0.** Only if you choose AI background removal 2.0 for removing backgrounds, the app downloads its
   model once (about 62 MB) from GitHub (`github.com`). The cut-out itself runs on the device.

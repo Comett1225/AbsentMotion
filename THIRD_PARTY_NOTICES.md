@@ -17,7 +17,7 @@ dependency is added, removed or upgraded, update this file in the same change.
 **Contents**
 
 1. Engine libraries (C and C++): Skia and the libraries it links, whisper.cpp and ggml, RNNoise, ncnn, glslang, the RIFE warp layer, LAME, FFmpeg (desktop apps only) with the codec libraries of the macOS build (x264, x265, libvpx, dav1d, Opus, SVT-AV1), FFamp with its codec libraries (when it is switched on; macOS app: Opus, LAME, mpg123, libvorbis, libogg, OpenAPV, libvpx, dav1d, SVT-AV1, Xvid; Windows and Linux apps: the same plus x264, x265, libde265, vo-aacenc and OpenCORE AMR, and on Linux libmpeg2, libjpeg-turbo and the libva headers; 64-bit Android apps: Xvid), the AppImage runtime (Linux AppImage only), and the video downloader add-on (CPython and yt-dlp, downloaded at run time)
-2. Machine learning models: OpenAI Whisper weights, RIFE and Real-ESRGAN weights and the AI background removal 2.0 model (all downloaded at run time), the built-in background removal model
+2. Machine learning models: OpenAI Whisper weights, RIFE and Real-ESRGAN weights, the AI background removal 2.0 model and the DeepFilterNet3 noise reduction weights (all downloaded at run time), the built-in background removal model
 3. Kotlin and Compose libraries, including those bundled in the desktop apps (OpenJDK, Compose Desktop, Skiko, kotlinx)
 4. Fonts, icons and effect thumbnails
 5. Appendix: licence texts
@@ -165,7 +165,8 @@ together with Skia.
 - Copyright: Copyright (c) 2017, Mozilla; Copyright (c) 2007-2017, Jean-Marc Valin; Copyright (c) 2005-2017,
   Xiph.Org Foundation; Copyright (c) 2003-2004, Mark Borgerding.
 - URL: https://gitlab.xiph.org/xiph/rnnoise
-- Used in: the engine library (the "Reduce Noise" audio action).
+- Used in: the engine library (the "Reduce Noise" audio action when its model is not downloaded, and the FFT of the
+  DeepFilterNet3 runner).
 
 ### ncnn
 
@@ -638,6 +639,32 @@ can remove the add-on.
   (https://huggingface.co/ZhengPeng7/BiRefNet_lite), MIT License, Copyright (c) 2024 ZhengPeng. The teacher only made
   labels: none of its weights or code are in AbsentMotion. Its card states training on DIS-TR; no DIS images were
   used.
+
+### Reduce Noise model (DeepFilterNet3)
+
+- Version: the DeepFilterNet3 checkpoint `models/DeepFilterNet3.zip` (`checkpoints/model_120.ckpt.best`) of
+  https://github.com/Rikorose/DeepFilterNet at commit `7b14b895fe7fc42cab72b4a4c1e49c982bd6404b`. For AbsentMotion its
+  weights were converted to the file `deepfilternet3.amdf` (4,297,222 bytes, SHA-256
+  `ed99240a1f8c60b13c6419f56762fbc86c2925dd6df98ad653553b3c316b7aa5`): batch normalisation folded into scale and bias,
+  large tensors stored as 16-bit floats. The file is published as an asset of this repository's `ai-models-6` release.
+  It is run by AbsentMotion's own code in `shared/cpp/deepfilter/`, which follows the DeepFilterNet3 network and the
+  feature and STFT code of libDF; no DeepFilterNet code is included.
+- Licence: MIT or Apache-2.0, at your option; AbsentMotion uses it under MIT (text in appendix A.34).
+- Copyright: Copyright (c) 2021 Hendrik Schröter.
+- URL: https://github.com/Rikorose/DeepFilterNet
+- Used in: Reduce Noise. The model is **not** part of the app: it is downloaded the first time Reduce Noise runs, after
+  the app has shown its size, checked against its SHA-256, and removable in Settings. Without it the app uses RNNoise.
+
+### Face detection model (built in)
+
+- Version: `shared/assets/faces/face_detection_yunet_2023mar.onnx` (232,589 bytes, SHA-256
+  `8f2383e4dd3cfbb4553ea8718107fc0423210dc964f9f4280604804ed2552fa4`), the YuNet face detector of the OpenCV Zoo, unchanged,
+  from https://github.com/opencv/opencv_zoo/tree/eb9f4f2d4b79b58e5513b5d25d5f0243a8357bf4/models/face_detection_yunet. It is
+  run by AbsentMotion's own code in `shared/cpp/faces/`; no OpenCV code is included.
+- Licence: MIT (text in appendix A.33).
+- Copyright: Copyright (c) 2020 Shiqi Yu.
+- URL: https://github.com/opencv/opencv_zoo (model trained with https://github.com/ShiqiYu/libfacedetection.train)
+- Used in: the Face Tracking effect. It runs on the device and nothing is downloaded.
 
 ---
 
@@ -6399,4 +6426,58 @@ From `COPYING` of libva 2.22.0; the header files carry "Copyright (c) 2007-2009 
     ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
     TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+~~~~
+
+### A.33 YuNet face detection model (MIT)
+
+From `models/face_detection_yunet/LICENSE` of the OpenCV Zoo at commit `eb9f4f2d4b79b58e5513b5d25d5f0243a8357bf4`.
+
+~~~~text
+MIT License
+
+Copyright (c) 2020 Shiqi Yu <shiqi.yu@gmail.com>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+~~~~
+
+### A.34 DeepFilterNet (MIT)
+
+From `LICENSE-MIT` of https://github.com/Rikorose/DeepFilterNet at commit `7b14b895fe7fc42cab72b4a4c1e49c982bd6404b`.
+
+~~~~text
+The MIT License (MIT)
+Copyright (c) 2021 Hendrik Schröter
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ~~~~

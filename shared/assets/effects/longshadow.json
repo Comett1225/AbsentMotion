@@ -2,6 +2,9 @@
  "id": "longshadow",
  "name": "Long Shadow",
  "category": "stylize",
+ "also": [
+  "color"
+ ],
  "since": "3.0.0",
  "description": "Casts long, parallel shadows from the opaque parts of the layer.",
  "params": [

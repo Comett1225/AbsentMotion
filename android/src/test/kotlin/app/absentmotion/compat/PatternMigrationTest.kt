@@ -93,6 +93,7 @@ class PatternMigrationTest {
             assertEquals(id, 57.5f, migrate(id, "amount" to "57.5").number("count"), 1e-3f)
             assertEquals(id, 1f, migrate(id).number("style"), 1e-6f)
             assertEquals(id, 1f, migrate(id).number("edges"), 1e-6f)
+            assertEquals(id, 1f, migrate(id).number("edgeStyle"), 1e-6f)
             assertEquals(id, "true", migrate(id, "screenSpace" to "true").value("screenSpace"))
         }
         assertEquals("41.000000,-24.000000", migrate("tilerotate2", "stretch" to "41,-24").value("stretch"))
@@ -110,6 +111,21 @@ class PatternMigrationTest {
         }
     }
 
+    @Test fun hexagonTilesKeepAlightsSizeAndPaceWhenSizeIsAnimated() {
+        for (id in listOf("hexrotate", "hexshift")) {
+            assertEquals(id, 4.0404f, migrate(id).number("count"), 1e-4f)
+            assertEquals(id, 2.0202f, migrate(id, "size" to "20").number("count"), 1e-4f)
+            val scene = Scene.parse("""<scene title="p" width="1080" height="1080" fps="30" totalTime="1000"><shape id="1" startTime="0" endTime="1000" fillType="color" s=".rect">
+                <effect id="com.alightcreative.effects.$id"><property name="size" type="float"><kf t="0" v="5" /><kf t="1" v="20" /></property></effect>
+                <property name="size" type="vec2" value="110,82.5" /></shape></scene>""")
+            val effect = migration.migrate(scene).scene.node.children.single { it.name == "shape" }.children.single { it.name == "effect" }
+            val keys = effect.children.single { it["name"] == "count" }.children.filter { it.name == "kf" }
+            assertEquals(id, 17, keys.size)
+            assertEquals(id, 40.404f / 12.5f, keys[8]["v"]!!.toFloat(), 1e-4f)
+        }
+        assertEquals(1f, migrate("hexrotate").number("edgeStyle"), 1e-6f)
+    }
+
     @Test fun pixelateKeepsAlightsStretchAndClearsOutsideCells() {
         val v = migrate("pixelate2", "size" to "140", "stretch" to "41,-24", "screenSpace" to "true")
         assertEquals("41.000000,-24.000000", v.value("stretch"))
@@ -123,6 +139,11 @@ class PatternMigrationTest {
         assertEquals(0.6f, d.number("scale"), 1e-5f)
         assertEquals(1f, d.number("fit"), 1e-6f)
         assertEquals(1f, d.number("crop"), 1e-6f)
+        assertEquals(1f, d.number("edgeStyle"), 1e-6f)
+        val lined = migrate("hextile", "lineWidth" to "0.05", "feather" to "0.25")
+        assertEquals(0.05f, lined.number("lineWidth"), 1e-6f)
+        assertEquals(0.25f, lined.number("feather"), 1e-6f)
+        assertEquals("0.000000", catalog.find("absent.hexagontiling")!!.params.single { it.id == "lineWidth" }.default)
         val v = migrate("hextile", "size" to "72.5", "stretch" to "3.25", "texCrop" to "1.75", "position" to "40,-25", "screenSpace" to "true", "maskToLayer" to "true")
         assertEquals(1.45f, v.number("scale"), 1e-5f)
         assertEquals("1.000000,3.250000", v.value("stretch"))
@@ -139,8 +160,8 @@ class PatternMigrationTest {
         val v = migrate("kaleidoscope", "rcount" to "10.5", "centerPoint" to "40,-25", "offsetAngle" to "900")
         assertEquals(1f, v.number("direction"), 1e-6f)
         val center = v.value("center")!!.split(',').map { it.trim().toFloat() }
-        assertEquals(0.5f + 0.185f * 40f / 220f, center[0], 1e-5f)
-        assertEquals(0.5f - 0.185f * 25f / 165f, center[1], 1e-5f)
+        assertEquals(0.54f, center[0], 1e-5f)
+        assertEquals(0.475f, center[1], 1e-5f)
         val direction = catalog.find("absent.kaleidoscope")!!.params.single { it.id == "direction" }
         assertEquals("0.000000", direction.default)
         assertEquals(listOf("Clockwise", "Counterclockwise"), direction.options)

@@ -283,7 +283,7 @@ tasks.test {
     systemProperty("am.native", layout.buildDirectory.file("$nativeDir/$nativeName").get().asFile.absolutePath)
     systemProperties(judgeTools + bundledTools)
     systemProperty("am.mediaReader", providers.gradleProperty("mediaReader").getOrElse("standard"))
-    listOf("fixtureItems", "fixtureFeed").forEach { name -> providers.gradleProperty(name).orNull?.let { systemProperty("am.$name", it) } }
+    listOf("fixtureItems", "fixtureFeed", "effectThumbs", "effectThumbsOut").forEach { name -> providers.gradleProperty(name).orNull?.let { systemProperty("am.$name", it) } }
     systemProperty("am.assets", file("../shared/assets").absolutePath)
     systemProperty("am.bgmodel", file("../android/src/foss/assets/absent_bg.abg").absolutePath)
     systemProperty("am.repo", file("..").absolutePath)

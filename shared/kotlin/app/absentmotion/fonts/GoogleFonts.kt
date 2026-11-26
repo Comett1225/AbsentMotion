@@ -6,8 +6,14 @@ import org.json.JSONObject
 import java.io.File
 
 data class GoogleFamily(val family: String, val category: Int, val weights: Set<Int>, val italics: Set<Int>) {
-    val regular: FontName get() = FontName("googlefonts", family, weights.minByOrNull { kotlin.math.abs(it - 400) * 2 + if (it < 400) 1 else 0 } ?: 400)
+    val regular: FontName get() = FontName("googlefonts", family, closest(weights, 400) ?: 400)
+    fun nearest(weight: Int, italic: Boolean): FontName? {
+        val slanted = if (italic) italics.isNotEmpty() else weights.isEmpty()
+        return closest(if (slanted) italics else weights, weight)?.let { FontName("googlefonts", family, it, slanted) }
+    }
 }
+
+private fun closest(options: Set<Int>, weight: Int) = options.minByOrNull { kotlin.math.abs(it - weight) * 2 + if (it < weight) 1 else 0 }
 
 enum class FontSource { All, Imported, App, Device, Google }
 

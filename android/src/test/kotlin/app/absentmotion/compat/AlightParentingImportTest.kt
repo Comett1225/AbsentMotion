@@ -117,8 +117,8 @@ class AlightParentingImportTest {
 
     @Test fun solidsThatStartTurnedKeepTheirOwnStartingPose() {
         val torus = migrate("""<effect id="com.alightcreative.effects.torus"><property name="rotate" type="vec3" value="10.000000,20.000000,30.000000" /></effect>""")
-        assertAngles(listOf(34.372f, 19.683f, -26.384f), angles(torus), 0.05f)
-        assertAngles(listOf(-8.45f, 44.69f, 5.97f), angles(migrate("""<effect id="com.alightcreative.effects.pyramid"></effect>""")))
+        assertAngles(listOf(-10.628f, 19.683f, -26.384f), angles(torus), 0.05f)
+        assertAngles(listOf(0f, 0f, 0f), angles(migrate("""<effect id="com.alightcreative.effects.pyramid"></effect>""")))
     }
 
     @Test fun anOrientationIsNotReportedAsDropped() {

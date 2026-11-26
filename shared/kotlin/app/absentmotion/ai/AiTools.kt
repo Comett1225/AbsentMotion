@@ -90,6 +90,7 @@ class AiTools(private val context: Context, private val state: EditorState, priv
     var videoSetup by mutableStateOf<Layer?>(null)
     var noiseSetup by mutableStateOf<Layer?>(null)
     var noiseSource by mutableStateOf(NoiseSource.Voice)
+    var noiseAmount by mutableIntStateOf(100)
     var smoothSetup by mutableStateOf<Layer?>(null)
     var smoothing by mutableStateOf(Smoothing(FrameInterpolation.Flow))
     var videoSide by mutableIntStateOf(MatteSides[1])
@@ -269,7 +270,22 @@ class AiTools(private val context: Context, private val state: EditorState, priv
                                     standard = { BackgroundRemoval.run(context, source, original, limit, cutout, report) },
                                 ).also { note = it.note }.value
                             }
-                            else -> NoiseReduction.run(context, source, noiseSource, report)
+                            else -> {
+                                val model = try {
+                                    if (!AiModel.Noise.installed(context)) {
+                                        report(0f, AppText.get(R.string.ai_downloading_model))
+                                        AiModel.Noise.download(context) { fraction -> progress = fraction.coerceIn(0f, 1f) }
+                                    }
+                                    AiModel.Noise.verify(context)
+                                    AiModel.Noise.file(context, NOISE_MODEL)
+                                } catch (e: CancellationException) {
+                                    throw e
+                                } catch (_: Exception) {
+                                    note = R.string.ai_noise_fallback_download
+                                    null
+                                }
+                                NoiseReduction.run(context, source, noiseSource, noiseAmount / 100.0, model, report)
+                            }
                         }
                     }
                     ensureActive()

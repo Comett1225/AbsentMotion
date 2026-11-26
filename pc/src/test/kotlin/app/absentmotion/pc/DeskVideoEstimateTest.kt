@@ -46,18 +46,20 @@ class DeskVideoEstimateTest {
         return Scene.parse(xml)
     }
 
-    @Test fun shortProjectsAreEncodedWholeAndLongOnesInSpreadSecondsTwice() {
+    @Test fun shortProjectsAreEncodedWholeAndLongOnesFromTheirStartAndSpreadSeconds() {
         assertNull(videoSizeSample(300, 30))
+        assertNull(videoSizeSample(240 + 5 * 30, 30))
         val sample = videoSizeSample(900, 30)!!
-        assertEquals(2 * 10 * 30, sample.size)
-        val once = sample.copyOf(sample.size / 2)
-        assertTrue(sample.copyOfRange(once.size, sample.size).contentEquals(once))
-        assertTrue(once.toList() == once.sorted() && once.first() >= 0 && once.last() < 900)
-        assertTrue(once.toList().chunked(30).all { it.first() % 30 == 0 && it.zipWithNext().all { (a, b) -> b == a + 1 } })
-        assertEquals(2 * 5 * 30, videoSizeSample(450, 30)!!.size)
-        assertEquals(2 * 5 * 60, videoSizeSample(60 * 60 * 60 * 3, 60, 1920L * 1080)!!.size)
-        assertEquals(2 * 5 * 60, videoSizeSample(60 * 60 * 60, 60, 3840L * 2160)!!.size)
-        assertEquals(2 * 11 * 30, videoSizeSample(30 * 60 * 60, 30, 1280L * 720)!!.size)
+        assertEquals(240 + 10 * 30, sample.size)
+        assertTrue(sample.copyOf(240).contentEquals(IntArray(240) { it }))
+        val spread = sample.copyOfRange(240, sample.size)
+        assertTrue(spread.toList() == spread.toSortedSet().toList() && spread.first() >= 240 && spread.last() < 900)
+        assertTrue(spread.toList().chunked(30).all { it.first() % 30 == 0 && it.zipWithNext().all { (a, b) -> b == a + 1 } })
+        assertEquals(240 + 5 * 30, videoSizeSample(450, 30)!!.size)
+        assertEquals(240 + 5 * 60, videoSizeSample(60 * 60 * 60 * 3, 60, 1920L * 1080)!!.size)
+        assertEquals(240 + 5 * 60, videoSizeSample(60 * 60 * 60, 60, 3840L * 2160)!!.size)
+        assertEquals(240 + 11 * 30, videoSizeSample(30 * 60 * 60, 30, 1280L * 720)!!.size)
+        assertEquals(250 + 10 * 25, videoSizeSample(25 * 30, 25)!!.size)
     }
 
     @Test fun theSampledSizeIsCloseToTheExportedSize() = runBlocking {

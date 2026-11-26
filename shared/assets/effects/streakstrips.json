@@ -1,0 +1,53 @@
+{
+ "id": "streakstrips",
+ "name": "Streak Strips",
+ "category": "blur",
+ "since": "5.3.2",
+ "description": "Cuts the layer into parallel strips and stretches one line of the picture across each strip, like a glitchy scan.",
+ "params": [
+  {
+   "id": "count",
+   "label": "Count",
+   "type": "float",
+   "default": 10,
+   "min": 0,
+   "max": 500,
+   "step": 0.1
+  },
+  {
+   "id": "angle",
+   "label": "Angle",
+   "type": "angle",
+   "default": 45,
+   "min": -360,
+   "max": 360,
+   "step": 0.1
+  },
+  {
+   "id": "phase",
+   "label": "Phase",
+   "type": "float",
+   "default": 0,
+   "min": -1000,
+   "max": 1000,
+   "step": 0.1
+  },
+  {
+   "id": "maskToLayer",
+   "label": "Mask To Layer",
+   "type": "switch",
+   "default": false
+  },
+  {
+   "id": "alpha",
+   "label": "Alpha",
+   "type": "float",
+   "default": 1,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float4 screen;\nuniform float time;\nuniform float count;\nuniform float angle;\nuniform float phase;\nuniform float maskToLayer;\nuniform float alpha;\nhalf4 main(float2 coord) {\n    half4 own = image.eval(coord);\n    if (count <= 0.0) return half4(0.0);\n    float a = radians(angle);\n    float2 along = float2(cos(a), sin(a));\n    float2 across = float2(-sin(a), cos(a));\n    float2 d = coord / size - 0.5;\n    float h = 1.0 / count;\n    float shift = phase * 0.1 * h;\n    float v = dot(d, across) + 0.5 - shift;\n    float edge = (floor(v / h) + 1.0) * h - 0.5 + shift;\n    float2 p = (0.5 + along * dot(d, along) + across * edge) * size;\n    half4 strip = image.eval(clamp(p, screen.xy + 0.5, screen.xy + screen.zw - 0.5));\n    half4 r = maskToLayer > 0.5 ? (strip + own * (1.0 - strip.a)) * own.a : strip;\n    return mix(own, r, half(clamp(alpha, 0.0, 1.0)));\n}\n"
+}

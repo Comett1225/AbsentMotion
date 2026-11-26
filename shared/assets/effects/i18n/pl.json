@@ -16,6 +16,103 @@
   "text": "Tekst"
  },
  "effects": {
+  "advancedchromakey": {
+   "description": "Usuwa naraz do czterech kolorów. Każdy kolor można usunąć (Wyklucz) albo ochronić przed innymi kluczami (Uwzględnij), z własnym progiem, wtapianiem i czułością na luminancję. Pokaż maskę pokazuje na czerwono to, co zostaje.",
+   "name": "Zaawansowany kluczownik barwy",
+   "params": {
+    "c1active": {
+     "label": "Kolor 1"
+    },
+    "c1color": {
+     "label": "Kolor"
+    },
+    "c1feather": {
+     "label": "Wtapianie"
+    },
+    "c1luma": {
+     "label": "Czułość na luminancję"
+    },
+    "c1mode": {
+     "label": "Tryb",
+     "options": [
+      "Wyklucz",
+      "Uwzględnij"
+     ]
+    },
+    "c1threshold": {
+     "label": "Próg"
+    },
+    "c2active": {
+     "label": "Kolor 2"
+    },
+    "c2color": {
+     "label": "Kolor"
+    },
+    "c2feather": {
+     "label": "Wtapianie"
+    },
+    "c2luma": {
+     "label": "Czułość na luminancję"
+    },
+    "c2mode": {
+     "label": "Tryb",
+     "options": [
+      "Wyklucz",
+      "Uwzględnij"
+     ]
+    },
+    "c2threshold": {
+     "label": "Próg"
+    },
+    "c3active": {
+     "label": "Kolor 3"
+    },
+    "c3color": {
+     "label": "Kolor"
+    },
+    "c3feather": {
+     "label": "Wtapianie"
+    },
+    "c3luma": {
+     "label": "Czułość na luminancję"
+    },
+    "c3mode": {
+     "label": "Tryb",
+     "options": [
+      "Wyklucz",
+      "Uwzględnij"
+     ]
+    },
+    "c3threshold": {
+     "label": "Próg"
+    },
+    "c4active": {
+     "label": "Kolor 4"
+    },
+    "c4color": {
+     "label": "Kolor"
+    },
+    "c4feather": {
+     "label": "Wtapianie"
+    },
+    "c4luma": {
+     "label": "Czułość na luminancję"
+    },
+    "c4mode": {
+     "label": "Tryb",
+     "options": [
+      "Wyklucz",
+      "Uwzględnij"
+     ]
+    },
+    "c4threshold": {
+     "label": "Próg"
+    },
+    "showMask": {
+     "label": "Pokaż maskę"
+    }
+   }
+  },
   "ascii": {
    "description": "Zamienia warstwę w obraz z liter i symboli: jaśniejsze obszary otrzymują pełniejsze znaki. Rozmiar określa szerokość znaku na warstwie, dzięki czemu znaki przesuwają się, obracają i skalują wraz z nią. Kolor zachowuje kolory obrazu lub używa jednego koloru, a Linie krawędzi rysują kontury znakami | - / i \\.",
    "name": "ASCII",
@@ -106,6 +203,13 @@
     },
     "slack": {
      "label": "Luz"
+    },
+    "style": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
     },
     "zshake": {
      "label": "Drgania Z"
@@ -625,12 +729,75 @@
       "Środek",
       "Narożnik"
      ]
+    },
+    "alight": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
+    },
+    "alZ": {
+     "label": "Pozycja Z"
+    },
+    "alLight": {
+     "label": "Kierunek"
+    },
+    "alElev": {
+     "label": "Wysokość"
+    },
+    "faceStyle": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
+    },
+    "lightStyle": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
+    }
+   }
+  },
+  "boxblur": {
+   "description": "Rozmywa warstwę, uśredniając równy kwadrat sąsiednich pikseli. Siła ustala zasięg rozmycia; rozmycie gaussowskie jest gładsze.",
+   "name": "Rozmycie pudełkowe",
+   "params": {
+    "iterations": {
+     "label": "Iteracje"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "shape": {
+     "label": "Kształt",
+     "options": [
+      "Gładki",
+      "Prostokątny",
+      "Szybki prostokątny"
+     ]
+    },
+    "strength": {
+     "label": "Siła"
+    },
+    "style": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
     }
    }
   },
   "brightnesscontrast": {
+   "aliases": [
+    "Jasność i kontrast"
+   ],
    "description": "Dostosowuje jasność i kontrast obrazu.",
-   "name": "Jasność i kontrast",
+   "name": "Jasność / kontrast",
    "params": {
     "brightness": {
      "label": "Jasność"
@@ -1027,6 +1194,13 @@
       "Klasyczny",
       "Ostry"
      ]
+    },
+    "alight": {
+     "label": "Układ",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
     }
    }
   },
@@ -1096,8 +1270,11 @@
    }
   },
   "colorwheels": {
+   "aliases": [
+    "Cienie, gamma, światła"
+   ],
    "description": "Koła kolorów dla cieni, półtonów i świateł pozwalają ustawić barwę, jej siłę i poziom. Przesunięcie zmienia wszystkie tony. Styl Według jasności dostosowuje wpływ każdego koła do jasności piksela.",
-   "name": "Cienie, gamma, światła",
+   "name": "Strojenie kolorów",
    "params": {
     "gainAmount": {
      "label": "Siła barwy świateł"
@@ -1269,6 +1446,13 @@
       "Klasyczny",
       "Nakładany"
      ]
+    },
+    "alight": {
+     "label": "Układ",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
     }
    }
   },
@@ -1432,6 +1616,22 @@
       "Klasyczny",
       "Standardowy"
      ]
+    },
+    "alight": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
+    },
+    "alZ": {
+     "label": "Pozycja Z"
+    },
+    "alLight": {
+     "label": "Kierunek"
+    },
+    "alElev": {
+     "label": "Wysokość"
     }
    }
   },
@@ -1531,6 +1731,22 @@
       "Klasyczny",
       "Standardowy"
      ]
+    },
+    "alight": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
+    },
+    "alZ": {
+     "label": "Pozycja Z"
+    },
+    "alLight": {
+     "label": "Kierunek"
+    },
+    "alElev": {
+     "label": "Wysokość"
     }
    }
   },
@@ -1560,6 +1776,13 @@
     },
     "stretch": {
      "label": "Rozciągnięcie"
+    },
+    "edgeStyle": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
     }
    }
   },
@@ -1655,6 +1878,22 @@
       "Środek",
       "Narożnik"
      ]
+    },
+    "alight": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
+    },
+    "alZ": {
+     "label": "Pozycja Z"
+    },
+    "alLight": {
+     "label": "Kierunek"
+    },
+    "alElev": {
+     "label": "Wysokość"
     }
    }
   },
@@ -1676,6 +1915,13 @@
     },
     "threshold": {
      "label": "Próg"
+    },
+    "style": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
     }
    }
   },
@@ -1754,6 +2000,22 @@
     },
     "vibrance": {
      "label": "Żywość"
+    },
+    "exposure": {
+     "label": "Ekspozycja"
+    },
+    "threshold": {
+     "label": "Próg"
+    },
+    "knee": {
+     "label": "Miękkość progu"
+    },
+    "style": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
     }
    }
   },
@@ -2024,8 +2286,11 @@
    }
   },
   "edgedetect": {
+   "aliases": [
+    "Wykrywanie krawędzi"
+   ],
    "description": "Tworzy jasne linie w miejscach zmian obrazu, a w pozostałych miejscach ciemne tło. Tusz rysuje ciemne linie na białym tle; Kolor zachowuje na krawędziach własne kolory obrazu.",
-   "name": "Wykrywanie krawędzi",
+   "name": "Znajdź krawędzie",
    "params": {
     "strength": {
      "label": "Siła"
@@ -2275,6 +2540,22 @@
       "Środek",
       "Narożnik"
      ]
+    },
+    "alight": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
+    },
+    "alZ": {
+     "label": "Pozycja Z"
+    },
+    "alLight": {
+     "label": "Kierunek"
+    },
+    "alElev": {
+     "label": "Wysokość"
     }
    }
   },
@@ -2350,8 +2631,11 @@
    }
   },
   "exposure": {
+   "aliases": [
+    "Ekspozycja"
+   ],
    "description": "Symuluje ekspozycję fotograficzną za pomocą działek ekspozycji, przesunięcia i korekcji gamma. Rozjaśnij przezroczyste części pozwala częściowo przezroczystym pikselom, na przykład na rozmytej krawędzi, rozjaśnić się powyżej bieli.",
-   "name": "Ekspozycja",
+   "name": "Ekspozycja / gamma",
    "params": {
     "gamma": {
      "label": "Gamma"
@@ -2364,6 +2648,24 @@
     },
     "stops": {
      "label": "Działki ekspozycji"
+    }
+   }
+  },
+  "facetrack": {
+   "aliases": [
+    "Ruch twarzy"
+   ],
+   "description": "Ruch twarzy dla warstw wideo: wideo przesuwa się i przybliża tak, aby wybrana twarz pozostawała w tym samym miejscu kadru. Stuknij Wybierz twarz, a potem stuknij twarz w podglądzie. Twarz jest śledzona raz przez cały klip, a wynik zostaje zachowany, więc podgląd i eksport korzystają z niego od razu. Powiększenie ustala, jak duża pozostaje twarz (100% to jej rozmiar w chwili wyboru), Położenie – gdzie pozostaje w kadrze, a Wygładzanie sprawia, że ruch jest spokojniejszy.",
+   "name": "Śledzenie twarzy",
+   "params": {
+    "position": {
+     "label": "Położenie"
+    },
+    "smoothing": {
+     "label": "Wygładzanie"
+    },
+    "zoom": {
+     "label": "Powiększenie"
     }
    }
   },
@@ -2437,6 +2739,13 @@
     "edgeStrength": {
      "label": "Siła krawędzi"
     },
+    "edgeStyle": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
+    },
     "feather": {
      "label": "Wtapianie"
     },
@@ -2461,18 +2770,18 @@
     "scanStrength": {
      "label": "Siła linii skanowania"
     },
-    "tint": {
-     "label": "Zabarwienie"
-    },
-    "tintColor": {
-     "label": "Kolor zabarwienia"
-    },
     "style": {
      "label": "Styl",
      "options": [
       "Klasyczny",
       "Standardowy"
      ]
+    },
+    "tint": {
+     "label": "Zabarwienie"
+    },
+    "tintColor": {
+     "label": "Kolor zabarwienia"
     }
    }
   },
@@ -2509,6 +2818,13 @@
      "options": [
       "Miganie",
       "Stały"
+     ]
+    },
+    "wave": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
      ]
     }
    }
@@ -2616,6 +2932,16 @@
       "Środek",
       "Narożnik"
      ]
+    },
+    "style": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
+    },
+    "alZ": {
+     "label": "Pozycja Z"
     }
    }
   },
@@ -2629,6 +2955,9 @@
    }
   },
   "fourcolor": {
+   "aliases": [
+    "Gradient czterokolorowy"
+   ],
    "description": "Łączy na warstwie cztery kolory umieszczone w czterech punktach, których położenie jest mierzone w pikselach od środka warstwy.",
    "name": "Gradient czterokolorowy",
    "params": {
@@ -2869,6 +3198,18 @@
     }
    }
   },
+  "gaussianblur": {
+   "description": "Gładkie, miękkie rozmycie. Siła ustala jego zasięg.",
+   "name": "Rozmycie gaussowskie",
+   "params": {
+    "scale": {
+     "label": "Skala"
+    },
+    "strength": {
+     "label": "Siła"
+    }
+   }
+  },
   "glass": {
    "description": "Zmienia kształt warstwy w fazowane szkło, które załamuje warstwy za nim, z rozświetleniem wzdłuż krawędzi. Przy ustawieniu Światło: Miękkie efekt pokazuje warstwę zgodnie z Wypełnieniem i oświetla szkło Kolorem, najjaśniej wzdłuż wewnętrznej krawędzi fazowania zwróconej ku światłu.",
    "name": "Szkło",
@@ -2952,14 +3293,26 @@
    }
   },
   "glowscan": {
-   "description": "Rozmywa i rozświetla tylko fragmenty warstwy o jasności w wybranym zakresie; animuj położenie, aby przesunąć poświatę od cieni do świateł.",
+   "description": "Rysuje świecący kontur tam, gdzie jasność obrazu przekracza próg, jak skan konturów.",
    "name": "Skanowanie poświatą",
    "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blend": {
+     "label": "Mieszanie"
+    },
     "blur": {
      "label": "Rozmycie"
     },
     "color": {
      "label": "Kolor poświaty"
+    },
+    "feather": {
+     "label": "Wtapianie"
+    },
+    "fill": {
+     "label": "Wypełnienie"
     },
     "intensity": {
      "label": "Intensywność"
@@ -2967,11 +3320,30 @@
     "position": {
      "label": "Położenie"
     },
+    "radius": {
+     "label": "Promień"
+    },
     "show": {
      "label": "Pokaż tylko zakres"
     },
+    "smoothing": {
+     "label": "Wygładzanie"
+    },
     "softness": {
      "label": "Miękkość"
+    },
+    "style": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
+    },
+    "threshold": {
+     "label": "Próg"
+    },
+    "tint": {
+     "label": "Kolor"
     },
     "width": {
      "label": "Szerokość"
@@ -3209,6 +3581,13 @@
       "Klasyczny",
       "Standardowy"
      ]
+    },
+    "alight": {
+     "label": "Układ",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
     }
    }
   },
@@ -3243,8 +3622,11 @@
    }
   },
   "halftone": {
+   "aliases": [
+    "Raster"
+   ],
    "description": "Drukowane punkty, które rosną w ciemnych obszarach obrazu.",
-   "name": "Raster",
+   "name": "Raster punktowy",
    "params": {
     "angle": {
      "label": "Kąt"
@@ -3254,6 +3636,13 @@
     },
     "colored": {
      "label": "Kolorowe punkty"
+    },
+    "edgeStyle": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
     },
     "ink": {
      "label": "Kolor punktów"
@@ -3300,6 +3689,13 @@
      "label": "Siła"
     },
     "style": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
+    },
+    "edgeStyle": {
      "label": "Styl",
      "options": [
       "Klasyczny",
@@ -3407,6 +3803,22 @@
       "Klasyczny",
       "Standardowy"
      ]
+    },
+    "alight": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
+    },
+    "alZ": {
+     "label": "Pozycja Z"
+    },
+    "alLight": {
+     "label": "Kierunek"
+    },
+    "alElev": {
+     "label": "Wysokość"
     }
    }
   },
@@ -3431,6 +3843,13 @@
     },
     "seed": {
      "label": "Ziarno losowe"
+    },
+    "edgeStyle": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
     }
    }
   },
@@ -3489,6 +3908,19 @@
     },
     "stretch": {
      "label": "Rozciągnięcie"
+    },
+    "lineWidth": {
+     "label": "Grubość linii"
+    },
+    "feather": {
+     "label": "Wtapianie"
+    },
+    "edgeStyle": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
     }
    }
   },
@@ -3550,6 +3982,14 @@
     },
     "stretch": {
      "label": "Rozciągnięcie"
+    },
+    "alight": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy",
+      "Obraz"
+     ]
     }
    }
   },
@@ -3645,10 +4085,29 @@
       "Środek",
       "Narożnik"
      ]
+    },
+    "alight": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
+    },
+    "alZ": {
+     "label": "Położenie Z"
+    },
+    "alLight": {
+     "label": "Kierunek"
+    },
+    "alElev": {
+     "label": "Wysokość"
     }
    }
   },
   "highlightshadow": {
+   "aliases": [
+    "Światła i cienie"
+   ],
    "description": "Odzyskuje lub wzmacnia jasne światła oraz rozjaśnia lub pogłębia cienie zależnie od jasności każdego piksela.",
    "name": "Światła i cienie",
    "params": {
@@ -3775,6 +4234,22 @@
       "Klasyczny",
       "Standardowy"
      ]
+    },
+    "alight": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
+    },
+    "alZ": {
+     "label": "Pozycja Z"
+    },
+    "alLight": {
+     "label": "Kierunek"
+    },
+    "alElev": {
+     "label": "Wysokość"
     }
    }
   },
@@ -3909,12 +4384,31 @@
     }
    }
   },
+  "hueshift": {
+   "description": "Obraca każdy kolor o ten sam kąt na kole barw i zachowuje jasność.",
+   "name": "Przesunięcie odcienia",
+   "params": {
+    "hue": {
+     "label": "Przesunięcie odcienia"
+    }
+   }
+  },
   "innerblur": {
    "description": "Rozmywa obraz wewnątrz warstwy, zachowując ostry kontur.",
    "name": "Rozmycie wewnętrzne",
    "params": {
     "blur": {
      "label": "Siła"
+    },
+    "iterations": {
+     "label": "Iteracje"
+    },
+    "style": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
     }
    }
   },
@@ -3994,6 +4488,15 @@
     },
     "invert_alpha": {
      "label": "Odwróć alfę"
+    },
+    "red": {
+     "label": "Czerwony"
+    },
+    "green": {
+     "label": "Zielony"
+    },
+    "blue": {
+     "label": "Niebieski"
     }
    }
   },
@@ -4060,6 +4563,13 @@
     },
     "segments": {
      "label": "Segmenty"
+    },
+    "edgeStyle": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
     }
    }
   },
@@ -4096,9 +4606,23 @@
    }
   },
   "lensflare": {
-   "description": "Jasne światło z poświatą nałożone na obraz.",
-   "name": "Blask światła",
+   "aliases": [
+    "Blask światła"
+   ],
+   "description": "Jasne światło z gwiazdą, poświatą i pierścieniami odbić nałożone na obraz.",
+   "name": "Flara obiektywu",
    "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blendMode": {
+     "label": "Tryb mieszania",
+     "options": [
+      "Normalny",
+      "Mnożenie",
+      "Ekran"
+     ]
+    },
     "brightness": {
      "label": "Jasność"
     },
@@ -4108,8 +4632,21 @@
     "color": {
      "label": "Kolor"
     },
+    "points": {
+     "label": "Ramiona"
+    },
     "radius": {
      "label": "Promień"
+    },
+    "shine": {
+     "label": "Blask"
+    },
+    "style": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
     }
    }
   },
@@ -4274,6 +4811,13 @@
       "Klasyczny",
       "Standardowy"
      ]
+    },
+    "alight": {
+     "label": "Układ",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
     }
    }
   },
@@ -4392,6 +4936,14 @@
      "options": [
       "Klasyczny",
       "Standardowy"
+     ]
+    },
+    "weighting": {
+     "label": "Tryb",
+     "options": [
+      "Klasyczny",
+      "Luma",
+      "RGB"
      ]
     }
    }
@@ -4709,6 +5261,25 @@
       "Środek",
       "Narożnik"
      ]
+    },
+    "alight": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
+    },
+    "alZ": {
+     "label": "Pozycja Z"
+    },
+    "alLight": {
+     "label": "Kierunek"
+    },
+    "alElev": {
+     "label": "Wysokość"
+    },
+    "alHeight": {
+     "label": "Wysokość"
     }
    }
   },
@@ -4964,6 +5535,13 @@
      ]
     },
     "roll": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
+    },
+    "space": {
      "label": "Styl",
      "options": [
       "Klasyczny",
@@ -5328,6 +5906,16 @@
       "Klasyczny",
       "Standardowy"
      ]
+    },
+    "edgeStyle": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
+    },
+    "saturation": {
+     "label": "Nasycenie"
     }
    }
   },
@@ -5446,6 +6034,18 @@
       "Klasyczny",
       "Standardowy"
      ]
+    },
+    "angle": {
+     "label": "Kąt"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "repeat": {
+     "label": "Powtórzenia"
+    },
+    "mirror": {
+     "label": "Odbicie lustrzane"
     }
    }
   },
@@ -5706,6 +6306,22 @@
       "Środek",
       "Narożnik"
      ]
+    },
+    "alight": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
+    },
+    "alZ": {
+     "label": "Pozycja Z"
+    },
+    "alLight": {
+     "label": "Kierunek"
+    },
+    "alElev": {
+     "label": "Wysokość"
     }
    }
   },
@@ -5752,6 +6368,13 @@
     },
     "width": {
      "label": "Szerokość"
+    },
+    "alight": {
+     "label": "Układ",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
     }
    }
   },
@@ -5840,6 +6463,13 @@
     },
     "sweep": {
      "label": "Rozpiętość"
+    },
+    "alight": {
+     "label": "Układ",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
     }
    }
   },
@@ -6018,6 +6648,19 @@
     },
     "glossiness": {
      "label": "Ostrość połysku"
+    },
+    "style": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
+    },
+    "alLight": {
+     "label": "Kierunek"
+    },
+    "alElev": {
+     "label": "Wysokość"
     }
    },
    "shortcuts": {
@@ -6107,8 +6750,11 @@
    }
   },
   "reorient360": {
+   "aliases": [
+    "Zmiana orientacji sfery 360°"
+   ],
    "description": "Obraca warstwę panoramy 360° wewnątrz jej sfery, aby wyrównać horyzont lub zmienić miejsce przodu.",
-   "name": "Zmiana orientacji sfery 360°",
+   "name": "Zmiana orientacji sfery 360º",
    "params": {
     "pitch": {
      "label": "Pochylenie"
@@ -6432,6 +7078,18 @@
     },
     "seed": {
      "label": "Ziarno"
+    }
+   }
+  },
+  "saturationvibrance": {
+   "description": "Wzmacnia albo osłabia kolory. Jaskrawość łagodnie podbija matowe kolory i zostawia mocne bez zmian.",
+   "name": "Nasycenie / Jaskrawość",
+   "params": {
+    "saturation": {
+     "label": "Nasycenie"
+    },
+    "vibrance": {
+     "label": "Żywość"
     }
    }
   },
@@ -6959,6 +7617,42 @@
     }
    }
   },
+  "spectralmap": {
+   "description": "Przebarwia obraz według jasności widmem z trzech kolorów. Powtórz przechodzi je więcej razy, Faza je przesuwa, a Ściśnięcie poszerza każde pasmo.",
+   "name": "Mapa spektralna",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "blueColor": {
+     "label": "Kolor 3"
+    },
+    "greenColor": {
+     "label": "Kolor 2"
+    },
+    "phase": {
+     "label": "Faza"
+    },
+    "redColor": {
+     "label": "Kolor 1"
+    },
+    "repeat": {
+     "label": "Powtórzenia"
+    },
+    "reverse": {
+     "label": "Odwróć"
+    },
+    "saturation": {
+     "label": "Nasycenie"
+    },
+    "scaleBrightness": {
+     "label": "Skaluj jasność"
+    },
+    "squeeze": {
+     "label": "Ściśnięcie"
+    }
+   }
+  },
   "spherize": {
    "description": "Nakłada warstwę na kulę za pomocą rzutu z przodu lub tekstury równokątnej.",
    "name": "Sferyzacja",
@@ -7055,6 +7749,22 @@
       "Środek",
       "Narożnik"
      ]
+    },
+    "alight": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
+    },
+    "alZ": {
+     "label": "Pozycja Z"
+    },
+    "alLight": {
+     "label": "Kierunek"
+    },
+    "alElev": {
+     "label": "Wysokość"
     }
    }
   },
@@ -7168,8 +7878,11 @@
    }
   },
   "splittone": {
+   "aliases": [
+    "Tonowanie podzielone"
+   ],
    "description": "Barwi cienie w jednym odcieniu, a światła w innym, zachowując czerń, biel i jasność. Poziom cieni zagina krzywą jasności, a Poziom świateł przesuwa miejsce, gdzie zaczyna się kolor świateł. Styl Mapa gradientu nadaje każdemu pikselowi kolor wyłącznie na podstawie jego jasności.",
-   "name": "Tonowanie podzielone",
+   "name": "Gorący kolor",
    "params": {
     "highlightAmount": {
      "label": "Intensywność świateł"
@@ -7284,6 +7997,13 @@
     },
     "shine": {
      "label": "Blask"
+    },
+    "edgeStyle": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
     }
    }
   },
@@ -7306,20 +8026,17 @@
    }
   },
   "starpolyhedron": {
-   "description": "Umieszcza warstwę na gwieździe zbudowanej z dwóch skrzyżowanych piramid.",
+   "description": "Umieszcza warstwę na gwieździe, której ramiona wznoszą się z przodu i z tyłu do grzbietu, ze światłem i głębią.",
    "name": "Gwiazda wielościenna",
    "params": {
-    "light": {
-     "label": "Kąt światła"
+    "orientA": {
+     "label": "Orientacja α"
     },
-    "perspective": {
-     "label": "Perspektywa"
+    "orientB": {
+     "label": "Orientacja β"
     },
-    "position": {
-     "label": "Pozycja"
-    },
-    "radius": {
-     "label": "Promień"
+    "orientG": {
+     "label": "Orientacja γ"
     },
     "rotX": {
      "label": "Obrót X"
@@ -7330,11 +8047,83 @@
     "rotZ": {
      "label": "Obrót Z"
     },
+    "starSize": {
+     "label": "Rozmiar"
+    },
+    "starDepth": {
+     "label": "Głębia"
+    },
+    "pointLength": {
+     "label": "Długość ramion"
+    },
+    "smoothing": {
+     "label": "Wygładzanie"
+    },
+    "points": {
+     "label": "Ramiona"
+    },
+    "alPos": {
+     "label": "Pozycja"
+    },
+    "alZ": {
+     "label": "Pozycja Z"
+    },
+    "alScale": {
+     "label": "Skala"
+    },
+    "intensity": {
+     "label": "Intensywność światła"
+    },
+    "alShine": {
+     "label": "Połysk"
+    },
+    "spec": {
+     "label": "Odbłysk"
+    },
+    "alAmbient": {
+     "label": "Światło otoczenia"
+    },
+    "alColor": {
+     "label": "Kolor"
+    },
+    "lightDir": {
+     "label": "Kierunek"
+    },
+    "lightDepth": {
+     "label": "Wysokość"
+    },
+    "alMirror": {
+     "label": "Odbicie lustrzane"
+    },
+    "alRepeatX": {
+     "label": "Powtórzenia X"
+    },
+    "alRepeatY": {
+     "label": "Powtórzenia Y"
+    },
+    "alTexAngle": {
+     "label": "Kąt tekstury"
+    },
+    "alCrop": {
+     "label": "Kadrowanie"
+    },
+    "radius": {
+     "label": "Promień"
+    },
+    "position": {
+     "label": "Pozycja"
+    },
     "scale": {
      "label": "Skala"
     },
+    "perspective": {
+     "label": "Perspektywa"
+    },
     "shading": {
      "label": "Cieniowanie"
+    },
+    "light": {
+     "label": "Kąt światła"
     },
     "shine": {
      "label": "Połysk"
@@ -7390,6 +8179,13 @@
      "options": [
       "Środek",
       "Narożnik"
+     ]
+    },
+    "style": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
      ]
     }
    }
@@ -7506,6 +8302,22 @@
       "Klasyczny",
       "Standardowy"
      ]
+    },
+    "alight": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
+    },
+    "alZ": {
+     "label": "Pozycja Z"
+    },
+    "alLight": {
+     "label": "Kierunek"
+    },
+    "alElev": {
+     "label": "Wysokość"
     }
    }
   },
@@ -7518,6 +8330,27 @@
     },
     "grain": {
      "label": "Rozmiar"
+    }
+   }
+  },
+  "streakstrips": {
+   "description": "Tnie warstwę na równoległe paski i rozciąga w każdym pasku jedną linię obrazu, jak zakłócony skan.",
+   "name": "Rozciągnięte paski",
+   "params": {
+    "alpha": {
+     "label": "Alfa"
+    },
+    "angle": {
+     "label": "Kąt"
+    },
+    "count": {
+     "label": "Liczba"
+    },
+    "maskToLayer": {
+     "label": "Maskuj do warstwy"
+    },
+    "phase": {
+     "label": "Faza"
     }
    }
   },
@@ -7601,6 +8434,15 @@
     }
    }
   },
+  "strokecolor": {
+   "description": "Maluje obrysy warstwy jednym kolorem: kontur kształtu lub tekstu i każde pociągnięcie pióra i pędzla w rysunku.",
+   "name": "Kolor obrysu",
+   "params": {
+    "color": {
+     "label": "Kolor"
+    }
+   }
+  },
   "stroketaper": {
    "description": "Zwęża obrysy do punktu: pociągnięcia pióra i pędzla w rysunku odręcznym oraz obrys linii i kształtów (Ramka i cień > Obrys). Od zera do początku oraz od końca do zera. Ściśnięcie wyostrza zwężenie.",
    "name": "Zwężenie obrysu",
@@ -7613,6 +8455,13 @@
     },
     "start": {
      "label": "Początek"
+    },
+    "style": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
     }
    }
   },
@@ -7955,6 +8804,18 @@
     "wobbly": "Chwiejny"
    }
   },
+  "textspacing": {
+   "description": "Zmienia odstęp między literami i między wierszami warstwy tekstowej. Odstęp liter rozsuwa litery, a poniżej 0% je zbliża. Interlinia ustala, jak daleko od siebie są wiersze: 100% to wartość normalna, a 200% ją podwaja. Dodaj klatki kluczowe do jednego z nich, aby animować odstępy.",
+   "name": "Odstępy tekstu",
+   "params": {
+    "letterspacing": {
+     "label": "Odstęp liter"
+    },
+    "linespacing": {
+     "label": "Interlinia"
+    }
+   }
+  },
   "texttransform": {
    "description": "Przesuwa, skaluje, obraca, zanika i barwi litery, słowa lub wiersze w zakresie. Kotwica określa, czy skalowanie i obrót dotyczą każdego składnika, czy środka warstwy. Przesuwaj zakres za pomocą Fazy, aby zmiana przebiegała przez tekst.",
    "name": "Przekształcenie tekstu",
@@ -8139,6 +9000,13 @@
       "Klasyczny",
       "Standardowy"
      ]
+    },
+    "edgeStyle": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
     }
    }
   },
@@ -8209,6 +9077,13 @@
       "Klasyczny",
       "Standardowy"
      ]
+    },
+    "edgeStyle": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
     }
    }
   },
@@ -8244,8 +9119,11 @@
    }
   },
   "timequant": {
+   "aliases": [
+    "Liczba klatek na sekundę"
+   ],
    "description": "Sprawia, że ta warstwa porusza się z niższą liczbą klatek na sekundę, jak szarpany materiał lub animacja poklatkowa.",
-   "name": "Liczba klatek na sekundę",
+   "name": "Kwantyzacja czasu",
    "params": {
     "fps": {
      "label": "Kroki/s"
@@ -8363,6 +9241,22 @@
       "Środek",
       "Narożnik"
      ]
+    },
+    "alight": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
+    },
+    "alZ": {
+     "label": "Pozycja Z"
+    },
+    "alLight": {
+     "label": "Kierunek"
+    },
+    "alElev": {
+     "label": "Wysokość"
     }
    }
   },
@@ -8409,6 +9303,16 @@
       "Klasyczny",
       "Standardowy"
      ]
+    },
+    "wrapStyle": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
+    },
+    "depth": {
+     "label": "Głębokość"
     }
    }
   },
@@ -8528,6 +9432,9 @@
       "Klasyczny",
       "Standardowy"
      ]
+    },
+    "singleAxis": {
+     "label": "Jedna oś"
     }
    }
   },
@@ -8549,6 +9456,13 @@
      "options": [
       "Warstwy",
       "Ekranu"
+     ]
+    },
+    "edgeStyle": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
      ]
     }
    }
@@ -8574,6 +9488,13 @@
      "options": [
       "Szary",
       "Czerwony"
+     ]
+    },
+    "style": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
      ]
     }
    }
@@ -8656,8 +9577,11 @@
    }
   },
   "viewer360": {
+   "aliases": [
+    "Podgląd 360°"
+   ],
    "description": "Pokazuje warstwę panoramy 360° przez wirtualną kamerę, którą można obracać i przybliżać.",
-   "name": "Podgląd 360°",
+   "name": "Podgląd 360º",
    "params": {
     "fov": {
      "label": "Pole widzenia"
@@ -8965,6 +9889,94 @@
     },
     "zoom": {
      "label": "Siła"
+    },
+    "alight": {
+     "label": "Układ",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
+    }
+   }
+  },
+  "ring": {
+   "description": "Owija warstwę wokół pierścienia o płaskich ścianach, jak krótka rura, ze światłem i głębią.",
+   "name": "Pierścień",
+   "params": {
+    "orientA": {
+     "label": "Orientacja α"
+    },
+    "orientB": {
+     "label": "Orientacja β"
+    },
+    "orientG": {
+     "label": "Orientacja γ"
+    },
+    "rotX": {
+     "label": "Obrót X"
+    },
+    "rotY": {
+     "label": "Obrót Y"
+    },
+    "rotZ": {
+     "label": "Obrót Z"
+    },
+    "radius": {
+     "label": "Promień"
+    },
+    "thickness": {
+     "label": "Szerokość"
+    },
+    "height": {
+     "label": "Długość"
+    },
+    "smoothing": {
+     "label": "Wygładzanie"
+    },
+    "position": {
+     "label": "Pozycja"
+    },
+    "alZ": {
+     "label": "Pozycja Z"
+    },
+    "scale": {
+     "label": "Skala"
+    },
+    "intensity": {
+     "label": "Intensywność światła"
+    },
+    "shine": {
+     "label": "Połysk"
+    },
+    "spec": {
+     "label": "Odbłysk"
+    },
+    "ambient": {
+     "label": "Światło otoczenia"
+    },
+    "lightColor": {
+     "label": "Kolor"
+    },
+    "lightDir": {
+     "label": "Kierunek"
+    },
+    "lightDepth": {
+     "label": "Wysokość"
+    },
+    "texMirror": {
+     "label": "Odbicie lustrzane"
+    },
+    "texRepeatX": {
+     "label": "Powtórzenia X"
+    },
+    "texRepeatY": {
+     "label": "Powtórzenia Y"
+    },
+    "texAngle": {
+     "label": "Kąt tekstury"
+    },
+    "texCrop": {
+     "label": "Kadrowanie"
     }
    }
   }

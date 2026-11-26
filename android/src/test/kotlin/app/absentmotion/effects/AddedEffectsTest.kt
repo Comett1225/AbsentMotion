@@ -13,6 +13,7 @@ import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -120,6 +121,28 @@ class AddedEffectsTest {
         assertTrue(lastRemoved)
         assertEquals(emptySet<String>(), saved["shown_added_effects"])
         assertEquals(emptySet<String>(), saved["shown_added_creators"])
+    }
+
+    @Test fun communityPicturesReplaceTheRenderedOneAndKeepTheirHeroUntilRemoved() {
+        val store = AddedEffectStore(temp.root)
+        val effect = read(effect().put("author", "A Painter"))
+        val key = effect.definition.key
+        val rendered = listOf(AddedEffectPreview(effect, true, byteArrayOf(1)))
+        val provided = rendered.withPictures(mapOf(key to (byteArrayOf(2) to byteArrayOf(3))))
+        assertEquals(listOf(2, 3), provided.single().let { listOf(it.picture!!.single().toInt(), it.hero!!.single().toInt()) })
+        assertSame(rendered.single(), rendered.withPictures(mapOf("someone.else" to (byteArrayOf(2) to null))).single())
+        assertArrayEquals(byteArrayOf(1), rendered.withPictures(mapOf(key to (null to null))).single().picture)
+        store.putAll(provided)
+        val catalog = EffectCatalog().withAdded(store)
+        val added = catalog.find(effect.definition.id)!!
+        assertArrayEquals(byteArrayOf(3), catalog.bytes(added.hero))
+        assertArrayEquals(byteArrayOf(2), catalog.bytes(added.thumbnail))
+        store.putAll(rendered)
+        val again = EffectCatalog().withAdded(store).find(effect.definition.id)!!
+        assertEquals(again.thumbnail, again.hero)
+        store.putAll(provided)
+        store.remove(key)
+        assertFalse(store.hero(key).exists())
     }
 
     @Test fun packsOnlyReadRootJsonAndLimitTheirFileCount() {

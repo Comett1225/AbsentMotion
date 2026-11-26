@@ -1,6 +1,13 @@
 package app.absentmotion.ui.home
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -166,14 +173,12 @@ private class Line(val section: Int, val group: Int, val text: String?, val row:
     val header get() = group < 0 && text == null
 }
 
-private fun lines(notes: WhatsNew, open: Set<Int>): List<Line> = buildList {
+private fun lines(notes: WhatsNew): List<Line> = buildList {
     add(Line(-1, -1, null, -1, false))
     notes.sections.forEachIndexed { s, section ->
-        add(Line(s, -1, null, -1, s !in open))
-        if (s in open) {
-            val rows = section.items.map { -1 to it } + section.groups.flatMapIndexed { g, group -> listOf(g to null) + group.items.map { g to it } }
-            rows.forEachIndexed { n, (g, text) -> add(Line(s, g, text, n, n == rows.lastIndex)) }
-        }
+        add(Line(s, -1, null, -1, false))
+        val rows = section.items.map { -1 to it } + section.groups.flatMapIndexed { g, group -> listOf(g to null) + group.items.map { g to it } }
+        rows.forEachIndexed { n, (g, text) -> add(Line(s, g, text, n, n == rows.lastIndex)) }
     }
 }
 
@@ -200,7 +205,7 @@ fun WhatsNewCard(notes: WhatsNew, button: String, links: (String) -> String?, on
     val style = Rich(SpanStyle(color = Am.HomeInk, fontWeight = FontWeight.Bold), TextLinkStyles(SpanStyle(color = Am.Navy, fontWeight = FontWeight.Bold, textDecoration = TextDecoration.Underline)), links)
     var open by remember(notes) { mutableStateOf(setOf(0)) }
     val wide = LocalAdaptiveSpace.current?.wide == true
-    val lines = remember(notes, open, wide) { lines(notes, open).let { if (wide) it.drop(1) else it } }
+    val lines = remember(notes, wide) { lines(notes).let { if (wide) it.drop(1) else it } }
     val list = rememberLazyListState()
     val scope = rememberCoroutineScope()
     var labelHeight by remember { mutableIntStateOf(0) }
@@ -230,8 +235,8 @@ fun WhatsNewCard(notes: WhatsNew, button: String, links: (String) -> String?, on
                                     if (stuck) scope.launch { list.scrollToItem(index) }
                                 }
                             }
-                            line.text == null -> item("r${line.section}.${line.row}") { WhatsNewLabel(section.groups[line.group], Modifier.animateItem().part(line)) }
-                            else -> item("r${line.section}.${line.row}") { WhatsNewItem(line.text, style, Modifier.animateItem().part(line)) }
+                            line.text == null -> item("r${line.section}.${line.row}") { Unfold(line.section in open) { WhatsNewLabel(section.groups[line.group], Modifier.part(line)) } }
+                            else -> item("r${line.section}.${line.row}") { Unfold(line.section in open) { WhatsNewItem(line.text, style, Modifier.part(line)) } }
                         }
                     }
                 }
@@ -259,10 +264,19 @@ private fun Modifier.part(line: Line) = padding(bottom = if (line.last) 10.dp el
     .padding(start = 14.dp, end = 14.dp, top = if (line.row == 0) 0.dp else 10.dp, bottom = if (line.last) 14.dp else 0.dp)
 
 @Composable
+private fun Unfold(open: Boolean, content: @Composable () -> Unit) =
+    AnimatedVisibility(open, enter = expandVertically(tween(UnfoldMs), Alignment.Top) + fadeIn(tween(UnfoldMs)),
+        exit = shrinkVertically(tween(UnfoldMs), Alignment.Top) + fadeOut(tween(UnfoldMs / 2))) { content() }
+
+private const val UnfoldMs = 260
+
+@Composable
 private fun WhatsNewHeader(section: WhatsNewSection, open: Boolean, onClick: () -> Unit) {
     val turn by animateFloatAsState(if (open) 180f else 0f)
-    val shape = if (open) RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp) else RoundedCornerShape(14.dp)
-    Row(Modifier.padding(bottom = if (open) 0.dp else 10.dp).fillMaxWidth().clip(shape).background(Am.HomeBg).heightIn(min = 48.dp).clickable(role = Role.Button, onClick = onClick).padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+    val corner by animateDpAsState(if (open) 0.dp else 14.dp, tween(UnfoldMs))
+    val gap by animateDpAsState(if (open) 0.dp else 10.dp, tween(UnfoldMs))
+    val shape = RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp, bottomStart = corner, bottomEnd = corner)
+    Row(Modifier.padding(bottom = gap).fillMaxWidth().clip(shape).background(Am.HomeBg).heightIn(min = 48.dp).clickable(role = Role.Button, onClick = onClick).padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
         Text(section.title, Modifier.weight(1f).semantics { heading() }, color = Am.Navy, fontSize = 16.sp, lineHeight = 21.sp, fontWeight = FontWeight.Bold)
         Box(Modifier.padding(horizontal = 8.dp).clip(CircleShape).background(Am.Card).padding(horizontal = 9.dp, vertical = 2.dp)) {
             Text(section.count.toString(), color = Am.HomeMid, fontSize = 13.sp, fontWeight = FontWeight.Medium)

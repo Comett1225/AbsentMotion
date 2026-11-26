@@ -1187,8 +1187,6 @@
     <string name="font_source_google">Google Fonts</string>
     <string name="font_google_hint">برای جستجو در همه Google Fonts یک نام تایپ کنید</string>
     <string name="font_downloads_when_chosen">هنگام انتخاب دانلود می‌شود</string>
-    <string name="fonts_missing_title">فونت‌هایی که روی این گوشی نیستند</string>
-    <string name="fonts_missing_body">این پروژه از فونت‌هایی استفاده می‌کند که روی این گوشی نیستند: %1$s. تا زمانی که آن‌ها را از Google Fonts دانلود نکنید، متن با فونت دیگری نمایش داده می‌شود.</string>
     <string name="font_favorite">موردعلاقه</string>
     <string name="font_category_sans_serif">بدون سریف</string>
     <string name="font_category_serif">سریف</string>
@@ -1350,6 +1348,7 @@
     <string name="structure_paste_fill_color">چسباندن پرشدگی و رنگ</string>
     <string name="structure_paste_border_shadow">چسباندن حاشیه و سایه</string>
     <string name="structure_paste_blending">چسباندن شفافیت و حالت ترکیب</string>
+    <string name="structure_paste_motions">چسباندن انیمیشن‌ها و ترنزیشن‌ها</string>
     <string name="structure_paste_style">چسباندن استایل</string>
     <string name="text_alignment">ترازبندی</string>
     <string name="track_track">ردیابی</string>
@@ -1813,6 +1812,7 @@
     <string name="ai_model_grain">مدل بهبود دانه AI</string>
     <string name="ai_model_cartoon">مدل کارتون AI Enhance</string>
     <string name="ai_model_cutout">حذف پس‌زمینه با AI 2.0</string>
+    <string name="ai_model_noise">مدل کاهش نویز</string>
     <string name="ai_model_broken">یک فایل مدل AI خراب شد و حذف شد. دوباره دانلودش کنید.</string>
     <string name="ai_model_download_failed">دانلود مدل AI ناموفق بود. اتصال را بررسی کنید و دوباره تلاش کنید.</string>
     <string name="ai_model_download_wrong">دانلودشده مدل AI نبود</string>
@@ -1862,6 +1862,7 @@
     <string name="cutout_best">حذف پس‌زمینه با AI 2.0</string>
     <string name="cutout_best_hint">لبه‌های تمیزتر دور مو و جزئیات ریز. %1$s یک‌بار دانلود می‌شود. فقط تصاویر.</string>
     <string name="cutout_fallback_download">حذف پس‌زمینه با AI 2.0 دانلود نشد، بنابراین از حالت استاندارد استفاده شد. اتصال را بررسی کنید و دوباره امتحان کنید.</string>
+    <string name="ai_noise_fallback_download">مدل کاهش نویز دانلود نشد، بنابراین از کاهش نویز استاندارد استفاده شد. اتصال را بررسی کنید و دوباره امتحان کنید.</string>
     <string name="cutout_fallback_failed">حذف پس‌زمینه با AI 2.0 نتوانست پردازش این تصویر را تمام کند، بنابراین از حالت استاندارد استفاده شد.</string>
     <string name="ai_gpu_warning">این کار می‌تواند برخی گوشی‌ها را فریز کند. اگر گوشی فریز شد، دوباره راه‌اندازی‌اش کنید تا AI دوباره از پردازنده استفاده کند.</string>
     <string name="ai_gpu_failed">کار AI روی تراشه گرافیکی تمام نشد، بنابراین AI اکنون از پردازنده استفاده می‌کند.</string>
@@ -1979,6 +1980,17 @@
     <string name="track_motion_cancelled">ردیابی لغو شد. فریم‌های ردیابی‌شده کی‌فریم‌های خود را نگه می‌دارند.</string>
     <string name="track_motion_unavailable">ردیابی حرکت در این نسخه در دسترس نیست.</string>
     <string name="track_motion_failed">این ویدیو قابل ردیابی نبود.</string>
+    <string name="face_tracking_pick">انتخاب چهره</string>
+    <string name="face_tracking_again">ردیابی دوباره</string>
+    <string name="face_tracking_none">هنوز چهره‌ای انتخاب نشده است.</string>
+    <string name="face_tracking_ready">ویدیو چهره‌ای را که انتخاب کردید دنبال می‌کند.</string>
+    <string name="face_tracking_partial">بخشی از کلیپ هنوز ردیابی نشده است.</string>
+    <string name="face_tracking_video_only">ردیابی چهره روی لایه‌های ویدیو کار می‌کند.</string>
+    <string name="face_tracking_tap">روی چهره‌ای که ویدیو باید دنبال کند بزنید.</string>
+    <string name="face_tracking_looking">در حال جستجوی چهره‌ها…</string>
+    <string name="face_tracking_none_here">در این فریم چهره‌ای پیدا نشد. فریم دیگری را امتحان کنید.</string>
+    <string name="face_tracking_lost">چهره در این کلیپ ردیابی نشد.</string>
+    <string name="face_tracking_cancelled">ردیابی چهره لغو شد.</string>
     <string name="edit_layer_copy_name">کپی %1$s</string>
     <string name="model_layer_video">ویدیو</string>
     <string name="ai_video_mask_name">ماسک %1$s</string>
@@ -2310,6 +2322,10 @@
         <item quantity="one">روی %1$s لایه جای‌گذاری شد</item>
         <item quantity="other">روی %1$s لایه جای‌گذاری شد</item>
     </plurals>
+    <plurals name="structure_transitions_skipped">
+        <item quantity="one">‏%1$s ترنزیشن رد شد: به یک کلیپ درست قبل یا بعد از لایه نیاز دارد</item>
+        <item quantity="other">‏%1$s ترنزیشن رد شدند: به یک کلیپ درست قبل یا بعد از لایه نیاز دارند</item>
+    </plurals>
     <string name="subject_keep_all">همه را نگه دار</string>
     <string name="subject_hint_photo">برای نگه‌داشتن فقط یک شخص یا شیء، روی آن بزنید.</string>
     <string name="subject_hint_video">برای نگه‌داشتن فقط یک شخص یا شیء، روی آن در این فریم اول بزنید. برنامه آن را در طول کلیپ دنبال می‌کند.</string>
@@ -2428,8 +2444,6 @@
     <string name="desk_folder_back">بازگشت به همه رسانه‌ها</string>
     <string name="voice_install_espeak">صدایی پیدا نشد. بستهٔ espeak-ng را نصب کنید و دوباره این پنجره را باز کنید.</string>
     <string name="desk_close_save_failed">آخرین تغییرات شما ذخیره نشد. کمی از فضای دیسک را آزاد کنید و روی «تلاش دوباره» کلیک کنید. اگر بدون ذخیره ببندید، AbsentMotion دفعهٔ بعد که اجرا شود این تغییرات را دوباره پیشنهاد می‌دهد.</string>
-    <string name="desk_fonts_missing_title">فونت‌هایی که روی این رایانه نیستند</string>
-    <string name="desk_fonts_missing_body">این پروژه از فونت‌هایی استفاده می‌کند که روی این رایانه نیستند: %1$s. تا وقتی آن‌ها را از Google Fonts دانلود نکنید، متن با فونت دیگری نمایش داده می‌شود.</string>
     <string name="desk_export_busy">خروجی دیگری هنوز در حال انجام است. صبر کنید تمام شود یا اول آن را لغو کنید.</string>
     <string name="desk_export_no_ffmpeg">‏AbsentMotion نتوانست FFmpeg، برنامه مورد استفاده برای ساخت فایل‌های ویدیو و صدا را اجرا کند. AbsentMotion را دوباره نصب کنید.</string>
     <string name="desk_export_note_software">هیچ رمزگذار ویدیوی سخت‌افزاری روی این رایانه کار نمی‌کند، بنابراین برای این خروجی از رمزگذار نرم‌افزاری کندتر استفاده می‌شود.</string>
@@ -2804,6 +2818,7 @@
     <string name="added_effect_save_failed">همه‌ی افکت‌ها ذخیره نشدند.</string>
     <string name="added_effect_remove_failed">افکت حذف نشد.</string>
     <string name="community_filter_effects">افکت‌ها</string>
+    <string name="community_filter_new">جدید</string>
     <string name="added_effect_version">نسخه‌ی %1$d</string>
     <string name="added_effect_already_added">قبلاً اضافه شده</string>
     <string name="added_effect_newer_installed">نسخه‌ی جدیدتری دارید (v%1$d)</string>

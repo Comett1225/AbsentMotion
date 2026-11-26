@@ -27,6 +27,7 @@
 
 - Herkese uygun tutun. AbsentMotion'ı her yaştan insan kullanır.
 - Proje paketleri en fazla 20 MB, ön ayarlar en fazla 1 MB, efektler en fazla 512 KB olabilir.
+- Her efektin onu gösteren bir küçük resmi olmalı, iki boyutta: küçük (192 × 192 WebP, sabit ya da en fazla 3 saniyelik hareketli) ve büyük (720 × 720 WebP), her biri en fazla 150 KB.
 - Öğeler CC BY 4.0 altında paylaşılır: yapanı belirttikleri sürece herkes onları kullanabilir ve değiştirebilir.
 - Öğenizdeki ad, yazdığınız yaratıcı adıdır. İçine kişisel hiçbir şey yazmayın.
 - Neyin yayınlanacağına bakımcı karar verir ve bir öğeyi istediği zaman kaldırabilir.

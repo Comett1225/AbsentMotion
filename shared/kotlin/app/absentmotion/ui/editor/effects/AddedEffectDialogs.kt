@@ -39,6 +39,7 @@ import app.absentmotion.effects.AddedEffectStore
 import app.absentmotion.effects.EffectCatalog
 import app.absentmotion.effects.EffectDefinition
 import app.absentmotion.effects.readAddedEffectUri
+import app.absentmotion.effects.withPictures
 import app.absentmotion.engine.EngineThread
 import app.absentmotion.export.formatBytes
 import app.absentmotion.i18n.UiText
@@ -133,17 +134,21 @@ internal class AddedEffectImport(private val context: Context, private val getEn
         }
         val source = AddedEffectSource(item.name, item.sha256)
         val rejected = entries.filter { it.second.isFailure }.map { it.first }
-        present(entries.map { (_, effect) -> effect.map { listOf(it.from(source)) } }, skipped(rejected))
+        present(entries.map { (_, effect) -> effect.map { listOf(it.from(source)) } }, skipped(rejected), communityPictures(item))
     }
 
-    suspend fun present(files: List<Result<List<AddedEffect>>>, problem: UiText? = null) = imports.withLock {
+    private suspend fun communityPictures(item: CommunityItem) = withContext(Dispatchers.IO) {
+        runCatching { CommunityClient(context.cacheDir).effectPictures(item) }.getOrDefault(emptyMap())
+    }
+
+    suspend fun present(files: List<Result<List<AddedEffect>>>, problem: UiText? = null, pictures: Map<String, Pair<ByteArray?, ByteArray?>> = emptyMap()) = imports.withLock {
         if (files.isEmpty()) return@withLock
         val effects = files.flatMap { it.getOrNull().orEmpty() }
         busy = true
         try {
             if (effects.isNotEmpty()) {
                 engine.awaitEffects()
-                previews = previews + preview(effects)
+                previews = previews + preview(effects).withPictures(pictures)
             }
             if (files.any { it.isFailure }) error = problem ?: txt(R.string.added_effect_bad_file)
         } finally {
@@ -301,8 +306,9 @@ internal class AddedEffectImport(private val context: Context, private val getEn
                 ask(ProjectEffectPrompt.Notice(listOf(packMessage(label, R.string.added_effect_community_unavailable))))
                 continue
             }
+            val pictures = communityPictures(item)
             while (true) {
-                val failures = saveEntries(entries)
+                val failures = saveEntries(entries, pictures)
                 if (failures.isEmpty()) break
                 val retry = failures.any { it.id == R.string.added_effect_save_failed }
                 val answer = ask(ProjectEffectPrompt.Notice(failures, retry = retry, canOpen = retry))
@@ -361,11 +367,11 @@ internal class AddedEffectImport(private val context: Context, private val getEn
         }
     }
 
-    private suspend fun saveEntries(entries: List<Pair<String, Result<AddedEffect>>>): List<UiText> = imports.withLock {
+    private suspend fun saveEntries(entries: List<Pair<String, Result<AddedEffect>>>, pictures: Map<String, Pair<ByteArray?, ByteArray?>> = emptyMap()): List<UiText> = imports.withLock {
         projectPrompt = ProjectEffectPrompt.Progress(txt(R.string.community_adding), cancellable = false)
         try {
             val candidates = entries.mapNotNull { (_, entry) -> entry.getOrNull()?.takeIf(::isNewer) }
-            val tested = preview(candidates)
+            val tested = preview(candidates).withPictures(pictures)
             val broken = tested.filterNot { it.works }.map { it.effect.definition.name }.distinct()
             val rejected = entries.filter { it.second.isFailure }.map { it.first }.distinct()
             val working = tested.filter { it.works }.groupBy { it.effect.definition.id }

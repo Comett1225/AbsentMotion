@@ -1187,8 +1187,6 @@
     <string name="font_source_google">Google Fonts</string>
     <string name="font_google_hint">पूरे Google Fonts में खोजने के लिए नाम टाइप करें</string>
     <string name="font_downloads_when_chosen">चुनने पर डाउनलोड होगा</string>
-    <string name="fonts_missing_title">इस फ़ोन पर फ़ॉन्ट नहीं हैं</string>
-    <string name="fonts_missing_body">यह प्रोजेक्ट ऐसे फ़ॉन्ट इस्तेमाल करता है जो इस फ़ोन पर नहीं हैं: %1$s। जब तक आप उन्हें Google Fonts से डाउनलोड नहीं करते, टेक्स्ट किसी दूसरे फ़ॉन्ट में दिखता है।</string>
     <string name="font_favorite">पसंदीदा</string>
     <string name="font_category_sans_serif">सैंस सेरिफ़</string>
     <string name="font_category_serif">सेरिफ़</string>
@@ -1350,6 +1348,7 @@
     <string name="structure_paste_fill_color">फ़िल और कलर पेस्ट करें</string>
     <string name="structure_paste_border_shadow">फ़्रेम और शैडो पेस्ट करें</string>
     <string name="structure_paste_blending">ओपेसिटी और ब्लेंडिंग मोड पेस्ट करें</string>
+    <string name="structure_paste_motions">एनिमेशन और ट्रांज़िशन पेस्ट करें</string>
     <string name="structure_paste_style">स्टाइल पेस्ट करें</string>
     <string name="text_alignment">अलाइनमेंट</string>
     <string name="track_track">ट्रैक</string>
@@ -1813,6 +1812,7 @@
     <string name="ai_model_grain">AI एन्हांस ग्रेन मॉडल</string>
     <string name="ai_model_cartoon">AI एन्हांस कार्टून मॉडल</string>
     <string name="ai_model_cutout">AI बैकग्राउंड रिमूवल 2.0</string>
+    <string name="ai_model_noise">नॉइज़ कम करने का मॉडल</string>
     <string name="ai_model_broken">AI मॉडल फ़ाइल खराब हो गई थी और हटा दी गई है। इसे फिर से डाउनलोड करें।</string>
     <string name="ai_model_download_failed">AI मॉडल डाउनलोड नहीं हो सका। कनेक्शन जाँचें और फिर कोशिश करें।</string>
     <string name="ai_model_download_wrong">डाउनलोड की गई फ़ाइल AI मॉडल नहीं थी</string>
@@ -1862,6 +1862,7 @@
     <string name="cutout_best">AI बैकग्राउंड रिमूवल 2.0</string>
     <string name="cutout_best_hint">बालों और बारीक डिटेल के आसपास साफ़ किनारे। %1$s एक बार डाउनलोड होता है। सिर्फ़ इमेज के लिए।</string>
     <string name="cutout_fallback_download">AI बैकग्राउंड रिमूवल 2.0 डाउनलोड नहीं हो सका, इसलिए स्टैंडर्ड इस्तेमाल हुआ। कनेक्शन जाँचें और फिर से कोशिश करें।</string>
+    <string name="ai_noise_fallback_download">नॉइज़ कम करने का मॉडल डाउनलोड नहीं हो सका, इसलिए स्टैंडर्ड नॉइज़ रिडक्शन इस्तेमाल हुआ। कनेक्शन जाँचें और फिर से कोशिश करें।</string>
     <string name="cutout_fallback_failed">AI बैकग्राउंड रिमूवल 2.0 इस इमेज को पूरा नहीं कर सका, इसलिए स्टैंडर्ड इस्तेमाल हुआ।</string>
     <string name="ai_gpu_warning">इससे कुछ फ़ोन हैंग हो सकते हैं। फ़ोन हैंग हो जाए तो उसे रीस्टार्ट करें, फिर AI प्रोसेसर का इस्तेमाल करेगा।</string>
     <string name="ai_gpu_failed">ग्राफ़िक्स चिप पर AI का काम पूरा नहीं हो सका, इसलिए अब AI प्रोसेसर का उपयोग करता है।</string>
@@ -1979,6 +1980,17 @@
     <string name="track_motion_cancelled">ट्रैकिंग रद्द की गई। पहले से ट्रैक किए गए फ़्रेम अपने कीफ़्रेम रखते हैं।</string>
     <string name="track_motion_unavailable">इस बिल्ड में मोशन ट्रैकिंग उपलब्ध नहीं है।</string>
     <string name="track_motion_failed">इस वीडियो को ट्रैक नहीं किया जा सका।</string>
+    <string name="face_tracking_pick">चेहरा चुनें</string>
+    <string name="face_tracking_again">फिर से ट्रैक करें</string>
+    <string name="face_tracking_none">अभी कोई चेहरा नहीं चुना गया।</string>
+    <string name="face_tracking_ready">वीडियो आपके चुने हुए चेहरे के साथ चलता है।</string>
+    <string name="face_tracking_partial">क्लिप का कुछ हिस्सा अभी ट्रैक नहीं हुआ है।</string>
+    <string name="face_tracking_video_only">फ़ेस ट्रैकिंग वीडियो लेयर पर काम करती है।</string>
+    <string name="face_tracking_tap">उस चेहरे पर टैप करें जिसके साथ वीडियो चले।</string>
+    <string name="face_tracking_looking">चेहरे खोजे जा रहे हैं…</string>
+    <string name="face_tracking_none_here">इस फ़्रेम में कोई चेहरा नहीं मिला। दूसरा फ़्रेम आज़माएँ।</string>
+    <string name="face_tracking_lost">इस क्लिप में चेहरा ट्रैक नहीं हो सका।</string>
+    <string name="face_tracking_cancelled">फ़ेस ट्रैकिंग रद्द की गई।</string>
     <string name="edit_layer_copy_name">%1$s कॉपी</string>
     <string name="model_layer_video">वीडियो</string>
     <string name="ai_video_mask_name">%1$s मास्क</string>
@@ -2310,6 +2322,10 @@
         <item quantity="one">%1$s लेयर पर पेस्ट किया गया</item>
         <item quantity="other">%1$s लेयर पर पेस्ट किया गया</item>
     </plurals>
+    <plurals name="structure_transitions_skipped">
+        <item quantity="one">%1$s ट्रांज़िशन छोड़ा गया: इसके लिए लेयर के ठीक पहले या बाद में एक क्लिप चाहिए</item>
+        <item quantity="other">%1$s ट्रांज़िशन छोड़े गए: इनके लिए लेयर के ठीक पहले या बाद में एक क्लिप चाहिए</item>
+    </plurals>
     <string name="subject_keep_all">सब कुछ रखें</string>
     <string name="subject_hint_photo">सिर्फ़ एक व्यक्ति या चीज़ रखने के लिए उसे टैप करें।</string>
     <string name="subject_hint_video">सिर्फ़ एक व्यक्ति या चीज़ रखने के लिए इस पहले फ़्रेम पर उसे टैप करें। ऐप क्लिप के दौरान उसका पीछा करता है।</string>
@@ -2428,8 +2444,6 @@
     <string name="desk_folder_back">सभी मीडिया पर वापस जाएँ</string>
     <string name="voice_install_espeak">कोई वॉइस नहीं मिली। espeak-ng पैकेज इंस्टॉल करें, फिर यह विंडो दोबारा खोलें।</string>
     <string name="desk_close_save_failed">आपके पिछले बदलाव सेव नहीं हो सके। डिस्क पर कुछ जगह खाली करें, फिर \"फिर से कोशिश करें\" पर क्लिक करें। बिना सेव किए बंद करने पर AbsentMotion अगली बार शुरू होने पर ये बदलाव फिर से दिखाएगा।</string>
-    <string name="desk_fonts_missing_title">इस कंप्यूटर पर फ़ॉन्ट नहीं हैं</string>
-    <string name="desk_fonts_missing_body">यह प्रोजेक्ट ऐसे फ़ॉन्ट इस्तेमाल करता है जो इस कंप्यूटर पर नहीं हैं: %1$s। जब तक आप उन्हें Google Fonts से डाउनलोड नहीं करते, टेक्स्ट किसी दूसरे फ़ॉन्ट में दिखता है।</string>
     <string name="desk_export_busy">एक और एक्सपोर्ट अभी चल रहा है। उसके पूरा होने तक रुकें या पहले उसे रद्द करें।</string>
     <string name="desk_export_no_ffmpeg">AbsentMotion वीडियो और ऑडियो फ़ाइलें बनाने वाला प्रोग्राम FFmpeg शुरू नहीं कर सका। AbsentMotion दोबारा इंस्टॉल करें।</string>
     <string name="desk_export_note_software">इस कंप्यूटर पर कोई हार्डवेयर वीडियो एनकोडर काम नहीं करता, इसलिए इस एक्सपोर्ट में धीमा सॉफ़्टवेयर एनकोडर इस्तेमाल होगा।</string>
@@ -2804,6 +2818,7 @@
     <string name="added_effect_save_failed">सभी इफ़ेक्ट सेव नहीं हो सके।</string>
     <string name="added_effect_remove_failed">इफ़ेक्ट हटाया नहीं जा सका।</string>
     <string name="community_filter_effects">इफ़ेक्ट</string>
+    <string name="community_filter_new">नया</string>
     <string name="added_effect_version">संस्करण %1$d</string>
     <string name="added_effect_already_added">पहले से जोड़ा गया</string>
     <string name="added_effect_newer_installed">आपके पास नया संस्करण है (v%1$d)</string>

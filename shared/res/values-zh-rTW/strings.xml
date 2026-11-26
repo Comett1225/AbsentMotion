@@ -1169,8 +1169,6 @@
     <string name="font_source_google">Google Fonts</string>
     <string name="font_google_hint">輸入名稱即可搜尋所有 Google Fonts</string>
     <string name="font_downloads_when_chosen">選取時下載</string>
-    <string name="fonts_missing_title">此手機缺少字型</string>
-    <string name="fonts_missing_body">此專案使用了手機上沒有的字型：%1$s。從Google Fonts下載之前，文字會以其他字型顯示。</string>
     <string name="font_favorite">加入最愛</string>
     <string name="font_category_sans_serif">無襯線體</string>
     <string name="font_category_serif">襯線體</string>
@@ -1330,6 +1328,7 @@
     <string name="structure_paste_fill_color">貼上填色與顏色</string>
     <string name="structure_paste_border_shadow">貼上邊框與陰影</string>
     <string name="structure_paste_blending">貼上不透明度與混合模式</string>
+    <string name="structure_paste_motions">貼上動畫與轉場</string>
     <string name="structure_paste_style">貼上樣式</string>
     <string name="text_alignment">對齊</string>
     <string name="track_track">追蹤</string>
@@ -1786,6 +1785,7 @@
     <string name="ai_model_grain">AI增強顆粒模型</string>
     <string name="ai_model_cartoon">AI增強卡通模型</string>
     <string name="ai_model_cutout">AI背景移除2.0</string>
+    <string name="ai_model_noise">降噪模型</string>
     <string name="ai_model_broken">AI模型檔案已損毀並遭刪除，請重新下載。</string>
     <string name="ai_model_download_failed">AI模型下載失敗，請檢查連線後再試一次。</string>
     <string name="ai_model_download_wrong">下載的檔案不是AI模型</string>
@@ -1835,6 +1835,7 @@
     <string name="cutout_best">AI背景移除2.0</string>
     <string name="cutout_best_hint">頭髮和細節的邊緣更乾淨。一次性下載 %1$s。僅適用於圖片。</string>
     <string name="cutout_fallback_download">無法下載AI背景移除2.0，已改用標準模式。請檢查連線後再試一次。</string>
+    <string name="ai_noise_fallback_download">無法下載降噪模型，已改用標準降噪。請檢查連線後再試一次。</string>
     <string name="cutout_fallback_failed">AI背景移除2.0無法完成此圖片，已改用標準模式。</string>
     <string name="ai_gpu_warning">此功能可能導致部分手機當機。若手機當機，請重新啟動，AI將改回使用處理器。</string>
     <string name="ai_gpu_failed">圖形晶片上的AI處理未完成，AI現已改用處理器。</string>
@@ -1952,6 +1953,17 @@
     <string name="track_motion_cancelled">已取消追蹤。已追蹤影格的關鍵影格會保留。</string>
     <string name="track_motion_unavailable">此版本無法使用動態追蹤。</string>
     <string name="track_motion_failed">無法追蹤此影片。</string>
+    <string name="face_tracking_pick">選擇臉部</string>
+    <string name="face_tracking_again">重新追蹤</string>
+    <string name="face_tracking_none">尚未選擇臉部。</string>
+    <string name="face_tracking_ready">影片會跟著你選擇的臉部移動。</string>
+    <string name="face_tracking_partial">片段有部分尚未追蹤。</string>
+    <string name="face_tracking_video_only">臉部追蹤適用於影片圖層。</string>
+    <string name="face_tracking_tap">點一下影片要跟隨的臉部。</string>
+    <string name="face_tracking_looking">正在尋找臉部…</string>
+    <string name="face_tracking_none_here">這個影格中找不到臉部。請試試其他影格。</string>
+    <string name="face_tracking_lost">無法在這個片段中追蹤該臉部。</string>
+    <string name="face_tracking_cancelled">已取消臉部追蹤。</string>
     <string name="edit_layer_copy_name">%1$s 副本</string>
     <string name="model_layer_video">影片</string>
     <string name="ai_video_mask_name">%1$s 遮罩</string>
@@ -2277,6 +2289,9 @@
     <plurals name="structure_style_pasted">
         <item quantity="other">已貼到 %1$s 個圖層</item>
     </plurals>
+    <plurals name="structure_transitions_skipped">
+        <item quantity="other">已略過 %1$s 個轉場：圖層前後需要緊鄰的片段</item>
+    </plurals>
     <string name="subject_keep_all">保留全部</string>
     <string name="subject_hint_photo">若只要保留一個人或物件，請點選該對象。</string>
     <string name="subject_hint_video">若只要保留一個人或物件，請在此首個影格中點選該對象。應用程式會在整個片段中追蹤它。</string>
@@ -2393,8 +2408,6 @@
     <string name="desk_folder_back">返回所有媒體</string>
     <string name="voice_install_espeak">找不到語音。請安裝espeak-ng套件，然後重新開啟此視窗。</string>
     <string name="desk_close_save_failed">無法儲存最近的變更。請釋放一些磁碟空間，然後按一下「再試一次」。如果不儲存就關閉，AbsentMotion下次啟動時會再次提供這些變更。</string>
-    <string name="desk_fonts_missing_title">此電腦缺少字型</string>
-    <string name="desk_fonts_missing_body">此專案使用了此電腦沒有的字型：%1$s。從Google Fonts下載這些字型之前，文字會以其他字型顯示。</string>
     <string name="desk_export_busy">另一個匯出作業仍在進行中。請等待完成或先取消。</string>
     <string name="desk_export_no_ffmpeg">AbsentMotion無法啟動用來寫入影片和音訊檔案的FFmpeg。請重新安裝AbsentMotion。</string>
     <string name="desk_export_note_software">此電腦沒有可用的硬體影片編碼器，因此此次匯出會使用較慢的軟體編碼器。</string>
@@ -2765,6 +2778,7 @@
     <string name="added_effect_save_failed">無法儲存所有效果。</string>
     <string name="added_effect_remove_failed">無法移除效果。</string>
     <string name="community_filter_effects">效果</string>
+    <string name="community_filter_new">最新</string>
     <string name="added_effect_version">版本 %1$d</string>
     <string name="added_effect_already_added">已新增</string>
     <string name="added_effect_newer_installed">你有較新的版本（v%1$d）</string>

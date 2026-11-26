@@ -101,24 +101,32 @@ class BlurMigrationTest {
         assertEquals(12f, migrate("streaks-spin", "angle" to "12").number("sweep"), 1e-5f)
     }
 
-    @Test fun boxBlursBecomeTheBlurWithAlightsSizes() {
-        assertEquals(52.64f, migrate("boxblur3").number("strength"), 1e-3f)
-        val box = migrate("boxblur3", "strength" to "0.6125")
-        assertEquals(201.5125f, box.number("strength"), 1e-3f)
-        assertEquals(1f, box.number("shape"), 0f)
+    @Test fun boxBlursBecomeBoxBlurWithAlightsSizes() {
+        val current = migrate("boxblur3")
+        assertEquals("absent.boxblur", current["id"])
+        assertEquals(0.16f, current.number("strength"), 1e-5f)
+        assertEquals(0.6125f, migrate("boxblur3", "strength" to "0.6125").number("strength"), 1e-5f)
         val plain = migrate("boxblur")
-        assertEquals(3.75f, plain.number("strength"), 1e-4f)
+        assertEquals("absent.boxblur", plain["id"])
+        assertEquals(1f, plain.number("strength"), 1e-4f)
+        assertEquals(3.75f, plain.number("scale"), 1e-4f)
         assertEquals(1f, plain.number("shape"), 0f)
         assertEquals(1f, plain.number("style"), 0f)
         assertEquals(1f, migrate("boxblur", "strength" to "25.75", "iter" to "1").number("shape"), 0f)
         val old = migrate("boxblur", "strength" to "25.75", "iter" to "3")
-        assertEquals("absent.blur", old["id"])
-        assertEquals(96.5625f, old.number("strength"), 1e-3f)
+        assertEquals(25.75f, old.number("strength"), 1e-3f)
         assertEquals(0f, old.number("shape"), 0f)
         assertTrue(result("boxblur", "strength" to "25.75", "iter" to "3").dropped.isEmpty())
-        assertEquals(51.1125f, migrate("boxblur2", "strength" to "0.3625", "iter" to "3").number("strength"), 1e-3f)
-        assertTrue(result("boxblur2", "strength" to "0.3625", "iter" to "3").dropped.isEmpty())
-        assertEquals(setOf("Blur: iter"), result("boxblur2", "strength" to "0.3625", "iter" to "5").dropped)
+        val second = migrate("boxblur2", "strength" to "0.3625", "iter" to "3")
+        assertEquals("absent.boxblur", second["id"])
+        assertEquals(0.1574f * 165f, second.number("scale"), 1e-3f)
+        assertEquals(0.3625f, second.number("strength"), 1e-5f)
+        assertEquals(0f, second.number("shape"), 0f)
+        assertEquals(listOf(1f, 3f), listOf("style", "iterations").map { second.number(it) })
+        assertTrue(result("boxblur2", "strength" to "0.3625", "iter" to "5").dropped.isEmpty())
+        val inner = migrate("innerblur", "strength" to "0.15", "iter" to "4")
+        assertEquals(0.15f * 0.1574f * 165f, inner.number("blur"), 1e-4f)
+        assertEquals(listOf(4f, 1f), listOf("iterations", "style").map { inner.number(it) })
     }
 
     @Test fun sharpenKeepsTheRadiusAndUnsharpMaskShowsAlightsRedMask() {

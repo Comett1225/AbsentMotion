@@ -559,6 +559,11 @@ ORDER = ["cube", "box", "hollowbox", "cylinder", "ellipsoid", "torus", "pyramid"
 
 
 STANDARD_STYLE = {"id": "style", "label": "Style", "type": "choice", "default": 0, "options": ["Classic", "Standard"], "when": {"style": [1]}}
+STANDARD_EXTRA = {"tunnel": [{"id": "wrapStyle", "label": "Style", "type": "choice", "default": 0, "options": ["Classic", "Standard"], "when": {"wrapStyle": [2]}},
+                             dict(number("depth", "Depth", 0.3, 0, 100), when={"wrapStyle": [1]})],
+                  "flip": [dict(number("alZ", "Position Z", 0, -100000, 100000), when={"style": [1]})],
+                  "rasterextrude": [dict({"id": "alLight", "label": "Direction", "type": "point", "default": [75, -75], "min": -100000, "max": 100000, "step": 1}, when={"style": [1]}),
+                                    dict(number("alElev", "Elevation", 100, -100000, 100000, 0.1), when={"style": [1]})]}
 
 STANDARD = {
     'cube': [
@@ -585,19 +590,320 @@ STANDARD = {
         ('    float dist = max(2.0 + 40.0 * pow(1.0 - clamp(perspective, 0.0, 1.0), 3.0), rb + 0.5);\n    float3 rw = normalize(float3((coord - size * 0.5 - position) / unit, dist));\n',
          '    float dist = max(2.0 + 40.0 * pow(1.0 - clamp(perspective, 0.0, 1.0), 3.0), rb + 0.5);\n    float3 rw = normalize(float3((coord - size * 0.5 - position * (style > 0.5 ? scale : 1.0)) / unit, dist));\n'),
     ],
+    'rasterextrude': [
+        ('uniform float scale;\n',
+         'uniform float scale;\nuniform float style;\nuniform float2 alLight;\nuniform float alElev;\n'),
+        ('float alpha(float2 q, float2 h) {',
+         'float4 alShade(float4 c, float3 n) {\n    float3 l = normalize(float3(alLight, -4.1 * alElev));\n    float d = max(dot(n, l), 0.0);\n    float g = shine * pow(d, max(glossiness, 0.0001));\n    float3 lc = float3(lightColor.rgb);\n    return float4(c.rgb * (shading * mix(d, 1.0, ambient) * (1.0 - 0.1 * shine) * (1.0 - g)) * lc + g * lc * c.a, c.a);\n}\n\nfloat alpha(float2 q, float2 h) {'),
+        ('    c = shade(c, normalize(m * n), -rw);\n',
+         '    c = style > 0.5 ? alShade(c, normalize(m * n)) : shade(c, normalize(m * n), -rw);\n'),
+    ],
     'starprism': [
         ('uniform float scale;\n',
          'uniform float scale;\nuniform float style;\n'),
         ('    float dist = max(2.0 + 40.0 * pow(1.0 - clamp(perspective, 0.0, 1.0), 3.0), rb + 0.5);\n    float3 rw = normalize(float3((coord - size * 0.5 - position) / unit, dist));\n',
          '    float dist = max(2.0 + 40.0 * pow(1.0 - clamp(perspective, 0.0, 1.0), 3.0), rb + 0.5);\n    float3 rw = normalize(float3((coord - size * 0.5 - position * (style > 0.5 ? scale : 1.0)) / unit, dist));\n'),
     ],
+    'flip': [
+        ('uniform float scale;\n',
+         'uniform float scale;\nuniform float style;\nuniform float alZ;\n'),
+        ('    float3 pv = float3(pivot / unit, pivotDepth);\n    float3 ro = (float3(0.0, 0.0, -dist) - pv) * m;\n',
+         '    float3 pv = float3(pivot / unit, pivotDepth);\n    if (style > 0.5) {\n        float3 bh = float3(h, 0.0096);\n        float3 rl = (float3(0.0, 0.0, -dist - alZ) - pv) * m + pv;\n        float3 rdl = rw * m;\n        float3 inv = 1.0 / max(abs(rdl), float3(0.000001)) * sign(rdl + 0.0000001);\n        float3 lo = min((-bh - rl) * inv, (bh - rl) * inv);\n        float3 hi = max((-bh - rl) * inv, (bh - rl) * inv);\n        float tn = max(max(lo.x, lo.y), lo.z);\n        if (tn > min(min(hi.x, hi.y), hi.z) || tn <= 0.0) return half4(0.0);\n        float3 q = rl + rdl * tn;\n        bool face = lo.z >= max(lo.x, lo.y);\n        float4 c = tex(face ? q.xy / h * 0.5 + 0.5 : float2(0.5 - q.y / h.y * 0.5, 0.5 + q.z / bh.z * 0.5), h);\n        if (face && rdl.z < 0.0 && back > 1.5) c = float4(backColor.rgb * backColor.a, backColor.a);\n        else if (face && rdl.z < 0.0 && back > 0.5) c = tex(float2(0.5 - q.x / h.x * 0.5, 0.5 + q.y / h.y * 0.5), h);\n        return half4(shade(c, normalize(m * (face ? float3(0.0, 0.0, -sign(rdl.z)) : float3(sign(q.x), 0.0, 0.0))), -rw));\n    }\n    float3 ro = (float3(0.0, 0.0, -dist) - pv) * m;\n'),
+    ],
     'tunnel': [
         ('uniform float scale;\n',
-         'uniform float scale;\nuniform float style;\n'),
+         'uniform float scale;\nuniform float style;\nuniform float wrapStyle;\nuniform float depth;\n'),
         ('half4 main(float2 coord) {\n',
-         'half4 main(float2 coord) {\n    if (style > 0.5) {\n        float2 n = (coord - size * 0.5 - position) / max(size * 0.5 * scale, float2(0.5));\n        float r = length(n);\n        if (r > 0.995) return half4(0.0);\n        float4 shade = float4(fogColor.rgb * fogColor.a, fogColor.a);\n        if (r < 0.0001) return half4(shade);\n        float g = 1.0 / r + phase + time * speed;\n        float2 q = 0.5 + 0.5 * float2(-abs(n.x), n.y) / r * g;\n        q = 1.0 - abs(1.0 - mod(q, 2.0));\n        float4 c = pic(q);\n        return half4(mix(c, shade, 1.0 - exp(-0.45 * fog * (1.0 / r - 1.0))));\n    }\n'),
+         'half4 main(float2 coord) {\n    if (style > 0.5 && wrapStyle > 0.5) {\n        float2 n = (coord - size * 0.5 - position) / max(size * 0.5 * scale, float2(0.5));\n        float r = length(n);\n        if (r > 1.0) return half4(0.0);\n        float a = (atan(n.x, -n.y) + radians(twist) * r) * max(floor(repeat + 0.5), 1.0) / (2.0 * PI);\n        float2 q = 1.0 - abs(1.0 - mod(float2(2.0 * depth / max(r, 0.0001) + 1.0 + phase + time * speed, a), 2.0));\n        return half4(mix(float4(fogColor.rgb * fogColor.a, fogColor.a), pic((q - 0.5) * 0.995 + 0.5), clamp(1.0 - fog * (1.0 - r), 0.0, 1.0)));\n    }\n    if (style > 0.5) {\n        float2 n = (coord - size * 0.5 - position) / max(size * 0.5 * scale, float2(0.5));\n        float r = length(n);\n        if (r > 0.995) return half4(0.0);\n        float4 shade = float4(fogColor.rgb * fogColor.a, fogColor.a);\n        if (r < 0.0001) return half4(shade);\n        float g = 1.0 / r + phase + time * speed;\n        float2 q = 0.5 + 0.5 * float2(-abs(n.x), n.y) / r * g;\n        q = 1.0 - abs(1.0 - mod(q, 2.0));\n        float4 c = pic(q);\n        return half4(mix(c, shade, 1.0 - exp(-0.45 * fog * (1.0 / r - 1.0))));\n    }\n'),
     ],
 }
+
+
+ALIGHT_PARAMS = [{"id": "alight", "label": "Style", "type": "choice", "default": 0, "options": ["Classic", "Standard"], "when": {"alight": [1]}},
+                 dict(number("alZ", "Position Z", 600, -100000, 100000, 1), when={"alight": [1]}),
+                 dict({"id": "alLight", "label": "Direction", "type": "point", "default": [75, -75], "min": -100000, "max": 100000, "step": 1}, when={"alight": [1]}),
+                 dict(number("alElev", "Elevation", 100, -100000, 100000, 0.1), when={"alight": [1]})]
+
+ALIGHT_EXTRA = {"octahedron": [dict(number("alHeight", "Height", 1, 0.0001, 100000), when={"alight": [1]})],
+                "box": [{"id": "faceStyle", "label": "Style", "type": "choice", "default": 0, "options": ["Classic", "Standard"], "when": {"faceStyle": [2]}},
+                        {"id": "lightStyle", "label": "Style", "type": "choice", "default": 0, "options": ["Classic", "Standard"], "when": {"lightStyle": [2]}}]}
+
+ALIGHT_POST = {"pyramid": [("    float4 col = alShade(surface(p, n), normalize(m * n));", "    float4 col = alShade(surfaceV(p, n, rd), normalize(m * n));")],
+               "box": [("float4 alShade(float4 c, float3 n) {\n",
+                        "float4 alShade(float4 c, float3 n) {\n    if (lightStyle > 0.5) return float4(min(c.rgb * c.rgb / max(c.a, 0.0001) * 1.49, float3(c.a)), c.a);\n")]}
+
+ALIGHT_MAIN = """
+float4 alShade(float4 c, float3 n) {
+    float3 l = normalize(float3(alLight, -4.1 * alElev));
+    float d = max(dot(n, l), 0.0);
+    float g = shine * pow(d, max(glossiness, 0.0001));
+    float3 lc = float3(lightColor.rgb);
+    return float4(c.rgb * (shading * mix(d, 1.0, ambient) * (1.0 - 0.1 * shine) * (1.0 - g)) * lc + g * lc * c.a, c.a);
+}
+
+half4 alMain(float2 coord) {
+    float f = size.y;
+    float3 rw = normalize(float3((coord - size * 0.5) / (f * max(scale, 0.0001)), 1.0));
+    float3 c = float3(position.x, 100.0 - position.y, alZ + 100.0) / 100.0;
+    float rb = bound() * 1.02 + 0.02;
+    float b = -dot(c, rw);
+    float disc = b * b - dot(c, c) + rb * rb;
+    if (disc <= 0.0) return half4(0.0);
+    float3x3 m = orient * turn();
+    float3 ro = -c * m;
+    float3 rd = rw * m;
+    float far = -b + sqrt(disc);
+    float t = max(-b - sqrt(disc), 0.0);
+    float px = f * scale / rw.z;
+    float best = 1e9;
+    float tb = t;
+    bool hit = false;
+    for (int i = 0; i < STEPS; i++) {
+        float h = map(ro + rd * t);
+        float g = h * px / max(t, 0.0001);
+        if (g < best) { best = g; tb = t; }
+        if (g < 0.2) { hit = true; break; }
+        t += h * 0.9;
+        if (t > far) break;
+    }
+    if (!hit && best >= EDGE) return half4(0.0);
+    if (!hit) t = tb;
+    float e = max(0.5 * t / px, 0.00005);
+    float3 p = ro + rd * t;
+    float3 n = normal(p, e);
+    if (!hit) p -= n * map(p);
+    float4 col = alShade(surface(p, n), normalize(m * n));
+    return half4(hit ? col : col * FADE);
+}
+"""
+
+
+def edged(main, hard=False):
+    main = main if hard else main.replace("if (g < 0.2) { hit = true; break; }", "if (g < 0.05) { hit = true; break; }")
+    return main.replace("EDGE", "1.5" if hard else "0.5").replace("FADE", "1.0" if hard else "(0.5 - best)")
+
+
+ALIGHT = {
+    "cube": [],
+    "ellipsoid": [("float3 radii() { return radius * float3(1.0, squeezeRatio, flattenRatio); }",
+                   "float3 radii() { return radius * (alight > 0.5 ? float3(squeezeRatio, flattenRatio, 1.0) : float3(1.0, squeezeRatio, flattenRatio)); }"),
+                  ("    float3 q = normalize(p / radii());", "    float3 q = normalize(alight > 0.5 ? p : p / radii());")],
+    "hexprism": [("    float3 k = float3(-0.8660254, 0.5, 0.57735);\n    p = abs(p);\n",
+                  "    float3 k = float3(-0.8660254, 0.5, 0.57735);\n    p = abs(alight > 0.5 ? p.xzy : p);\n"),
+                 ("float4 surface(float3 p, float3 n) { return front(p, n, radius * 1.1547); }",
+                  "float4 surface(float3 p, float3 n) {\n    if (alight > 0.5 && abs(n.y) > 0.7) return wrap(float2(0.5 + p.x / (4.0 * radius), 0.5 - p.z / (4.0 * radius)));\n    if (alight > 0.5) return wrap(float2(0.5 + atan(p.x, -p.z) / (2.0 * PI), 0.5 + p.y / (2.0 * depth)));\n    return front(p, n, radius * 1.1547);\n}")],
+    "starprism": [("    if (starStyle > 0.5) return pointed(",
+                   "    if (alight > 0.5) { float k = floor(points + 0.0001); return extrude(star(p.xy, radius, radius * 0.4985 / sin(PI / k + 0.5231), k), p.z, depth, 0.0); }\n    if (starStyle > 0.5) return pointed("),
+                  ("float4 surface(float3 p, float3 n) { return front(p, n, radius); }",
+                   "float4 surface(float3 p, float3 n) {\n    if (alight > 0.5) {\n        float2 f = float2(0.45 + 0.5607 * p.x / radius, 0.5496 + 0.5607 * p.y / radius);\n        float d = 0.3735 * p.z / max(depth, 0.0001);\n        if (abs(n.z) < 0.5 && abs(n.x) * 1.1 > abs(n.y)) f.x = 0.45 + sign(n.x) * d;\n        if (abs(n.z) < 0.5 && abs(n.x) * 1.1 <= abs(n.y)) f.y = 0.5496 + sign(n.y) * d;\n        return wrap(f);\n    }\n    return front(p, n, radius);\n}")],
+    "octahedron": [("float bound() { return radius; }", "float bound() { return alight > 0.5 ? radius * max(alHeight, 1.0) : radius; }"),
+                   ("float map(float3 p) {\n    p = abs(p);\n",
+                    "float map(float3 p) {\n    if (alight > 0.5) { float h = max(alHeight, 0.0001); p = abs(p); return (p.x + p.y / h + p.z - radius) / sqrt(2.0 + 1.0 / (h * h)); }\n    p = abs(p);\n"),
+                   ("float4 surface(float3 p, float3 n) { return facet(p, n, radius * 0.6); }",
+                    "float4 surface(float3 p, float3 n) {\n    float3 q = abs(p) / (radius * float3(1.0, max(alHeight, 0.0001), 1.0));\n    if (alight > 0.5) return wrap(float2(0.9971 * (0.5 * q.y + q.z) + 0.0005, 0.867 * (1.0 - q.y) + 0.0006));\n    return facet(p, n, radius * 0.6);\n}")],
+    "pyramid": [("float bound() { return length(float3(base, height * 0.5, base)); }",
+                 "float bound() { return alight > 0.5 ? base * max(height, 1.0) : length(float3(base, height * 0.5, base)); }"),
+                ("float map(float3 p) { float s = 2.0 * base;",
+                 "float map(float3 p) {\n    if (alight > 0.5) { float k = 1.0 / max(height, 0.0001); return max((abs(p.x) + abs(p.z) - p.y * k - base) / sqrt(2.0 + k * k), p.y); }\n    float s = 2.0 * base;"),
+                ("float4 surface(float3 p, float3 n) { return boxFace(p, n, float3(base, height * 0.5, base)); }",
+                 "float4 surface(float3 p, float3 n) { return boxFace(p, n, float3(base, height * 0.5, base)); }\nfloat4 surfaceV(float3 p, float3 n, float3 rd) {\n    float3 q = abs(p) / (base * float3(1.0, max(height, 0.0001), 1.0));\n    float2 f = float2(0.9971 * (0.5 * q.y + q.z) + 0.0005, 0.867 * (1.0 - q.y) + 0.0006);\n    float v = clamp(2.0 - 3.3 * rd.y, 0.0, 1.0);\n    float t = 0.0115 * v;\n    float w = 0.8 * v * (1.0 - min(q.y * q.y / max(t * t, 0.00000001), 1.0));\n    return wrap(mix(f, float2(0.5 + 0.5 * (p.x - p.z) / base, 0.5 + 0.5 * (p.x + p.z) / base), w));\n}")],
+    "spherize": [("float4 surface(float3 p, float3 n) {\n    float3 q = normalize(p);\n",
+                  "float4 surface(float3 p, float3 n) {\n    float3 q = normalize(p);\n    if (alight > 0.5) return wrap(float2(0.5 + atan(q.x, -q.z) / (2.0 * PI), acos(clamp(-q.y, -1.0, 1.0)) / PI));\n")],
+    "torus": [("float map(float3 p) { return length(float2(length(p.xy) - radius, p.z)) - thickness; }",
+               "float map(float3 p) { if (alight > 0.5) p = p.xzy; return length(float2(length(p.xy) - radius, p.z)) - thickness; }"),
+              ("float4 surface(float3 p, float3 n) {\n    return wrap(",
+               "float4 surface(float3 p, float3 n) {\n    if (alight > 0.5) return wrap(float2(0.5 - atan(p.x, -p.z) / PI, 0.25 - atan(-p.y, length(p.xz) - radius) / (2.0 * PI)));\n    return wrap(")],
+    "cylinder": [("float bound() { return length(float2(radius, height)); }",
+                  "float rad() { return alight > 0.5 ? 2.0 * radius : radius; }\nfloat bound() { return length(float2(rad(), height)); }"),
+                 ("    float r = smoothing * min(radius, height) * 0.5;\n    float2 d = float2(length(p.xz) - radius + r,",
+                  "    float r = smoothing * min(rad(), height) * 0.5;\n    float2 d = float2(length(p.xz) - rad() + r,"),
+                 ("float2(p.x, n.y < 0.0 ? -p.z : p.z) / radius * 0.5 + 0.5", "float2(p.x, n.y < 0.0 ? -p.z : p.z) / rad() * 0.5 + 0.5")],
+    "cross": [("float bound() { return length(float3(reach, thickness, thickness)); }\nfloat map(float3 p) {\n    float r = smoothing * thickness * 0.5;\n    return min(sdRoundBox(p, float3(reach, thickness, thickness), r), min(sdRoundBox(p, float3(thickness, reach, thickness), r),\n        sdRoundBox(p, float3(thickness, thickness, reach), r)));",
+               "float bar() { return alight > 0.5 ? thickness * reach : thickness; }\nfloat bound() { return length(float3(reach, bar(), bar())); }\nfloat map(float3 p) {\n    float w = bar();\n    float r = smoothing * w * 0.5;\n    return min(sdRoundBox(p, float3(reach, w, w), r), min(sdRoundBox(p, float3(w, reach, w), r),\n        sdRoundBox(p, float3(w, w, reach), r)));")],
+    "hollowbox": [("float3 dims() { float side", "float3 dims() { if (alight > 0.5) return float3(width, height, depth); float side"),
+                  ("float hole(float3 p) { float3 h = dims();", "float hole(float3 p) { if (alight > 0.5) return 1e9; float3 h = dims();"),
+                  ("    if (abs(n.y) > 0.7 || abs(hole(p)) < abs(sdBox(p, h))) return inside();", "    if (alight < 0.5 && (abs(n.y) > 0.7 || abs(hole(p)) < abs(sdBox(p, h)))) return inside();"),
+                  ("    float f = size.x / max(2.0 * width * min(size.x, size.y) * 0.5 * scale, 1.0);",
+                   "    float f = size.x / max(alight > 0.5 ? 2.0 * width * size.y * scale / max(alZ / 100.0 + 1.0 - depth, 0.1) : 2.0 * width * min(size.x, size.y) * 0.5 * scale, 1.0);")],
+    "heart": [("float bound() { return length(float2(heartSize * 0.7, depth)); }",
+               "float bound() { return alight > 0.5 ? heartSize * 1.75 + 0.6 : length(float2(heartSize * 0.7, depth)); }"),
+              ("float map(float3 p) {\n    float s = heartSize;",
+               'float map(float3 p) {\n    if (alight > 0.5) {\n        float k = heartSize / 15.0 * 1.0055;\n        float3 q = float3(p.x, -p.y - 0.5011, p.z - 0.0036) / k;\n        float x = abs(q.x);\n        float y = 3.9351 + 1.2106 * q.y - 1.0126 * x * sqrt(max((20.0 - x) / 15.0, 0.0));\n        return (length(float3(x, y, q.z * (2.015 - 0.1211 * y / 15.0))) - 15.0) * k * 0.3;\n    }\n    float s = heartSize;'),
+              ("float4 surface(float3 p, float3 n) { return front(p, n, heartSize * 0.62); }",
+               'float4 surface(float3 p, float3 n) {\n    if (alight > 0.5) {\n        float3 q = float3(p.x, -p.y - 0.5011, p.z - 0.0036) / (heartSize / 15.0 * 1.0055);\n        return pic(fract(float2((q.x < 0.0 ? -1.0 : 1.0) * (0.1182 - 6.14 * atan(1.2 * abs(q.x), 0.5 - q.z) / (2.0 * PI)), 0.5326 - 0.169 * q.y)));\n    }\n    return front(p, n, heartSize * 0.62);\n}')],
+    "box": [("float3 dims() { float side", "float3 dims() { if (alight > 0.5) return float3(width, height, depth); float side"),
+            ("float4 surface(float3 p, float3 n) { return boxFace(p, n, dims()); }",
+             "float4 surface(float3 p, float3 n) { return boxFace(p, n, alight > 0.5 && faceStyle < 0.5 ? float3(1.0) : dims()); }")],
+}
+
+
+AL_LIGHT = [dict(number("intensity", "Light Intensity", 1, 0, 10), section="light"), dict(number("shine", "Shine", 0.8, 0, 1), section="light"),
+            dict(number("spec", "Specularity", 30, 0.1, 500, 0.1), section="light"), dict(number("ambient", "Ambient", 0.1, 0, 1), section="light"),
+            dict(colour("lightColor", "Color", "#ffffffff"), section="light"),
+            dict({"id": "lightDir", "label": "Direction", "type": "point", "default": [75, -75], "min": -100000, "max": 100000, "step": 1}, section="light"),
+            dict(number("lightDepth", "Elevation", 100, -100000, 100000, 0.1), section="light")]
+AL_TEXTURE = [dict({"id": "texMirror", "label": "Mirror", "type": "switch", "default": False}, section="texture"),
+              dict(number("texRepeatX", "Repeat X", 1, 0.01, 100), section="texture"), dict(number("texRepeatY", "Repeat Y", 1, 0.01, 100), section="texture"),
+              dict(angle("texAngle", "Texture Angle", 0), section="texture"), dict(number("texCrop", "Crop", 1, 0.01, 100), section="texture")]
+AL_TURN = [angle("orientA", "Orientation \u03b1", 0), angle("orientB", "Orientation \u03b2", 0), angle("orientG", "Orientation \u03b3", 0)] + turns(0, 0)
+AL_PLACE = [{"id": "position", "label": "Position", "type": "point", "default": [0, 100], "min": -100000, "max": 100000, "step": 1},
+            number("alZ", "Position Z", 600, -100000, 100000, 1), number("scale", "Scale", 1, 0.01, 100)]
+
+AL_CORE = """
+float3x3 euler(float3 d) {
+    float3 a = radians(d);
+    float cx = cos(a.x), sx = sin(a.x), cy = cos(a.y), sy = sin(a.y), cz = cos(a.z), sz = sin(a.z);
+    return float3x3(cz, -sz, 0.0, sz, cz, 0.0, 0.0, 0.0, 1.0) * float3x3(cy, 0.0, sy, 0.0, 1.0, 0.0, -sy, 0.0, cy) *
+        float3x3(1.0, 0.0, 0.0, 0.0, cx, -sx, 0.0, sx, cx);
+}
+
+float3x3 turn() { return euler(float3(orientA, orientB, orientG)) * euler(float3(rotX, rotY, rotZ)); }
+
+float4 pic(float2 uv) {
+    return float4(image.eval(clamp(uv * size, float2(0.5), max(size - 0.5, float2(0.5)))));
+}
+
+float4 wrap(float2 uv) {
+    float t = radians(texAngle);
+    float2 q = uv - 0.5;
+    q = float2(cos(t) * q.x + sin(t) * q.y, cos(t) * q.y - sin(t) * q.x) * float2(texRepeatX, texRepeatY) + 0.5;
+    float2 f = fract(q);
+    if (texMirror > 0.5) f = mix(f, 1.0 - f, mod(floor(q), 2.0));
+    return pic((f - 0.5) / max(texCrop, 0.0001) + 0.5);
+}
+
+float4 alShade(float4 c, float3 n) {
+    float3 l = normalize(float3(lightDir, -4.1 * lightDepth));
+    float d = max(dot(n, l), 0.0);
+    float g = shine * pow(d, max(spec, 0.0001));
+    float3 lc = float3(lightColor.rgb);
+    return float4(c.rgb * (intensity * mix(d, 1.0, ambient) * (1.0 - 0.1 * shine) * (1.0 - g)) * lc + g * lc * c.a, c.a);
+}
+
+float3 normal(float3 p, float e) {
+    float2 k = float2(1.0, -1.0);
+    return normalize(k.xyy * map(p + k.xyy * e) + k.yyx * map(p + k.yyx * e) + k.yxy * map(p + k.yxy * e) + k.xxx * map(p + k.xxx * e));
+}
+"""
+
+
+def alight_solid(key, name, description, dims, code, steps=128):
+    params = AL_TURN + dims + AL_PLACE + AL_LIGHT + AL_TEXTURE
+    main = edged(ALIGHT_MAIN[ALIGHT_MAIN.index("half4 alMain"):].replace("half4 alMain(float2 coord)", "half4 main(float2 coord)").replace("STEPS", str(steps)))
+    sksl = uniforms(params) + "\nconst float PI = 3.14159265;\n" + code.split("//CORE")[0] + AL_CORE + code.split("//CORE")[1] + main
+    return key, name, description, params, sksl
+
+
+ALIGHT_EFFECTS = [
+    alight_solid("ring", "Ring", "Wraps the layer around a ring with flat faces, like a short pipe, with light and depth.",
+                 [number("radius", "Radius", 100, 0, 100000, 0.1), number("thickness", "Width", 10, 0, 100000, 0.1), number("height", "Length", 50, 0, 100000, 0.1),
+                  number("smoothing", "Smoothing", 0, 0, 1, 0.001)], """
+float map(float3 p) {
+    float3 q = p * 100.0;
+    float s = smoothing * min(thickness, height) * 0.5;
+    float r = length(q.xz);
+    float2 w = float2(max(r - radius, radius - thickness - r), abs(q.y) - height) + s;
+    return (min(max(w.x, w.y), 0.0) + length(max(w, 0.0)) - s) / 100.0;
+}
+//CORE
+float bound() { return length(float2(radius, height)) / 100.0 + 0.01; }
+float4 surface(float3 p, float3 n) {
+    float3 q = p * 100.0;
+    float c = max(radius * 4.0 / 3.0, 0.0001);
+    if (abs(n.y) > 0.7) return wrap(float2(0.5 + q.x / c, 0.5 + sign(n.y) * q.z / c));
+    return wrap(float2(0.5 + (atan(-q.x, q.z) - PI) * radius / 200.0, 0.5 + q.y / 200.0));
+}
+"""),
+]
+
+
+STAR_STANDARD = alight_solid("starpolyhedron", "", "",
+    [number("starSize", "Size", 50, 0, 100000, 0.1), number("depth", "Depth", 50, -100000, 100000, 0.1),
+     number("pointLength", "Point Length", 100, 0, 100000, 0.1), number("smoothing", "Smoothing", 0, 0, 1, 0.001),
+     number("points", "Points", 5, 2, 100, 1)], """
+float starOuter() { return starSize * (0.8 + pointLength / 100.0); }
+float starPoint(float3 q, float w, float ro, float h) {
+    return max(-q.y, (abs(q.x) / w + q.y / ro + abs(q.z) / h - 1.0) / length(float3(1.0 / w, 1.0 / ro, 1.0 / h)));
+}
+float map(float3 p) {
+    if (depth * starSize <= 0.0 || starSize <= 0.0) return 1.0;
+    float3 q = p * 100.0 * float3(1.0, -1.0, 1.0);
+    float w = max(starSize, 0.001);
+    float ro = max(starOuter(), 0.001);
+    float h = max(0.84 * depth * starSize / 100.0, 0.001);
+    float sec = 2.0 * PI / max(floor(points + 0.0001), 2.0);
+    float a = atan(q.x, q.y);
+    float a0 = floor(a / sec + 0.5) * sec;
+    float r = length(q.xy);
+    float d = 1e9;
+    for (int k = -1; k <= 1; k++) {
+        float b = a - a0 - float(k) * sec;
+        d = min(d, starPoint(float3(r * sin(b), r * cos(b), q.z), w, ro, h));
+    }
+    return d / 100.0;
+}
+//CORE
+float bound() { return max(starOuter(), abs(depth * starSize / 100.0)) / 100.0 + 0.01; }
+float4 surface(float3 p, float3 n) {
+    float3 q = p * 100.0;
+    float th = 1.52 * starSize;
+    return wrap(float2(0.5 + q.x / (th * size.x / size.y), 0.5 + q.y / th));
+}
+""")
+
+
+STAR_ON = True
+STAR_NEW = {"rotX": 0, "rotY": 0, "position": [0, 100], "scale": 3, "shine": 0.8, "texMirror": False, "texRepeatX": 1, "texRepeatY": 1, "texAngle": 0}
+STAR_RENAMED = {"position": "alPos", "scale": "alScale", "shine": "alShine", "ambient": "alAmbient", "lightColor": "alColor", "texMirror": "alMirror",
+                "texRepeatX": "alRepeatX", "texRepeatY": "alRepeatY", "texAngle": "alTexAngle", "texCrop": "alCrop", "depth": "starDepth"}
+STAR_FUNCS = ["euler", "turn", "pic", "wrap", "alShade", "normal", "map", "bound", "surface", "starOuter", "main"]
+
+
+def star_combined(old_params, old_sksl):
+    import re
+    key, name, description, params, sksl = STAR_STANDARD
+    new = []
+    for p in params:
+        p = dict(p)
+        if p["id"] in ("rotX", "rotY", "rotZ"):
+            continue
+        if p["id"] == "alZ": p["default"] = 500
+        if p["id"] == "scale": p["default"] = 3
+        if p["id"] in STAR_RENAMED: p["id"] = STAR_RENAMED[p["id"]]
+        if p["id"] in STAR_NEW.values() and False: pass
+        new.append(dict(p, when={"style": [1]}) if "when" not in p else p)
+    for old, ren in STAR_RENAMED.items():
+        sksl = re.sub(r"\b%s\b" % old, ren, sksl)
+    for f in STAR_FUNCS:
+        sksl = re.sub(r"\b%s\(" % f, f + "S(", sksl)
+    sksl = sksl.replace("alZ + 100.0) / 100.0;", "alZ + 100.0) / 100.0 + float3(0.0, 0.05, 0.0);")
+    sksl = sksl.replace("const float PI", "const float PIS").replace("PI ", "PIS ").replace("PI)", "PIS)").replace("PI;", "PIS;")
+    body = sksl[sksl.index("\n\n") + 2:]
+    olds = [dict(p, when={"style": [0]}) if "when" not in p and p["id"] not in ("rotX", "rotY", "rotZ") else p for p in old_params]
+    rot = [dict(p, default=0, legacyDefault=p["default"]) if p["id"] in ("rotX", "rotY") else p for p in olds if p["id"] in ("rotX", "rotY", "rotZ")]
+    rest = [p for p in olds if p["id"] not in ("rotX", "rotY", "rotZ")]
+    style = {"id": "style", "label": "Style", "type": "choice", "default": 1, "options": ["Classic", "Standard"], "legacyDefault": 0, "when": {"style": [0]}}
+    orient = [p for p in new if p["id"].startswith("orient")]
+    shape = [p for p in new if not p["id"].startswith("orient")]
+    sec = lambda ps, k: [p for p in ps if p.get("section") == k]
+    plain = lambda ps: [p for p in ps if "section" not in p]
+    allp = orient + rot + plain(shape) + plain(rest) + sec(shape, "light") + sec(rest, "light") + sec(shape, "texture") + sec(rest, "texture") + [style]
+    assert len(allp) == len(orient + rot + shape + rest) + 1
+    head = uniforms(allp)
+    old_body = old_sksl[len(uniforms(old_params)):]
+    old_body = old_body.replace("half4 main(float2 coord) {", "half4 main(float2 coord) {\n    if (style > 0.5) return mainS(coord);", 1)
+    return allp, head + body + old_body
+
+
+def alightened(sksl, edits, steps, hard=False):
+    for before, after in edits:
+        assert sksl.count(before) == 1, before
+        sksl = sksl.replace(before, after)
+    front = ""
+    head = "half4 shape(float2 coord)" if "half4 shape(float2 coord)" in sksl else "half4 main(float2 coord)"
+    assert sksl.count(head) == 1
+    sksl = sksl.replace(head, front + edged(ALIGHT_MAIN.replace("STEPS", str(steps)), hard) + "\n" + head + " {\n    if (alight > 0.5) return alMain(coord);", 1)
+    return sksl.replace(head + " {\n    if (alight > 0.5) return alMain(coord); {", head + " {\n    if (alight > 0.5) return alMain(coord);", 1)
 
 
 def main():
@@ -606,9 +912,20 @@ def main():
     for key in ORDER:
         name, description, params, sksl = found[key]
         if key in STANDARD:
-            params = params + [STANDARD_STYLE]
+            params = params + [STANDARD_STYLE] + STANDARD_EXTRA.get(key, [])
             for before, after in STANDARD[key]:
                 assert sksl.count(before) == 1, (key, before)
+                sksl = sksl.replace(before, after)
+        if key == "starpolyhedron" and STAR_ON:
+            params, sksl = star_combined(params, sksl)
+            description = "Puts the layer on a star whose points rise to a ridge in front and behind, with light and depth."
+        if key in ALIGHT:
+            extra = ALIGHT_EXTRA.get(key, [])
+            params = params + ALIGHT_PARAMS + extra
+            sksl = sksl.replace("uniform float time;\n", "uniform float time;\nuniform float alight;\nuniform float alZ;\nuniform float2 alLight;\nuniform float alElev;\n" + "".join(f"uniform float {p['id']};\n" for p in extra), 1)
+            sksl = alightened(sksl, ALIGHT[key], 128, key in ("ellipsoid", "spherize"))
+            for before, after in ALIGHT_POST.get(key, []):
+                assert sksl.count(before) == 1, before
                 sksl = sksl.replace(before, after)
         effect = {"id": key, "name": name, "category": "3d", "since": SINCE, "description": description, "params": params, "sksl": sksl}
         if key in SHORTCUTS:
@@ -620,8 +937,17 @@ def main():
                 sys.exit(f"{path.name} is out of date: run python3 tools/gen_3d_effects.py")
         else:
             path.write_text(text)
+    for key, name, description, params, sksl in ALIGHT_EFFECTS:
+        effect = {"id": key, "name": name, "category": "3d", "since": "5.3.2", "description": description, "params": params, "sksl": sksl}
+        text = json.dumps(effect, indent=1, ensure_ascii=False) + "\n"
+        path = PACK / f"{key}.json"
+        if "--check" in sys.argv:
+            if not path.exists() or path.read_text() != text:
+                sys.exit(f"{path.name} is out of date: run python3 tools/gen_3d_effects.py")
+        else:
+            path.write_text(text)
     index = json.loads((PACK / "index.json").read_text())
-    missing = [k for k in ORDER if k not in index]
+    missing = [k for k in ORDER + [e[0] for e in ALIGHT_EFFECTS] if k not in index]
     if missing and "--check" in sys.argv:
         sys.exit("index.json misses " + " ".join(missing))
     if missing:

@@ -30,9 +30,16 @@ class MoveEffectsTest {
     @Test fun theMoveCategoryHoldsTheMotionEffects() {
         val moves = catalog.listed("move").map { it.key }.toSet()
         assertEquals(setOf("autoshake", "randomdisplace", "randomjitter", "oscillate", "swing", "spin", "pulsesize", "pulseopacity",
-            "stretchaxis", "offset", "rastertransform", "movealongpath", "scaleassist", "parenthelper", "echo", "timequant", "shutterblur"), moves)
+            "stretchaxis", "offset", "rastertransform", "movealongpath", "scaleassist", "parenthelper", "facetrack", "echo", "timequant", "shutterblur"), moves)
         assertEquals(setOf("stretchaxis", "offset", "rastertransform"), catalog.listed("move").filterNot { it.native && it.sksl == null }.map { it.key }.toSet())
         assertEquals("Move", EffectCatalog.Categories["move"])
+    }
+
+    @Test fun faceTrackingIsFoundAsFaceTrackingAndFaceMotion() {
+        for (query in listOf("face tracking", "Face motion", "face")) assertEquals(query, "facetrack", catalog.search(query).first().key)
+        val face = catalog.find("absent.facetrack")!!
+        assertEquals("5.3.2", face.since)
+        assertEquals(listOf(row("Zoom", "float", "1.000000", "0.1..10.0", "%"), row("Position", "point", "0.500000,0.500000", "0.0..1.0"), row("Smoothing", "float", "0.300000", "0.0..1.0", "%")), params("facetrack"))
     }
 
     private fun params(key: String) = catalog.find("absent.$key")!!.params.map { p ->
@@ -46,7 +53,7 @@ class MoveEffectsTest {
         assertEquals(listOf(row("Magnitude", "float", "50.000000", "0.0..2000.0"), row("Frequency", "float", "2.000000", "0.0..16.0", "Hz"),
             row("Evolution", "float", "0.000000", "0.0..2000.0"), row("Seed", "float", "0.000000", "0.0..5.0"), row("Angle", "angle", "45.000000", "-3600.0..3600.0"),
             row("Slack", "float", "0.250000", "0.0..1.0", "%"), row("Z Shake", "float", "0.000000", "0.0..2000.0"),
-            row("Pattern", "choice", "1.000000", "Classic/Standard")), params("autoshake"))
+            row("Pattern", "choice", "1.000000", "Classic/Standard"), row("Style", "choice", "0.000000", "Classic/Standard")), params("autoshake"))
         assertEquals(listOf(row("Magnitude", "float", "50.000000", "0.0..2000.0"), row("Evolution", "float", "0.000000", "0.0..2000.0"),
             row("Seed", "float", "0.000000", "0.0..5.0"), row("Scatter", "float", "0.500000", "0.0..2.0", "%"),
             row("Speed", "float", "1.000000", "0.0..50.0"), row("Style", "choice", "1.000000", "Classic/Standard")), params("randomdisplace"))

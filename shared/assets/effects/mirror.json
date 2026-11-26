@@ -2,6 +2,9 @@
  "id": "mirror",
  "name": "Mirror",
  "category": "repeat",
+ "also": [
+  "distort"
+ ],
  "description": "Reflects one half of the image across a mirror line defined by an angle and a center point.",
  "params": [
   {

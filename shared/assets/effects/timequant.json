@@ -1,7 +1,13 @@
 {
  "id": "timequant",
- "name": "Frame Rate",
+ "name": "Time Quantization",
+ "aliases": [
+  "Frame Rate"
+ ],
  "category": "move",
+ "also": [
+  "other"
+ ],
  "since": "3.0.0",
  "native": true,
  "description": "Makes this layer move at a lower frame rate, like choppy or stop-motion footage.",

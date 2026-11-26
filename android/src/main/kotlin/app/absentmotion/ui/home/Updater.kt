@@ -641,7 +641,7 @@ internal object Updater {
         context.applicationContext.getSystemService(ConnectivityManager::class.java).isActiveNetworkMetered
     }.getOrNull()
 
-    private fun online(app: Context): Boolean? = runCatching {
+    fun online(app: Context): Boolean? = runCatching {
         val connectivity = app.getSystemService(ConnectivityManager::class.java)
         connectivity.getNetworkCapabilities(connectivity.activeNetwork)?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
     }.getOrNull()

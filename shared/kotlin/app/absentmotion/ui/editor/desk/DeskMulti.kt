@@ -150,6 +150,8 @@ internal fun DeskMulti(state: EditorState, modifier: Modifier) {
         MultiTile(PanelIcons.PaintBucket, R.string.structure_paste_fill_color, some && style, if (style) null else noStyle) { paste(setOf(StylePart.ColorFill)) },
         MultiTile(PanelIcons.BorderShadow, R.string.structure_paste_border_shadow, some && style, if (style) null else noStyle) { paste(setOf(StylePart.BorderShadow)) },
         MultiTile(PanelIcons.Blending, R.string.structure_paste_blending, some && style, if (style) null else noStyle) { paste(setOf(StylePart.Blending)) },
+        MultiTile(PanelIcons.Effects, R.string.effects_paste_effects, some && style, if (style) null else noStyle) { paste(setOf(StylePart.Effects)) },
+        MultiTile(PanelIcons.Animate, R.string.structure_paste_motions, some && style, if (style) null else noStyle) { paste(setOf(StylePart.Motions)) },
         MultiTile(ChromeIcons.CopyPaste, R.string.structure_paste_style, some && style, if (style) null else noStyle) { paste(StylePart.entries.toSet()) },
         MultiTile(PanelIcons.AudioMuted, R.string.structure_remove_audio_all, layers.any { it.mediaFill?.video == true }, noSound) {
             val n = state.removeAudioOfChosen()

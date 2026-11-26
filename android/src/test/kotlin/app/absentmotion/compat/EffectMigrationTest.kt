@@ -53,7 +53,7 @@ class EffectMigrationTest {
           <shape id="1" label="Backdrop card" startTime="0" endTime="1999" fillType="color" s=".rect">
             <fillColor value="#ff2a6f97" />
             <effect id="${foreign("backdrop", "fill")}" locallyApplied="false"><property name="fill" type="float" value="0.000000" /></effect>
-            <effect id="${foreign("blur", "strength")}" locallyApplied="false">
+            <effect id="${foreign("gaussianblur", "strength")}" locallyApplied="false">
               <property name="strength" type="float"><kf t="0.000000" v="0.200000" /><kf t="1.000000" v="0.800000" e="cubicBezier 0.42 0 0.58 1" /></property>
             </effect>
             <effect id="${foreign("sharpen", "strength")}" hidden="true" locallyApplied="false">
@@ -99,10 +99,10 @@ class EffectMigrationTest {
               <property name="color" type="color" value="#ffffffff" /><property name="blend" type="float" value="1.000000" />
               <property name="alpha" type="float" value="0.800000" /><property name="outsideAlpha" type="float" value="0.000000" />
             </effect>
-            <effect id="${foreign("huesaturation", "vib")}" locallyApplied="false">
+            <effect id="${foreign("saturationvibrance", "vib")}" locallyApplied="false">
               <property name="saturation" type="float" value="1.000000" /><property name="vib" type="float" value="0.400000" />
             </effect>
-            <effect id="${foreign("huesaturation", "hue")}" locallyApplied="false">
+            <effect id="${foreign("hueshift", "hue")}" locallyApplied="false">
               <property name="hue" type="float"><kf t="0.100000" v="10.000000" /><kf t="0.900000" v="200.000000" e="elastic 0.25 1 0.5 1" /></property>
             </effect>
             <property name="size" type="vec2" value="320.000000,180.000000" />
@@ -117,7 +117,7 @@ class EffectMigrationTest {
                   <property name="threshold" type="float" value="0.400000" /><property name="feather" type="float" value="0.100000" />
                   <property name="invert" type="bool" value="true" /><property name="blendMode" type="int" value="0" />
                 </effect>
-                <effect id="${foreign("gradientmap", "squeeze")}" locallyApplied="false">
+                <effect id="${foreign("spectralmap", "squeeze")}" locallyApplied="false">
                   <property name="blueColor" type="color" value="#ff0000ff" /><property name="greenColor" type="color" value="#ff00ff00" />
                   <property name="redColor" type="color" value="#ffff0000" /><property name="saturation" type="float" value="1.000000" />
                   <property name="scaleBrightness" type="bool" value="false" /><property name="phase" type="float" value="0.250000" />
@@ -171,8 +171,8 @@ class EffectMigrationTest {
         val result = migration.migrate(Scene.parse(scene))
         val ids = effects(result.scene.node).map { it["id"] }
         assertEquals(
-            listOf("backdrop", "blur", "sharpen", "gradientoverlay", "exposure", "splittone", "fourcolor", "colorwheels", "lightglow", "softglow",
-                "huesaturation", "huesaturation", "temperature", "threshold", "gradientmap", "blink", "solid", "stretch").map { "absent.$it" } +
+            listOf("backdrop", "gaussianblur", "sharpen", "gradientoverlay", "exposure", "splittone", "fourcolor", "colorwheels", "lightglow", "softglow",
+                "saturationvibrance", "hueshift", "temperature", "threshold", "spectralmap", "blink", "solid", "stretch").map { "absent.$it" } +
                 listOf("example.effects.unknown", "absent.blur"),
             ids,
         )
@@ -324,10 +324,10 @@ class EffectMigrationTest {
         fun own(key: String, nth: Int = 0) = all.filter { it["id"] == "absent.$key" }[nth]
 
         close(0f, own("backdrop").number("mix"))
-        val blur = own("blur").prop("strength").keyframes
+        val blur = own("gaussianblur").prop("strength").keyframes
         assertEquals(listOf(0f, 1f), blur.map { it.t })
-        close(expected("blur", "strength", 0.2f), blur[0].v.toFloat())
-        close(expected("blur", "strength", 0.8f), blur[1].v.toFloat())
+        close(expected("gaussianblur", "strength", 0.2f), blur[0].v.toFloat())
+        close(expected("gaussianblur", "strength", 0.8f), blur[1].v.toFloat())
         assertNull(blur[0].e)
         assertEquals("cubicBezier 0.42 0 0.58 1", blur[1].e)
 
@@ -374,23 +374,18 @@ class EffectMigrationTest {
         close(expected("lightglow", "strength", 0.4f), own("lightglow").number("blur"))
         close(0.2f, own("softglow").number("diffusion"))
 
-        val vibrance = own("huesaturation", 0)
-        close(expected("huesaturation", "vib", 0.4f), vibrance.number("vibrance"))
-        close(0f, vibrance.number("hue"))
-        val shift = own("huesaturation", 1)
-        close(1f, shift.number("saturation"))
-        close(0f, shift.number("lightness"))
-        val keys = shift.prop("hue").keyframes
+        close(expected("saturationvibrance", "vib", 0.4f), own("saturationvibrance").number("vibrance"))
+        val keys = own("hueshift").prop("hue").keyframes
         assertEquals(listOf(0.1f, 0.9f), keys.map { it.t })
-        close(expected("huesaturation", "hue", 200f), keys[1].v.toFloat())
+        close(expected("hueshift", "hue", 200f), keys[1].v.toFloat())
         assertEquals("elastic 0.25 1 0.5 1", keys[1].e)
 
         close(expected("temperature", "temperature", 4.5f), own("temperature").number("kelvin"))
         assertEquals("true", own("threshold").prop("invert")["value"])
         close(0.4f, own("threshold").number("level"))
-        assertEquals("true", own("gradientmap").prop("reverse")["value"])
-        assertEquals("false", own("gradientmap").prop("scaleBrightness")["value"])
-        assertEquals("#ff0000ff", own("gradientmap").prop("color1")["value"])
+        assertEquals("true", own("spectralmap").prop("reverse")["value"])
+        assertEquals("false", own("spectralmap").prop("scaleBrightness")["value"])
+        assertEquals("#ff0000ff", own("spectralmap").prop("blueColor")["value"])
         close(3f, own("blink").number("frequency"))
         close(expected("solid", "blendMode", 1f), own("solid").number("blend"))
         close(0.75f, own("solid").number("amount"))
@@ -444,7 +439,7 @@ class EffectMigrationTest {
             val definition = catalog.find(effect["id"]!!)!!
             for (p in effect.children) assertEquals("${definition.key}.${p["name"]}", definition.params.single { it.id == p["name"] }.type, p["type"])
         }
-        assertEquals(mapOf("magnitude" to 50f, "frequency" to 2f, "evolution" to 0f, "seed" to 0f, "angle" to 45f, "slack" to 0.25f, "zshake" to 0f, "pattern" to 1f), numbers("autoshake"))
+        assertEquals(mapOf("magnitude" to 50f, "frequency" to 2f, "evolution" to 0f, "seed" to 0f, "angle" to 45f, "slack" to 0.25f, "zshake" to 0f, "pattern" to 1f, "style" to 1f), numbers("autoshake"))
         assertEquals(mapOf("progress" to 0f, "orientation" to 0f, "inset" to 0f, "style" to 1f), numbers("movealongpath"))
         assertEquals("true", own("movealongpath").prop("rotate")["value"])
         assertEquals(mapOf("seamFeather" to 0f, "style" to 1f), numbers("offset"))
@@ -477,7 +472,7 @@ class EffectMigrationTest {
             """<effect id="com.alightcreative.effects.flicker2" locallyApplied="true"><property name="freq" type="float" value="3.73" /><property name="basis" type="int" value="$basis" /></effect></shape></scene>"""))
         val time = flicker(0)
         assertTrue(time.dropped.isEmpty())
-        assertEquals(listOf("speed", "intensity", "seed", "style"), time.scene.node.children.single().children.single().children.map { it["name"] })
+        assertEquals(listOf("speed", "intensity", "seed", "style", "wave"), time.scene.node.children.single().children.single().children.map { it["name"] })
         assertEquals(setOf("Flicker: basis"), flicker(1).dropped)
     }
 }

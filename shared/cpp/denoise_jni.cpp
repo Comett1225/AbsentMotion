@@ -2,7 +2,9 @@
 #include <cstdlib>
 #include <cstdint>
 #include <mutex>
+#include <vector>
 #include "rnnoise.h"
+#include "deepfilter/deepfilter.h"
 
 static std::mutex noiseMutex;
 
@@ -40,4 +42,33 @@ Java_app_absentmotion_ai_NoiseReduction_nativeProcess(JNIEnv* env, jobject, jlon
 extern "C" JNIEXPORT void JNICALL
 Java_app_absentmotion_ai_NoiseReduction_nativeDestroy(JNIEnv*, jobject, jlong handle) {
     if (handle) rnnoise_destroy(reinterpret_cast<DenoiseState*>(static_cast<intptr_t>(handle)));
+}
+
+extern "C" JNIEXPORT jlong JNICALL
+Java_app_absentmotion_ai_NoiseReduction_nativeOpenModel(JNIEnv* env, jobject, jbyteArray model) {
+    const jsize size = model ? env->GetArrayLength(model) : 0;
+    std::vector<std::uint8_t> bytes(size);
+    if (size) env->GetByteArrayRegion(model, 0, size, reinterpret_cast<jbyte*>(bytes.data()));
+    if (env->ExceptionCheck()) return 0;
+    return reinterpret_cast<intptr_t>(deepfilter::Denoiser::Load(bytes.data(), bytes.size()).release());
+}
+
+extern "C" JNIEXPORT jfloatArray JNICALL
+Java_app_absentmotion_ai_NoiseReduction_nativeModelProcess(JNIEnv* env, jobject, jlong handle, jfloatArray pcm) {
+    if (!handle || !pcm || env->GetArrayLength(pcm) != deepfilter::kHop) {
+        env->ThrowNew(env->FindClass("java/lang/IllegalArgumentException"), "The noise model needs 480 mono samples");
+        return nullptr;
+    }
+    float input[deepfilter::kHop], output[deepfilter::kHop];
+    env->GetFloatArrayRegion(pcm, 0, deepfilter::kHop, input);
+    if (env->ExceptionCheck()) return nullptr;
+    reinterpret_cast<deepfilter::Denoiser*>(static_cast<intptr_t>(handle))->Process(input, output);
+    auto result = env->NewFloatArray(deepfilter::kHop);
+    if (result) env->SetFloatArrayRegion(result, 0, deepfilter::kHop, output);
+    return result;
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_app_absentmotion_ai_NoiseReduction_nativeCloseModel(JNIEnv*, jobject, jlong handle) {
+    delete reinterpret_cast<deepfilter::Denoiser*>(static_cast<intptr_t>(handle));
 }

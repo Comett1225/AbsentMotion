@@ -2,6 +2,9 @@
  "id": "softglow",
  "name": "Soft Glow",
  "category": "stylize",
+ "also": [
+  "color"
+ ],
  "description": "Screens a soft, blurred copy of the picture over it for a dreamy glow, mostly from the highlights.",
  "params": [
   {

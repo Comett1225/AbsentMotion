@@ -150,7 +150,8 @@ class DeskWindowTest {
             assertEquals(listOf("New Project… Ctrl+N", "Settings… Ctrl+,", "", "-Import Media…", "Import Project…", "Import project from link", "Link Media Folder…", "", "-Export… Ctrl+E", "-Close Project Ctrl+W") + if (DeskOs.mac) emptyList() else listOf("", "Quit Ctrl+Q"), labels["File"])
             assertEquals(listOf("-Play", "-Go to Start", "-Go to End", "", "-Previous Bookmark Alt+←", "-Next Bookmark Alt+→"), labels["Playback"])
             assertEquals(listOf("Zoom In Ctrl+=", "Zoom Out Ctrl+-", "-Actual Size Ctrl+0"), labels["View"])
-            assertEquals(9, labels["Edit"]!!.size)
+            assertEquals(10, labels["Edit"]!!.size)
+            assertTrue("-Paste Style" in labels["Edit"]!!)
             assertEquals(listOf("AbsentMotion Help", "About AbsentMotion", "Crash Logs"), labels["Help"])
         }
     }

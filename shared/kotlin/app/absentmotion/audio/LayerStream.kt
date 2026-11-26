@@ -13,7 +13,23 @@ internal fun MutableMap<Long, LayerStream>.dropFailed() {
     values.removeAll { stream -> stream.failed.also { if (it) stream.close() } }
 }
 
-internal class LayerStream(val uri: String, startMs: Double, val loopMs: Double? = null, private val open: () -> PcmSource) {
+internal fun MutableMap<Long, LayerStream>.keepFor(clips: List<AudioClip>, t0: Double, silent: (String) -> Boolean, open: (AudioClip) -> PcmSource) {
+    val wanted = HashSet<Long>()
+    for (clip in clips) {
+        if (t0 + LayerStream.AHEAD_MS < clip.startMs || t0 > clip.endMs + LayerStream.BEHIND_MS || silent(clip.uri)) continue
+        wanted += clip.id
+        val (pos, early) = clip.cue(t0)
+        val loopMs = clip.inMs.takeIf { clip.loop }
+        var s = this[clip.id]
+        var tries = 0
+        if (s != null && (s.uri != clip.uri || s.loopMs != loopMs || s.retryDue())) { if (s.failed && s.uri == clip.uri) tries = s.tries + 1; s.close(); s = null }
+        if (s == null) this[clip.id] = LayerStream(clip.uri, pos - LayerStream.LEAD_MS, loopMs, tries) { open(clip) }
+        else if (early) s.prepare(pos)
+    }
+    keys.filter { it !in wanted }.forEach { remove(it)?.close() }
+}
+
+internal class LayerStream(val uri: String, startMs: Double, val loopMs: Double? = null, val tries: Int = 0, private val open: () -> PcmSource) {
     private val lock = ReentrantLock()
     private val changed = lock.newCondition()
     private var ring = ShortArray(0)
@@ -39,6 +55,9 @@ internal class LayerStream(val uri: String, startMs: Double, val loopMs: Double?
     @Volatile private var closed = false
     @Volatile var failed = false
         private set
+    @Volatile private var failedAt = 0L
+
+    fun retryDue(now: Long = System.nanoTime()): Boolean = failed && tries < MAX_TRIES && now - failedAt >= RETRY_NS shl tries
 
     private val voice = Voice()
 
@@ -83,6 +102,7 @@ internal class LayerStream(val uri: String, startMs: Double, val loopMs: Double?
                 if (placed && append(chunk, handled)) keepHead(false)
             }
         } catch (e: Exception) {
+            failedAt = System.nanoTime()
             failed = true
             lock.withLock { changed.signalAll() }
             Log.w("AMAudio", "Cannot decode $uri", e)
@@ -279,6 +299,10 @@ internal class LayerStream(val uri: String, startMs: Double, val loopMs: Double?
 
     companion object {
         const val LEAD_MS = 20.0
+        const val AHEAD_MS = 1500.0
+        const val BEHIND_MS = 300.0
+        const val RETRY_NS = 500_000_000L
+        const val MAX_TRIES = 3
         private const val HEAD_MS = 1000
         private const val KEEP = 64L
         private const val INV = 1f / 32768f

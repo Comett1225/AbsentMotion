@@ -604,6 +604,19 @@ bool ParseLayer(const XmlNode& node, int fps, Layer* out) {
                 }
                 effect.props.push_back({StrAttr(*p, "name"), StrAttr(*p, "type"), ParseAnim(p.get()), std::move(text)});
             }
+            for (const auto& p : c->children) if (p->name == "facepath") {
+                Property path{"facepath", "path", {}, ""};
+                const std::vector<float> v = ParseValue(p->attr("path"));
+                for (size_t i = 0; i + 3 < v.size(); i += 4) {
+                    if (std::isfinite(v[i]) && std::isfinite(v[i + 1]) && std::isfinite(v[i + 2]) && v[i + 3] > 0) path.anim.keys.push_back({v[i], {v[i + 1], v[i + 2], v[i + 3]}, Easing{}});
+                }
+                std::stable_sort(path.anim.keys.begin(), path.anim.keys.end(), [](const Keyframe& x, const Keyframe& y) { return x.t < y.t; });
+                Property base{"facebase", "path", {}, ""};
+                base.anim.value = {strtof(StrAttr(*p, "size").c_str(), nullptr), (float)IntAttr(*p, "w", 0), (float)IntAttr(*p, "h", 0)};
+                effect.props.push_back(std::move(path));
+                effect.props.push_back(std::move(base));
+                break;
+            }
             l.effects.push_back(std::move(effect));
         }
         if (c->name != "property") continue;
@@ -763,11 +776,12 @@ void DrawMedia(SkCanvas* canvas, const Layer& layer, const SkPath& path, float o
     const SkRect bounds = path.getBounds();
     if (bounds.isEmpty()) return;
     const SkRect dst = MediaRect(layer, bounds, image->width(), image->height());
+    const bool hard = layer.alight && path.isRect(nullptr);
     SkPaint paint;
-    paint.setAntiAlias(true);
+    paint.setAntiAlias(!hard);
     paint.setAlphaf(std::clamp(opacity, 0.0f, 1.0f));
     canvas->save();
-    canvas->clipPath(path, true);
+    canvas->clipPath(path, !hard);
     const float density = canvas->getTotalMatrix().getMinScale() * dst.width() / std::max(image->width(), 1);
     const bool minified = !layer.alight && density > 0 && density < 0.25f && (image->hasMipmaps() || !image->isTextureBacked());
     canvas->drawImageRect(image, dst, minified ? SkSamplingOptions(SkFilterMode::kLinear, SkMipmapMode::kLinear) : SkSamplingOptions(SkFilterMode::kLinear), &paint);

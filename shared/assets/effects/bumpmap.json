@@ -2,6 +2,9 @@
  "id": "bumpmap",
  "name": "Bump Map",
  "category": "stylize",
+ "also": [
+  "color"
+ ],
  "since": "3.0.0",
  "description": "Lights the layer as if its brightness were a raised surface, for an embossed, textured look that keeps the colors.",
  "params": [

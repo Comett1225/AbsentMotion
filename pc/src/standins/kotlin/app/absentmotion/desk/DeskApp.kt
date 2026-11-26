@@ -62,8 +62,6 @@ import app.absentmotion.editor.ElementNav
 import app.absentmotion.editor.MultiSelect
 import app.absentmotion.editor.PreviewCache
 import app.absentmotion.engine.EngineThread
-import app.absentmotion.fonts.FontName
-import app.absentmotion.model.fontNames
 import app.absentmotion.i18n.Ltr
 import app.absentmotion.export.DeskExports
 import app.absentmotion.export.ExportRun
@@ -162,14 +160,12 @@ class DeskAppState {
     var newProjectTick by mutableIntStateOf(0)
     val canStartProject: Boolean get() = editor == null && editingTemplate == null && exportingFromList == null && DeskModals.open == 0
     var saveFailed by mutableStateOf(false)
-    var fontOffer by mutableStateOf<Pair<EditorState, List<String>>?>(null)
     var afterClose: (() -> Unit)? = null
     var hidden by mutableStateOf(false)
     var quitAsk by mutableStateOf(false)
     var quitNow: (() -> Unit)? = null
     var job: Job? = null
     private var closeAnyway = false
-    private val fontsDeclined = HashSet<String>()
     private val closeLock = Mutex()
     private val openLock = Mutex()
     private val background = MainScope()
@@ -275,32 +271,13 @@ class DeskAppState {
         val scene = load(id) ?: return null
         addedEffects.confirmMissing(scene, id)
         val saver = ProjectSaver(id, store, recovery, failed = { javax.swing.SwingUtilities.invokeLater { toast(R.string.home_save_project_failed) } })
-        return EditorState(id, scene, store, engine, settings, saver).also { DeskLibrary.open(id, it.scene.media.map { m -> m.uri }); editor = it; offerFonts(it) }
+        return EditorState(id, scene, store, engine, settings, saver).also { DeskLibrary.open(id, it.scene.media.map { m -> m.uri }); editor = it; installFonts(it) }
     }
 
-    private fun offerFonts(state: EditorState) {
+    private fun installFonts(state: EditorState) {
         val library = engine.fonts ?: return
-        if (System.getProperty("am.fontOffer") == "off" || state.projectId in fontsDeclined) return
-        background.launch {
-            val missing = withContext(Dispatchers.IO) {
-                if (System.getProperty("am.fontOffer") == "offline") state.project.fontNames().filter { FontName.parse(it).source == "googlefonts" && library.localFile(it) == null }
-                else library.fetchMissing(state.project)
-            }
-            if (missing.isNotEmpty() && editor === state) fontOffer = state to missing
-        }
-    }
-
-    fun declineFonts(state: EditorState) {
-        fontsDeclined += state.projectId
-        fontOffer = null
-    }
-
-    fun downloadFonts(names: List<String>) {
-        fontOffer = null
-        val library = engine.fonts ?: return
-        background.launch {
-            if (names.count { library.resolve(it, download = true) == null } > 0) toast(R.string.font_load_failed_body)
-        }
+        if (System.getProperty("am.fontOffer") == "off") return
+        background.launch { library.fetchMissing(state.project) { delay(60_000); editor === state } }
     }
 
     fun closeAnyway() { saveFailed = false; closeAnyway = true; closeSoon() }
@@ -629,7 +606,6 @@ private fun DeskContent(app: DeskAppState, scale: Float) {
                 homeFree = open == null && first == null && !app.opening && app.editingTemplate == null && app.exportingFromList == null && PresetSharing.preset == null && app.recovered == null && app.imported.isEmpty() && !app.settingsOpen && Updates.answer == null && whatsNew == null && !FfampOffer.pending(app.settings),
                 onOpen = { id -> run { app.openNow(id) } }, onCloseEditor = { scope.launch { app.closeEditor() } }, onChanged = { app.projectsChanged++ },
             )
-            app.fontOffer?.takeIf { it.first === open }?.let { (state, names) -> DeskFontOffer(names, { app.downloadFonts(names) }) { app.declineFonts(state) } }
             if (app.saveFailed && open != null) DeskSaveFailed(app)
             if (app.quitAsk) DeskQuitAsk(app)
             UpdateDialog(app::requestQuit)

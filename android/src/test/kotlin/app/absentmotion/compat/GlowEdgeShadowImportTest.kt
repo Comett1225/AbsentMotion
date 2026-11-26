@@ -30,6 +30,12 @@ class GlowEdgeShadowImportTest {
         }
     }
 
+    @Test fun radialShadowLightMovesInThousandthsOfTheScene() {
+        val light = migrate("effects.radialshadow2", "light" to "-100,50").text("light")!!.split(',').map { it.trim().toFloat() }
+        close(0.5f - 108f / 220f, light[0])
+        close(0.5f + 54f / 165f, light[1])
+    }
+
     @Test fun longShadowTakesOneSamplePerPixelOfLength() {
         for (id in listOf("effects.longshadow", "effects.longshadow2")) {
             val set = migrate(id, "size" to "0.3625")
@@ -115,16 +121,17 @@ class GlowEdgeShadowImportTest {
         close(1.25f, migrate("effects.softglow", "brightness" to "1.25").number("brightness"))
     }
 
-    @Test fun contourStripsStackFromHalfAGapLower() {
+    @Test fun contourStripsUseAlightsLayout() {
         val plain = migrate("effects.contourstrips")
         close(1f, plain.number("style"))
-        close(0.5f, plain.number("phase"))
-        close(250.5f, migrate("effects.contourstrips", "phase" to "250").number("phase"))
+        close(1f, plain.number("alight"))
+        close(0.3f, migrate("effects.contourstrips", "phase" to "0.3").number("phase"))
     }
 
-    @Test fun cmykDotsAreHardAndSizedByTheScene() {
+    @Test fun cmykDotsUseAlightsScreensAndCellCount() {
         val plain = migrate("effects.halftonedotscmyk")
         close(1f, plain.number("style"))
-        close(200f * 220f / 1080f, migrate("effects.halftonedotscmyk", "amount" to "200").number("amount"))
+        close(1f, plain.number("alight"))
+        close(200f, migrate("effects.halftonedotscmyk", "amount" to "200").number("amount"))
     }
 }
