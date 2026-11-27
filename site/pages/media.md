@@ -29,13 +29,13 @@ Select a video or sound clip and tap **Speed** (the first small button of the to
 - The buttons at the top set the start or the end of the clip to the playhead **without** trimming the video: the speed changes so that the same part of the video fits the new length. Only the buttons that fit where the playhead is are shown: **Extend the start to the playhead** before the clip, **Trim start** and **Trim end** inside it, **Extend the end to the playhead** after it.
 - The ruler sets one speed for the whole clip, from 0.05x to 100x. Drag it sideways; it clicks at 1x.
 - The box next to the ruler shows the speed and a small picture that changes with it: a snail, a turtle, a walking person, a rabbit, a horse and, at the top, a cheetah. Double-tap the box to type an exact value.
-- Under the ruler are the chips **Smooth**, **Reverse** and **Freeze Frame**. They are described below.
+- Under the ruler are the chips **Smooth**, **Reverse**, **Freeze Frame** and **Keep Pitch**. They are described below.
 
 ![The Time Remapping panel, Normal tab: the tabs (1), the buttons that set the start or the end (2), the ruler with the speed (3) and Smooth, Reverse and Freeze Frame (4).](img/media-speed.webp)
 
 When the clip has a curve, the ruler shows its average speed. Changing it makes the whole curve faster or slower and keeps its shape.
 
-The sound of a clip follows its speed, so its pitch changes with it.
+The sound of a clip follows its speed, so its pitch changes with it. Turn on **Keep Pitch** to keep its pitch instead: the sound is stretched to the new length.
 
 ### Curve
 

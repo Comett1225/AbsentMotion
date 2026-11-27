@@ -2,6 +2,9 @@
  "id": "feather",
  "name": "Feather",
  "category": "key",
+ "also": [
+  "opacity"
+ ],
  "since": "3.0.0",
  "description": "Softens the alpha edges of the layer, fading them in from the outline. More Iterations make a smoother, deeper fade. Classic style: Inward fades into the existing outline; Blur Alpha also spreads the softened edge outside it.",
  "params": [

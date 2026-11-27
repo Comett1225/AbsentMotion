@@ -1483,6 +1483,9 @@
     <string name="effects_visibility">Keterlihatan</string>
     <string name="effects_reorder">Susun Semula</string>
     <string name="speed_freeze_frame">Bekukan Bingkai</string>
+    <string name="speed_keep_pitch">Kekalkan Pic</string>
+    <string name="landscape_unlocked">Landskap dibuka</string>
+    <string name="gpu_software_fallback">Permulaan terakhir ranap dalam pemacu grafik, jadi AbsentMotion kini melukis tanpa kad grafik (lebih perlahan). Mengemas kini pemacu grafik mungkin membetulkannya.</string>
     <string name="speed_reverse">Songsang</string>
     <string name="speed_reverse_remove_ai">Buang Licin dan Tingkatkan daripada klip ini sebelum menyongsangkannya</string>
     <string name="speed_seconds">Saat</string>

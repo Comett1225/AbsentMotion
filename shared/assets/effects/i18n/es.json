@@ -10,7 +10,9 @@
   "move": "Movimiento",
   "new": "Nuevos",
   "noise": "Ruido",
+  "opacity": "Opacidad",
   "other": "Otros",
+  "procedural": "Procedimental",
   "repeat": "Repetición",
   "stylize": "Estilizar",
   "text": "Texto"
@@ -2619,6 +2621,13 @@
     "span": {
      "label": "Longitud"
     },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Clásico",
+      "Estándar"
+     ]
+    },
     "to": {
      "label": "Fin"
     },
@@ -2946,7 +2955,7 @@
    }
   },
   "fontweight": {
-   "description": "Define qué tan gruesas son las letras, de finas a pesadas, y se puede animar con fotogramas clave. Funciona con fuentes variables, que guardan todos los grosores en un solo archivo: Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display y Dancing Script en la lista de fuentes, o una fuente variable que importes. Las fuentes con grosores fijos conservan su propio aspecto.",
+   "description": "Define qué tan gruesas son las letras, de finas a pesadas, y se puede animar con fotogramas clave. Funciona con fuentes variables, que guardan todos los grosores en un solo archivo: Roboto, Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display y Dancing Script en la lista de fuentes, o una fuente variable que importes. Las fuentes con grosores fijos conservan su propio aspecto.",
    "name": "Grosor de la fuente",
    "params": {
     "weight": {
@@ -3238,6 +3247,13 @@
     },
     "refraction": {
      "label": "Refracción"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Clásico",
+      "Estándar"
+     ]
     },
     "tint": {
      "label": "Tinte"
@@ -4647,6 +4663,9 @@
       "Clásico",
       "Estándar"
      ]
+    },
+    "importProfile": {
+     "label": "Perfil de importación"
     }
    }
   },
@@ -5441,6 +5460,13 @@
     "specularity": {
      "label": "Especularidad"
     },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Clásico",
+      "Estándar"
+     ]
+    },
     "useLuma": {
      "label": "Usar luminancia de capa"
     }
@@ -5547,6 +5573,12 @@
       "Clásico",
       "Estándar"
      ]
+    },
+    "rollAlpha": {
+     "label": "Alfa"
+    },
+    "frontShadow": {
+     "label": "Sombra frontal"
     }
    }
   },
@@ -6761,6 +6793,13 @@
     },
     "roll": {
      "label": "Alabeo"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Clásico",
+      "Estándar"
+     ]
     },
     "yaw": {
      "label": "Guiñada"
@@ -9320,6 +9359,13 @@
    "description": "Rellena las partes opacas de la capa con ruido fractal suave, para nubes, humo o un mapa de brillo.",
    "name": "Turbulencia",
    "params": {
+    "alight": {
+     "label": "Estilo",
+     "options": [
+      "Clásico",
+      "Estándar"
+     ]
+    },
     "alpha": {
      "label": "Alfa"
     },
@@ -9894,6 +9940,8 @@
      "label": "Disposición",
      "options": [
       "Clásico",
+      "Estándar",
+      "Estándar",
       "Estándar"
      ]
     }

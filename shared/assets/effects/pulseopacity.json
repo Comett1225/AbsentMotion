@@ -2,6 +2,9 @@
  "id": "pulseopacity",
  "name": "Pulse Opacity",
  "category": "move",
+ "also": [
+  "opacity"
+ ],
  "since": "3.0.0",
  "native": true,
  "description": "Fades the layer out and in over and over, on a sine or triangle wave.",

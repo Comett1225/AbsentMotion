@@ -6,7 +6,7 @@ import app.absentmotion.pc.engine.DesktopNative
 class NativeEngine(backend: Backend = Backend.GANESH) : AutoCloseable {
     enum class Backend { GRAPHITE, GANESH, GL }
 
-    private var handle = DesktopNative.create()
+    private var handle = GpuGuard.create()
     val failed: Boolean get() = false
     val info: String get() = "{\"backend\":\"desktop\"}"
     val displayTiming: Boolean get() = false

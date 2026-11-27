@@ -49,17 +49,17 @@ COMMON_SCRIPTS = ("cyrillic",)
 def static(directory, stem):
     return {"dir": directory, "files": {(400, 0): stem + "-Regular.ttf", (700, 0): stem + "-Bold.ttf"}}
 
-def variable(directory, file, italic=None):
+def variable(directory, file, italic=None, keep_weight=False):
     files = {(400, 0): file, (700, 0): file}
     if italic:
         files.update({(400, 1): italic, (700, 1): italic})
-    return {"dir": directory, "files": files}
+    return {"dir": directory, "files": files, "keepWeight": keep_weight}
 
 def single(directory, file, **extra):
     return {"dir": directory, "files": {(400, 0): file}, **extra}
 
 BUILTIN = {
-    "Roboto": variable("ofl/roboto", "Roboto[wdth,wght].ttf"),
+    "Roboto": variable("ofl/roboto", "Roboto[wdth,wght].ttf", keep_weight=True),
     "Open Sans": variable("ofl/opensans", "OpenSans[wdth,wght].ttf"),
     "Inter": variable("ofl/inter", "Inter[opsz,wght].ttf"),
     "Montserrat": variable("ofl/montserrat", "Montserrat[wght].ttf"),
@@ -182,7 +182,7 @@ def covered(font, probe):
 def claimed_scripts(font):
     return sorted(code for code, probe in PROBES.items() if covered(font, probe))
 
-def build_font(data, weight, italic, scripts):
+def build_font(data, weight, italic, scripts, keep_weight=False):
     from fontTools import subset
     from fontTools.ttLib import TTFont
     from fontTools.varLib import instancer
@@ -192,7 +192,8 @@ def build_font(data, weight, italic, scripts):
         for axis in font["fvar"].axes:
             tag = axis.axisTag
             if tag == "wght":
-                limits[tag] = min(max(weight, axis.minValue), axis.maxValue)
+                if not keep_weight:
+                    limits[tag] = min(max(weight, axis.minValue), axis.maxValue)
             elif tag == "wdth":
                 limits[tag] = min(max(100, axis.minValue), axis.maxValue)
             elif tag == "slnt":
@@ -203,6 +204,10 @@ def build_font(data, weight, italic, scripts):
             font = instancer.instantiateVariableFont(font, limits, inplace=False, updateFontNames=True)
         except Exception:
             font = instancer.instantiateVariableFont(TTFont(io.BytesIO(data)), limits, inplace=False)
+        if keep_weight:
+            kept = io.BytesIO()
+            font.save(kept)
+            font = TTFont(io.BytesIO(kept.getvalue()))
     options = subset.Options()
     options.layout_features = ["*"]
     options.hinting = False
@@ -267,6 +272,9 @@ def fetch():
                 outputs = [("%s/%s-Variable%s.ttf" % (slug(family), slug(family), "Italic" if italic else ""), weights, source)]
             elif unmodified:
                 outputs = [(asset_name(family, w, italic), [w], source) for w in weights]
+            elif variable and spec.get("keepWeight"):
+                outputs = [("%s/%s-Variable%s.ttf" % (slug(family), slug(family), "Italic" if italic else ""), weights,
+                            build_font(source, None, italic, spec.get("scripts", ()), keep_weight=True))]
             else:
                 outputs = [(asset_name(family, w, italic), [w], build_font(source, w, italic, spec.get("scripts", ()))) for w in weights]
             for name, covers, data in outputs:
@@ -274,7 +282,7 @@ def fetch():
                 found = claimed_scripts(TTFont(io.BytesIO(data)))
                 claims = found if claims is None else sorted(set(claims) & set(found))
                 files[name] = {"weights": covers, "italic": italic, "source": file, "sourceSha256": sha256(source), "sha256": sha256(data),
-                               "bytes": len(data), "modified": not unmodified, "variable": unmodified and variable}
+                               "bytes": len(data), "modified": not unmodified, "variable": "-Variable" in name}
         manifest["builtin"][family] = {"dir": spec["dir"], "licence": licence[0], "licenceSha256": sha256(licence[1]),
                                        "category": spec.get("category", 0), "languages": claims, "files": files}
         print("%-18s %2d files %7d bytes  %s  scripts %s" % (family, len(files), sum(f["bytes"] for f in files.values()), "as published" if unmodified else "subset", claims))

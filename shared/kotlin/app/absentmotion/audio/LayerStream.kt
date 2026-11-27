@@ -245,7 +245,7 @@ internal class LayerStream(val uri: String, startMs: Double, val loopMs: Double?
 
     fun mix(
         dst: FloatArray, from: Int, to: Int, posMs: Double, stepMs: Double, g0: Float, g1: Float, quality: Int,
-        clipMs0: Double, dtMs: Double, clipLenMs: Double, waitUntil: Long = 0,
+        clipMs0: Double, dtMs: Double, clipLenMs: Double, waitUntil: Long = 0, keepPitch: Boolean = false,
     ): Boolean {
         val r = rate
         val count = to - from
@@ -256,7 +256,7 @@ internal class LayerStream(val uri: String, startMs: Double, val loopMs: Double?
         }
         val pos0 = posMs * r / 1000.0
         val step = stepMs * r / 1000.0
-        voice.begin(pos0, step, count)
+        voice.begin(pos0, step, count, if (keepPitch) dtMs * r / 1000.0 else 0.0)
         val ok = lock.withLock {
             keepFrom = voice.base - KEEP
             changed.signalAll()
@@ -298,7 +298,7 @@ internal class LayerStream(val uri: String, startMs: Double, val loopMs: Double?
     }
 
     companion object {
-        const val LEAD_MS = 20.0
+        const val LEAD_MS = 100.0
         const val AHEAD_MS = 1500.0
         const val BEHIND_MS = 300.0
         const val RETRY_NS = 500_000_000L
@@ -328,7 +328,7 @@ internal fun mixStreams(
             next = span.to
             val source = stream(clip) ?: break
             if (!span.inMedia) { source.restart(); continue }
-            if (source.mix(dst, span.from, span.to, span.pos, span.step, span.g0, span.g1, quality, span.clipMs0, dt, span.lengthMs, waitUntil)) rendered = true
+            if (source.mix(dst, span.from, span.to, span.pos, span.step, span.g0, span.g1, quality, span.clipMs0, dt, span.lengthMs, waitUntil, clip.keepPitch)) rendered = true
         }
         rack.finish(clip, out, frames, rendered)
     }

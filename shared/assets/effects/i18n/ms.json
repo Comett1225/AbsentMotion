@@ -10,7 +10,9 @@
   "move": "Gerak",
   "new": "Baharu",
   "noise": "Hingar",
+  "opacity": "Kelegapan",
   "other": "Lain-lain",
+  "procedural": "Prosedural",
   "repeat": "Ulangan",
   "stylize": "Gaya",
   "text": "Teks"
@@ -2619,6 +2621,13 @@
     "span": {
      "label": "Panjang"
     },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
+    },
     "to": {
      "label": "Tamat"
     },
@@ -2946,7 +2955,7 @@
    }
   },
   "fontweight": {
-   "description": "Menetapkan ketebalan huruf, daripada nipis hingga tebal, dan boleh dianimasikan dengan bingkai kunci. Berfungsi dengan fon boleh ubah, iaitu fon yang menyimpan semua ketebalan dalam satu fail: Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display dan Dancing Script dalam senarai fon, atau fon boleh ubah yang anda import. Fon dengan ketebalan tetap mengekalkan rupanya sendiri.",
+   "description": "Menetapkan ketebalan huruf, daripada nipis hingga tebal, dan boleh dianimasikan dengan bingkai kunci. Berfungsi dengan fon boleh ubah, iaitu fon yang menyimpan semua ketebalan dalam satu fail: Roboto, Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display dan Dancing Script dalam senarai fon, atau fon boleh ubah yang anda import. Fon dengan ketebalan tetap mengekalkan rupanya sendiri.",
    "name": "Ketebalan Fon",
    "params": {
     "weight": {
@@ -3238,6 +3247,13 @@
     },
     "refraction": {
      "label": "Pembiasan"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
     },
     "tint": {
      "label": "Tona"
@@ -4647,6 +4663,9 @@
       "Klasik",
       "Standard"
      ]
+    },
+    "importProfile": {
+     "label": "Profil Import"
     }
    }
   },
@@ -5441,6 +5460,13 @@
     "specularity": {
      "label": "Spekulariti"
     },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
+    },
     "useLuma": {
      "label": "Guna Luminans Lapisan"
     }
@@ -5547,6 +5573,12 @@
       "Klasik",
       "Standard"
      ]
+    },
+    "rollAlpha": {
+     "label": "Alfa"
+    },
+    "frontShadow": {
+     "label": "Bayang Hadapan"
     }
    }
   },
@@ -6761,6 +6793,13 @@
     },
     "roll": {
      "label": "Roll"
+    },
+    "style": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
     },
     "yaw": {
      "label": "Yaw"
@@ -9320,6 +9359,13 @@
    "description": "Mengisi bahagian legap lapisan dengan hingar fraktal licin, untuk awan, asap atau peta kecerahan.",
    "name": "Turbulensi",
    "params": {
+    "alight": {
+     "label": "Gaya",
+     "options": [
+      "Klasik",
+      "Standard"
+     ]
+    },
     "alpha": {
      "label": "Alfa"
     },
@@ -9894,6 +9940,8 @@
      "label": "Susun Atur",
      "options": [
       "Klasik",
+      "Standard",
+      "Standard",
       "Standard"
      ]
     }

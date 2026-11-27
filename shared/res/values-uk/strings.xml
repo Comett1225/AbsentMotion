@@ -1552,6 +1552,9 @@
     <string name="effects_visibility">Видимість</string>
     <string name="effects_reorder">Змінити порядок</string>
     <string name="speed_freeze_frame">Стоп-кадр</string>
+    <string name="speed_keep_pitch">Зберігати висоту</string>
+    <string name="landscape_unlocked">Альбомний режим розблоковано</string>
+    <string name="gpu_software_fallback">Під час останнього запуску стався збій графічного драйвера, тож AbsentMotion тепер малює без відеокарти (повільніше). Оновлення графічного драйвера може це виправити.</string>
     <string name="speed_reverse">Реверс</string>
     <string name="speed_reverse_remove_ai">Перед реверсом приберіть із цього кліпу «Згладити» і «Покращити»</string>
     <string name="speed_seconds">Секунди</string>

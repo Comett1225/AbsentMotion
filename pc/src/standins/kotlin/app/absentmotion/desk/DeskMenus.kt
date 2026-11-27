@@ -2,9 +2,12 @@ package app.absentmotion.desk
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.input.key.KeyShortcut
 import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.MenuBar
 import androidx.compose.ui.window.MenuScope
+
+private val DeskMenuItem.shortcut: KeyShortcut? get() = keys?.let { KeyShortcut(it.key, meta = it.command && DeskOs.mac, ctrl = it.command && !DeskOs.mac, alt = it.alt, shift = it.shift) }
 
 @Composable
 fun FrameWindowScope.DeskMenus(app: DeskAppState) {

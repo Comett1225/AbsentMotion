@@ -24,6 +24,8 @@ val Layer.gain: Float get() = element(GainRef)?.valueAt(t)?.finiteFloat() ?: 1f
 
 val XmlNode.mutes: Boolean get() = !isKeyframed && (this["value"]?.finiteFloat() ?: 1f) <= 0f
 
+val Layer.keepPitch: Boolean get() = node["keepPitch"] == "true"
+
 val Layer.soundUri: String? get() = if (kind == "audio") node["src"] else mediaFill?.takeIf { it.video }?.uri
 
 internal class AudioClip(layer: Layer, val uri: String, private val track: LayerTrack? = null, durationMs: Double = Double.POSITIVE_INFINITY) {
@@ -37,6 +39,7 @@ internal class AudioClip(layer: Layer, val uri: String, private val track: Layer
 
     fun resolveDuration(durationUs: Long) { if (durationUs > 0) sourceEndMs = durationUs / 1000.0 }
     val loop = layer.node["loop"] == "true"
+    val keepPitch = layer.keepPitch
     val fx = layer.audioEffects.spec()
     private val timing = VideoTiming(layer)
     private val gainLayer = layer

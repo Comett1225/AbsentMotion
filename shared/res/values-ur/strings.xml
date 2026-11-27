@@ -1506,6 +1506,9 @@
     <string name="effects_visibility">ویزیبلٹی</string>
     <string name="effects_reorder">ری آرڈر</string>
     <string name="speed_freeze_frame">فریز فریم</string>
+    <string name="speed_keep_pitch">پچ برقرار رکھیں</string>
+    <string name="landscape_unlocked">لینڈ اسکیپ ان لاک ہو گیا</string>
+    <string name="gpu_software_fallback">پچھلی بار شروع کرتے وقت گرافکس ڈرائیور کریش ہو گیا، اس لیے AbsentMotion اب گرافکس کارڈ کے بغیر ڈرا کرتا ہے (سست)۔ گرافکس ڈرائیور اپ ڈیٹ کرنے سے یہ ٹھیک ہو سکتا ہے۔</string>
     <string name="speed_reverse">ریورس</string>
     <string name="speed_reverse_remove_ai">اس کلپ کو ریورس کرنے سے پہلے اس سے اسموتھ اور اینہانس ہٹائیں</string>
     <string name="speed_seconds">سیکنڈ</string>

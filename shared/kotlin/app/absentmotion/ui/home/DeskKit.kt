@@ -67,7 +67,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
-import app.absentmotion.desk.DeskBack
+import app.absentmotion.platform.BackHandler
 import app.absentmotion.desk.DeskTyping
 import app.absentmotion.platform.Hint
 import app.absentmotion.ui.editor.panels.ThinSwitch
@@ -87,7 +87,7 @@ internal fun DeskModal(
     dismissOnScrim: Boolean = true,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    DeskBack.Handler(true, onClose)
+    BackHandler(true, onClose)
     var level by remember { mutableStateOf(0) }
     DisposableEffect(Unit) {
         level = ++DeskModals.open
@@ -212,7 +212,7 @@ internal fun DeskMenuSurface(width: Dp, content: @Composable ColumnScope.() -> U
 
 @Composable
 internal fun DeskPopupMenu(provider: PopupPositionProvider, onDismiss: () -> Unit, width: Dp = 220.dp, content: @Composable ColumnScope.() -> Unit) {
-    DeskBack.Handler(true, onDismiss)
+    BackHandler(true, onDismiss)
     Popup(popupPositionProvider = provider, onDismissRequest = onDismiss, properties = PopupProperties(focusable = true)) {
         DeskMenuSurface(width, content)
     }

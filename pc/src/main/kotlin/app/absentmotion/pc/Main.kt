@@ -43,6 +43,7 @@ import kotlin.math.roundToInt
 
 @OptIn(androidx.compose.ui.ExperimentalComposeUiApi::class)
 fun main(args: Array<String>) {
+    if (args.firstOrNull() == app.absentmotion.engine.GpuGuard.PROBE) { app.absentmotion.engine.GpuGuard.probeChild(); return }
     System.setProperty("apple.awt.application.appearance", "system")
     app.absentmotion.ui.home.localFeed()?.let { app.absentmotion.ui.home.Updates.source = it }
     app.absentmotion.ui.home.localCommunity()?.let { app.absentmotion.library.CommunityFeed.source = it }
@@ -65,6 +66,7 @@ fun main(args: Array<String>) {
     java.util.Locale.setDefault(app.absentmotion.desk.Strings.locale)
     val files = DeskOpen.fromArguments(args)
     if (!DeskInstance.claim(files)) return
+    runCatching { app.absentmotion.engine.GpuGuard.start() }
     DeskOpen.offer(files)
     DeskOpen.listenForFiles()
     DeskInstance.serve { DeskOpen.offer(it); DeskOpen.raise() }

@@ -40,6 +40,7 @@ struct DesktopMosh {
 };
 
 static std::atomic<int> DesktopGpuState{-1};
+static std::atomic<bool> SoftwareOnly{false};
 
 struct ExportRead {
     int width = 0, height = 0;
@@ -61,7 +62,7 @@ struct Desktop {
     std::vector<uint8_t> frameBytes;
     std::shared_ptr<ExportRead> exportPending;
     sk_sp<SkSurface> exportSurface;
-    Desktop() : gpu(std::getenv("AM_SOFTWARE_RENDER") ? nullptr : CreateDesktopGpu()) {
+    Desktop() : gpu(std::getenv("AM_SOFTWARE_RENDER") || SoftwareOnly.load() ? nullptr : CreateDesktopGpu()) {
         DesktopGpuState = gpu && gpu->context() ? 1 : 0;
         if (gpu && gpu->context()) gpu->context()->setResourceCacheLimit(size_t(512) << 20);
         trails.layerBudget = size_t(128) << 20;
@@ -237,6 +238,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM*, void*) {
 }
 JNIEXPORT jlong JNICALL JNI(create)(JNIEnv*, jobject) { return reinterpret_cast<jlong>(new Desktop()); }
 JNIEXPORT jint JNICALL JNI(gpuState)(JNIEnv*, jobject) { return DesktopGpuState.load(); }
+JNIEXPORT void JNICALL JNI(useSoftware)(JNIEnv*, jobject) { SoftwareOnly.store(true); }
 JNIEXPORT void JNICALL JNI(destroy)(JNIEnv*, jobject, jlong h) {
     ptr(h)->runtime.forgetHeld();
     delete ptr(h);

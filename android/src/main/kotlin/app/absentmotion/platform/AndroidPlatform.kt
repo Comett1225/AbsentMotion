@@ -256,7 +256,7 @@ object PlatformFeatures {
     val ffamp = android.os.Process.is64Bit()
 }
 
-fun textFieldFocused(): Boolean = DeskTyping.active > 0
+fun textFieldFocused(): Boolean = app.absentmotion.desk.DeskTyping.active > 0
 
 fun systemDark(context: Context): Boolean =
     context.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK == android.content.res.Configuration.UI_MODE_NIGHT_YES

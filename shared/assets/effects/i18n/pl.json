@@ -10,7 +10,9 @@
   "move": "Ruch",
   "new": "Nowe",
   "noise": "Szum",
+  "opacity": "Krycie",
   "other": "Inne",
+  "procedural": "Proceduralne",
   "repeat": "Powtarzanie",
   "stylize": "Stylizacja",
   "text": "Tekst"
@@ -2619,6 +2621,13 @@
     "span": {
      "label": "Długość"
     },
+    "style": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
+    },
     "to": {
      "label": "Koniec"
     },
@@ -2946,7 +2955,7 @@
    }
   },
   "fontweight": {
-   "description": "Ustawia grubość liter, od cienkich do grubych, i pozwala animować ją klatkami kluczowymi. Działa z czcionkami zmiennymi, które zawierają wszystkie grubości w jednym pliku: Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display i Dancing Script na liście czcionek lub zaimportowaną czcionką zmienną. Czcionki o stałej grubości zachowują swój wygląd.",
+   "description": "Ustawia grubość liter, od cienkich do grubych, i pozwala animować ją klatkami kluczowymi. Działa z czcionkami zmiennymi, które zawierają wszystkie grubości w jednym pliku: Roboto, Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display i Dancing Script na liście czcionek lub zaimportowaną czcionką zmienną. Czcionki o stałej grubości zachowują swój wygląd.",
    "name": "Grubość czcionki",
    "params": {
     "weight": {
@@ -3238,6 +3247,13 @@
     },
     "refraction": {
      "label": "Załamanie światła"
+    },
+    "style": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
     },
     "tint": {
      "label": "Zabarwienie"
@@ -4647,6 +4663,9 @@
       "Klasyczny",
       "Standardowy"
      ]
+    },
+    "importProfile": {
+     "label": "Profil importu"
     }
    }
   },
@@ -5441,6 +5460,13 @@
     "specularity": {
      "label": "Odbłysk"
     },
+    "style": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
+    },
     "useLuma": {
      "label": "Użyj luminancji warstwy"
     }
@@ -5547,6 +5573,12 @@
       "Klasyczny",
       "Standardowy"
      ]
+    },
+    "rollAlpha": {
+     "label": "Alfa"
+    },
+    "frontShadow": {
+     "label": "Cień z przodu"
     }
    }
   },
@@ -6761,6 +6793,13 @@
     },
     "roll": {
      "label": "Przechył"
+    },
+    "style": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
     },
     "yaw": {
      "label": "Odchylenie"
@@ -9320,6 +9359,13 @@
    "description": "Wypełnia nieprzezroczyste części warstwy gładkim szumem fraktalnym, dla chmur, dymu lub mapy jasności.",
    "name": "Turbulencje",
    "params": {
+    "alight": {
+     "label": "Styl",
+     "options": [
+      "Klasyczny",
+      "Standardowy"
+     ]
+    },
     "alpha": {
      "label": "Alfa"
     },
@@ -9894,6 +9940,8 @@
      "label": "Układ",
      "options": [
       "Klasyczny",
+      "Standardowy",
+      "Standardowy",
       "Standardowy"
      ]
     }

@@ -8,8 +8,8 @@ Export the project from Alight Motion as XML and open it in AbsentMotion. After 
 
 ## In short
 
-- **181** Alight effects look the same and **12** are very close.
-- **61** are converted to a similar effect that does not look identical.
+- **191** Alight effects look the same and **7** are very close.
+- **56** are converted to a similar effect that does not look identical.
 - **2** are converted but have not been compared side by side yet.
 - Not converted yet: **0**.
 - **Blending modes:** all of Alight's blending modes come across. Multiply, Subtract, Screen, Lighten and Darken get their opacity converted so they look the same.
@@ -48,6 +48,7 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | colortune | Color Tune | Same look |
 | Contour Gradient | Contour Gradient | Same look |
 | Contour Lines | Contour Lines | Same look |
+| Contour Strips | Contour Strips | Same look |
 | Copy Background | Copy Background | Same look |
 | Count Up/Down | Count Up/Down | Same look |
 | Cube | Cube | Same look |
@@ -62,6 +63,7 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Echo Keyframes | Echo Keyframes | Same look |
 | Edge Glow | Edge Glow | Same look |
 | Ellipsoid | Ellipsoid | Same look |
+| Energy Beam | Energy Beam | Same look |
 | Exposure / Gamma | Exposure / Gamma | Same look |
 | Fade In/Out | Fade In/Out | Same look |
 | Feather | Feather | Same look |
@@ -73,6 +75,8 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Four-color Gradient | Four-color Gradient | Same look |
 | Fractal Ridges | Fractal Ridges | Same look |
 | Gaussian Blur | Gaussian Blur | Same look |
+| Glass | Glass | Same look |
+| glass | Glass | Same look |
 | Glow | Glow | Same look |
 | Glow Scan | Glow Scan | Same look |
 | Gradient Map | Gradient Map | Same look |
@@ -95,9 +99,11 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Kaleidoscope | Kaleidoscope | Same look |
 | Key Spill Cleaner | Key Spill Cleaner | Same look |
 | Lens Blur | Lens Blur | Same look |
+| Lens Flare | Lens Flare | Same look |
 | lensblur | Lens Blur | Same look |
 | Light Glow | Light Glow | Same look |
 | Linear Repeat | Linear Repeat | Same look |
+| Linear Streaks | Linear Streaks | Same look |
 | Long Shadow | Long Shadow | Same look |
 | longshadow | Long Shadow | Same look |
 | Luma Key | Luma Key | Same look |
@@ -121,6 +127,7 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Oscillate | Oscillate | Same look |
 | oscillate | Oscillate | Same look |
 | oscillate2 | Oscillate | Same look |
+| Page Curl | Page Curl | Same look |
 | Palette Map | Palette Map | Same look |
 | Parenting Helper | Parenting Helper | Same look |
 | Pinch/Bulge | Pinch/Bulge | Same look |
@@ -169,6 +176,7 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Squeeze | Squeeze | Same look |
 | Star | Star | Same look |
 | Star Prism | Star Prism | Same look |
+| Streak Strips | Streak Strips | Same look |
 | stretch | Stretch Axis | Same look |
 | Stretch Axis | Stretch Axis | Same look |
 | Stretch Segment | Stretch Segment | Same look |
@@ -190,6 +198,8 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Time Quantization | Time Quantization | Same look |
 | Timecode | Timecode | Same look |
 | Torus | Torus | Same look |
+| Tunnel | Tunnel | Same look |
+| Turbulence | Turbulence | Same look |
 | turbulence | Turbulence | Same look |
 | Turbulent Displace | Turbulent Displace | Same look |
 | Unsharp Mask | Unsharp Mask | Same look |
@@ -201,19 +211,13 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Zoom Blur | Zoom Blur | Same look |
 | zoomblur | Zoom Blur | Same look |
 | zoomblur2 | Zoom Blur | Same look |
-| Contour Strips | Contour Strips | Very close |
+| 360º Reorient Sphere | 360º Reorient Sphere | Very close |
 | cube | Box | Very close |
 | flip | Flip Layer | Very close |
 | Hexagon Array | Hexagon Array | Very close |
-| Lens Flare | Lens Flare | Very close |
-| Page Curl | Page Curl | Very close |
 | Simple Starfield | Simple Starfield | Very close |
 | Starfield | Starfield | Very close |
 | starfield2 | Starfield | Very close |
-| Streak Strips | Streak Strips | Very close |
-| Tunnel | Tunnel | Very close |
-| Turbulence | Turbulence | Very close |
-| 360º Reorient Sphere | 360º Reorient Sphere | Similar, not identical |
 | Block Dissolve | Block Dissolve | Similar, not identical |
 | Block Noise | Block Noise | Similar, not identical |
 | blocknoise | Block Noise | Similar, not identical |
@@ -228,15 +232,12 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Dots | Dots | Similar, not identical |
 | dots | Dots | Similar, not identical |
 | Electric Edges | Electric Edges | Similar, not identical |
-| Energy Beam | Energy Beam | Similar, not identical |
 | Flicker | Flicker | Similar, not identical |
 | flicker | Flicker | Similar, not identical |
 | Fractal Warp | Fractal Warp | Similar, not identical |
 | fractalwarp | Fractal Warp | Similar, not identical |
 | fractalwarp2 | Fractal Warp | Similar, not identical |
 | fractalwarp3 | Fractal Warp | Similar, not identical |
-| Glass | Glass | Similar, not identical |
-| glass | Glass | Similar, not identical |
 | Grunge | Grunge | Similar, not identical |
 | Heart | Heart | Similar, not identical |
 | heart | Heart | Similar, not identical |
@@ -246,7 +247,6 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Iridescence | Iridescence | Similar, not identical |
 | irridescence | Iridescence | Similar, not identical |
 | Lightning | Lightning | Similar, not identical |
-| Linear Streaks | Linear Streaks | Similar, not identical |
 | Mosaic | Mosaic | Similar, not identical |
 | Noise | Noise | Similar, not identical |
 | noise | Noise | Similar, not identical |

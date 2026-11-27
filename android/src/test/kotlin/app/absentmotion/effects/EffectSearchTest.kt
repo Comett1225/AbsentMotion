@@ -67,5 +67,11 @@ class EffectSearchTest {
         for (key in listOf("timequant", "parenthelper", "channelremap", "backdrop")) assertTrue(key, key in other)
         assertTrue("sharpen" in catalog.listed("blur").map { it.key } && "pagecurl" in catalog.listed("3d").map { it.key })
         assertEquals(1, catalog.search("Light Glow").count { it.key == "lightglow" })
+        val procedural = catalog.listed("procedural").map { it.key }
+        val opacity = catalog.listed("opacity").map { it.key }
+        assertEquals(23, procedural.size)
+        assertEquals(listOf("blink", "blockdissolve", "dissolve", "fade", "feather", "flicker", "pulseopacity"), opacity.sorted())
+        assertTrue("clouds" in procedural && "clouds" in catalog.listed("noise").map { it.key } && "lensflare" in procedural)
+        assertTrue(listOf("procedural", "opacity").all { it in catalog.categories.toMap() })
     }
 }

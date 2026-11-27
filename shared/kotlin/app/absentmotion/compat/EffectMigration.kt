@@ -54,6 +54,7 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
         val ignoreWhenDisabled: String? = null,
         val ignoreWhenEnabled: String? = null,
         val bake: Boolean = false,
+        val times: String? = null,
     )
 
     class Turn(val quat: String, val spin: String, val to: List<String>, val inverse: Boolean = false, val sphere: Boolean = false)
@@ -203,9 +204,10 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
             values(it).any { value -> value == "true" || (value.finiteFloat() ?: 0f) > 0f } }
         fun sibling(name: String?) = name?.let { n -> effect.children.firstOrNull { it.name == "property" && it["name"] == n } }
         fun convertAt(text: String, c: Conversion, component: Int, t: Float, keyed: Boolean = false) = convertValue(text, c, component,
-            (sibling(c.plus)?.valueAt(t)?.finiteFloat() ?: 0f) * c.plusScale, dims, c.over?.let { length(sibling(it)?.valueAt(t) ?: c.overDefault) } ?: 1f, !keyed)
+            (sibling(c.plus)?.valueAt(t)?.finiteFloat() ?: 0f) * c.plusScale, dims, (c.over?.let { length(sibling(it)?.valueAt(t) ?: c.overDefault) } ?: 1f) /
+                (c.times?.let { (sibling(it)?.valueAt(t) ?: c.overDefault)?.trim()?.finiteFloat() } ?: 1f), !keyed)
         fun linked(source: XmlNode, name: String, type: String, c: Conversion, component: Int): XmlNode {
-            val moving = listOfNotNull(sibling(c.plus), sibling(c.over)).filter { it.isKeyframed }
+            val moving = listOfNotNull(sibling(c.plus), sibling(c.over), sibling(c.times)).filter { it.isKeyframed }
             if (moving.isEmpty() && c.bake && source.isKeyframed) {
                 val keys = source.keyframes
                 return property(source, name, type) { it }.withKeyframes(keys.flatMapIndexed { i, b ->
@@ -403,6 +405,7 @@ class EffectMigration(private val rules: Map<String, Rule>, private val catalog:
             json.optString("ignoreWhenDisabled").takeIf { it.isNotEmpty() },
             json.optString("ignoreWhenEnabled").takeIf { it.isNotEmpty() },
             json.optBoolean("bake"),
+            json.optString("times").takeIf { it.isNotEmpty() },
         )
     }
 }

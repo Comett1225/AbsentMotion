@@ -198,6 +198,7 @@ fun HomeScreen(
     imported: List<ImportReport> = emptyList(),
     onImportShown: () -> Unit = {},
     onImportFile: (Uri) -> Unit = {},
+    onImportFiles: (List<Uri>) -> Unit = { it.forEach(onImportFile) },
     onTemplate: (String) -> Unit = {},
     onTemplateProject: (app.absentmotion.model.Scene) -> Unit = {},
     onHistory: (ProjectInfo) -> Unit = {},
@@ -251,7 +252,7 @@ fun HomeScreen(
         projects = projects.filter { it.id !in ids }
         scope.launch { withContext(Dispatchers.IO) { ids.forEach { store.delete(it, context.getExternalFilesDir(null)?.resolve("ai")) } }; version++ }
     }
-    val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) onImportFile(uri) }
+    val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris -> if (uris.isNotEmpty()) onImportFiles(uris) }
     val toReport = imported.filter { it.sections.isNotEmpty() || it.community != null }
     LaunchedEffect(imported) {
         if (imported.isEmpty()) return@LaunchedEffect

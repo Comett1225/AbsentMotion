@@ -1529,6 +1529,9 @@
     <string name="effects_visibility">Visibilidade</string>
     <string name="effects_reorder">Reordenar</string>
     <string name="speed_freeze_frame">Congelar quadro</string>
+    <string name="speed_keep_pitch">Manter tom</string>
+    <string name="landscape_unlocked">Paisagem desbloqueada</string>
+    <string name="gpu_software_fallback">A última abertura travou no driver de vídeo, então o AbsentMotion agora desenha sem a placa de vídeo (mais lento). Atualizar o driver de vídeo pode resolver.</string>
     <string name="speed_reverse">Inverter</string>
     <string name="speed_reverse_remove_ai">Remova Suavizar e Melhorar deste clipe antes de invertê-lo</string>
     <string name="speed_seconds">Segundos</string>

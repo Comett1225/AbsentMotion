@@ -6,6 +6,7 @@ dropped effect.glass elevation_s
 dropped effect.glass spec
 dropped effect.glass2 color_s
 dropped effect.glass2 elevation
+dropped effect.glass2 shine
 dropped effect.glass2 spec
 dropped effects.blocknoise stretch
 dropped effects.box MAX_ITER
@@ -183,10 +184,8 @@ dropped effects.octahedron shadingType
 dropped effects.octahedron smooth
 dropped effects.octahedron texSqueeze
 dropped effects.octahedron texTwirl
-dropped effects.pagecurl alpha
 dropped effects.pagecurl backBlendMode
 dropped effects.pagecurl dropShadowColor
-dropped effects.pagecurl frontShadowAlpha
 dropped effects.pagecurl frontShadowBlendMode
 dropped effects.pagecurl frontShadowColor
 dropped effects.pagecurl shineBlendMode
@@ -272,7 +271,6 @@ dropped effects.starpoly texTwirl
 dropped effects.starprism MAX_ITER
 dropped effects.starprism shadingType
 dropped effects.starprism texTwirl
-dropped effects.streaks-zoom adaptive
 dropped effects.textprogress blink
 dropped effects.textprogress cursor
 dropped effects.torus MAX_ITER

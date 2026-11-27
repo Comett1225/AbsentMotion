@@ -10,7 +10,9 @@
   "move": "Bewegung",
   "new": "Neu",
   "noise": "Rauschen",
+  "opacity": "Deckkraft",
   "other": "Sonstige",
+  "procedural": "Prozedural",
   "repeat": "Wiederholen",
   "stylize": "Stilisieren",
   "text": "Text"
@@ -2619,6 +2621,13 @@
     "span": {
      "label": "Länge"
     },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
+    },
     "to": {
      "label": "Ende"
     },
@@ -2946,7 +2955,7 @@
    }
   },
   "fontweight": {
-   "description": "Bestimmt die Strichstärke der Buchstaben von dünn bis fett und lässt sich mit Keyframes animieren. Funktioniert mit variablen Schriftarten, die alle Stärken in einer Datei enthalten: Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display und Dancing Script aus der Schriftartenliste oder einer importierten variablen Schriftart. Schriftarten mit festen Stärken behalten ihr Aussehen.",
+   "description": "Bestimmt die Strichstärke der Buchstaben von dünn bis fett und lässt sich mit Keyframes animieren. Funktioniert mit variablen Schriftarten, die alle Stärken in einer Datei enthalten: Roboto, Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display und Dancing Script aus der Schriftartenliste oder einer importierten variablen Schriftart. Schriftarten mit festen Stärken behalten ihr Aussehen.",
    "name": "Schriftstärke",
    "params": {
     "weight": {
@@ -3238,6 +3247,13 @@
     },
     "refraction": {
      "label": "Lichtbrechung"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
     },
     "tint": {
      "label": "Tönung"
@@ -4647,6 +4663,9 @@
       "Klassisch",
       "Standard"
      ]
+    },
+    "importProfile": {
+     "label": "Importprofil"
     }
    }
   },
@@ -5441,6 +5460,13 @@
     "specularity": {
      "label": "Spiegelglanz"
     },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
+    },
     "useLuma": {
      "label": "Luminanz der Ebene verwenden"
     }
@@ -5547,6 +5573,12 @@
       "Klassisch",
       "Standard"
      ]
+    },
+    "rollAlpha": {
+     "label": "Alpha"
+    },
+    "frontShadow": {
+     "label": "Vorderer Schatten"
     }
    }
   },
@@ -6761,6 +6793,13 @@
     },
     "roll": {
      "label": "Rollen"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
     },
     "yaw": {
      "label": "Gieren"
@@ -9320,6 +9359,13 @@
    "description": "Füllt die deckenden Bereiche der Ebene mit weichem fraktalem Rauschen, für Wolken, Rauch oder eine Helligkeitskarte.",
    "name": "Turbulenz",
    "params": {
+    "alight": {
+     "label": "Stil",
+     "options": [
+      "Klassisch",
+      "Standard"
+     ]
+    },
     "alpha": {
      "label": "Alpha"
     },
@@ -9894,6 +9940,8 @@
      "label": "Anordnung",
      "options": [
       "Klassisch",
+      "Standard",
+      "Standard",
       "Standard"
      ]
     }

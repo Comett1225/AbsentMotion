@@ -1552,6 +1552,9 @@
     <string name="effects_visibility">Видимость</string>
     <string name="effects_reorder">Изменить порядок</string>
     <string name="speed_freeze_frame">Стоп-кадр</string>
+    <string name="speed_keep_pitch">Сохранять высоту</string>
+    <string name="landscape_unlocked">Альбомный режим разблокирован</string>
+    <string name="gpu_software_fallback">При прошлом запуске произошёл сбой видеодрайвера, поэтому AbsentMotion теперь рисует без видеокарты (медленнее). Обновление видеодрайвера может это исправить.</string>
     <string name="speed_reverse">Реверс</string>
     <string name="speed_reverse_remove_ai">Перед реверсом удалите с клипа результаты «Сгладить» и «Улучшение»</string>
     <string name="speed_seconds">Секунды</string>

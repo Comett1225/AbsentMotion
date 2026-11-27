@@ -1506,6 +1506,9 @@
     <string name="effects_visibility">Pagpapakita</string>
     <string name="effects_reorder">I-reorder</string>
     <string name="speed_freeze_frame">I-freeze ang frame</string>
+    <string name="speed_keep_pitch">Panatilihin ang Pitch</string>
+    <string name="landscape_unlocked">Naka-unlock na ang landscape</string>
+    <string name="gpu_software_fallback">Nag-crash sa graphics driver ang huling pagbukas, kaya gumuguhit na ngayon ang AbsentMotion nang walang graphics card (mas mabagal). Maaaring maayos ito ng pag-update sa graphics driver.</string>
     <string name="speed_reverse">I-reverse</string>
     <string name="speed_reverse_remove_ai">Alisin ang I-smooth at I-enhance sa clip na ito bago ito i-reverse</string>
     <string name="speed_seconds">Segundo</string>

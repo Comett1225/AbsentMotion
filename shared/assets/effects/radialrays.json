@@ -2,6 +2,9 @@
  "id": "radialrays",
  "name": "Radial Rays",
  "category": "stylize",
+ "also": [
+  "procedural"
+ ],
  "since": "3.0.0",
  "description": "Paints solid sunburst rays from a point over the opaque parts of the layer.",
  "params": [

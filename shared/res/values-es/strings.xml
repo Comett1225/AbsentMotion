@@ -1529,6 +1529,9 @@
     <string name="effects_visibility">Visibilidad</string>
     <string name="effects_reorder">Reordenar</string>
     <string name="speed_freeze_frame">Congelar fotograma</string>
+    <string name="speed_keep_pitch">Mantener tono</string>
+    <string name="landscape_unlocked">Horizontal desbloqueado</string>
+    <string name="gpu_software_fallback">El último inicio falló en el controlador gráfico, así que AbsentMotion dibuja ahora sin la tarjeta gráfica (más lento). Actualizar el controlador gráfico puede solucionarlo.</string>
     <string name="speed_reverse">Invertir</string>
     <string name="speed_reverse_remove_ai">Quita Suavizado y Mejora de este clip antes de invertirlo</string>
     <string name="speed_seconds">Segundos</string>

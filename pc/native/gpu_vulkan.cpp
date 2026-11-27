@@ -1,7 +1,7 @@
 #include "gpu.h"
 #ifdef _WIN32
 #include <windows.h>
-static void* OpenVulkan() { return LoadLibraryW(L"vulkan-1.dll"); }
+static void* OpenVulkan() { return LoadLibraryExW(L"vulkan-1.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32); }
 static void* VulkanSymbol(void* library, const char* name) { return (void*)GetProcAddress((HMODULE)library, name); }
 static void CloseVulkan(void* library) { FreeLibrary((HMODULE)library); }
 #else
@@ -47,7 +47,9 @@ struct VulkanGpu : DesktopGpu {
         getInstance = (PFN_vkGetInstanceProcAddr)VulkanSymbol(library, "vkGetInstanceProcAddr");
         if (!getInstance) return false;
         auto createInstance = (PFN_vkCreateInstance)getInstance(nullptr, "vkCreateInstance");
-        if (!createInstance) return false;
+        auto instanceVersion = (PFN_vkEnumerateInstanceVersion)getInstance(nullptr, "vkEnumerateInstanceVersion");
+        uint32_t loaderVersion = 0;
+        if (!createInstance || !instanceVersion || instanceVersion(&loaderVersion) != VK_SUCCESS || loaderVersion < VK_API_VERSION_1_1) return false;
         VkApplicationInfo app = {VK_STRUCTURE_TYPE_APPLICATION_INFO};
         app.pApplicationName = "AbsentMotion";
         app.apiVersion = VK_API_VERSION_1_1;

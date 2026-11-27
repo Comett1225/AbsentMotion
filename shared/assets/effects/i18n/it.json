@@ -10,7 +10,9 @@
   "move": "Movimento",
   "new": "Novità",
   "noise": "Rumore",
+  "opacity": "Opacità",
   "other": "Altro",
+  "procedural": "Procedurale",
   "repeat": "Ripetizione",
   "stylize": "Stile",
   "text": "Testo"
@@ -2619,6 +2621,13 @@
     "span": {
      "label": "Lunghezza"
     },
+    "style": {
+     "label": "Stile",
+     "options": [
+      "Classico",
+      "Standard"
+     ]
+    },
     "to": {
      "label": "Fine"
     },
@@ -2946,7 +2955,7 @@
    }
   },
   "fontweight": {
-   "description": "Regola lo spessore delle lettere, da sottile a marcato, e può essere animato con keyframe. Funziona con i font variabili, che contengono tutti gli spessori in un file: Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display e Dancing Script nell'elenco, oppure un font variabile importato. I font a spessore fisso mantengono il proprio aspetto.",
+   "description": "Regola lo spessore delle lettere, da sottile a marcato, e può essere animato con keyframe. Funziona con i font variabili, che contengono tutti gli spessori in un file: Roboto, Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display e Dancing Script nell'elenco, oppure un font variabile importato. I font a spessore fisso mantengono il proprio aspetto.",
    "name": "Spessore font",
    "params": {
     "weight": {
@@ -3238,6 +3247,13 @@
     },
     "refraction": {
      "label": "Rifrazione"
+    },
+    "style": {
+     "label": "Stile",
+     "options": [
+      "Classico",
+      "Standard"
+     ]
     },
     "tint": {
      "label": "Tinta"
@@ -4647,6 +4663,9 @@
       "Classico",
       "Standard"
      ]
+    },
+    "importProfile": {
+     "label": "Profilo di importazione"
     }
    }
   },
@@ -5441,6 +5460,13 @@
     "specularity": {
      "label": "Riflesso speculare"
     },
+    "style": {
+     "label": "Stile",
+     "options": [
+      "Classico",
+      "Standard"
+     ]
+    },
     "useLuma": {
      "label": "Usa luminanza del livello"
     }
@@ -5547,6 +5573,12 @@
       "Classico",
       "Standard"
      ]
+    },
+    "rollAlpha": {
+     "label": "Alfa"
+    },
+    "frontShadow": {
+     "label": "Ombra anteriore"
     }
    }
   },
@@ -6761,6 +6793,13 @@
     },
     "roll": {
      "label": "Rollio"
+    },
+    "style": {
+     "label": "Stile",
+     "options": [
+      "Classico",
+      "Standard"
+     ]
     },
     "yaw": {
      "label": "Imbardata"
@@ -9320,6 +9359,13 @@
    "description": "Riempie le parti opache del livello con un rumore frattale morbido, per nuvole, fumo o una mappa di luminosità.",
    "name": "Turbolenza",
    "params": {
+    "alight": {
+     "label": "Stile",
+     "options": [
+      "Classico",
+      "Standard"
+     ]
+    },
     "alpha": {
      "label": "Alfa"
     },
@@ -9894,6 +9940,8 @@
      "label": "Disposizione",
      "options": [
       "Classico",
+      "Standard",
+      "Standard",
       "Standard"
      ]
     }

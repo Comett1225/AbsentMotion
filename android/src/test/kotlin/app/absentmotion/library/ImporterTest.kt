@@ -144,9 +144,19 @@ class ImporterTest {
         assertEquals(txt(R.string.library_err_is_model), failure("# Blender OBJ File\n\nmtllib cube.mtl\no Cube\nv 1.0 1.0 -1.0\n".toByteArray()))
         assertEquals(txt(R.string.library_err_unsupported_type), failure("""{"name":"not a model"}""".toByteArray()))
         assertEquals(txt(R.string.library_err_unsupported_type), failure("version 2 notes".toByteArray()))
-        assertEquals(txt(R.string.library_err_missing_manifest), failure(zip(listOf("a.xml" to "<scene width=\"1\" height=\"1\"/>".toByteArray()))))
+        assertEquals(txt(R.string.library_err_missing_manifest), failure(zip(listOf("a.txt" to "notes".toByteArray()))))
         assertEquals(R.string.library_err_scene_needs_size, failure("<html/>".toByteArray()).id)
         assertEquals(R.string.library_err_malformed_xml, failure("<scene width=\"1\"".toByteArray()).id)
+    }
+
+    @Test fun aZipOfPlainAlightXmlFilesImportsEveryProject() {
+        val store = store()
+        val xmls = (1..40).map { "project $it.xml" to """<scene title="P$it" width="1080" height="1920" fps="30" totalTime="1000"/>""".toByteArray() }
+        val bytes = zip(xmls + ("__MACOSX/._project 1.xml" to byteArrayOf(0, 5, 22, 7)) + ("notes.txt" to "x".toByteArray()))
+        val reports = Importer(store).import { ByteArrayInputStream(bytes) }
+        assertEquals(40, reports.size)
+        assertTrue(reports.none { it.template })
+        assertEquals((1..40).map { "P$it" }.toSet(), reports.map { store.load(it.id)!!.title }.toSet())
     }
 
     @Test fun aZeroFrameRateFallsBackAndImportRefusesBadRatesAndSizes() {

@@ -17,7 +17,7 @@ private fun FontLibrary.prepareText(scene: XmlNode, fps: Int, timeMs: Int): XmlN
         if (node.name != "text") return@mapTimedLayers node
         val layer = raw.at(localTime.toInt(), localFps)
         val name = FontName.parse(layer.font)
-        node.with("_fontPath", (renderFile(layer.font) ?: android.content.AssetManager.root().resolve("fonts/Roboto/Roboto-Regular.ttf")).absolutePath)
+        node.with("_fontPath", (renderFile(layer.font) ?: android.content.AssetManager.root().resolve("fonts/Roboto/Roboto-Variable.ttf")).absolutePath)
             .with("_fontFamily", name.family).with("_fontIndex", "0")
             .with("_letterSpacing", "${layer.textSpacing("letterspacing", 0f)}").with("_lineSpacing", "${layer.textSpacing("linespacing", 1f)}")
             .with("_fontWeight", "${layer.fontWeight?.let { Math.round(it) } ?: name.weight}").with("_fontAxes", if (layer.fontWeight != null) "true" else null).with("_fontItalic", "${name.italic}").with("_emoji", emoji).with("_emojiFlags", flags).with("_locale", java.util.Locale.getDefault().toLanguageTag())

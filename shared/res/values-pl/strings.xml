@@ -1552,6 +1552,9 @@
     <string name="effects_visibility">Widoczność</string>
     <string name="effects_reorder">Zmień kolejność</string>
     <string name="speed_freeze_frame">Zatrzymaj klatkę</string>
+    <string name="speed_keep_pitch">Zachowaj wysokość</string>
+    <string name="landscape_unlocked">Odblokowano widok poziomy</string>
+    <string name="gpu_software_fallback">Ostatnie uruchomienie zakończyło się awarią sterownika grafiki, więc AbsentMotion rysuje teraz bez karty graficznej (wolniej). Aktualizacja sterownika grafiki może to naprawić.</string>
     <string name="speed_reverse">Odwróć</string>
     <string name="speed_reverse_remove_ai">Przed odwróceniem klipu usuń z niego wygładzanie i ulepszanie</string>
     <string name="speed_seconds">Sekundy</string>

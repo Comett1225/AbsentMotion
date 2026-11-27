@@ -95,7 +95,9 @@ import app.absentmotion.library.TemplateStore
 import app.absentmotion.model.Scene
 import app.absentmotion.platform.BitmapFactory
 import app.absentmotion.platform.Hint
+import app.absentmotion.platform.ActivityResultContracts
 import app.absentmotion.platform.LocalContext
+import app.absentmotion.platform.rememberLauncherForActivityResult
 import app.absentmotion.platform.asImageBitmap
 import app.absentmotion.ui.editor.ChromeIcons
 import app.absentmotion.ui.editor.NoMatches
@@ -118,7 +120,7 @@ private val CardMax = 400.dp
 private val TileGap = 16.dp
 private val GridPad = 24.dp
 
-internal fun deskKey(letter: String): String = app.absentmotion.desk.DeskOs.commandKey + letter
+internal fun deskKey(letter: String): String = app.absentmotion.desk.ShortcutPlatform.commandKey + letter
 
 internal enum class DeskSection { Projects, Assets, Community, Templates, Tools }
 
@@ -169,10 +171,8 @@ internal fun DeskHome(
         if (toReport.isEmpty()) onImportShown()
     }
     val shown = remember(projects, section, query) { projects.filter { it.isElement == (section == DeskSection.Assets) && matchesSearch(query, it.title) } }
-    val import = {
-        val files = app.absentmotion.desk.DeskFiles.chooseFiles(media = false, multiple = true)
-        if (files.isNotEmpty()) onImportFiles(files.map(Uri::fromFile))
-    }
+    val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris -> if (uris.isNotEmpty()) onImportFiles(uris) }
+    val import = { picker.launch(arrayOf("text/xml", "application/xml", "application/zip", "application/octet-stream")) }
     val duplicate: (String) -> Unit = { id ->
         if (!duplicating) {
             duplicating = true

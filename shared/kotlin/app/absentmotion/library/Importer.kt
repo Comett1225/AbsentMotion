@@ -93,7 +93,7 @@ class CommunityInfo(
 
 data class ImportLimits(
     val entries: Int = 2_000,
-    val scenes: Int = 32,
+    val scenes: Int = 1_000,
     val unpacked: Long = 2L shl 30,
     val sceneText: Int = 32 shl 20,
 )
@@ -137,6 +137,7 @@ class Importer(
         val fontFiles = ArrayList<File>()
         var projectEntry: String? = null
         var ours = false
+        var bare = false
         var community: JSONObject? = null
         val communityFiles = HashMap<String, ByteArray>()
         val bundledEffects = linkedMapOf<String, ByteArray>()
@@ -169,7 +170,8 @@ class Importer(
             }
             if (sigs == null && links == null) {
                 if (files.any { leaf(it) == "DOMDocument.xml" }) return fromFla(open, files)
-                throw ImportFailed(txt(R.string.library_err_missing_manifest))
+                if (files.none { it.endsWith(".xml", ignoreCase = true) }) throw ImportFailed(txt(R.string.library_err_missing_manifest))
+                bare = true
             }
             val declaredProject = projectEntry?.let { find(it, files) ?: throw ImportFailed(txt(R.string.library_err_package_project_missing)) }
             val mediaEntries = (links.orEmpty().values + sigs.orEmpty().values).mapNotNull { find(it, files) }.toSet()
@@ -236,7 +238,7 @@ class Importer(
             scenes.indices.mapTo(saved) { add(ids[it], check(scenes[it]).let { root -> if (renamedFonts.isEmpty()) root else root.mapFonts(renamedFonts) }, moved[it]) }
             ids.forEach { File(store.mediaDir(it), ImportMarker).delete(); store.mediaDir(it).delete() }
             val shared = community?.takeIf { saved.size == 1 }?.let { CommunityInfo.read(it, communityFiles) }
-            return if (!ours) saved.map { if (it.element) it else it.copy(template = true) }
+            return if (!ours) saved.map { if (it.element || bare) it else it.copy(template = true) }
                 else saved.map { it.copy(community = shared, bundledEffects = bundledEffects) }
         } catch (t: Throwable) {
             ids.forEach { store.mediaDir(it).deleteRecursively() }

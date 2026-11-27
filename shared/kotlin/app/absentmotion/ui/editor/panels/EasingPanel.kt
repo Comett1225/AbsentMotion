@@ -10,7 +10,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.drag
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -190,44 +192,30 @@ private fun Graph(state: EditorState, easing: Easing, overshoot: Boolean, modifi
         Canvas(
             Modifier.fillMaxSize().clipToBounds().onSizeChanged { size = it }
                 .pointerInput(Unit) {
-                    var grabbed = -1
-                    var start = Offset.Zero
-                    var position = Offset.Zero
-                    var damping = 1f
-                    var handleOvershoot = false
-                    detectDragGestures(
-                        onDragStart = { at ->
-                            val g = liveGeo
-                            grabbed = -1
-                            if (g != null) {
-                                val hs = liveEasing.handles()
-                                val reach = 24.dp.toPx()
-                                val nearest = hs.indices.minByOrNull { hypot(at.x - g.x(hs[it].x) * g.k, at.y - g.y(hs[it].y) * g.k) }
-                                if (nearest != null) {
-                                    val corner = Offset(g.x(hs[nearest].x) * g.k, g.y(hs[nearest].y) * g.k)
-                                    if ((corner - at).getDistance() <= reach) {
-                                        grabbed = nearest
-                                        start = at
-                                        position = Offset(hs[nearest].x, hs[nearest].y)
-                                        damping = hs[nearest].dampingFactor
-                                        handleOvershoot = liveOvershoot || hs[nearest].allowOvershoot
-                                    }
-                                }
-                            }
-                        },
-                        onDragEnd = { grabbed = -1; state.endGesture() },
-                        onDragCancel = { grabbed = -1; state.endGesture() },
-                    ) { change, _ ->
-                        val g = liveGeo ?: return@detectDragGestures
+                    awaitEachGesture {
+                        val down = awaitFirstDown(requireUnconsumed = false)
+                        val g = liveGeo ?: return@awaitEachGesture
                         val hs = liveEasing.handles()
-                        if (grabbed < 0 || grabbed >= hs.size) return@detectDragGestures
-                        change.consume()
-                        val delta = (change.position - start) * damping
-                        val u = (position.x + delta.x / (491f * g.k)).coerceIn(0f, 1f)
-                        val v = (position.y - delta.y / (g.s * g.k)).let {
-                            if (handleOvershoot) it.coerceIn(g.vMin, g.vMax) else it.coerceIn(0f, 1f)
+                        val grabbed = hs.indices.minByOrNull { hypot(down.position.x - g.x(hs[it].x) * g.k, down.position.y - g.y(hs[it].y) * g.k) }
+                            ?.takeIf { (Offset(g.x(hs[it].x) * g.k, g.y(hs[it].y) * g.k) - down.position).getDistance() <= 32.dp.toPx() }
+                            ?: return@awaitEachGesture
+                        down.consume()
+                        val position = Offset(hs[grabbed].x, hs[grabbed].y)
+                        val damping = hs[grabbed].dampingFactor
+                        val handleOvershoot = liveOvershoot || hs[grabbed].allowOvershoot
+                        drag(down.id) { change ->
+                            val now = liveGeo ?: return@drag
+                            val live = liveEasing.handles()
+                            if (grabbed >= live.size) return@drag
+                            change.consume()
+                            val delta = (change.position - down.position) * damping
+                            val u = (position.x + delta.x / (491f * now.k)).coerceIn(0f, 1f)
+                            val v = (position.y - delta.y / (now.s * now.k)).let {
+                                if (handleOvershoot) it.coerceIn(now.vMin, now.vMax) else it.coerceIn(0f, 1f)
+                            }
+                            state.setEasing(live[grabbed].moved(u, v), HANDLE_KEY)
                         }
-                        state.setEasing(hs[grabbed].moved(u, v), HANDLE_KEY)
+                        state.endGesture()
                     }
                 },
         ) {

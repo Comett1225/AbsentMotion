@@ -30,11 +30,11 @@ class AlightKeyAndLookImportTest {
             <property name="haloSpread" type="float" value="42.5" /><property name="clip" type="float" value="0.5" /><property name="progress" type="float" value="0.75" />
             <property name="fstr" type="float" value="0.265" /><property name="freq" type="float" value="20" /><property name="blendMode" type="int" value="1" /></effect>""")
         assertEquals("absent.energybeam", beam["id"])
-        assertEquals(listOf(-160f, -225f), beam.floats("from"))
-        assertEquals(listOf(240f, 175f), beam.floats("to"))
+        listOf(-160f, -225f).zip(beam.floats("from")).forEach { (alight, ours) -> assertEquals(alight * 0.165f, ours, 1e-3f) }
+        listOf(240f, 175f).zip(beam.floats("to")).forEach { (alight, ours) -> assertEquals(alight * 0.165f, ours, 1e-3f) }
         assertEquals("#FF3366CC", beam.value("color"))
         assertEquals("#FF112233", beam.value("haloColor"))
-        listOf(36f, 0.75f, 0f, 2.5f, 0.475f, 42.5f, 0.5f, 1f, 0.265f, 6f, 0f).zip(listOf("width", "opacity", "dim", "glow", "halo", "haloWidth", "span", "progress", "wiggle", "frequency", "blend"))
+        listOf(36f, 0.75f, 0f, 2.5f, 0.475f, 42.5f, 0.5f, 0.75f, 0.265f, 6f, 0f).zip(listOf("width", "opacity", "dim", "glow", "halo", "haloWidth", "span", "progress", "wiggle", "frequency", "blend"))
             .forEach { (want, name) -> assertEquals(name, want, beam.floats(name)[0], 1e-4f) }
     }
 

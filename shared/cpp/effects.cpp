@@ -825,6 +825,7 @@ sk_sp<SkImageFilter> BuiltInFilter(const std::string& id, const std::function<fl
 const int kDiffuse = 12, kMethods = 23, kExact = 4, kMaxColors = 512;
 
 thread_local Upload tUpload;
+thread_local float tPixel = 1, tOuter = 0;
 
 sk_sp<SkImage> OnGpu(const sk_sp<SkImage>& image) {
     return image && tUpload ? tUpload(image) : image;
@@ -1510,6 +1511,7 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
                     const SkRect r = seen.makeOffset(-area.left(), -area.top());
                     v = {r.left(), r.top(), r.right(), r.bottom()};
                 }
+                else if (automatic && name == "pixel") v = {tPixel > 0 ? tPixel : 1.0f};
                 else if (automatic && name == "screen") v = {-area.left(), -area.top(), (float)scene.width, (float)scene.height};
                 else if (automatic && name == "beat") v = {particles::Envelope(beatNow().since, Value(e, defaults, "decay", 0, t, 0.4f))};
                 else if (automatic && name == "beatTime") v = {(float)beatNow().since};
@@ -1612,7 +1614,7 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
                                                                 SkImageFilters::MatrixTransform(down, SkSamplingOptions(SkFilterMode::kLinear), f));
                         const float half = std::max(Value(e, defaults, "blur", 0, t, 0), 0.0f) * kDarkGlowSpread;
                         inputs.push_back(half > 0 ? SkImageFilters::Blur(half, half, SkTileMode::kDecal, dark) : dark);
-                    } else if (e.id == "absent.fringeclean" && Value(e, defaults, "style", 0, t, 0) > 0.5f) {
+                    } else if ((e.id == "absent.fringeclean" || e.id == "absent.glass") && Value(e, defaults, "style", 0, t, 0) > 0.5f) {
                         inputs.push_back(blurOf(SkImageFilters::Crop(SkRect::MakeXYWH(-area.left(), -area.top(), scene.width, scene.height), SkTileMode::kClamp, f)));
                     } else if (e.id == "absent.feather" && Value(e, defaults, "style", 0, t, 0) > 0.5f) {
                         inputs.push_back(FeatherAlpha(f, blur, Value(e, defaults, "iter", 0, t, 3),
@@ -1661,6 +1663,31 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
                          const std::function<void(SkCanvas*)>& source, const std::function<void(SkCanvas*)>& below, const Grab& grab,
                          const Upload& upload) const {
     tUpload = upload;
+    tPixel = tOuter > 0 ? tOuter : canvas->getTotalMatrix().getMinScale();
+    tOuter = 0;
+    const SkMatrix device = canvas->getTotalMatrix();
+    const float ds = device.getScaleX();
+    bool sharp = device.isScaleTranslate() && ds > 0 && ds < 0.999f && std::abs(device.getScaleY() - ds) < 1e-4f * ds;
+    for (const LayerEffect& e : layer.effects) {
+        if (!sharp || e.hidden) continue;
+        const Definition* d = find(e.id);
+        const float lt = layer.localTime(timeMs);
+        static const std::array<std::string_view, 5> kSharp = {"absent.hexgrid", "absent.hexagontilerotate", "absent.star", "absent.glowscan", "absent.cross"};
+        sharp = d && ((layer.alight && (std::find(kSharp.begin(), kSharp.end(), e.id) != kSharp.end() || (e.id == "absent.box" && Value(e, &d->defaults, "faceStyle", 0, lt, 0) > 0.5f))) || (e.id == "absent.pagecurl" && Value(e, &d->defaults, "space", 0, lt, 0) > 0.5f) ||
+                      (e.id == "absent.tunnel" && Value(e, &d->defaults, "style", 0, lt, 0) > 0.5f && Value(e, &d->defaults, "wrapStyle", 0, lt, 0) > 0.5f));
+    }
+    if (sharp) {
+        const auto up = [ds](const std::function<void(SkCanvas*)>& f) {
+            return f ? std::function<void(SkCanvas*)>([ds, &f](SkCanvas* c) { c->save(); c->scale(ds, ds); f(c); c->restore(); }) : f;
+        };
+        canvas->save();
+        canvas->scale(1 / ds, 1 / ds);
+        tOuter = ds;
+        const bool done = draw(canvas, scene, layer, timeMs, SkMatrix::Scale(ds, ds).mapRect(area), SkMatrix::Scale(ds, ds) * placed, up(source), up(below),
+                               grab, upload);
+        canvas->restore();
+        return done;
+    }
     SkRect frame = SkRect::MakeIWH(scene.width, scene.height);
     if (InsideGroup() && area.isFinite()) frame.join(area);
     const SkRect bounds = WorldView() ? canvas->getLocalClipBounds() : frame;

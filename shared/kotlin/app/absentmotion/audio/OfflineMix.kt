@@ -85,7 +85,7 @@ internal class OfflineMix(
                 val count = span.to - span.from
                 val pos0 = span.pos * rate / 1000.0
                 val step = span.step * rate / 1000.0
-                voice.begin(pos0, step, count)
+                voice.begin(pos0, step, count, if (clip.keepPitch) dt * rate / 1000.0 else 0.0)
                 if (voice.jump) { source.window(voice.ghostBase, voice.ghostSize, voice.ghostWindow()); voice.ghostOk = true }
                 source.window(voice.base, voice.size, voice.win)
                 voice.render(dst, span.from, count, pos0, step, span.g0, span.g1, quality, span.clipMs0, dt, span.lengthMs)

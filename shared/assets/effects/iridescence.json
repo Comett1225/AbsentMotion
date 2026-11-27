@@ -2,6 +2,9 @@
  "id": "iridescence",
  "name": "Iridescence",
  "category": "stylize",
+ "also": [
+  "procedural"
+ ],
  "since": "3.0.0",
  "description": "Covers the opaque parts of the layer with a flowing rainbow sheen, like oil on water or a soap bubble.",
  "params": [

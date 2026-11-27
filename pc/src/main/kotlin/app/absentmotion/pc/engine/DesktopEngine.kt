@@ -78,7 +78,7 @@ class DesktopEngine(val assets: File, private val repo: File?, private val bundl
         val selected = imported ?: files.minByOrNull { f ->
             val name = f.name.lowercase()
             (if (italic == ("italic" in name)) 0 else 4) + (if ((weight >= 600) == ("bold" in name)) 0 else 2)
-        } ?: assets.resolve("fonts/Roboto/Roboto-Regular.ttf")
+        } ?: assets.resolve("fonts/Roboto/Roboto-Variable.ttf")
         val layer = Layer(node)
         return node.copy(children = children).with("_fontPath", selected.absolutePath).with("_fontFamily", family)
             .with("_fontWeight", "$weight").with("_fontItalic", "$italic")

@@ -1483,6 +1483,9 @@
     <string name="effects_visibility">การมองเห็น</string>
     <string name="effects_reorder">จัดลำดับ</string>
     <string name="speed_freeze_frame">ฟรีซเฟรม</string>
+    <string name="speed_keep_pitch">คงระดับเสียง</string>
+    <string name="landscape_unlocked">ปลดล็อกแนวนอนแล้ว</string>
+    <string name="gpu_software_fallback">การเปิดครั้งล่าสุดเกิดข้อขัดข้องในไดรเวอร์กราฟิก AbsentMotion จึงวาดโดยไม่ใช้การ์ดกราฟิก (ช้าลง) การอัปเดตไดรเวอร์กราฟิกอาจแก้ปัญหานี้ได้</string>
     <string name="speed_reverse">ย้อนกลับ</string>
     <string name="speed_reverse_remove_ai">นำ “ปรับให้ลื่น” และ “เพิ่มคุณภาพ” ออกจากคลิปนี้ก่อนย้อนกลับ</string>
     <string name="speed_seconds">วินาที</string>

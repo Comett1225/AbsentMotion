@@ -2,6 +2,9 @@
  "id": "checker",
  "name": "Checker",
  "category": "stylize",
+ "also": [
+  "procedural"
+ ],
  "since": "3.0.0",
  "description": "Draws a checkerboard over the opaque parts of the layer, or punches the checkers out of it.",
  "params": [

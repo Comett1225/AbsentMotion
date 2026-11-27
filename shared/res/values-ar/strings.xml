@@ -1598,6 +1598,9 @@
     <string name="effects_visibility">الظهور</string>
     <string name="effects_reorder">إعادة الترتيب</string>
     <string name="speed_freeze_frame">تجميد الإطار</string>
+    <string name="speed_keep_pitch">حفظ طبقة الصوت</string>
+    <string name="landscape_unlocked">تم فتح الوضع الأفقي</string>
+    <string name="gpu_software_fallback">تعطّل التشغيل الأخير في برنامج تشغيل الرسومات، لذا يرسم AbsentMotion الآن دون بطاقة الرسومات (أبطأ). قد يحل تحديث برنامج تشغيل الرسومات المشكلة.</string>
     <string name="speed_reverse">عكس</string>
     <string name="speed_reverse_remove_ai">أزل التنعيم والتحسين من هذا المقطع قبل عكسه</string>
     <string name="speed_seconds">ثوانٍ</string>

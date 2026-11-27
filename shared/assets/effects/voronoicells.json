@@ -2,6 +2,9 @@
  "id": "voronoicells",
  "name": "Voronoi Cells",
  "category": "stylize",
+ "also": [
+  "procedural"
+ ],
  "since": "3.0.0",
  "description": "Fills the opaque parts of the layer with a pattern of cells around randomly placed points.",
  "params": [

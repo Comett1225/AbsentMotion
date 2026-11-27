@@ -10,7 +10,9 @@
   "move": "移動",
   "new": "新增",
   "noise": "雜訊",
+  "opacity": "不透明度",
   "other": "其他",
+  "procedural": "程序化",
   "repeat": "重複",
   "stylize": "風格化",
   "text": "文字"
@@ -2619,6 +2621,13 @@
     "span": {
      "label": "長度"
     },
+    "style": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
+    },
     "to": {
      "label": "結束"
     },
@@ -2946,7 +2955,7 @@
    }
   },
   "fontweight": {
-   "description": "設定文字的粗細，並可使用關鍵影格製作動畫。適用於將所有字重儲存在同一檔案中的可變字型，包括字型清單中的Raleway、Quicksand、Comfortaa、Lora、Bitter、Orbitron、Playfair Display和Dancing Script，或自行匯入的可變字型。固定字重的字型會保持原有外觀。",
+   "description": "設定文字的粗細，並可使用關鍵影格製作動畫。適用於將所有字重儲存在同一檔案中的可變字型，包括字型清單中的Roboto、Raleway、Quicksand、Comfortaa、Lora、Bitter、Orbitron、Playfair Display和Dancing Script，或自行匯入的可變字型。固定字重的字型會保持原有外觀。",
    "name": "字重",
    "params": {
     "weight": {
@@ -3238,6 +3247,13 @@
     },
     "refraction": {
      "label": "折射"
+    },
+    "style": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
     },
     "tint": {
      "label": "色調"
@@ -4647,6 +4663,9 @@
       "經典",
       "標準"
      ]
+    },
+    "importProfile": {
+     "label": "匯入設定檔"
     }
    }
   },
@@ -5441,6 +5460,13 @@
     "specularity": {
      "label": "鏡面反射"
     },
+    "style": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
+    },
     "useLuma": {
      "label": "使用圖層亮度"
     }
@@ -5547,6 +5573,12 @@
       "經典",
       "標準"
      ]
+    },
+    "rollAlpha": {
+     "label": "透明度"
+    },
+    "frontShadow": {
+     "label": "正面陰影"
     }
    }
   },
@@ -6761,6 +6793,13 @@
     },
     "roll": {
      "label": "翻滾"
+    },
+    "style": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
     },
     "yaw": {
      "label": "偏航"
@@ -9320,6 +9359,13 @@
    "description": "以平滑的碎形雜訊填滿圖層的不透明部分，可做出雲、煙或亮度對應圖。",
    "name": "紊流",
    "params": {
+    "alight": {
+     "label": "樣式",
+     "options": [
+      "經典",
+      "標準"
+     ]
+    },
     "alpha": {
      "label": "Alpha"
     },
@@ -9894,6 +9940,8 @@
      "label": "版面",
      "options": [
       "經典",
+      "標準",
+      "標準",
       "標準"
      ]
     }

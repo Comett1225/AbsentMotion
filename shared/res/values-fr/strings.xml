@@ -1529,6 +1529,9 @@
     <string name="effects_visibility">Visibilité</string>
     <string name="effects_reorder">Réorganiser</string>
     <string name="speed_freeze_frame">Arrêt sur image</string>
+    <string name="speed_keep_pitch">Conserver la hauteur</string>
+    <string name="landscape_unlocked">Paysage déverrouillé</string>
+    <string name="gpu_software_fallback">Le dernier démarrage a planté dans le pilote graphique, AbsentMotion dessine donc sans la carte graphique (plus lent). Mettre à jour le pilote graphique peut régler le problème.</string>
     <string name="speed_reverse">Inverser</string>
     <string name="speed_reverse_remove_ai">Retirez Fluidifier et Améliorer de ce clip avant de l’inverser</string>
     <string name="speed_seconds">Secondes</string>

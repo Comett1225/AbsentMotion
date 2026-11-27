@@ -2,6 +2,9 @@
  "id": "blink",
  "name": "Blink",
  "category": "stylize",
+ "also": [
+  "opacity"
+ ],
  "description": "Switches the layer on and off a number of times per second.",
  "params": [
   {

@@ -2,6 +2,9 @@
  "id": "dissolve",
  "name": "Dissolve",
  "category": "noise",
+ "also": [
+  "opacity"
+ ],
  "description": "Removes random pixels or blocks from the layer. Animate Strength for a dissolve transition; Seed chooses the pattern and Size sets the size of each speck.",
  "params": [
   {

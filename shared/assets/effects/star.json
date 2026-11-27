@@ -2,6 +2,9 @@
  "id": "star",
  "name": "Star",
  "category": "stylize",
+ "also": [
+  "procedural"
+ ],
  "since": "3.0.0",
  "description": "Draws one glowing star on the layer.",
  "params": [

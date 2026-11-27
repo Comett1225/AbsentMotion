@@ -2681,7 +2681,11 @@
     "max": 1
    },
    "adaptive": {
-    "neutral": true
+    "to": "alight",
+    "values": {
+     "true": 2,
+     "false": 3
+    }
    },
    "rmode": {
     "to": "r",
@@ -2709,7 +2713,7 @@
    }
   },
   "set": {
-   "alight": 1
+   "alight": 2
   }
  },
  "com.alightcreative.effects.streaks-spin": {
@@ -2721,6 +2725,7 @@
    },
    "angle": {
     "to": "sweep",
+    "scale": 0.94,
     "min": 0,
     "max": 360,
     "absent": "3.5"
@@ -3320,7 +3325,8 @@
     "per": "height",
     "min": 1,
     "max": 500,
-    "absent": 10
+    "absent": 10,
+    "bake": true
    },
    "phase": {
     "to": "offset"
@@ -3912,6 +3918,9 @@
      "2": 2
     }
    }
+  },
+  "set": {
+   "importProfile": true
   }
  },
  "com.alightcreative.effects.rays": {
@@ -4329,6 +4338,9 @@
     "min": 1,
     "max": 9
    }
+  },
+  "set": {
+   "alight": 1
   }
  },
  "com.alightcreative.effects.ridges2": {
@@ -4894,6 +4906,9 @@
     "min": 0,
     "max": 5
    }
+  },
+  "set": {
+   "style": 1
   }
  },
  "com.alightcreative.effects.maskblur": {
@@ -6818,7 +6833,7 @@
    }
   },
   "set": {
-   "copies": 1
+   "copies": 2
   }
  },
  "com.alightcreative.effects.contourstrips": {
@@ -7293,10 +7308,14 @@
     "neutral": 0
    },
    "start": {
-    "to": "from"
+    "to": "from",
+    "per": "short",
+    "scale": 0.001
    },
    "end": {
-    "to": "to"
+    "to": "to",
+    "per": "short",
+    "scale": 0.001
    },
    "color1": {
     "to": "color"
@@ -7333,9 +7352,7 @@
     "max": 400
    },
    "progress": {
-    "to": "progress",
-    "plus": "clip",
-    "plusScale": 0.5
+    "to": "progress"
    },
    "clip": {
     "to": "span",
@@ -7368,7 +7385,8 @@
    }
   },
   "set": {
-   "dim": 0
+   "dim": 0,
+   "style": 1
   }
  },
  "com.alightcreative.effects.lumastamper": {
@@ -10493,7 +10511,9 @@
     "max": 1
    },
    "alpha": {
-    "neutral": 1
+    "to": "rollAlpha",
+    "min": 0,
+    "max": 1
    },
    "strength": {
     "ignore": true
@@ -10520,7 +10540,9 @@
     "neutral": "#ffffffff"
    },
    "frontShadowAlpha": {
-    "neutral": 1
+    "to": "frontShadow",
+    "min": 0,
+    "max": 1
    },
    "frontShadowBlendMode": {
     "neutral": 2
@@ -11320,7 +11342,8 @@
   "set": {
    "yaw": 0,
    "pitch": 0,
-   "roll": 0
+   "roll": 0,
+   "style": 1
   },
   "orientation": {
    "quat": "orient",
@@ -12173,18 +12196,22 @@
     "min": -300,
     "max": 300
    },
-   "intensity": {
-    "to": "tint",
-    "scale": 0.125,
-    "min": 0,
-    "max": 1
-   },
-   "shine": {
-    "to": "highlight",
-    "scale": 0.735,
-    "min": 0,
-    "max": 1
-   },
+   "intensity": [
+    {
+     "to": "tint",
+     "scale": 0.5,
+     "min": 0,
+     "max": 1,
+     "component": 0
+    },
+    {
+     "to": "highlight",
+     "scale": 0.4,
+     "min": 0,
+     "max": 1,
+     "component": 0
+    }
+   ],
    "fill": {
     "to": "fill",
     "scale": 0.64,
@@ -12196,7 +12223,8 @@
    }
   },
   "set": {
-   "light": 1
+   "light": 1,
+   "style": 1
   }
  },
  "com.alightcreative.effect.glass": {
@@ -12221,13 +12249,13 @@
    },
    "intensity_d": {
     "to": "tint",
-    "scale": 0.705,
+    "scale": 1.537,
     "min": 0,
     "max": 1
    },
    "intensity_s": {
     "to": "highlight",
-    "scale": 0.575,
+    "scale": 0.639,
     "min": 0,
     "max": 1
    },
@@ -12242,7 +12270,8 @@
    }
   },
   "set": {
-   "light": 1
+   "light": 1,
+   "style": 1
   }
  },
  "com.alightcreative.effects.glowscan": {
@@ -13168,7 +13197,12 @@
     "to": "angle"
    },
    "phase": {
-    "to": "phase"
+    "to": "phase",
+    "pre": [
+     10
+    ],
+    "times": "amount",
+    "overDefault": "10"
    },
    "maskToLayer": {
     "to": "maskToLayer"

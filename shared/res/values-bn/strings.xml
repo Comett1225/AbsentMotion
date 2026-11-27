@@ -1506,6 +1506,9 @@
     <string name="effects_visibility">দৃশ্যমানতা</string>
     <string name="effects_reorder">পুনরায় সাজান</string>
     <string name="speed_freeze_frame">ফ্রিজ ফ্রেম</string>
+    <string name="speed_keep_pitch">পিচ ঠিক রাখুন</string>
+    <string name="landscape_unlocked">ল্যান্ডস্কেপ চালু হয়েছে</string>
+    <string name="gpu_software_fallback">শেষবার চালু করার সময় গ্রাফিক্স ড্রাইভারে ক্র্যাশ হয়েছে, তাই AbsentMotion এখন গ্রাফিক্স কার্ড ছাড়া আঁকছে (ধীর)। গ্রাফিক্স ড্রাইভার আপডেট করলে ঠিক হতে পারে।</string>
     <string name="speed_reverse">রিভার্স</string>
     <string name="speed_reverse_remove_ai">এই ক্লিপটি রিভার্স করার আগে স্মুথ ও এনহ্যান্স সরান</string>
     <string name="speed_seconds">সেকেন্ড</string>

@@ -2,6 +2,9 @@
  "id": "clouds",
  "name": "Clouds",
  "category": "noise",
+ "also": [
+  "procedural"
+ ],
  "since": "3.0.0",
  "description": "Covers the opaque parts of the layer with a soft cloud pattern, also handy as a noise source.",
  "params": [

@@ -10,7 +10,9 @@
   "move": "Movimento",
   "new": "Novos",
   "noise": "Ruído",
+  "opacity": "Opacidade",
   "other": "Outros",
+  "procedural": "Procedural",
   "repeat": "Repetição",
   "stylize": "Estilizar",
   "text": "Texto"
@@ -2619,6 +2621,13 @@
     "span": {
      "label": "Comprimento"
     },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Clássico",
+      "Padrão"
+     ]
+    },
     "to": {
      "label": "Fim"
     },
@@ -2946,7 +2955,7 @@
    }
   },
   "fontweight": {
-   "description": "Define a espessura das letras, de fina a pesada, e pode ser animada com quadros-chave. Funciona com fontes variáveis, que guardam todos os pesos em um só arquivo: Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display e Dancing Script na lista de fontes, ou uma fonte variável que você importar. Fontes com pesos fixos mantêm o próprio visual.",
+   "description": "Define a espessura das letras, de fina a pesada, e pode ser animada com quadros-chave. Funciona com fontes variáveis, que guardam todos os pesos em um só arquivo: Roboto, Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display e Dancing Script na lista de fontes, ou uma fonte variável que você importar. Fontes com pesos fixos mantêm o próprio visual.",
    "name": "Peso da fonte",
    "params": {
     "weight": {
@@ -3238,6 +3247,13 @@
     },
     "refraction": {
      "label": "Refração"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Clássico",
+      "Padrão"
+     ]
     },
     "tint": {
      "label": "Tonalidade"
@@ -4647,6 +4663,9 @@
       "Clássico",
       "Padrão"
      ]
+    },
+    "importProfile": {
+     "label": "Perfil de importação"
     }
    }
   },
@@ -5441,6 +5460,13 @@
     "specularity": {
      "label": "Especularidade"
     },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Clássico",
+      "Padrão"
+     ]
+    },
     "useLuma": {
      "label": "Usar luminância da camada"
     }
@@ -5547,6 +5573,12 @@
       "Clássico",
       "Padrão"
      ]
+    },
+    "rollAlpha": {
+     "label": "Alfa"
+    },
+    "frontShadow": {
+     "label": "Sombra frontal"
     }
    }
   },
@@ -6761,6 +6793,13 @@
     },
     "roll": {
      "label": "Rolagem"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Clássico",
+      "Padrão"
+     ]
     },
     "yaw": {
      "label": "Guinada"
@@ -9320,6 +9359,13 @@
    "description": "Preenche as partes opacas da camada com ruído fractal suave, para nuvens, fumaça ou um mapa de brilho.",
    "name": "Turbulência",
    "params": {
+    "alight": {
+     "label": "Estilo",
+     "options": [
+      "Clássico",
+      "Padrão"
+     ]
+    },
     "alpha": {
      "label": "Alfa"
     },
@@ -9894,6 +9940,8 @@
      "label": "Layout",
      "options": [
       "Clássico",
+      "Padrão",
+      "Padrão",
       "Padrão"
      ]
     }

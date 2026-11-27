@@ -1483,6 +1483,9 @@
     <string name="effects_visibility">Hiển thị</string>
     <string name="effects_reorder">Sắp xếp lại</string>
     <string name="speed_freeze_frame">Đóng băng khung hình</string>
+    <string name="speed_keep_pitch">Giữ cao độ</string>
+    <string name="landscape_unlocked">Đã mở khóa chế độ ngang</string>
+    <string name="gpu_software_fallback">Lần mở trước bị lỗi trong trình điều khiển đồ họa, nên AbsentMotion giờ vẽ không dùng card đồ họa (chậm hơn). Cập nhật trình điều khiển đồ họa có thể khắc phục.</string>
     <string name="speed_reverse">Đảo ngược</string>
     <string name="speed_reverse_remove_ai">Xóa Làm mượt và Nâng cao khỏi clip này trước khi đảo ngược</string>
     <string name="speed_seconds">Giây</string>

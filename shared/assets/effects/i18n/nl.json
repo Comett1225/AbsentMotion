@@ -10,7 +10,9 @@
   "move": "Beweging",
   "new": "Nieuw",
   "noise": "Ruis",
+  "opacity": "Dekking",
   "other": "Overig",
+  "procedural": "Procedureel",
   "repeat": "Herhaling",
   "stylize": "Stileren",
   "text": "Tekst"
@@ -2619,6 +2621,13 @@
     "span": {
      "label": "Lengte"
     },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    },
     "to": {
      "label": "Einde"
     },
@@ -2946,7 +2955,7 @@
    }
   },
   "fontweight": {
-   "description": "Bepaalt hoe dik de letters zijn, van dun tot zwaar, en is te animeren met keyframes. Werkt met variabele lettertypen, die elk gewicht in één bestand bevatten: Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display en Dancing Script in de lettertypelijst, of een variabel lettertype dat je importeert. Lettertypen met vaste gewichten behouden hun eigen uiterlijk.",
+   "description": "Bepaalt hoe dik de letters zijn, van dun tot zwaar, en is te animeren met keyframes. Werkt met variabele lettertypen, die elk gewicht in één bestand bevatten: Roboto, Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display en Dancing Script in de lettertypelijst, of een variabel lettertype dat je importeert. Lettertypen met vaste gewichten behouden hun eigen uiterlijk.",
    "name": "Letterdikte",
    "params": {
     "weight": {
@@ -3238,6 +3247,13 @@
     },
     "refraction": {
      "label": "Breking"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
     },
     "tint": {
      "label": "Tint"
@@ -4647,6 +4663,9 @@
       "Klassiek",
       "Standaard"
      ]
+    },
+    "importProfile": {
+     "label": "Importprofiel"
     }
    }
   },
@@ -5441,6 +5460,13 @@
     "specularity": {
      "label": "Spiegelglans"
     },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    },
     "useLuma": {
      "label": "Luminantie van laag gebruiken"
     }
@@ -5547,6 +5573,12 @@
       "Klassiek",
       "Standaard"
      ]
+    },
+    "rollAlpha": {
+     "label": "Alfa"
+    },
+    "frontShadow": {
+     "label": "Schaduw aan de voorkant"
     }
    }
   },
@@ -6761,6 +6793,13 @@
     },
     "roll": {
      "label": "Rollen"
+    },
+    "style": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
     },
     "yaw": {
      "label": "Zwenken"
@@ -9320,6 +9359,13 @@
    "description": "Vult de ondoorzichtige delen van de laag met vloeiende fractale ruis, voor wolken, rook of een helderheidskaart.",
    "name": "Turbulentie",
    "params": {
+    "alight": {
+     "label": "Stijl",
+     "options": [
+      "Klassiek",
+      "Standaard"
+     ]
+    },
     "alpha": {
      "label": "Alfa"
     },
@@ -9894,6 +9940,8 @@
      "label": "Indeling",
      "options": [
       "Klassiek",
+      "Standaard",
+      "Standaard",
       "Standaard"
      ]
     }

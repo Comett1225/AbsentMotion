@@ -2,6 +2,9 @@
  "id": "blockdissolve",
  "name": "Block Dissolve",
  "category": "noise",
+ "also": [
+  "opacity"
+ ],
  "since": "3.0.0",
  "description": "Removes random grid-aligned blocks from the layer. Animate Strength to take away more and more blocks.",
  "params": [

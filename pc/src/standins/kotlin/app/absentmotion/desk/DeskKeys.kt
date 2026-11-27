@@ -1,7 +1,5 @@
 package app.absentmotion.desk
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
@@ -10,31 +8,11 @@ import androidx.compose.ui.input.key.isCtrlPressed
 import androidx.compose.ui.input.key.isMetaPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
-import androidx.compose.ui.platform.InterceptPlatformTextInput
-import androidx.compose.ui.platform.PlatformTextInputInterceptor
-import androidx.compose.ui.platform.PlatformTextInputMethodRequest
-import androidx.compose.ui.platform.PlatformTextInputSession
 import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.PointMode
 import app.absentmotion.ui.editor.DeskDrop
 import app.absentmotion.ui.editor.DrawingKeys
 import app.absentmotion.ui.home.DeskModals
-
-@OptIn(ExperimentalComposeUiApi::class)
-object DeskTyping {
-    var active = 0
-        private set
-
-    private object Counter : PlatformTextInputInterceptor {
-        override suspend fun interceptStartInputMethod(request: PlatformTextInputMethodRequest, nextHandler: PlatformTextInputSession): Nothing {
-            active++
-            try { nextHandler.startInputMethod(request) } finally { active-- }
-        }
-    }
-
-    @Composable
-    fun Track(content: @Composable () -> Unit) = InterceptPlatformTextInput(Counter, content)
-}
 
 object DeskKeys {
     private val mac = DeskOs.mac

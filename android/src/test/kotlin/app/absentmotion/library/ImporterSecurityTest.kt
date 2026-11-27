@@ -163,7 +163,7 @@ class ImporterSecurityTest {
     @Test fun theDefaultLimitsAreTheDocumentedOnes() {
         val limits = ImportLimits()
         assertEquals(2_000, limits.entries)
-        assertEquals(32, limits.scenes)
+        assertEquals(1_000, limits.scenes)
         assertEquals(2L * 1024 * 1024 * 1024, limits.unpacked)
         assertEquals(32 * 1024 * 1024, limits.sceneText)
         XmlNode.parse(scene())

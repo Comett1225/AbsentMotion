@@ -13,6 +13,18 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import app.absentmotion.platform.SystemBars
 import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -130,6 +142,7 @@ class MainActivity : ComponentActivity() {
     private val treePicker = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree()) { uri ->
         if (uri != null) app.absentmotion.platform.LinkedMediaTrees.picked(applicationContext, uri)
     }
+    private val projectPicker = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.OpenMultipleDocuments()) { if (it.isNotEmpty()) importUris(it) }
     internal lateinit var store: ProjectStore
     internal lateinit var settings: AppSettings
     private lateinit var templates: TemplateStore
@@ -167,6 +180,30 @@ class MainActivity : ComponentActivity() {
     private var elementNav: ((String) -> Unit)? = null
     private var effectLanguage = ""
     internal var memoryLow: () -> Boolean = { false }
+    private var deskNewTick by mutableIntStateOf(0)
+    private var deskSheet by mutableStateOf<DeskSheet?>(null)
+    private val deskMenu = object : app.absentmotion.desk.DeskMenuHost {
+        override val context: Context get() = this@MainActivity
+        override val editor: EditorState? get() = this@MainActivity.editor
+        override val canStartProject: Boolean get() = editor == null && editingTemplate == null && exportingFromList == null && app.absentmotion.ui.home.DeskModals.open == 0
+        override val canImportLink: Boolean get() = canStartProject && !opening && !openingProject && projectLinkInput == null
+        override val linkedFolders: List<Pair<String, () -> Unit>> get() = app.absentmotion.platform.LinkedMediaTrees.saved(this@MainActivity).map { raw ->
+            val tree = Uri.parse(raw)
+            (app.absentmotion.platform.LinkedMediaTrees.folderName(tree) ?: raw) to { app.absentmotion.platform.LinkedMediaTrees.unlinkFor(tree) }
+        }
+        override fun newProject() { deskNewTick++ }
+        override fun openSettings() { deskSheet = DeskSheet.Settings }
+        override fun importMedia() = MediaPicks.openFiles()
+        override fun importProjects() = projectPicker.launch(ProjectFileTypes)
+        override fun importLink() { projectLinkInput = "" }
+        override fun closeProject() = closeEditor()
+        override fun openHelp() { deskSheet = DeskSheet.Help }
+        override fun openAbout() { deskSheet = DeskSheet.About }
+        override fun openCrashLogs() { deskSheet = DeskSheet.CrashLogs }
+    }
+    private val deskBurger: @androidx.compose.runtime.Composable () -> Unit = {
+        app.absentmotion.desk.DeskBurger(Am.TopBar.luminance() > 0.5f) { app.absentmotion.desk.deskMenus(deskMenu) }
+    }
     internal var afterImport: () -> Unit = {}
 
     override fun attachBaseContext(newBase: Context) = super.attachBaseContext(newBase.inAppLanguage())
@@ -184,6 +221,8 @@ class MainActivity : ComponentActivity() {
         app.absentmotion.media.MediaBackend.ffampReaders = app.absentmotion.ffamp.FfampMedia
         android.util.Log.i("AMMedia", "Media reader: ${if (app.absentmotion.media.MediaReader.ffamp(this)) "FFamp" else "Standard"}")
         effectLanguage = app.absentmotion.i18n.currentLanguage(this).tag
+        app.absentmotion.platform.Peripherals.refresh(this)
+        getSystemService(android.hardware.input.InputManager::class.java)?.registerInputDeviceListener(devices, null)
         followScreenSize(resources.configuration)
         store = ProjectStore(this)
         settings = AppSettings(this)
@@ -296,10 +335,24 @@ class MainActivity : ComponentActivity() {
                     Box(Modifier.fillMaxSize().then(if (returning) Modifier.enterFade() else Modifier)) {
                         val config = LocalConfiguration.current
                         CompositionLocalProvider(LocalWide provides tabletEditor(config.smallestScreenWidthDp, config.screenWidthDp), LocalTablet provides isTablet(config.smallestScreenWidthDp)) {
-                            HomeScreen(
+                            if (app.absentmotion.ui.adaptive.deskLayout) Column(Modifier.fillMaxSize().background(Am.HomeBg).windowInsetsPadding(WindowInsets.safeDrawing)) {
+                                DeskMenuRow(Am.HomeBg) { app.absentmotion.desk.DeskBurger(Am.HomeBg.luminance() > 0.5f) { app.absentmotion.desk.deskMenus(deskMenu) } }
+                                Box(Modifier.fillMaxWidth().weight(1f)) {
+                                    app.absentmotion.desk.DeskTyping.Track {
+                                        app.absentmotion.ui.home.DeskHome(
+                                            store, settings, onOpen = ::open, onExport = ::exportFromList,
+                                            imported = if (projectLinkInput == null) imported else emptyList(), onImportShown = { imported = emptyList() }, onImportFiles = { importUris(it) },
+                                            onTemplate = ::openTemplate, onTemplateProject = ::projectFromTemplate,
+                                            onHistory = { historyFor = Triple(it.id, it.title, it.damaged) }, onSettings = deskMenu::openSettings, changes = projectsChanged,
+                                            newTick = deskNewTick, onCollect = ::collectMedia, engine = { engine },
+                                            onImportLink = { if (!opening && !openingProject) projectLinkInput = "" },
+                                        )
+                                    }
+                                }
+                            } else HomeScreen(
                                 store, settings, onOpen = ::open, onExport = ::exportFromList,
-                                imported = if (projectLinkInput == null) imported else emptyList(), onImportShown = { imported = emptyList() }, onImportFile = { importUris(listOf(it)) },
-                                onTemplate = { id -> if (!opening && !openingProject) { openingProject = true; openJob = lifecycleScope.launch { try { if (engineWorks()) editingTemplate = id } finally { openingProject = false } } } }, onTemplateProject = ::projectFromTemplate,
+                                imported = if (projectLinkInput == null) imported else emptyList(), onImportShown = { imported = emptyList() }, onImportFile = { importUris(listOf(it)) }, onImportFiles = { importUris(it) },
+                                onTemplate = ::openTemplate, onTemplateProject = ::projectFromTemplate,
                                 onHistory = { historyFor = Triple(it.id, it.title, it.damaged) }, onCollect = ::collectMedia, changes = projectsChanged, engine = { engine },
                                 onImportLink = { if (!opening && !openingProject) projectLinkInput = "" },
                             )
@@ -318,7 +371,7 @@ class MainActivity : ComponentActivity() {
                         else {
                             val screen = LocalConfiguration.current
                             CompositionLocalProvider(LocalWide provides tabletEditor(screen.smallestScreenWidthDp, screen.screenWidthDp), LocalTablet provides isTablet(screen.smallestScreenWidthDp), app.absentmotion.ui.editor.panels.LocalVibration provides settings.vibration, LocalDensity provides dense) {
-                                key(open) { Ltr { app.absentmotion.platform.DeskTyping.Track { CompositionLocalProvider(app.absentmotion.ui.home.LocalImportLink provides { if (!opening && !openingProject) projectLinkInput = "" }) { EditorScreen(open, onExit = ::closeEditor) } } } }
+                                key(open) { Ltr { app.absentmotion.desk.DeskTyping.Track { CompositionLocalProvider(app.absentmotion.ui.home.LocalImportLink provides { if (!opening && !openingProject) projectLinkInput = "" }, app.absentmotion.desk.LocalDeskMenu provides deskBurger) { EditorScreen(open, onExit = ::closeEditor) } } } }
                             }
                         }
                         if (open.exportOpen) ExportScreen(open.project, open.exportFrame, engine, settings, fromProjectList = false, outdated) { open.exportOpen = false }
@@ -349,6 +402,7 @@ class MainActivity : ComponentActivity() {
                 }
                 app.absentmotion.ui.home.MobileDataDialog()
                 app.absentmotion.ui.home.DeviceSendHost()
+                deskSheet?.let { sheet -> DeskSheetHost(sheet) { deskSheet = null } }
                 engineProblem?.takeIf { problemShown }?.let { UnsupportedPhone(it) { problemShown = false } }
                 openFailed?.let { id -> OpenFailedDialog({ openFailed = null; historyFor = Triple(id, "", false) }, outdated) { openFailed = null } }
                 importFailed?.let { reason ->
@@ -407,6 +461,34 @@ class MainActivity : ComponentActivity() {
     }
 
 
+
+    private fun openTemplate(id: String) {
+        if (opening || openingProject) return
+        openingProject = true
+        openJob = lifecycleScope.launch { try { if (engineWorks()) editingTemplate = id } finally { openingProject = false } }
+    }
+
+    @androidx.compose.runtime.Composable
+    private fun DeskSheetHost(sheet: DeskSheet, onClose: () -> Unit) {
+        when (sheet) {
+            DeskSheet.Settings -> {
+                val drawer = androidx.compose.material3.rememberDrawerState(androidx.compose.material3.DrawerValue.Closed)
+                LaunchedEffect(Unit) {
+                    launch { drawer.open() }
+                    androidx.compose.runtime.snapshotFlow { drawer.targetValue }.first { it == androidx.compose.material3.DrawerValue.Open }
+                    androidx.compose.runtime.snapshotFlow { drawer.currentValue == androidx.compose.material3.DrawerValue.Closed && drawer.targetValue == androidx.compose.material3.DrawerValue.Closed }.first { it }
+                    onClose()
+                }
+                androidx.compose.material3.ModalNavigationDrawer(
+                    drawerContent = { app.absentmotion.ui.home.SettingsDrawer(settings, drawer, onRestored = { projectsChanged++ }) },
+                    drawerState = drawer, gesturesEnabled = drawer.isOpen, scrimColor = Color.Black.copy(alpha = 0.94f),
+                ) { Box(Modifier.fillMaxSize()) }
+            }
+            DeskSheet.Help -> app.absentmotion.ui.home.HelpScreen(onClose = onClose)
+            DeskSheet.About -> app.absentmotion.ui.home.AboutScreen(settings, onClose)
+            DeskSheet.CrashLogs -> app.absentmotion.ui.home.CrashLogsScreen(onClose)
+        }
+    }
 
     private fun updateCalm() = updateVisible() && editor == null && !closingEditor && !opening && !openingProject &&
         editingTemplate == null && exportingFromList == null && app.absentmotion.ui.export.PresetSharing.preset == null && firstRun == null && recovered == null && crashed == null && !problemShown && whatsNew == null && !app.absentmotion.ui.home.FfampOffer.pending(settings) &&
@@ -806,12 +888,30 @@ class MainActivity : ComponentActivity() {
     override fun dispatchKeyEvent(event: android.view.KeyEvent): Boolean {
         val state = editor
         if (state != null && (event.action == android.view.KeyEvent.ACTION_DOWN || event.action == android.view.KeyEvent.ACTION_UP) && app.absentmotion.platform.DeskKeys.handle(state, androidx.compose.ui.input.key.KeyEvent(event), ::closeEditor)) return true
+        if (firstRun == null && app.absentmotion.platform.DeskKeys.global(androidx.compose.ui.input.key.KeyEvent(event), deskMenu)) return true
         return super.dispatchKeyEvent(event)
     }
 
+    private var landscapeShown = false
+    private val devices = object : android.hardware.input.InputManager.InputDeviceListener {
+        override fun onInputDeviceAdded(deviceId: Int) = peripheralsChanged()
+        override fun onInputDeviceRemoved(deviceId: Int) = peripheralsChanged()
+        override fun onInputDeviceChanged(deviceId: Int) = peripheralsChanged()
+    }
+
+    private fun peripheralsChanged() {
+        app.absentmotion.platform.Peripherals.refresh(this)
+        followScreenSize(resources.configuration)
+    }
+
     private fun followScreenSize(config: Configuration) {
-        val wanted = if (isInMultiWindowMode || isTablet(config.smallestScreenWidthDp)) ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED else ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        val tablet = isTablet(config.smallestScreenWidthDp)
+        val free = app.absentmotion.platform.Peripherals.landscapeFree(isInMultiWindowMode, tablet, app.absentmotion.platform.Peripherals.keyboard, app.absentmotion.platform.Peripherals.mouse)
+        val wanted = if (free) ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED else ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         if (requestedOrientation != wanted) requestedOrientation = wanted
+        val unlocked = free && !isInMultiWindowMode && !tablet
+        if (unlocked && !landscapeShown) Toast.makeText(this, getString(R.string.landscape_unlocked), Toast.LENGTH_SHORT).show()
+        landscapeShown = unlocked
     }
 
     @Suppress("OVERRIDE_DEPRECATION", "DEPRECATION")
@@ -855,6 +955,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        getSystemService(android.hardware.input.InputManager::class.java)?.unregisterInputDeviceListener(devices)
         if (app.absentmotion.editor.ElementNav.open === elementNav) app.absentmotion.editor.ElementNav.open = null
         elementNav = null
         MediaPicks.release(this)
@@ -909,7 +1010,10 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch { recheckVideoThumbnails(applicationContext) }
     }
 
+    private enum class DeskSheet { Settings, Help, About, CrashLogs }
+
     private companion object {
+        val ProjectFileTypes = arrayOf("text/xml", "application/xml", "application/zip", "application/octet-stream")
         const val AlightPackage = "com.alightcreative.motion"
         const val OPEN_PROJECT = "openProject"
         const val OPEN_FRAME = "openFrame"
@@ -919,5 +1023,19 @@ class MainActivity : ComponentActivity() {
         const val TRIM_RUNNING_LOW = 10
         const val MEMORY_CHECK_MS = 5_000L
         const val MEMORY_REST_MS = 60_000L
+    }
+}
+
+@androidx.compose.runtime.Composable
+private fun DeskMenuRow(color: Color, menu: @androidx.compose.runtime.Composable () -> Unit) {
+    Box(Modifier.fillMaxWidth().height(44.dp).background(color)) {
+        Row(Modifier.fillMaxSize().padding(horizontal = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+            menu()
+            Text("AbsentMotion", Modifier.padding(start = 8.dp), color = if (color.luminance() > 0.5f) Am.Navy else Am.OnDark, fontSize = 15.sp, fontWeight = FontWeight.Bold, maxLines = 1, softWrap = false)
+        }
+        if (app.absentmotion.ui.home.DeskModals.open > 0) Box(
+            Modifier.matchParentSize().background(Color.Black.copy(alpha = app.absentmotion.ui.home.DeskModals.ScrimAlpha * app.absentmotion.ui.home.DeskModals.fade))
+                .pointerInput(Unit) { awaitPointerEventScope { while (true) awaitPointerEvent().changes.forEach { it.consume() } } },
+        )
     }
 }

@@ -1,0 +1,8 @@
+Keep Pitch: faster or slower clips keep the pitch of their sound.
+Samsung DeX: the computer home screen and menu.
+Keyboard and mouse on phones: landscape unlocks, shortcuts work.
+Import many projects at once, also zips of XML projects.
+Procedural and Opacity effect categories, like in Alight Motion.
+Font Weight works on the default font Roboto.
+9 more Alight Motion effects look the same, like Tunnel, Page Curl and Turbulence.
+Curve handles follow your finger from the first touch.

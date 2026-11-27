@@ -151,7 +151,7 @@ private fun EditorBody(state: EditorState, onExit: () -> Unit) {
         if (app.absentmotion.platform.PlatformFeatures.desktop) DeskWorkspace(state, onExit, addLibrary)
         else Column(Modifier.fillMaxSize().background(Am.TopBar).windowInsetsPadding(androidx.compose.foundation.layout.WindowInsets.safeDrawing)) {
             androidx.compose.foundation.layout.Row(Modifier.fillMaxWidth().height(44.dp).padding(horizontal = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-                DeskTopBar(state, onExit) {}
+                DeskTopBar(state, onExit, app.absentmotion.desk.LocalDeskMenu.current)
             }
             Box(Modifier.fillMaxWidth().weight(1f)) { DeskWorkspace(state, onExit, addLibrary) }
         }

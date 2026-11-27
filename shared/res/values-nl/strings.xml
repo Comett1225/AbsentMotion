@@ -1506,6 +1506,9 @@
     <string name="effects_visibility">Zichtbaarheid</string>
     <string name="effects_reorder">Volgorde wijzigen</string>
     <string name="speed_freeze_frame">Beeld bevriezen</string>
+    <string name="speed_keep_pitch">Toonhoogte behouden</string>
+    <string name="landscape_unlocked">Liggend ontgrendeld</string>
+    <string name="gpu_software_fallback">De vorige start liep vast in het grafische stuurprogramma, dus AbsentMotion tekent nu zonder grafische kaart (langzamer). Het grafische stuurprogramma bijwerken kan dit oplossen.</string>
     <string name="speed_reverse">Omkeren</string>
     <string name="speed_reverse_remove_ai">Verwijder Vloeiend en Verbeteren uit deze clip voordat je hem omkeert</string>
     <string name="speed_seconds">Seconden</string>

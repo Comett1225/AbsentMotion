@@ -1,5 +1,7 @@
 package app.absentmotion.ui.editor.panels
 
+import app.absentmotion.audio.keepPitch
+import app.absentmotion.audio.soundUri
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -187,6 +189,9 @@ private fun NormalSpeed(state: EditorState, layer: Layer, ai: AiTools, modifier:
             RampChip(stringResource(R.string.smooth_clip), video, layer.aiMarks.any { it.kind == AiKind.Smooth }) { state.playing = false; ai.apply(AiAction.Smooth) }
             RampChip(stringResource(R.string.speed_reverse), video, layer.reverseMark != null) { state.playing = false; ai.apply(AiAction.Reverse) }
             RampChip(stringResource(R.string.speed_freeze_frame), inside) { state.askNumber(secondsLabel, 2f, "", 0.1f, 30f) { state.freezeFrame(it) } }
+            RampChip(stringResource(R.string.speed_keep_pitch), layer.soundUri != null, layer.keepPitch) {
+                state.editSelected { it.copy(node = it.node.with("keepPitch", if (it.keepPitch) null else "true")) }
+            }
         }
     }
 }

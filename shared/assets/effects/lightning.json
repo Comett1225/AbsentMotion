@@ -2,6 +2,9 @@
  "id": "lightning",
  "name": "Lightning",
  "category": "stylize",
+ "also": [
+  "procedural"
+ ],
  "since": "3.0.0",
  "description": "Draws a forked bolt of lightning between two points on the layer.",
  "params": [

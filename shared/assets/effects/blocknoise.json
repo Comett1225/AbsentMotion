@@ -2,6 +2,9 @@
  "id": "blocknoise",
  "name": "Block Noise",
  "category": "noise",
+ "also": [
+  "procedural"
+ ],
  "since": "3.0.0",
  "description": "Flickers random blocks of noise over the layer. Multiply modulates the existing colors; Add adds noise to them. Freeze holds the pattern still.",
  "params": [

@@ -56,7 +56,7 @@ You can open a project file from another app (for example a file manager) with S
 
 Effects that AbsentMotion has are converted. Effects it does not have stay in the file but are not drawn. A **Community bundle** shows its thumbnail, title, creator, description and tags when it is imported. After an import, a report lists only what did not come over: effects it cannot run, settings that could not be carried over, media not found and fonts not installed. When everything came over, no report is shown. Backup files (`.absbackup`) are restored from Settings, not imported here.
 
-There are limits to protect the phone. For example, a package can have at most 2000 files and 32 projects, be at most 2 GB unpacked, and a scene needs a size of at most 16384 pixels and a frame rate from 1 to 240. The app says which rule a file broke.
+There are limits to protect the phone. For example, a package can have at most 2000 files and 1000 projects, be at most 2 GB unpacked, and a scene needs a size of at most 16384 pixels and a frame rate from 1 to 240. The app says which rule a file broke.
 
 ### Projects from another editor
 

@@ -89,7 +89,7 @@ class BlurMigrationTest {
         val linear = migrate("streaks", "strength" to "0.3625", "rmode" to "2", "gmode" to "2", "bmode" to "2", "amode" to "2")
         assertEquals(391.5f, linear.number("reach"), 1e-3f)
         assertEquals(3f, linear.number("mode"), 0f)
-        assertEquals(1f, linear.number("copies"), 0f)
+        assertEquals(2f, linear.number("copies"), 0f)
         assertEquals(2f, migrate("streaks", "rmode" to "0", "gmode" to "0", "bmode" to "0", "amode" to "0").number("mode"), 0f)
         assertEquals(162f, migrate("streaks").number("reach"), 1e-3f)
         for (id in listOf("streaks-spin", "streaks-zoom")) {
@@ -97,8 +97,10 @@ class BlurMigrationTest {
             assertEquals(listOf(3f, 1f, 0f, 3f), listOf("r", "g", "b", "a").map { e.number(it) })
         }
         assertEquals(0.15f, migrate("streaks-zoom").number("zoom"), 1e-6f)
-        assertEquals(3.5f, migrate("streaks-spin").number("sweep"), 1e-5f)
-        assertEquals(12f, migrate("streaks-spin", "angle" to "12").number("sweep"), 1e-5f)
+        assertEquals(2f, migrate("streaks-zoom").number("alight"), 0f)
+        assertEquals(3f, migrate("streaks-zoom", "adaptive" to "false").number("alight"), 0f)
+        assertEquals(3.29f, migrate("streaks-spin").number("sweep"), 1e-5f)
+        assertEquals(11.28f, migrate("streaks-spin", "angle" to "12").number("sweep"), 1e-4f)
     }
 
     @Test fun boxBlursBecomeBoxBlurWithAlightsSizes() {

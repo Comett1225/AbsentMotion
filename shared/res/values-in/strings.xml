@@ -1483,6 +1483,9 @@
     <string name="effects_visibility">Visibilitas</string>
     <string name="effects_reorder">Susun ulang</string>
     <string name="speed_freeze_frame">Bekukan frame</string>
+    <string name="speed_keep_pitch">Pertahankan Nada</string>
+    <string name="landscape_unlocked">Mode lanskap dibuka</string>
+    <string name="gpu_software_fallback">Saat terakhir dibuka, driver grafis mengalami crash, jadi AbsentMotion kini menggambar tanpa kartu grafis (lebih lambat). Memperbarui driver grafis bisa memperbaikinya.</string>
     <string name="speed_reverse">Balikkan</string>
     <string name="speed_reverse_remove_ai">Hapus hasil Haluskan dan Tingkatkan dari klip ini sebelum membalikkannya</string>
     <string name="speed_seconds">Detik</string>

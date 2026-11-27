@@ -2,6 +2,9 @@
  "id": "fractalridges",
  "name": "Fractal Ridges",
  "category": "noise",
+ "also": [
+  "procedural"
+ ],
  "since": "3.0.0",
  "description": "Fills the opaque parts of the layer with sharp, turbulent ridges of fractal noise.",
  "params": [

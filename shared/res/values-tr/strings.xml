@@ -1506,6 +1506,9 @@
     <string name="effects_visibility">Görünürlük</string>
     <string name="effects_reorder">Yeniden sırala</string>
     <string name="speed_freeze_frame">Kareyi dondur</string>
+    <string name="speed_keep_pitch">Perdeyi Koru</string>
+    <string name="landscape_unlocked">Yatay mod açıldı</string>
+    <string name="gpu_software_fallback">Son açılışta grafik sürücüsü çöktü, bu yüzden AbsentMotion artık ekran kartı olmadan çiziyor (daha yavaş). Grafik sürücüsünü güncellemek sorunu çözebilir.</string>
     <string name="speed_reverse">Tersine çevir</string>
     <string name="speed_reverse_remove_ai">Bu klibi tersine çevirmeden önce Yumuşat ve İyileştir\'i kaldırın</string>
     <string name="speed_seconds">Saniye</string>

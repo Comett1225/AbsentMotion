@@ -2,6 +2,9 @@
  "id": "ominodiffusion",
  "name": "Omino Diffusion+",
  "category": "stylize",
+ "also": [
+  "procedural"
+ ],
  "since": "3.0.0",
  "description": "Redraws the layer in a small palette and drags the rounding error along a direction, for a glitchy dithered look that comes alive in motion.",
  "params": [

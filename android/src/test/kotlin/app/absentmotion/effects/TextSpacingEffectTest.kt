@@ -23,7 +23,7 @@ class TextSpacingEffectTest {
     private val pack = File("../shared/assets/effects")
     private val catalog = EffectCatalog.parse { File(pack, it).inputStream() }
     private val migration = EffectMigration.parse(File(pack, "foreign.json").readText(), catalog)
-    private val roboto = File("../shared/assets/fonts/Roboto/Roboto-Regular.ttf").canonicalPath
+    private val roboto = File("../shared/assets/fonts/Roboto/Roboto-Variable.ttf").canonicalPath
     private val keyed = """<property name="letterspacing" type="float"><kf t="0" v="-0.1"/><kf t="1" v="0.5"/></property>""" +
         """<property name="linespacing" type="float"><kf t="0" v="1"/><kf t="0.5" v="2"/></property>"""
 

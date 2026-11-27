@@ -2,6 +2,9 @@
  "id": "dots",
  "name": "Dots",
  "category": "stylize",
+ "also": [
+  "procedural"
+ ],
  "since": "3.0.0",
  "description": "Draws a random but even pattern of soft dots over the layer, or uses the layer only as a mask for the dots.",
  "params": [

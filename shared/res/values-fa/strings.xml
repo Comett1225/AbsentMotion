@@ -1506,6 +1506,9 @@
     <string name="effects_visibility">نمایش</string>
     <string name="effects_reorder">تغییر ترتیب</string>
     <string name="speed_freeze_frame">فریز فریم</string>
+    <string name="speed_keep_pitch">حفظ زیر و بمی</string>
+    <string name="landscape_unlocked">حالت افقی باز شد</string>
+    <string name="gpu_software_fallback">اجرای قبلی در درایور گرافیک از کار افتاد، برای همین AbsentMotion اکنون بدون کارت گرافیک ترسیم می‌کند (کندتر). به‌روزرسانی درایور گرافیک ممکن است مشکل را حل کند.</string>
     <string name="speed_reverse">معکوس</string>
     <string name="speed_reverse_remove_ai">پیش از معکوس کردن این کلیپ، نرم‌سازی و بهبود را از آن حذف کنید</string>
     <string name="speed_seconds">ثانیه</string>

@@ -1483,6 +1483,9 @@
     <string name="effects_visibility">表示</string>
     <string name="effects_reorder">並べ替え</string>
     <string name="speed_freeze_frame">フリーズフレーム</string>
+    <string name="speed_keep_pitch">ピッチを維持</string>
+    <string name="landscape_unlocked">横向きのロックを解除しました</string>
+    <string name="gpu_software_fallback">前回の起動時にグラフィックスドライバーがクラッシュしたため、AbsentMotion はグラフィックスカードを使わずに描画しています（低速）。グラフィックスドライバーを更新すると直る場合があります。</string>
     <string name="speed_reverse">逆再生</string>
     <string name="speed_reverse_remove_ai">このクリップを逆再生する前に、スムーズと高画質化を解除してください</string>
     <string name="speed_seconds">秒</string>

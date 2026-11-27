@@ -1506,6 +1506,9 @@
     <string name="effects_visibility">Sichtbarkeit</string>
     <string name="effects_reorder">Reihenfolge ändern</string>
     <string name="speed_freeze_frame">Standbild</string>
+    <string name="speed_keep_pitch">Tonhöhe beibehalten</string>
+    <string name="landscape_unlocked">Querformat entsperrt</string>
+    <string name="gpu_software_fallback">Der letzte Start ist im Grafiktreiber abgestürzt, daher zeichnet AbsentMotion jetzt ohne Grafikkarte (langsamer). Ein Update des Grafiktreibers kann das beheben.</string>
     <string name="speed_reverse">Umkehren</string>
     <string name="speed_reverse_remove_ai">Entferne Glättung und Verbesserung aus diesem Clip, bevor du ihn umkehrst</string>
     <string name="speed_seconds">Sekunden</string>

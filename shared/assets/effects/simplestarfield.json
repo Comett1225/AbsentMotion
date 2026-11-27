@@ -2,6 +2,9 @@
  "id": "simplestarfield",
  "name": "Simple Starfield",
  "category": "stylize",
+ "also": [
+  "procedural"
+ ],
  "since": "4.0.0",
  "description": "Scatters small stars in layers of depth over the opaque parts of the layer. Position moves the field with parallax, Depth flies through it, Scale zooms it, Size and Feather shape each star and Amount sets how many there are.",
  "params": [

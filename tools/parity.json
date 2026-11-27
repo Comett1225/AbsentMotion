@@ -1617,6 +1617,11 @@
     }
   ],
   "android_only": {
+    "app/absentmotion/platform/Peripherals.kt": {
+      "desktop": null,
+      "feature": "plat.keyboard",
+      "reason": "Phones lock to portrait until a keyboard and a mouse are connected; computers always have both and no orientation lock"
+    },
     "app/absentmotion/ImportActivity.kt": {
       "desktop": null,
       "feature": "home.open_with",

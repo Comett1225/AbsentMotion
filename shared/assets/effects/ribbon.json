@@ -2,6 +2,9 @@
  "id": "ribbon",
  "name": "Ribbon",
  "category": "stylize",
+ "also": [
+  "procedural"
+ ],
  "since": "3.0.0",
  "description": "Draws a twisting ribbon of changing width across the opaque parts of the layer; animate Phase to make it flow, or punch it out of the layer.",
  "params": [

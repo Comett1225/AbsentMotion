@@ -6,6 +6,33 @@ All notable changes to AbsentMotion are listed here, newest first. The format fo
 Versions before 2.0.0 were never published or numbered. The entry for 1.0.0 stands for the feature set as it stood on
 2026-10-12.
 
+## [5.3.3] - 2026-11-27
+
+### Added
+
+#### Editor
+- **Keyboard and mouse on phones** - connect a **keyboard and a mouse** and the app turns to **landscape** too (a message says **Landscape unlocked**); the editor's **keyboard shortcuts** work with any keyboard.
+- **Samsung DeX** - on a big screen the app now has the **computer home screen** and the **menu** (File, Edit, Playback, Help) with its **Ctrl** shortcuts, like the computer app.
+- **Keep Pitch** - in **Speed**, the sound of a faster or slower clip keeps its **pitch** and is **stretched** to the new length instead.
+
+### Changed
+
+#### Effects
+- **Procedural** and **Opacity** - two new categories in the Effects Library with the **30 effects** Alight Motion puts there, such as **Clouds**, **Lens Flare**, **Starfield**, **Blink** and **Fade In/Out**. Each effect also stays in its own category.
+- **Font Weight on Roboto** - the default font now goes from **thin** to **heavy** with **Font Weight**, also with keyframes. Text you already made looks the same.
+
+#### Alight Motion import
+- **Now the same** - **Linear Streaks**, **Glass**, **Energy Beam**, **Contour Strips**, **Streak Strips**, **Lens Flare**, **Tunnel**, **Page Curl** and **Turbulence** look **the same** as in Alight Motion.
+- **Closer** - **Hexagon Array**, **360º Reorient Sphere**, **Hexagon Tile Rotate**, **Glow Scan**, **Cube**, **Three-axis Cross**, **Mosaic**, **Omino Glass**, **Spin Streaks** and **Zoom Streaks**.
+- **191** effects look the same, and **7** are very close. **Your saved projects keep their look.**
+
+#### Projects
+- **Import many at once** - pick **several files** in **Import**, or share a **zip of XML projects** from Alight Motion: every project in it is imported, up to **1000** at a time.
+
+### Fixed
+- **Graphics driver crashes on computers** - on Windows and Linux the first start of each version **tests the graphics card in a separate process**, so a driver crash no longer closes the app: AbsentMotion then draws **without the graphics card** and says so.
+- **Keyframe curves** - a handle now follows your finger from the **first touch**, instead of sometimes not moving at all.
+
 ## [5.3.2] - 2026-11-26
 
 ### Added

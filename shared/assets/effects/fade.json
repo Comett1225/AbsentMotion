@@ -2,6 +2,9 @@
  "id": "fade",
  "name": "Fade In/Out",
  "category": "stylize",
+ "also": [
+  "opacity"
+ ],
  "since": "3.0.0",
  "description": "Fades the layer in at its start and out again at its end, over the times you set.",
  "params": [

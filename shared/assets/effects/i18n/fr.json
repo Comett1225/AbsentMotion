@@ -10,7 +10,9 @@
   "move": "Mouvement",
   "new": "Nouveau",
   "noise": "Bruit",
+  "opacity": "Opacité",
   "other": "Autre",
+  "procedural": "Procédural",
   "repeat": "Répétition",
   "stylize": "Stylisation",
   "text": "Texte"
@@ -2619,6 +2621,13 @@
     "span": {
      "label": "Longueur"
     },
+    "style": {
+     "label": "Style",
+     "options": [
+      "Classique",
+      "Standard"
+     ]
+    },
     "to": {
      "label": "Fin"
     },
@@ -2946,7 +2955,7 @@
    }
   },
   "fontweight": {
-   "description": "Règle l’épaisseur des lettres, de fine à grasse, et peut être animé avec des images clés. Fonctionne avec les polices variables, qui regroupent toutes les graisses dans un fichier : Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display et Dancing Script dans la liste des polices, ou une police variable importée. Les polices à graisses fixes conservent leur aspect.",
+   "description": "Règle l’épaisseur des lettres, de fine à grasse, et peut être animé avec des images clés. Fonctionne avec les polices variables, qui regroupent toutes les graisses dans un fichier : Roboto, Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display et Dancing Script dans la liste des polices, ou une police variable importée. Les polices à graisses fixes conservent leur aspect.",
    "name": "Graisse de police",
    "params": {
     "weight": {
@@ -3238,6 +3247,13 @@
     },
     "refraction": {
      "label": "Réfraction"
+    },
+    "style": {
+     "label": "Style",
+     "options": [
+      "Classique",
+      "Standard"
+     ]
     },
     "tint": {
      "label": "Teinte"
@@ -4647,6 +4663,9 @@
       "Classique",
       "Standard"
      ]
+    },
+    "importProfile": {
+     "label": "Profil d’importation"
     }
    }
   },
@@ -5441,6 +5460,13 @@
     "specularity": {
      "label": "Spécularité"
     },
+    "style": {
+     "label": "Style",
+     "options": [
+      "Classique",
+      "Standard"
+     ]
+    },
     "useLuma": {
      "label": "Utiliser la luminance du calque"
     }
@@ -5547,6 +5573,12 @@
       "Classique",
       "Standard"
      ]
+    },
+    "rollAlpha": {
+     "label": "Alpha"
+    },
+    "frontShadow": {
+     "label": "Ombre avant"
     }
    }
   },
@@ -6761,6 +6793,13 @@
     },
     "roll": {
      "label": "Roulis"
+    },
+    "style": {
+     "label": "Style",
+     "options": [
+      "Classique",
+      "Standard"
+     ]
     },
     "yaw": {
      "label": "Lacet"
@@ -9320,6 +9359,13 @@
    "description": "Remplit les parties opaques du calque avec un bruit fractal doux, pour des nuages, de la fumée ou une carte de luminosité.",
    "name": "Turbulence",
    "params": {
+    "alight": {
+     "label": "Style",
+     "options": [
+      "Classique",
+      "Standard"
+     ]
+    },
     "alpha": {
      "label": "Alpha"
     },
@@ -9894,6 +9940,8 @@
      "label": "Disposition",
      "options": [
       "Classique",
+      "Standard",
+      "Standard",
       "Standard"
      ]
     }

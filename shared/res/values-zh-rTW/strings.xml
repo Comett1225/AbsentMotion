@@ -1483,6 +1483,9 @@
     <string name="effects_visibility">可見度</string>
     <string name="effects_reorder">重新排序</string>
     <string name="speed_freeze_frame">定格</string>
+    <string name="speed_keep_pitch">保持音調</string>
+    <string name="landscape_unlocked">已解鎖橫向</string>
+    <string name="gpu_software_fallback">上次啟動時顯示卡驅動程式當機，因此 AbsentMotion 現在不使用顯示卡繪製（較慢）。更新顯示卡驅動程式可能會解決此問題。</string>
     <string name="speed_reverse">倒放</string>
     <string name="speed_reverse_remove_ai">請先從此片段移除流暢化與增強，再將它倒放</string>
     <string name="speed_seconds">秒</string>

@@ -10,7 +10,9 @@
   "move": "이동",
   "new": "신규",
   "noise": "노이즈",
+  "opacity": "불투명도",
   "other": "기타",
+  "procedural": "절차적",
   "repeat": "반복",
   "stylize": "스타일화",
   "text": "텍스트"
@@ -2619,6 +2621,13 @@
     "span": {
      "label": "길이"
     },
+    "style": {
+     "label": "스타일",
+     "options": [
+      "클래식",
+      "표준"
+     ]
+    },
     "to": {
      "label": "끝"
     },
@@ -2946,7 +2955,7 @@
    }
   },
   "fontweight": {
-   "description": "글자 굵기를 가늘게부터 두껍게까지 설정하고 키프레임으로 애니메이션할 수 있습니다. 글꼴 목록의 Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display, Dancing Script 또는 가져온 가변 글꼴에서 사용할 수 있습니다. 고정 굵기 글꼴은 원래 모양이 유지됩니다.",
+   "description": "글자 굵기를 가늘게부터 두껍게까지 설정하고 키프레임으로 애니메이션할 수 있습니다. 글꼴 목록의 Roboto, Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display, Dancing Script 또는 가져온 가변 글꼴에서 사용할 수 있습니다. 고정 굵기 글꼴은 원래 모양이 유지됩니다.",
    "name": "글꼴 굵기",
    "params": {
     "weight": {
@@ -3238,6 +3247,13 @@
     },
     "refraction": {
      "label": "굴절"
+    },
+    "style": {
+     "label": "스타일",
+     "options": [
+      "클래식",
+      "표준"
+     ]
     },
     "tint": {
      "label": "색조"
@@ -4647,6 +4663,9 @@
       "클래식",
       "표준"
      ]
+    },
+    "importProfile": {
+     "label": "가져오기 프로필"
     }
    }
   },
@@ -5441,6 +5460,13 @@
     "specularity": {
      "label": "반사광"
     },
+    "style": {
+     "label": "스타일",
+     "options": [
+      "클래식",
+      "표준"
+     ]
+    },
     "useLuma": {
      "label": "레이어 휘도 사용"
     }
@@ -5547,6 +5573,12 @@
       "클래식",
       "표준"
      ]
+    },
+    "rollAlpha": {
+     "label": "알파"
+    },
+    "frontShadow": {
+     "label": "앞면 그림자"
     }
    }
   },
@@ -6761,6 +6793,13 @@
     },
     "roll": {
      "label": "롤"
+    },
+    "style": {
+     "label": "스타일",
+     "options": [
+      "클래식",
+      "표준"
+     ]
     },
     "yaw": {
      "label": "요"
@@ -9320,6 +9359,13 @@
    "description": "구름, 연기 또는 밝기 맵을 만들 수 있도록 레이어의 불투명한 부분을 부드러운 프랙탈 노이즈로 채웁니다.",
    "name": "터뷸런스",
    "params": {
+    "alight": {
+     "label": "스타일",
+     "options": [
+      "클래식",
+      "표준"
+     ]
+    },
     "alpha": {
      "label": "알파"
     },
@@ -9894,6 +9940,8 @@
      "label": "배치",
      "options": [
       "클래식",
+      "표준",
+      "표준",
       "표준"
      ]
     }

@@ -9,6 +9,7 @@ import androidx.compose.ui.input.key.nativeKeyCode
 object ShortcutPlatform {
     @Volatile var prefs: android.content.SharedPreferences? = null
     const val mac = false
+    const val commandKey = "Ctrl+"
     fun isCommand(event: KeyEvent): Boolean = event.isCtrlPressed || event.isMetaPressed
     fun bindable(event: KeyEvent): Boolean = true
     fun keyName(key: Key): String = when (key) {

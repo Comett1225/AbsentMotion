@@ -1335,28 +1335,17 @@
    "category": 1,
    "dir": "ofl/roboto",
    "files": {
-    "Roboto/Roboto-Bold.ttf": {
-     "bytes": 90420,
+    "Roboto/Roboto-Variable.ttf": {
+     "bytes": 183280,
      "italic": 0,
      "modified": true,
-     "sha256": "603a15de6a78c2b86c4277d09a724f52a7cb29e506c7cea97d50f032b69dc756",
+     "sha256": "0430796d7eef92f145143468bec14b9fc5996669daf9219594ca8dc2cd88de81",
      "source": "Roboto[wdth,wght].ttf",
      "sourceSha256": "d7598e12c5dbef095ff8272cfc55da0250bd07fbdecbac8a530b9b277872a134",
-     "variable": false,
+     "variable": true,
      "weights": [
+      400,
       700
-     ]
-    },
-    "Roboto/Roboto-Regular.ttf": {
-     "bytes": 89968,
-     "italic": 0,
-     "modified": true,
-     "sha256": "dca1f6618e997c4ad3f36c051a114fe39faca5e0ac5467727945a430b7cb44b8",
-     "source": "Roboto[wdth,wght].ttf",
-     "sourceSha256": "d7598e12c5dbef095ff8272cfc55da0250bd07fbdecbac8a530b9b277872a134",
-     "variable": false,
-     "weights": [
-      400
      ]
     }
    },

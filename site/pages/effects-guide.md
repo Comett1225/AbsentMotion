@@ -4,7 +4,7 @@ group: Create
 order: 2
 summary: Add, stack, reorder, hide, copy and animate effects, and find the right one in the effects library.
 ---
-An effect changes how a layer looks or moves: a blur, a glow, a color change, a shake. A layer can have as many effects as you like. AbsentMotion has {{effect_count}} effects in twelve categories. The [effects library](@effects) on this website lists every effect with all of its settings.
+An effect changes how a layer looks or moves: a blur, a glow, a color change, a shake. A layer can have as many effects as you like. AbsentMotion has {{effect_count}} effects in fourteen categories. The [effects library](@effects) on this website lists every effect with all of its settings.
 
 ## Add an effect
 
@@ -19,7 +19,7 @@ To read about an effect first, press and hold its tile. A page opens with an ani
 
 - The top has a search box ("Search") that matches names first, then descriptions, and also finds AI tools and presets.
 - A strip of three recommended effects for the selected layer: up to two that you use most on that kind of layer (video, photo, text, shape, group or 3D model), and at least one that fits the layer, such as Chroma Key for a green-screen clip. Effects you keep passing over make room for others. Then a grid of your **Recent** or **Favorite** effects, then the categories. To switch between Recent and Favorite, tap the two small icons, swipe left or right on the grid, or press and hold the icons until the phone vibrates and slide your thumb (right for Favorite, left for Recent).
-- **Categories:** Color, Blur, Distort, Stylize, Noise, Repeat, Key, Move, Beat, 3D, Text and Other. A **New** category lists only the effects added in the current version and its updates (5.3, 5.3.1 and so on). An **Audio** category appears for layers that have sound, and **AI** holds the AI tools.
+- **Categories:** Color, Blur, Distort, Stylize, Noise, Procedural, Repeat, Key, Opacity, Move, Beat, 3D, Text and Other. A **New** category lists only the effects added in the current version and its updates (5.3, 5.3.1 and so on). An **Audio** category appears for layers that have sound, and **AI** holds the AI tools.
 - An effect that cannot run on your phone is grayed out.
 - Inside a category, swipe left for the next category and right for the previous one.
 

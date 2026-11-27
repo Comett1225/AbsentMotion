@@ -270,7 +270,7 @@ class DeskLogicTest {
     @Test fun layerRenameFieldBlocksShortcuts() {
         val s = session("rename")
         try {
-            runSkikoComposeUiTest(size = Size(1100f, 400f)) {
+            runSkikoComposeUiTest(size = Size(1100f, 800f)) {
                 val root = FocusRequester()
                 setContent {
                     DeskTyping.Track {

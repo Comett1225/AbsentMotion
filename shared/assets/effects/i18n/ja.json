@@ -10,7 +10,9 @@
   "move": "移動",
   "new": "新着",
   "noise": "ノイズ",
+  "opacity": "不透明度",
   "other": "その他",
+  "procedural": "プロシージャル",
   "repeat": "繰り返し",
   "stylize": "スタイライズ",
   "text": "テキスト"
@@ -2619,6 +2621,13 @@
     "span": {
      "label": "長さ"
     },
+    "style": {
+     "label": "スタイル",
+     "options": [
+      "クラシック",
+      "標準"
+     ]
+    },
     "to": {
      "label": "終了点"
     },
@@ -2946,7 +2955,7 @@
    }
   },
   "fontweight": {
-   "description": "文字の太さを細字から太字まで設定でき、キーフレームでアニメーションさせることもできます。1つのファイルにすべての太さを含むバリアブルフォントに対応しています。フォント一覧のRaleway、Quicksand、Comfortaa、Lora、Bitter、Orbitron、Playfair Display、Dancing Script、またはインポートしたバリアブルフォントが使えます。太さが固定されたフォントは元の見た目のままです。",
+   "description": "文字の太さを細字から太字まで設定でき、キーフレームでアニメーションさせることもできます。1つのファイルにすべての太さを含むバリアブルフォントに対応しています。フォント一覧のRoboto、Raleway、Quicksand、Comfortaa、Lora、Bitter、Orbitron、Playfair Display、Dancing Script、またはインポートしたバリアブルフォントが使えます。太さが固定されたフォントは元の見た目のままです。",
    "name": "フォントの太さ",
    "params": {
     "weight": {
@@ -3238,6 +3247,13 @@
     },
     "refraction": {
      "label": "屈折"
+    },
+    "style": {
+     "label": "スタイル",
+     "options": [
+      "クラシック",
+      "標準"
+     ]
     },
     "tint": {
      "label": "色合い"
@@ -4647,6 +4663,9 @@
       "クラシック",
       "標準"
      ]
+    },
+    "importProfile": {
+     "label": "インポートプロファイル"
     }
    }
   },
@@ -5441,6 +5460,13 @@
     "specularity": {
      "label": "スペキュラ"
     },
+    "style": {
+     "label": "スタイル",
+     "options": [
+      "クラシック",
+      "標準"
+     ]
+    },
     "useLuma": {
      "label": "レイヤーの輝度を使用"
     }
@@ -5547,6 +5573,12 @@
       "クラシック",
       "標準"
      ]
+    },
+    "rollAlpha": {
+     "label": "アルファ"
+    },
+    "frontShadow": {
+     "label": "前面の影"
     }
    }
   },
@@ -6761,6 +6793,13 @@
     },
     "roll": {
      "label": "ロール"
+    },
+    "style": {
+     "label": "スタイル",
+     "options": [
+      "クラシック",
+      "標準"
+     ]
     },
     "yaw": {
      "label": "ヨー"
@@ -9320,6 +9359,13 @@
    "description": "レイヤーの不透明な部分を滑らかなフラクタルノイズで埋めます。雲や煙、明るさマップなどに使えます。",
    "name": "タービュランス",
    "params": {
+    "alight": {
+     "label": "スタイル",
+     "options": [
+      "クラシック",
+      "標準"
+     ]
+    },
     "alpha": {
      "label": "アルファ"
     },
@@ -9894,6 +9940,8 @@
      "label": "配置",
      "options": [
       "クラシック",
+      "標準",
+      "標準",
       "標準"
      ]
     }

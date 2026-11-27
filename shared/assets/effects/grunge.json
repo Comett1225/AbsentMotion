@@ -2,6 +2,9 @@
  "id": "grunge",
  "name": "Grunge",
  "category": "stylize",
+ "also": [
+  "procedural"
+ ],
  "since": "4.3.0",
  "description": "Distresses the layer with grain, dirt blotches, burnt edges and a dusty color tint.",
  "params": [

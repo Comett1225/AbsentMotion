@@ -10,7 +10,9 @@
   "move": "Galaw",
   "new": "Bago",
   "noise": "Ingay",
+  "opacity": "Opacity",
   "other": "Iba pa",
+  "procedural": "Procedural",
   "repeat": "Pag-uulit",
   "stylize": "I-istilo",
   "text": "Teksto"
@@ -2619,6 +2621,13 @@
     "span": {
      "label": "Haba"
     },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
+    },
     "to": {
      "label": "Wakas"
     },
@@ -2946,7 +2955,7 @@
    }
   },
   "fontweight": {
-   "description": "Itinatakda kung gaano kakapal ang mga letra, mula manipis hanggang makapal, at puwedeng i-animate gamit ang mga keyframe. Gumagana sa mga variable font, na nasa iisang file ang lahat ng bigat: Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display at Dancing Script sa listahan ng font, o isang variable font na ii-import mo. Pinapanatili ng mga font na may nakapirming bigat ang sarili nilang hitsura.",
+   "description": "Itinatakda kung gaano kakapal ang mga letra, mula manipis hanggang makapal, at puwedeng i-animate gamit ang mga keyframe. Gumagana sa mga variable font, na nasa iisang file ang lahat ng bigat: Roboto, Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display at Dancing Script sa listahan ng font, o isang variable font na ii-import mo. Pinapanatili ng mga font na may nakapirming bigat ang sarili nilang hitsura.",
    "name": "Bigat ng Font",
    "params": {
     "weight": {
@@ -3238,6 +3247,13 @@
     },
     "refraction": {
      "label": "Refraction"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
     },
     "tint": {
      "label": "Tint"
@@ -4647,6 +4663,9 @@
       "Klasiko",
       "Karaniwan"
      ]
+    },
+    "importProfile": {
+     "label": "Profile ng Pag-import"
     }
    }
   },
@@ -5441,6 +5460,13 @@
     "specularity": {
      "label": "Specularity"
     },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
+    },
     "useLuma": {
      "label": "Gamitin ang Luminance ng Layer"
     }
@@ -5547,6 +5573,12 @@
       "Klasiko",
       "Karaniwan"
      ]
+    },
+    "rollAlpha": {
+     "label": "Alpha"
+    },
+    "frontShadow": {
+     "label": "Anino sa Harap"
     }
    }
   },
@@ -6761,6 +6793,13 @@
     },
     "roll": {
      "label": "Roll"
+    },
+    "style": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
     },
     "yaw": {
      "label": "Yaw"
@@ -9320,6 +9359,13 @@
    "description": "Pinupuno ang opaque na bahagi ng layer ng makinis na fractal noise, para sa ulap, usok o brightness map.",
    "name": "Turbulence",
    "params": {
+    "alight": {
+     "label": "Estilo",
+     "options": [
+      "Klasiko",
+      "Karaniwan"
+     ]
+    },
     "alpha": {
      "label": "Alpha"
     },
@@ -9894,6 +9940,8 @@
      "label": "Ayos",
      "options": [
       "Klasiko",
+      "Karaniwan",
+      "Karaniwan",
       "Karaniwan"
      ]
     }

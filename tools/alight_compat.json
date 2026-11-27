@@ -297,7 +297,7 @@
  {
   "name": "Turbulence",
   "id": "turbulence2",
-  "measured": "close"
+  "measured": "same"
  },
  {
   "name": "Vignette",
@@ -522,7 +522,7 @@
  {
   "name": "Contour Strips",
   "id": "contourstrips",
-  "measured": "close"
+  "measured": "same"
  },
  {
   "name": "Curl",
@@ -627,7 +627,7 @@
  {
   "name": "Lens Flare",
   "id": "lensflare",
-  "measured": "close"
+  "measured": "same"
  },
  {
   "name": "Lightning",
@@ -637,7 +637,7 @@
  {
   "name": "Linear Streaks",
   "id": "streaks",
-  "measured": "similar"
+  "measured": "same"
  },
  {
   "name": "Long Shadow",
@@ -909,7 +909,7 @@
  {
   "name": "360º Reorient Sphere",
   "id": "360-reorient-sphere",
-  "measured": "similar"
+  "measured": "close"
  },
  {
   "name": "Box",
@@ -1044,7 +1044,7 @@
  {
   "name": "Energy Beam",
   "id": "energybeam",
-  "measured": "similar"
+  "measured": "same"
  },
  {
   "name": "findedges-edgeglow",
@@ -1079,12 +1079,12 @@
  {
   "name": "glass",
   "id": "glass",
-  "measured": "similar"
+  "measured": "same"
  },
  {
   "name": "Glass",
   "id": "glass2",
-  "measured": "similar"
+  "measured": "same"
  },
  {
   "name": "Glow Scan",
@@ -1208,7 +1208,7 @@
  {
   "name": "Page Curl",
   "id": "pagecurl",
-  "measured": "close"
+  "measured": "same"
  },
  {
   "name": "Parenting Helper",
@@ -1297,7 +1297,7 @@
  {
   "name": "Streak Strips",
   "id": "streakstrips",
-  "measured": "close"
+  "measured": "same"
  },
  {
   "name": "Three-axis Cross",
@@ -1324,7 +1324,7 @@
  {
   "name": "Tunnel",
   "id": "tunnel",
-  "measured": "close"
+  "measured": "same"
  },
  {
   "name": "volumetricclouds",

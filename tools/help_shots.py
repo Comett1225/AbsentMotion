@@ -23,7 +23,7 @@ PAGES = ROOT / "site/pages"
 IMAGES = ROOT / "site/assets/img"
 TRANSLATIONS = ROOT / "site/data/help-translations"
 WORK = ROOT / "build/help-shots"
-FONT = ROOT / "shared/assets/fonts/Roboto/Roboto-Bold.ttf"
+FONT = ROOT / "shared/assets/fonts/Roboto/Roboto-Variable.ttf"
 SHOWCASE = ROOT / "tools/effect_showcase.json"
 TEST_MEDIA = ROOT / "testdata/media"
 ACTIVITY = "app.absentmotion.MainActivity"
@@ -411,6 +411,7 @@ def badge(image, point, number, style):
     draw.ellipse((mid - radius - ring_width, mid - radius - ring_width, mid + radius + ring_width, mid + radius + ring_width), fill=(255, 255, 255, 255))
     draw.ellipse((mid - radius, mid - radius, mid + radius, mid + radius), fill=tuple(style["accent"]) + (255,))
     font = ImageFont.truetype(str(FONT), int(d * 0.64 * k))
+    font.set_variation_by_axes([700])
     left, top, right, bottom = draw.textbbox((0, 0), str(number), font=font)
     draw.text((mid - (left + right) / 2, mid - (top + bottom) / 2), str(number), font=font, fill=tuple(style["ink"]) + (255,))
     layer = layer.resize((size, size), Image.LANCZOS)

@@ -2,6 +2,9 @@
  "id": "noise",
  "name": "Noise",
  "category": "noise",
+ "also": [
+  "procedural"
+ ],
  "since": "4.0.0",
  "description": "Covers the layer with fine grain, one grain per pixel, that changes every frame. Monochrome makes the grain grey, Extremes makes every grain fully light or dark, and Freeze holds the pattern still.",
  "params": [

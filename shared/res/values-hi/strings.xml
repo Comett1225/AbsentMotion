@@ -1506,6 +1506,9 @@
     <string name="effects_visibility">विज़िबिलिटी</string>
     <string name="effects_reorder">रीऑर्डर</string>
     <string name="speed_freeze_frame">फ़्रीज़ फ़्रेम</string>
+    <string name="speed_keep_pitch">पिच बनाए रखें</string>
+    <string name="landscape_unlocked">लैंडस्केप अनलॉक हुआ</string>
+    <string name="gpu_software_fallback">पिछली बार शुरू होते समय ग्राफ़िक्स ड्राइवर क्रैश हुआ, इसलिए AbsentMotion अब ग्राफ़िक्स कार्ड के बिना ड्रॉ करता है (धीमा)। ग्राफ़िक्स ड्राइवर अपडेट करने से यह ठीक हो सकता है।</string>
     <string name="speed_reverse">रिवर्स</string>
     <string name="speed_reverse_remove_ai">रिवर्स करने से पहले इस क्लिप से स्मूद और एन्हांस हटाएँ</string>
     <string name="speed_seconds">सेकंड</string>

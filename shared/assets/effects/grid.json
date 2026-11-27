@@ -2,6 +2,9 @@
  "id": "grid",
  "name": "Grid",
  "category": "stylize",
+ "also": [
+  "procedural"
+ ],
  "since": "3.0.0",
  "description": "Draws grid lines over the opaque parts of the layer, or cuts them out of it.",
  "params": [

@@ -10,7 +10,9 @@
   "move": "Hareket",
   "new": "Yeni",
   "noise": "Gürültü",
+  "opacity": "Opaklık",
   "other": "Diğer",
+  "procedural": "Prosedürel",
   "repeat": "Tekrar",
   "stylize": "Stil",
   "text": "Metin"
@@ -2619,6 +2621,13 @@
     "span": {
      "label": "Uzunluk"
     },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klasik",
+      "Standart"
+     ]
+    },
     "to": {
      "label": "Bitiş"
     },
@@ -2946,7 +2955,7 @@
    }
   },
   "fontweight": {
-   "description": "Harflerin kalınlığını inceden ağıra doğru ayarlar ve anahtar karelerle canlandırılabilir. Her kalınlığı tek dosyada tutan değişken yazı tipleriyle çalışır: yazı tipi listesindeki Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display ve Dancing Script ya da içe aktardığınız bir değişken yazı tipi. Sabit kalınlıklı yazı tipleri kendi görünümünü korur.",
+   "description": "Harflerin kalınlığını inceden ağıra doğru ayarlar ve anahtar karelerle canlandırılabilir. Her kalınlığı tek dosyada tutan değişken yazı tipleriyle çalışır: yazı tipi listesindeki Roboto, Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display ve Dancing Script ya da içe aktardığınız bir değişken yazı tipi. Sabit kalınlıklı yazı tipleri kendi görünümünü korur.",
    "name": "Yazı tipi kalınlığı",
    "params": {
     "weight": {
@@ -3238,6 +3247,13 @@
     },
     "refraction": {
      "label": "Kırılma"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klasik",
+      "Standart"
+     ]
     },
     "tint": {
      "label": "Ton"
@@ -4647,6 +4663,9 @@
       "Klasik",
       "Standart"
      ]
+    },
+    "importProfile": {
+     "label": "İçe Aktarma Profili"
     }
    }
   },
@@ -5441,6 +5460,13 @@
     "specularity": {
      "label": "Yansıma"
     },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klasik",
+      "Standart"
+     ]
+    },
     "useLuma": {
      "label": "Katman parlaklığını kullan"
     }
@@ -5547,6 +5573,12 @@
       "Klasik",
       "Standart"
      ]
+    },
+    "rollAlpha": {
+     "label": "Alfa"
+    },
+    "frontShadow": {
+     "label": "Ön Gölge"
     }
    }
   },
@@ -6761,6 +6793,13 @@
     },
     "roll": {
      "label": "Yatış"
+    },
+    "style": {
+     "label": "Stil",
+     "options": [
+      "Klasik",
+      "Standart"
+     ]
     },
     "yaw": {
      "label": "Sapma"
@@ -9320,6 +9359,13 @@
    "description": "Katmanın opak kısımlarını yumuşak fraktal gürültüyle doldurur; bulutlar, duman veya parlaklık haritası için.",
    "name": "Türbülans",
    "params": {
+    "alight": {
+     "label": "Stil",
+     "options": [
+      "Klasik",
+      "Standart"
+     ]
+    },
     "alpha": {
      "label": "Alfa"
     },
@@ -9894,6 +9940,8 @@
      "label": "Yerleşim",
      "options": [
       "Klasik",
+      "Standart",
+      "Standart",
       "Standart"
      ]
     }

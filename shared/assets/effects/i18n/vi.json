@@ -10,7 +10,9 @@
   "move": "Di chuyển",
   "new": "Mới",
   "noise": "Nhiễu",
+  "opacity": "Độ mờ",
   "other": "Khác",
+  "procedural": "Thủ tục",
   "repeat": "Lặp lại",
   "stylize": "Cách điệu",
   "text": "Văn bản"
@@ -2619,6 +2621,13 @@
     "span": {
      "label": "Chiều dài"
     },
+    "style": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
+    },
     "to": {
      "label": "Điểm cuối"
     },
@@ -2946,7 +2955,7 @@
    }
   },
   "fontweight": {
-   "description": "Đặt độ dày của chữ, từ mảnh đến đậm, và có thể tạo chuyển động bằng keyframe. Dùng được với phông chữ biến thiên, loại chứa mọi độ đậm trong một tệp: Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display và Dancing Script trong danh sách phông chữ, hoặc một phông chữ biến thiên do bạn nhập vào. Phông chữ có độ đậm cố định vẫn giữ nguyên diện mạo của chúng.",
+   "description": "Đặt độ dày của chữ, từ mảnh đến đậm, và có thể tạo chuyển động bằng keyframe. Dùng được với phông chữ biến thiên, loại chứa mọi độ đậm trong một tệp: Roboto, Raleway, Quicksand, Comfortaa, Lora, Bitter, Orbitron, Playfair Display và Dancing Script trong danh sách phông chữ, hoặc một phông chữ biến thiên do bạn nhập vào. Phông chữ có độ đậm cố định vẫn giữ nguyên diện mạo của chúng.",
    "name": "Độ đậm phông chữ",
    "params": {
     "weight": {
@@ -3238,6 +3247,13 @@
     },
     "refraction": {
      "label": "Khúc xạ"
+    },
+    "style": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
     },
     "tint": {
      "label": "Độ phủ màu"
@@ -4647,6 +4663,9 @@
       "Cổ điển",
       "Tiêu chuẩn"
      ]
+    },
+    "importProfile": {
+     "label": "Cấu hình nhập"
     }
    }
   },
@@ -5441,6 +5460,13 @@
     "specularity": {
      "label": "Độ phản xạ"
     },
+    "style": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
+    },
     "useLuma": {
      "label": "Dùng độ sáng của lớp"
     }
@@ -5547,6 +5573,12 @@
       "Cổ điển",
       "Tiêu chuẩn"
      ]
+    },
+    "rollAlpha": {
+     "label": "Alpha"
+    },
+    "frontShadow": {
+     "label": "Bóng phía trước"
     }
    }
   },
@@ -6761,6 +6793,13 @@
     },
     "roll": {
      "label": "Góc xoay"
+    },
+    "style": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
     },
     "yaw": {
      "label": "Góc ngang"
@@ -9320,6 +9359,13 @@
    "description": "Tô các phần mờ đục của lớp bằng nhiễu fractal mượt, dùng cho mây, khói hoặc bản đồ độ sáng.",
    "name": "Nhiễu loạn",
    "params": {
+    "alight": {
+     "label": "Kiểu",
+     "options": [
+      "Cổ điển",
+      "Tiêu chuẩn"
+     ]
+    },
     "alpha": {
      "label": "Alpha"
     },
@@ -9894,6 +9940,8 @@
      "label": "Bố cục",
      "options": [
       "Cổ điển",
+      "Tiêu chuẩn",
+      "Tiêu chuẩn",
       "Tiêu chuẩn"
      ]
     }
