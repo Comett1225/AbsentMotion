@@ -2,7 +2,7 @@
 title: Download
 kind: download
 site_only: true
-summary: A free and open source alternative to CapCut and Alight Motion, for Android, Mac, Windows and Linux. It works offline. No account, no subscription, no ads.
+summary: A free and open source alternative to CapCut and Alight Motion, for Android, Mac, Windows and Linux.
 ---
 ## Got a complaint or an issue?
 

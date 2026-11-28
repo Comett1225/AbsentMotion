@@ -82,6 +82,8 @@ figcaption{font-size:.9rem;color:var(--mid);margin-top:.4rem}
 .hero h1{font-size:2.4rem;margin:.5rem 0 .4rem}
 .hero-logo{border-radius:22px}
 .hero .lead{max-width:34rem;margin:0 auto}
+.hero-actions{margin:1rem 0 0}
+.btn.discord{flex-direction:row;gap:.6rem;min-height:52px;padding:0 1.6rem;border-radius:12px;background:#5865F2;border-color:#5865F2;color:#fff;font-size:1rem}
 .rec{min-height:19rem;margin:1.5rem 0;padding:1.4rem 1.5rem;background:var(--panel);border:1px solid var(--line);border-radius:1rem;box-shadow:var(--shadow)}
 .rec h2{margin:0 0 .4rem;font-size:1.3rem}
 .rec p{margin:.6rem 0}
