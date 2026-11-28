@@ -345,7 +345,7 @@ SkMatrix LayerMatrix(const Layer& layer, float t);
 
 SkRect MediaRect(const Layer& layer, const SkRect& bounds, int width, int height);
 void DrawMedia(SkCanvas* canvas, const Layer& layer, const SkPath& path, float opacity,
-               const MediaPictures& pictures);
+               const MediaPictures& pictures, float t = -1);
 
 struct ModelSkin {
     std::vector<int> parents, ids, jointBones, joints;

@@ -136,3 +136,19 @@ fun Layer.withNormalSpeed(speed: Float): Layer {
 }
 
 private fun speedText(speed: Float): String = speed.toBigDecimal().stripTrailingZeros().toPlainString()
+
+val Layer.mediaTimed: Boolean get() = mediaFill?.video == true || kind == "audio"
+
+val Layer.speedable: Boolean get() = mediaTimed || kind == "text" || kind == "nullobj" ||
+    nested?.let { it.retime == "off" && node.child("frame") == null } == true
+
+fun Layer.layerSpeed(): Float =
+    (node.child("speedMap")?.valueAt(0f) ?: node["speed"])?.finiteFloat()?.takeIf { it > 0f } ?: 1f
+
+fun Layer.withLayerSpeed(speed: Float): Layer {
+    val ratio = layerSpeed().toDouble() / speed
+    var n = node.withChild("speedMap", null).with("speed", if (speed == 1f) null else speedText(speed))
+        .with("endTime", "${startTime + ((endTime - startTime) * ratio).roundToInt().coerceAtLeast(1)}")
+    if (nested != null) n["inTime"]?.toIntOrNull()?.let { n = n.with("inTime", "${(it * ratio).roundToInt()}") }
+    return copy(node = n)
+}

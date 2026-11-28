@@ -14,7 +14,7 @@ import kotlin.math.abs
 
 class AppearanceTest {
     private val dark = Color(0xFF17181B)
-    private val accentKeys = setOf("Accent", "AccentLit", "AccentGlow", "AccentDeep", "OnAccent", "HomeAccent", "OnNavyAccent")
+    private val accentKeys = setOf("Accent", "AccentLit", "AccentGlow", "AccentDeep", "OnAccent", "HomeAccent", "OnNavyAccent", "SelectionBorder")
 
     @Test fun theDefaultAccentLeavesEveryPaletteExactlyAsItWas() {
         for ((_, palette) in Palette.BuiltIn) assertSame(palette, Accents.apply(palette, null))

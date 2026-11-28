@@ -11,6 +11,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import kotlinx.coroutines.flow.first
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -119,15 +121,36 @@ internal fun TextEditor(state: EditorState, ui: TextEditUi = remember { TextEdit
             if (!ui.browser && !leaving) ui.refocus(keyboard)
         }
     }
-    val finish = { leaving = true; ui.imeShown = false; state.endGesture(); keyboard?.hide(); state.panel = EditorPanel.Tools }
+    var closing by remember { mutableStateOf(false) }
+    val finish = {
+        if (!closing) {
+            leaving = true; ui.imeShown = false; state.endGesture(); keyboard?.hide()
+            if (embedded) state.panel = EditorPanel.Tools else closing = true
+        }
+    }
     LaunchedEffect(layer.id) { state.playing = false }
     BackHandler { if (popup.isNotEmpty()) popup = "" else finish() }
     DisposableEffect(layer.id) { onDispose { state.endGesture() } }
-    Box(if (embedded) Modifier.fillMaxSize().background(Am.Panel) else Modifier.fillMaxSize().background(Am.TopBar).systemBarsPadding().imePadding()) {
+    val density = LocalDensity.current
+    val navInsets = WindowInsets.navigationBars
+    val imeInsets = WindowInsets.ime
+    LaunchedEffect(closing) {
+        if (!closing) return@LaunchedEffect
+        kotlinx.coroutines.withTimeoutOrNull(700) {
+            androidx.compose.runtime.snapshotFlow { imeInsets.getBottom(density) > navInsets.getBottom(density) }.first { !it }
+        }
+        state.panel = EditorPanel.Tools
+    }
+    val imeNow = if (embedded) 0.dp else with(density) { (imeInsets.getBottom(density) - navInsets.getBottom(density)).coerceAtLeast(0).toDp() }
+    val screen = androidx.compose.ui.platform.LocalConfiguration.current
+    val wanted = if (isTablet(screen.smallestScreenWidthDp)) maxOf(280, screen.screenHeightDp * 2 / 5).dp else 280.dp
+    BoxWithConstraints(if (embedded) Modifier.fillMaxSize().background(Am.Panel) else Modifier.fillMaxSize().background(Am.TopBar).systemBarsPadding().displayCutoutPadding()) {
+        val restPreview = maxHeight - 42.dp - 46.dp - lowerPanelHeight(maxHeight, wanted)
+        val previewHeight = minOf(restPreview, maxHeight - 42.dp - 60.dp - imeNow).coerceAtLeast(0.dp)
         if (ui.browser && !embedded) {
             Box(Modifier.fillMaxSize().enterFade(rise = 12.dp)) { TextFontBrowser(state, ui) }
         } else {
-            Column(Modifier.fillMaxSize()) {
+            Column(Modifier.fillMaxSize().padding(bottom = imeNow)) {
                 Row(Modifier.fillMaxWidth().height(42.dp).background(Am.Deepest), verticalAlignment = Alignment.CenterVertically) {
                     val alignIcon = when (layer.textAlign) { "center" -> TextIcons.Centre; "right" -> TextIcons.Right; "justify" -> TextIcons.Justify; else -> TextIcons.Left }
                     Box(Modifier.padding(1.5.dp).width(38.dp).fillMaxHeight().clip(RoundedCornerShape(2.dp)).background(TextControl).tutorialGuard().clickable {
@@ -155,9 +178,13 @@ internal fun TextEditor(state: EditorState, ui: TextEditUi = remember { TextEdit
                         ColourSwatch(layer.fillColor, 24.dp)
                         HoldName(stringResource(R.string.color))
                     }
-                    FontIconButton(TextIcons.Tick, stringResource(R.string.done), Modifier.tutorialTarget("text_done"), tint = Am.Accent, onClick = finish)
+                    FontIconButton(TextIcons.Tick, stringResource(R.string.done), Modifier.tutorialTarget("text_done"), tint = Am.Accent,
+                        onClick = { if (popup.isNotEmpty()) popup = "" else finish() })
                 }
-                if (!embedded) Preview(state, Modifier.fillMaxWidth().weight(1f))
+                if (!embedded) {
+                    Preview(state, Modifier.fillMaxWidth().height(previewHeight))
+                    Spacer(Modifier.weight(1f))
+                }
                 TextContent(state, layer, ui, Modifier.fillMaxWidth().height(if (embedded) 132.dp else 60.dp).tutorialTarget("text_field"))
             }
             if (popup.isNotEmpty() && state.eyedropper == null) Box(Modifier.fillMaxSize().padding(top = 42.dp).tutorialGuard().clickable(interactionSource = null, indication = null) { popup = "" })

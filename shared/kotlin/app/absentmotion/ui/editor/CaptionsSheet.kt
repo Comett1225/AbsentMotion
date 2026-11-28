@@ -74,6 +74,11 @@ import kotlinx.coroutines.withContext
 import app.absentmotion.audio.soundUri
 import app.absentmotion.model.shownName
 import app.absentmotion.editor.EditorState
+import app.absentmotion.editor.SourcePick
+import app.absentmotion.editor.MultiSelect
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.draw.alpha
 import app.absentmotion.editor.FullColor
 import app.absentmotion.ui.editor.panels.FullColorPicker
 import app.absentmotion.fonts.FontLibrary
@@ -149,17 +154,25 @@ internal fun CaptionsSheet(state: EditorState, clipId: Long? = null, onClose: ()
     val snapshot = remember { state.scene }
     val sources = remember { snapshot.layers.filter { it.soundUri != null }.reversed() }
     val locked = clipId != null
-    var source by remember {
-        mutableStateOf(
-            when {
-                locked -> clipId
-                else -> null
-            }
-        )
+    var chosen by remember { mutableStateOf(listOfNotNull(clipId)) }
+    var style by remember {
+        val have = listOf(false, true).filter { CaptionModel.installed(context, it) }
+        mutableStateOf(lastStyle.let { if (have.size == 1) it.copy(highPrecision = have[0]) else it })
     }
-    var sourceMenu by remember { mutableStateOf(false) }
-    var style by remember { mutableStateOf(lastStyle) }
     var phase by remember { mutableStateOf(Phase.Choose) }
+    val installed = remember(phase) { listOf(false, true).map { CaptionModel.installed(context, it) } }
+    DisposableEffect(state) { onDispose { if (state.sourcePick != null) state.sourcePick = null } }
+    fun pick() {
+        state.playing = false
+        state.selectedId = null
+        MultiSelect.clear()
+        state.sourcePick = SourcePick(sources.map { it.id }.toSet()) { picked ->
+            state.sourcePick = null
+            state.selectedId = null
+            MultiSelect.clear()
+            if (!picked.isNullOrEmpty()) chosen = picked
+        }
+    }
     var progress by remember { mutableFloatStateOf(0f) }
     var status by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("") }
@@ -187,7 +200,7 @@ internal fun CaptionsSheet(state: EditorState, clipId: Long? = null, onClose: ()
         progress = 0f
         phaseStart = System.nanoTime()
         status = context.getString(R.string.caption_reading_audio)
-        val chunks = recogniseCaptions(context, snapshot, source, style) { fraction, text ->
+        val chunks = recogniseCaptions(context, snapshot, chosen, style) { fraction, text ->
             scope.launch { if (phase == Phase.Work && job?.isActive == true) { progress = fraction; status = text } }
         }
         coroutineContext.ensureActive()
@@ -195,14 +208,14 @@ internal fun CaptionsSheet(state: EditorState, clipId: Long? = null, onClose: ()
         onClose()
     }
     fun generate() {
-        if (source != null && sources.none { it.id == source }) { message = context.getString(R.string.ai_no_sound_to_caption); return }
+        if (chosen.any { id -> sources.none { it.id == id } }) { message = context.getString(R.string.ai_no_sound_to_caption); return }
         if (CaptionModel.installed(context, style.highPrecision)) start { captions() } else { message = ""; phase = Phase.Confirm }
     }
     val srt = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) start {
             val text = withContext(Dispatchers.IO) { context.contentResolver.openInputStream(uri)?.use { srtText(it.readAtMost(MaxSrtBytes)) } }
                 ?: error(context.getString(R.string.caption_unable))
-            val chunks = snapshot.srtChunks(text, source).ifEmpty { error(context.getString(R.string.caption_srt_empty)) }
+            val chunks = snapshot.srtChunks(text, chosen.singleOrNull()).ifEmpty { error(context.getString(R.string.caption_srt_empty)) }
             state.addCaptions(chunks, style, fonts)
             onClose()
         }
@@ -220,14 +233,13 @@ internal fun CaptionsSheet(state: EditorState, clipId: Long? = null, onClose: ()
         when {
             running != null -> running.cancel()
             browsing -> browsing = false
-            sourceMenu -> sourceMenu = false
             else -> onClose()
         }
     }
 
     val working = phase == Phase.Download || phase == Phase.Work
     val scrimTap by rememberUpdatedState { if (!working && !browsing) dismiss() }
-    Dialog(::dismiss, DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false, dismissOnClickOutside = false)) {
+    if (state.sourcePick == null) Dialog(::dismiss, DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false, dismissOnClickOutside = false)) {
         val wide = app.absentmotion.ui.adaptive.adaptiveWindowIsWide()
         val content: @Composable () -> Unit = {
         BoxWithConstraints(
@@ -260,10 +272,9 @@ internal fun CaptionsSheet(state: EditorState, clipId: Long? = null, onClose: ()
                         state = state,
                         sources = sources,
                         locked = locked,
-                        source = source,
-                        sourceMenu = sourceMenu,
-                        onSourceMenu = { sourceMenu = it },
-                        onSource = { source = it },
+                        chosen = chosen,
+                        onPick = ::pick,
+                        installed = installed,
                         style = style,
                         onStyle = ::update,
                         appearanceOpen = appearanceOpen,
@@ -292,10 +303,9 @@ private fun SetupScreen(
     state: EditorState,
     sources: List<app.absentmotion.model.Layer>,
     locked: Boolean,
-    source: Long?,
-    sourceMenu: Boolean,
-    onSourceMenu: (Boolean) -> Unit,
-    onSource: (Long?) -> Unit,
+    chosen: List<Long>,
+    onPick: () -> Unit,
+    installed: List<Boolean>,
     style: CaptionStyle,
     onStyle: (CaptionStyle) -> Unit,
     appearanceOpen: Boolean,
@@ -315,25 +325,12 @@ private fun SetupScreen(
             val sourceContent: @Composable () -> Unit = {
             Text(stringResource(if (locked) R.string.caption_scope_clip else R.string.caption_intro), Modifier.fillMaxWidth().padding(bottom = 16.dp), color = Am.OnDarkDim, fontSize = 13.sp, lineHeight = 18.sp)
             GroupTitle(stringResource(R.string.caption_source))
-            if (locked) {
-                val layer = sources.firstOrNull { it.id == source }
-                val title = layer?.label?.ifEmpty { layer.soundUri?.let(state.scene::media)?.title.orEmpty() }?.ifEmpty { layer.shownName() }.orEmpty()
-                Line(stringResource(R.string.caption_source)) {
-                    Text(title, Modifier.widthIn(max = 220.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                }
-            } else {
-                val names = listOf(stringResource(R.string.caption_whole_project)) + sources.map { layer ->
-                    layer.label.ifEmpty { layer.soundUri?.let(state.scene::media)?.title.orEmpty() }.ifEmpty { layer.shownName() }
-                }
-                Box {
-                    Line(stringResource(R.string.caption_source), Modifier.clickable { onSourceMenu(true) }) {
-                        Text(names[sources.indexOfFirst { it.id == source } + 1], Modifier.widthIn(max = 220.dp), color = Am.OnDark, fontSize = 14.sp,
-                            maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        Icon(ChromeIcons.ChevronDown, null, Modifier.size(24.dp), tint = Am.OnDark)
-                    }
-                    Presence(sourceMenu) { ChoiceList(names, { onSourceMenu(false) }) { onSource(sources.getOrNull(it - 1)?.id) } }
-                }
+            val title = if (chosen.isEmpty()) stringResource(R.string.caption_whole_project) else chosen.mapNotNull { id -> sources.firstOrNull { it.id == id } }
+                .joinToString(", ") { layer -> layer.label.ifEmpty { layer.soundUri?.let(state.scene::media)?.title.orEmpty() }.ifEmpty { layer.shownName() } }
+            Line(stringResource(R.string.caption_source)) {
+                Text(title, Modifier.widthIn(max = 220.dp), color = Am.OnDark, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
+            if (!locked) Action(stringResource(R.string.caption_select_source), Modifier.fillMaxWidth().padding(top = 4.dp), onClick = onPick)
             Spacer(Modifier.height(8.dp))
             }
             val optionsContent: @Composable () -> Unit = {
@@ -346,7 +343,8 @@ private fun SetupScreen(
                 Text(stringResource(R.string.caption_model), color = Am.OnDark, fontSize = 14.sp)
                 Spacer(Modifier.height(8.dp))
                 Row(Modifier.horizontalScroll(rememberScrollState())) {
-                    Choices(listOf(stringResource(R.string.caption_model_standard), stringResource(R.string.caption_model_precision)), if (style.highPrecision) 1 else 0) { onStyle(style.copy(highPrecision = it == 1)) }
+                    Choices(listOf(stringResource(R.string.caption_model_standard), stringResource(R.string.caption_model_precision)).mapIndexed { i, text -> if (installed[i]) modelName(text) else text },
+                        if (style.highPrecision) 1 else 0) { onStyle(style.copy(highPrecision = it == 1)) }
                 }
             }
             Line(stringResource(R.string.caption_appearance), Modifier.clickable { onAppearance(!appearanceOpen) }) {
@@ -542,8 +540,30 @@ internal fun Steps(value: Int, range: IntRange, step: Int, text: String, onChang
 }
 
 @Composable
-internal fun Action(label: String, modifier: Modifier, primary: Boolean = false, onClick: () -> Unit) {
-    Box(modifier.heightIn(min = 40.dp).clip(ChoiceShape).background(if (primary) Am.Accent else Am.Button).clickable(onClick = onClick).padding(horizontal = 8.dp), Alignment.Center) {
+internal fun Action(label: String, modifier: Modifier, primary: Boolean = false, enabled: Boolean = true, onClick: () -> Unit) {
+    Box(modifier.heightIn(min = 40.dp).alpha(if (enabled) 1f else 0.4f).clip(ChoiceShape).background(if (primary) Am.Accent else Am.Button).clickable(enabled = enabled, onClick = onClick).padding(horizontal = 8.dp), Alignment.Center) {
         Text(label, color = if (primary) Am.OnAccent else Am.OnDark, fontSize = 15.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+    }
+}
+
+internal fun modelName(label: String): String = label.substringBefore("·").substringBefore("・").trim()
+
+@Composable
+internal fun SourcePickBar(state: EditorState, modifier: Modifier) {
+    val pick = state.sourcePick ?: return
+    app.absentmotion.platform.BackHandler { pick.done(null) }
+    LaunchedEffect(pick) {
+        snapshotFlow { state.selectedId }.collect { id ->
+            if (id == null) return@collect
+            if (id in pick.usable && !MultiSelect.active) pick.done(listOf(id)) else state.selectedId = null
+        }
+    }
+    val picked = MultiSelect.ids.filter { it in pick.usable }
+    Column(modifier.background(Am.Panel).pointerInput(Unit) { detectTapGestures { } }.padding(horizontal = 16.dp, vertical = 10.dp), Arrangement.spacedBy(8.dp)) {
+        Text(stringResource(R.string.caption_pick_hint), color = Am.OnDark, fontSize = 13.sp, lineHeight = 17.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Action(stringResource(R.string.cancel), Modifier.weight(1f)) { pick.done(null) }
+            Action(stringResource(R.string.done), Modifier.weight(1f), primary = true, enabled = picked.isNotEmpty()) { pick.done(picked) }
+        }
     }
 }

@@ -1,0 +1,71 @@
+{
+ "cube-rotate.xml": {
+  "note": "source fix: the ray-box test ignored the ray origin and drew nothing; now uses it",
+  "patch": [
+   [
+    "vec3 t1=-m-b; vec3 t2=-m+b;",
+    "vec3 n=m*ro; vec3 t1=-n-b; vec3 t2=-n+b;"
+   ]
+  ]
+ },
+ "parallax-depth.xml": {
+  "meta": {
+   "change": "camera",
+   "changeValue": "150,100"
+  },
+  "note": "does nothing until Camera Offset moves off 0,0 (as in the original)"
+ },
+ "tanryu_card_dance.xml": {
+  "note": "source fix: float assigned to vec2; loose param format (<param type=slider>) read as sliders; its Rotation setting is unused by the shader",
+  "patch": [
+   [
+    "vec2 offset = (randID - 0.5) * (multiplier * 0.001);",
+    "vec2 offset = vec2((randID - 0.5) * (multiplier * 0.001));"
+   ]
+  ]
+ },
+ "tanryuflame.xml": {
+  "note": "source fix: a vec4 built from 5 values (GLSL drops the extra one, SkSL refuses it)",
+  "patch": [
+   [
+    "vec4(0.,0.,0.,uv*0.6+vec2(.5,.1)).xyz",
+    "vec4(0.,0.,0.,(uv*0.6+vec2(.5,.1)).x).xyz"
+   ]
+  ]
+ },
+ "tanryulensblurobs.xml": {
+  "meta": {
+   "change": "progressa",
+   "changeValue": "0.1"
+  },
+  "note": "blur is barely visible at the default Strength 0 (as in the original)"
+ },
+ "tanryulighting.xml": {
+  "meta": {
+   "change": "progressa",
+   "changeValue": "3"
+  },
+  "note": "the bolt only shows for some Progress values (as in the original)"
+ },
+ "tanryulongshadow2new.xml": {
+  "note": "source fix: min(int, int), which SkSL lacks, written as a comparison",
+  "patch": [
+   [
+    "minDist = min(minDist,i);",
+    "minDist = i < minDist ? i : minDist;"
+   ]
+  ]
+ },
+ "tanryusnow.xml": {
+  "meta": {
+   "change": "LAYERS",
+   "changeValue": "1"
+  }
+ },
+ "tanryusolidcolornew.xml": {
+  "meta": {
+   "flatOk": true
+  },
+  "note": "one flat colour by design"
+ }
+}

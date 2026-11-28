@@ -68,6 +68,8 @@ import app.absentmotion.model.SLOWEST_SPEED
 import app.absentmotion.model.SpeedTicks
 import app.absentmotion.model.isKeyframed
 import app.absentmotion.model.normalSpeed
+import app.absentmotion.model.layerSpeed
+import app.absentmotion.model.mediaTimed
 import app.absentmotion.model.rulerTick
 import app.absentmotion.model.steppedSpeed
 import app.absentmotion.model.tickSpeed
@@ -91,6 +93,10 @@ fun SpeedPanel(state: EditorState, layer: Layer, modifier: Modifier = Modifier) 
     val video = layer.mediaFill?.video == true
     var tab by remember(layer.id) { mutableIntStateOf(if (layer.remapped && video) 2 else if (layer.node.child("speedMap")?.isKeyframed == true) 1 else 0) }
     var editing by remember(layer.id) { mutableStateOf<List<CurvePoint>?>(null) }
+    if (!layer.mediaTimed) {
+        NormalSpeed(state, layer, ai, modifier)
+        return
+    }
     BackHandler(editing != null) { editing = null }
     Swap(editing != null, modifier, rise = 0.dp) {
         val base = editing
@@ -166,7 +172,8 @@ private fun RemapTime(state: EditorState, layer: Layer, modifier: Modifier) {
 
 @Composable
 private fun NormalSpeed(state: EditorState, layer: Layer, ai: AiTools, modifier: Modifier) {
-    val speed = remember(layer.node) { layer.normalSpeed().coerceIn(SLOWEST_SPEED, FASTEST_SPEED) }
+    val timed = layer.mediaTimed
+    val speed = remember(layer.node) { (if (timed) layer.normalSpeed() else layer.layerSpeed()).coerceIn(SLOWEST_SPEED, FASTEST_SPEED) }
     val inside = state.sampleMs in (layer.startTime + 1) until layer.endTime
     val before = state.sampleMs < layer.startTime
     val past = state.sampleMs > layer.endTime
@@ -176,7 +183,7 @@ private fun NormalSpeed(state: EditorState, layer: Layer, ai: AiTools, modifier:
     val secondsLabel = stringResource(R.string.speed_seconds)
     val video = layer.mediaFill?.video == true && ai.running == null
     Column(modifier.padding(top = 8.dp), Arrangement.spacedBy(8.dp)) {
-        RetimeButtons(state, usable, Modifier.padding(horizontal = 15.dp).fillMaxWidth().height(36.dp))
+        if (timed) RetimeButtons(state, usable, Modifier.padding(horizontal = 15.dp).fillMaxWidth().height(36.dp))
         Row(Modifier.padding(horizontal = 15.dp).fillMaxWidth().height(48.dp), verticalAlignment = Alignment.CenterVertically) {
             EffectRuler(rulerTick(speed).toFloat(), 1f, 1f, SpeedTicks.size.toFloat(), true,
                 { held[0] = state.selected }, { tick -> held[0]?.let { state.setVideoSpeed(tickSpeed(tick.roundToInt()), it) } }, state::endGesture,
@@ -185,7 +192,7 @@ private fun NormalSpeed(state: EditorState, layer: Layer, ai: AiTools, modifier:
                 state.askNumber(speedLabel, speed, "x", SLOWEST_SPEED, FASTEST_SPEED) { v -> if (v != speed) state.selected?.let { state.setVideoSpeed(steppedSpeed(v), it); state.endGesture() } }
             }
         }
-        Row(Modifier.fillMaxWidth().height(34.dp).horizontalScroll(rememberScrollState()).padding(horizontal = 15.dp), Arrangement.spacedBy(6.dp)) {
+        if (timed) Row(Modifier.fillMaxWidth().height(34.dp).horizontalScroll(rememberScrollState()).padding(horizontal = 15.dp), Arrangement.spacedBy(6.dp)) {
             RampChip(stringResource(R.string.smooth_clip), video, layer.aiMarks.any { it.kind == AiKind.Smooth }) { state.playing = false; ai.apply(AiAction.Smooth) }
             RampChip(stringResource(R.string.speed_reverse), video, layer.reverseMark != null) { state.playing = false; ai.apply(AiAction.Reverse) }
             RampChip(stringResource(R.string.speed_freeze_frame), inside) { state.askNumber(secondsLabel, 2f, "", 0.1f, 30f) { state.freezeFrame(it) } }

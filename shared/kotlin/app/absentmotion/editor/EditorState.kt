@@ -269,6 +269,10 @@ class EditorState(
     var addOpen by mutableStateOf(false)
 
     var cameraOpen by mutableStateOf(false)
+    var captionsOpen by mutableStateOf(false)
+    var bodyShown = false
+    var sourcePick by mutableStateOf<SourcePick?>(null)
+    var missingMedia by mutableStateOf<Set<String>>(emptySet())
 
     var drawing by mutableStateOf<DrawingMode?>(null)
 
@@ -406,7 +410,7 @@ class EditorState(
         if (previous != null && (key != previous.key || pivot != previous.pivotId)) endGesture()
         val before = scene
         val direct = change(before)
-        val changed = direct.withValueLinksFollowing(before).withMattesFollowing(before).withOutlinesFollowing(before).withFacePathsFollowing()
+        val changed = direct.withValueLinksFollowing(before).withMattesFollowing(before).withOutlinesFollowing(before).withFacePathsFollowing().withStabPathsFollowing()
         if (direct.node !== before.node) lockRefusal(before, direct, groupPath.indices.any { root.focused(groupPath.take(it))?.layer(groupPath[it])?.locked == true })?.let { return hint(it) }
         if (playing) {
             val recording = liveRecording ?: LiveRecording(before, key, settings.overwriteRecording, pivot, ::normalizedPoint)
@@ -675,3 +679,5 @@ internal class EditHistory(private val current: () -> Scene, private val show: (
         const val MAX_UNDO = 200
     }
 }
+
+class SourcePick(val usable: Set<Long>, val done: (List<Long>?) -> Unit)

@@ -10027,6 +10027,63 @@
      "label": "Kadrowanie"
     }
    }
+  },
+  "warmglow": {
+   "description": "Rozmywa warstwę i w każdym kolorze zachowuje ciemniejszą wartość z rozmycia i obrazu, więc cienie łagodnie rozlewają się na jasne części. Maska ogranicza efekt do prostokąta, elipsy lub wielokąta.",
+   "name": "Ciepła poświata",
+   "params": {
+    "blur": {
+     "label": "Poziom"
+    },
+    "mask": {
+     "label": "Maska",
+     "options": [
+      "Brak",
+      "Prostokąt",
+      "Elipsa",
+      "Wielokąt"
+     ]
+    },
+    "maskCenter": {
+     "label": "Położenie maski"
+    },
+    "maskWidth": {
+     "label": "Szerokość maski"
+    },
+    "maskHeight": {
+     "label": "Wysokość maski"
+    },
+    "sides": {
+     "label": "Boki"
+    },
+    "feather": {
+     "label": "Wtapianie"
+    }
+   }
+  },
+  "brokenglass": {
+   "description": "Rozbija obraz jak szybę uderzoną blisko środka: pęknięcia rozchodzą się od punktu uderzenia, a każdy odłamek jest trochę przesunięty i obrócony. Odłamki określa, na ile kawałków się rozpada i jak daleko się przesuwają.",
+   "name": "Stłuczone szkło",
+   "params": {
+    "debris": {
+     "label": "Odłamki"
+    }
+   }
+  },
+  "stabilizer": {
+   "description": "Stabilizuje drżącą warstwę wideo. Wybierz Niska, Średnia lub Wysoka, a ruch kamery w klipie zostanie zmierzony raz i zapisany w projekcie; potem obraz jest przesuwany i obracany przeciw drganiom, z powiększeniem akurat tyle, by ukryć krawędzie. Wyższe poziomy dają stabilniejszy obraz.",
+   "name": "Stabilizator",
+   "params": {
+    "stabilization": {
+     "label": "Stabilizacja",
+     "options": [
+      "Wył.",
+      "Niska",
+      "Średnia",
+      "Wysoka"
+     ]
+    }
+   }
   }
  }
 }

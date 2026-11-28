@@ -10027,6 +10027,63 @@
      "label": "Ritaglio"
     }
    }
+  },
+  "warmglow": {
+   "description": "Sfoca il livello e mantiene in ogni colore il più scuro tra la sfocatura e l'immagine, così le ombre si espandono dolcemente nelle parti chiare. Maschera limita l'effetto a un rettangolo, un'ellisse o un poligono.",
+   "name": "Bagliore caldo",
+   "params": {
+    "blur": {
+     "label": "Livello"
+    },
+    "mask": {
+     "label": "Maschera",
+     "options": [
+      "Nessuno",
+      "Rettangolo",
+      "Ellisse",
+      "Poligono"
+     ]
+    },
+    "maskCenter": {
+     "label": "Posizione maschera"
+    },
+    "maskWidth": {
+     "label": "Larghezza maschera"
+    },
+    "maskHeight": {
+     "label": "Altezza maschera"
+    },
+    "sides": {
+     "label": "Lati"
+    },
+    "feather": {
+     "label": "Sfumatura bordi"
+    }
+   }
+  },
+  "brokenglass": {
+   "description": "Frantuma l'immagine come una lastra di vetro colpita vicino al centro: le crepe partono dal punto d'impatto e ogni scheggia viene spostata e ruotata un poco. Frammenti imposta in quanti pezzi si rompe e quanto si spostano.",
+   "name": "Vetro rotto",
+   "params": {
+    "debris": {
+     "label": "Frammenti"
+    }
+   }
+  },
+  "stabilizer": {
+   "description": "Stabilizza un livello video mosso. Scegli Bassa, Media o Alta: il movimento della camera della clip viene misurato una sola volta e salvato con il progetto; poi l'immagine viene spostata e ruotata contro le vibrazioni, con lo zoom appena sufficiente a nascondere i bordi. I livelli più alti rendono l'immagine più stabile.",
+   "name": "Stabilizzatore",
+   "params": {
+    "stabilization": {
+     "label": "Stabilizzazione",
+     "options": [
+      "Disattivato",
+      "Bassa",
+      "Media",
+      "Alta"
+     ]
+    }
+   }
   }
  }
 }

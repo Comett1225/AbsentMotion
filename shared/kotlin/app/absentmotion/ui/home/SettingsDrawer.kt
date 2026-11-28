@@ -108,8 +108,8 @@ import app.absentmotion.i18n.currentLanguage
 import app.absentmotion.ui.onboarding.LanguageDialog
 import androidx.compose.ui.res.stringResource
 
-private val PanelColor get() = Am.HomePanel
-private val OpenColor get() = androidx.compose.ui.graphics.lerp(Am.HomePanel, Am.HomeInk, 0.06f)
+internal val PanelColor get() = Am.HomePanel
+internal val OpenColor get() = androidx.compose.ui.graphics.lerp(Am.HomePanel, Am.HomeInk, 0.06f)
 private val PanelShape = RoundedCornerShape(7.dp)
 private val DividerColor get() = Am.HomeLine
 private val ListLineColor get() = Am.NavyLine
@@ -118,14 +118,12 @@ internal val CardGap = 10.dp
 private const val DESK = app.absentmotion.platform.PlatformFeatures.desktop
 
 @Composable
-fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.DrawerState, onRestored: () -> Unit = {}) {
+fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.DrawerState, onAdvanced: () -> Unit) {
     var about by remember { mutableStateOf(false) }
     var help by remember { mutableStateOf(false) }
     var crashLogs by remember { mutableStateOf(false) }
     var language by remember { mutableStateOf(false) }
-    var demoNote by remember { mutableStateOf(false) }
     var whatsNew by remember { mutableStateOf(false) }
-    var tools by remember { mutableStateOf(false) }
     ModalDrawerSheet(
         drawer, Modifier.width(280.dp), drawerShape = RectangleShape, drawerContainerColor = Am.HomeDrawer,
         windowInsets = WindowInsets(0),
@@ -137,13 +135,7 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
             )
             AppCard(settings) { whatsNew = true }
             Spacer(Modifier.height(CardGap))
-            Category(R.string.settings_group_editor, HomeIcons.Pencil) { androidx.compose.runtime.key(drawer.targetValue) { EditorSettings(settings) } }
-            Category(R.string.settings_group_playback, HomeIcons.ProjectsTabOff) { PlaybackSettings(settings) }
-            Category(R.string.settings_group_projects, HomeIcons.Folder) { androidx.compose.runtime.key(drawer.targetValue) { ProjectsSettings(settings) { demoNote = it } } }
-            Category(R.string.settings_group_backup, ChromeIcons.SavePreset) {
-                BackupRows(settings, onRestored)
-            }
-            LinkRow(stringResource(R.string.home_tab_tools)) { tools = true }
+            LinkRow(stringResource(R.string.settings_advanced_open), onClick = onAdvanced)
             Spacer(Modifier.height(CardGap))
             LinkRow(stringResource(R.string.settings_language), currentLanguage(LocalContext.current).nativeName) { language = true }
             Spacer(Modifier.height(CardGap))
@@ -168,25 +160,65 @@ fun SettingsDrawer(settings: AppSettings, drawer: androidx.compose.material3.Dra
         }
     }
     if (language) LanguageDialog { language = false }
-    if (tools) CustomizeToolsSheet(settings) { tools = false }
     if (help) HelpScreen { help = false }
     if (about) AboutScreen(settings) { about = false }
     if (crashLogs) CrashLogsScreen { crashLogs = false }
     if (whatsNew) CurrentWhatsNew(settings) { whatsNew = false }
-    if (demoNote) AlertDialog(
-        onDismissRequest = { demoNote = false },
-        title = { Text(stringResource(R.string.demo_mode_is_on), color = Am.Navy) },
-        text = { Text(stringResource(R.string.the_media_picker_lists_only_albums), color = Am.Navy) },
-        confirmButton = { DialogPill(stringResource(R.string.ok)) { demoNote = false } },
-        containerColor = Am.Card,
-    )
+}
+
+@Composable
+private fun AppCard(settings: AppSettings, onWhatsNew: () -> Unit) {
+    val context = LocalContext.current
+    val version = app.absentmotion.platform.appVersion().trim()
+    val notes = remember { WhatsNewNotes.currentName(context) != null }
+    Column(Modifier.padding(horizontal = 6.dp).fillMaxWidth().clip(PanelShape).background(PanelColor).padding(start = 12.dp, end = 10.dp, top = 10.dp, bottom = 12.dp)) {
+        Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
+            Column(Modifier.widthIn(max = 140.dp).padding(end = 8.dp)) {
+                Text("AbsentMotion", color = Am.HomeInk, fontSize = 15.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                if (version.isNotEmpty()) Text(stringResource(R.string.about_version, version), color = Am.HomeMid, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
+            Pill(stringResource(R.string.update_check_now), Am.Navy, Am.OnNavy, Modifier.weight(1f, fill = false), pad = 12.dp, busy = Updates.checking) { Updates.check(context, settings, manual = true) }
+        }
+        Spacer(Modifier.height(10.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (notes) Pill(stringResource(R.string.settings_whats_new), Am.Card, Am.HomeInk, onClick = onWhatsNew)
+            val on = settings.autoUpdateCheck
+            Pill(
+                stringResource(if (on) R.string.settings_auto_check_on else R.string.settings_auto_check_off), Am.Card, Am.HomeInk,
+                Modifier.toggleable(value = on, role = androidx.compose.ui.semantics.Role.Switch) { settings.chooseUpdates(it) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun Pill(label: String, fill: Color, ink: Color, modifier: Modifier = Modifier, pad: androidx.compose.ui.unit.Dp = 14.dp, busy: Boolean = false, onClick: (() -> Unit)? = null) {
+    Box(
+        Modifier.heightIn(min = 38.dp).clip(RoundedCornerShape(50)).background(fill).then(modifier)
+            .then(if (onClick != null) Modifier.deskPress(19.dp).clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = onClick) else Modifier)
+            .padding(horizontal = pad, vertical = 6.dp),
+        Alignment.Center,
+    ) {
+        Text(label, Modifier.alpha(if (busy) 0f else 1f), color = ink, fontSize = 13.sp, lineHeight = 16.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center, maxLines = 2, overflow = TextOverflow.Ellipsis)
+        if (busy) CircularProgressIndicator(Modifier.size(16.dp), color = ink, strokeWidth = 2.dp)
+    }
 }
 
 @Composable
 internal fun EditorSettings(settings: AppSettings) {
+    CustomizationRows(settings)
+    EditorRows(settings)
+}
+
+@Composable
+internal fun CustomizationRows(settings: AppSettings) {
     ThemeRow(settings)
     AccentRow(settings)
     FontRow(settings)
+}
+
+@Composable
+internal fun EditorRows(settings: AppSettings) {
     DurationRow(settings)
     if (!DESK) SwitchRow(stringResource(R.string.settings_vibration), settings.vibration, enabled = true) { settings.vibration = it }
     SwitchRow(stringResource(R.string.settings_transition_in_preview), settings.transitionInPreview, enabled = true) { settings.transitionInPreview = it }
@@ -198,12 +230,29 @@ internal fun EditorSettings(settings: AppSettings) {
 
 @Composable
 internal fun PlaybackSettings(settings: AppSettings) {
+    PreviewRows(settings)
+    Divider(10.dp)
+    PlaybackAdvancedRows(settings)
+    PreviewCopyRows(settings)
+}
+
+@Composable
+internal fun PreviewRows(settings: AppSettings) {
     ChoicesBlock(R.string.preview_quality) {
         Choices(PreviewQuality.entries.map { it.label }, settings.previewQuality.ordinal) { settings.previewQuality = PreviewQuality.entries[it] }
     }
     Divider(10.dp)
     SwitchRow(stringResource(R.string.settings_background_preview), settings.backgroundPreview, enabled = true) { settings.backgroundPreview = it }
-    Divider(10.dp)
+}
+
+@Composable
+internal fun PreviewCopyRows(settings: AppSettings) {
+    SwitchRow(stringResource(R.string.settings_preview_copies), settings.previewCopies, enabled = true) { settings.previewCopies = it }
+    PreviewCopiesRow()
+}
+
+@Composable
+internal fun PlaybackAdvancedRows(settings: AppSettings) {
     SwitchRow(stringResource(R.string.settings_model_detail), settings.highDetailModels, enabled = true) { settings.highDetailModels = it }
     Text(stringResource(R.string.settings_model_detail_note, triangles(MODEL_HIGH_DETAIL_BUDGET), triangles(MODEL_TRIANGLE_BUDGET)), Modifier.padding(horizontal = 10.dp),
         color = Am.HomeMid, fontSize = 12.sp, lineHeight = 16.sp)
@@ -232,8 +281,6 @@ internal fun PlaybackSettings(settings: AppSettings) {
         Choices(listOf(R.string.settings_level_low, R.string.settings_level_high, R.string.settings_level_ultra), settings.audioResampling) { settings.audioResampling = it }
     }
     Divider(10.dp)
-    SwitchRow(stringResource(R.string.settings_preview_copies), settings.previewCopies, enabled = true) { settings.previewCopies = it }
-    PreviewCopiesRow()
 }
 
 @Composable
@@ -241,42 +288,31 @@ internal fun ProjectsSettings(settings: AppSettings, onDemoMode: (Boolean) -> Un
     if (!DESK) SwitchRow(stringResource(R.string.settings_open_xml), settings.xmlUpload, enabled = true) { settings.xmlUpload = it }
     SwitchRow(stringResource(R.string.settings_keep_media_copies), settings.keepMediaCopies, enabled = true) { settings.keepMediaCopies = it }
     ExportFolderRows(settings)
-    if (settings.demoModeShown) SwitchRow(stringResource(R.string.settings_demo_mode), settings.demoMode, enabled = true) { settings.demoMode = it; onDemoMode(it) }
+    DemoModeRow(settings, onDemoMode)
     if (!DESK) SwitchRow(stringResource(R.string.settings_ask_mobile_data), settings.askMobileData, enabled = true) { settings.askMobileData = it }
-    CaptionModelRow()
-    CutoutRows()
-    AiModelRows()
-    DownloaderRow()
+    AiRows()
     AiGpuRow()
 }
 
 @Composable
-private fun Category(@StringRes name: Int, icon: ImageVector, content: @Composable () -> Unit) {
-    var open by rememberSaveable { mutableStateOf(false) }
-    val turn by animateFloatAsState(if (open) 180f else 0f, Motion.enter())
-    Column(Modifier.padding(horizontal = 6.dp).fillMaxWidth().clip(PanelShape).background(PanelColor)) {
-        Row(
-            Modifier.fillMaxWidth().heightIn(min = 44.dp).clickable { open = !open }
-                .semantics { if (open) collapse { open = false; true } else expand { open = true; true } }
-                .padding(start = 13.dp, end = 7.dp, top = 4.dp, bottom = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(icon, null, Modifier.size(20.dp), tint = Am.HomeInk)
-            Spacer(Modifier.width(10.dp))
-            Text(stringResource(name), Modifier.weight(1f), color = Am.HomeInk, fontSize = 13.sp)
-            Icon(HomeIcons.ChevronDown, null, Modifier.size(24.dp).rotate(turn), tint = Am.HomeMid)
-        }
-        AnimatedVisibility(
-            open,
-            enter = expandVertically(Motion.enter()) + fadeIn(Motion.enter()),
-            exit = shrinkVertically(Motion.exit()) + fadeOut(Motion.exit()),
-        ) {
-            Column(Modifier.fillMaxWidth().background(OpenColor).padding(top = 4.dp, bottom = 4.dp)) {
-                content()
-            }
-        }
-    }
-    Spacer(Modifier.height(CardGap))
+internal fun ProjectRows(settings: AppSettings) {
+    if (!DESK) SwitchRow(stringResource(R.string.settings_open_xml), settings.xmlUpload, enabled = true) { settings.xmlUpload = it }
+    SwitchRow(stringResource(R.string.settings_keep_media_copies), settings.keepMediaCopies, enabled = true) { settings.keepMediaCopies = it }
+    ExportFolderRows(settings)
+    if (!DESK) SwitchRow(stringResource(R.string.settings_ask_mobile_data), settings.askMobileData, enabled = true) { settings.askMobileData = it }
+}
+
+@Composable
+internal fun DemoModeRow(settings: AppSettings, onDemoMode: (Boolean) -> Unit) {
+    if (settings.demoModeShown) SwitchRow(stringResource(R.string.settings_demo_mode), settings.demoMode, enabled = true) { settings.demoMode = it; onDemoMode(it) }
+}
+
+@Composable
+internal fun AiRows() {
+    CaptionModelRow()
+    CutoutRows()
+    AiModelRows()
+    DownloaderRow()
 }
 
 @Composable
@@ -497,7 +533,7 @@ private fun CutoutRows() {
 }
 
 @Composable
-private fun AiGpuRow() {
+internal fun AiGpuRow() {
     if (!app.absentmotion.Tier.has(app.absentmotion.Feature.AiSmooth) && !app.absentmotion.Tier.has(app.absentmotion.Feature.AiEnhance)) return
     val context = LocalContext.current
     var state by remember { mutableStateOf<Pair<Boolean, Boolean>?>(null) }
@@ -533,44 +569,6 @@ private fun AiGpuRow() {
 @Composable
 internal fun Divider(inset: androidx.compose.ui.unit.Dp) {
     Box(Modifier.padding(horizontal = inset).fillMaxWidth().height(1.dp).background(DividerColor))
-}
-
-@Composable
-private fun AppCard(settings: AppSettings, onWhatsNew: () -> Unit) {
-    val context = LocalContext.current
-    val version = app.absentmotion.platform.appVersion().trim()
-    val notes = remember { WhatsNewNotes.currentName(context) != null }
-    Column(Modifier.padding(horizontal = 6.dp).fillMaxWidth().clip(PanelShape).background(PanelColor).padding(start = 12.dp, end = 10.dp, top = 10.dp, bottom = 12.dp)) {
-        Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
-            Column(Modifier.widthIn(max = 140.dp).padding(end = 8.dp)) {
-                Text("AbsentMotion", color = Am.HomeInk, fontSize = 15.sp, fontWeight = FontWeight.Bold, maxLines = 1)
-                if (version.isNotEmpty()) Text(stringResource(R.string.about_version, version), color = Am.HomeMid, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            }
-            Pill(stringResource(R.string.update_check_now), Am.Navy, Am.OnNavy, Modifier.weight(1f, fill = false), pad = 12.dp, busy = Updates.checking) { Updates.check(context, settings, manual = true) }
-        }
-        Spacer(Modifier.height(10.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            if (notes) Pill(stringResource(R.string.settings_whats_new), Am.Card, Am.HomeInk, onClick = onWhatsNew)
-            val on = settings.autoUpdateCheck
-            Pill(
-                stringResource(if (on) R.string.settings_auto_check_on else R.string.settings_auto_check_off), Am.Card, Am.HomeInk,
-                Modifier.toggleable(value = on, role = androidx.compose.ui.semantics.Role.Switch) { settings.chooseUpdates(it) },
-            )
-        }
-    }
-}
-
-@Composable
-private fun Pill(label: String, fill: Color, ink: Color, modifier: Modifier = Modifier, pad: androidx.compose.ui.unit.Dp = 14.dp, busy: Boolean = false, onClick: (() -> Unit)? = null) {
-    Box(
-        Modifier.heightIn(min = 38.dp).clip(RoundedCornerShape(50)).background(fill).then(modifier)
-            .then(if (onClick != null) Modifier.deskPress(19.dp).clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = onClick) else Modifier)
-            .padding(horizontal = pad, vertical = 6.dp),
-        Alignment.Center,
-    ) {
-        Text(label, Modifier.alpha(if (busy) 0f else 1f), color = ink, fontSize = 13.sp, lineHeight = 16.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center, maxLines = 2, overflow = TextOverflow.Ellipsis)
-        if (busy) CircularProgressIndicator(Modifier.size(16.dp), color = ink, strokeWidth = 2.dp)
-    }
 }
 
 @Composable
@@ -661,6 +659,7 @@ private fun DurationRow(settings: AppSettings) {
 private fun ThemeRow(settings: AppSettings) {
     val context = LocalContext.current
     var open by remember { mutableStateOf(false) }
+    var making by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val picker = rememberDocumentPicker { uri ->
         if (uri != null) {
@@ -683,8 +682,10 @@ private fun ThemeRow(settings: AppSettings) {
             for ((id, label) in settings.themes) ThemeItem(label.text(), id == settings.theme) { open = false; if (id != settings.theme) app.absentmotion.ui.theme.ThemeFade.change { settings.theme = id } }
             Box(Modifier.fillMaxWidth().height(1.dp).background(ListLineColor))
             ThemeItem(stringResource(R.string.settings_import_theme), false) { open = false; picker.launch() }
+            ThemeItem(stringResource(R.string.theme_create), false) { open = false; making = true }
         }
     }
+    if (making) ThemeMaker(settings) { making = false }
 }
 
 private val AccentNames = listOf(R.string.accent_blue, R.string.accent_green, R.string.accent_purple, R.string.accent_pink)
@@ -785,7 +786,7 @@ private fun ThemeItem(label: String, chosen: Boolean, onClick: () -> Unit) {
     ) { Text(label, color = Am.OnNavy, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis) }
 }
 
-private fun readThemeText(context: Context, uri: Uri): String {
+internal fun readThemeText(context: Context, uri: Uri): String {
     val stream: java.io.InputStream? = try { context.contentResolver.openInputStream(uri) } catch (e: Exception) { null }
     val bytes = stream?.use { it.readAtMost(Themes.MAX_BYTES + 1) } ?: throw ThemeError(txt(R.string.settings_theme_open_failed))
     if (bytes.size > Themes.MAX_BYTES) throw ThemeError(txt(R.string.settings_theme_not_theme_file))

@@ -66,6 +66,8 @@ class AppSettings(private val context: Context) {
 
     fun showAccent(value: Int) { Am.palette = look(value) }
 
+    fun restoreLook() { Am.palette = look() }
+
     val themeAccent: androidx.compose.ui.graphics.Color get() = Themes.palette(context, themeState, systemDarkState).HomeAccent
 
     var uiFont: String?

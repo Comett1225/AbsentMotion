@@ -4,9 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
@@ -27,7 +24,7 @@ import app.absentmotion.ui.editor.LocalTablet
 import app.absentmotion.ui.editor.LocalWide
 import app.absentmotion.ui.editor.TransitionSheet
 import app.absentmotion.ui.home.CrashLogsScreen
-import app.absentmotion.ui.home.SettingsDrawer
+import app.absentmotion.ui.home.SettingsPage
 import app.absentmotion.ui.home.TrimScreen
 import app.absentmotion.ui.home.ExtractAudioScreen
 import app.absentmotion.ui.home.CompressScreen
@@ -88,10 +85,7 @@ class AdaptivePagesShotsTest {
         val app = DeskAppState()
         for ((w, h) in sizes) runSkikoComposeUiTest(size = Size(w.toFloat(), h.toFloat())) {
             setContent {
-                val drawer = rememberDrawerState(DrawerValue.Open)
-                ModalNavigationDrawer(drawerContent = { SettingsDrawer(app.settings, drawer) }, drawerState = drawer) {
-                    Box(Modifier.fillMaxSize())
-                }
+                SettingsPage(app.settings, onRestored = {}) {}
             }
             onNodeWithText("Settings").assertExists()
             shot("settings", w, h)

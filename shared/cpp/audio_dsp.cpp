@@ -563,6 +563,72 @@ void PitchShifter::process(float* data, int frames) noexcept {
     }
 }
 
+void Vibrato::prepare(double sampleRate, int) {
+    sampleRate_ = rate(sampleRate);
+    rampSamples_ = rampLength(sampleRate_);
+    buffer_.prepare(static_cast<std::size_t>(std::ceil(sampleRate_ * 0.1)) + 4);
+    prepared_ = true;
+    reset();
+}
+
+void Vibrato::configure(int samples) noexcept {
+    const double hz = bound(params.rateHz, 0.5, 12.0, 5.0);
+    const double semitones = 2.0 * bound(params.depth, 0.0, 1.0, 0.3);
+    const double step = 2.0 * pi * hz / sampleRate_;
+    controls_[0].set(step, samples);
+    controls_[1].set((std::pow(2.0, semitones / 12.0) - 1.0) / step, samples);
+}
+
+void Vibrato::reset() noexcept {
+    buffer_.clear();
+    phase_ = 0.0;
+    configure(0);
+}
+
+void Vibrato::process(float* data, int frames) noexcept {
+    if (!prepared_ || !data || frames <= 0) return;
+    configure(rampSamples_);
+    for (int frame = 0; frame < frames; ++frame) {
+        for (auto& control : controls_) control.next();
+        const double delay = 1.0 + controls_[1].value * (1.0 - std::cos(phase_));
+        const double left = buffer_.read(delay, 0), right = buffer_.read(delay, 1);
+        buffer_.write(data[2 * frame], data[2 * frame + 1]);
+        buffer_.advance();
+        phase_ += controls_[0].value;
+        if (phase_ >= 2.0 * pi) phase_ -= 2.0 * pi;
+        data[2 * frame] = output(left);
+        data[2 * frame + 1] = output(right);
+    }
+}
+
+void RingModulator::prepare(double sampleRate, int) {
+    sampleRate_ = rate(sampleRate);
+    rampSamples_ = rampLength(sampleRate_);
+    prepared_ = true;
+    reset();
+}
+
+void RingModulator::configure(int samples) noexcept {
+    step_.set(2.0 * pi * bound(params.frequencyHz, 5.0, 5000.0, 100.0) / sampleRate_, samples);
+}
+
+void RingModulator::reset() noexcept {
+    phase_ = 0.0;
+    configure(0);
+}
+
+void RingModulator::process(float* data, int frames) noexcept {
+    if (!prepared_ || !data || frames <= 0) return;
+    configure(rampSamples_);
+    for (int frame = 0; frame < frames; ++frame) {
+        const double carrier = std::sin(phase_);
+        phase_ += step_.next();
+        if (phase_ >= 2.0 * pi) phase_ -= 2.0 * pi;
+        data[2 * frame] = output(clean(data[2 * frame]) * carrier);
+        data[2 * frame + 1] = output(clean(data[2 * frame + 1]) * carrier);
+    }
+}
+
 void Limiter::prepare(double sampleRate, int) {
     sampleRate_ = rate(sampleRate);
     rampSamples_ = rampLength(sampleRate_);

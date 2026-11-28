@@ -152,6 +152,34 @@ class CaptionsTest {
         assertEquals("Caption 4", again.single().label)
     }
 
+    @Test fun severalChosenClipsAreCaptionedTogetherAndNothingElse() {
+        val a = Layer(XmlNode("audio", linkedMapOf("id" to "1", "src" to "a.m4a", "startTime" to "2000", "endTime" to "3999")))
+        val b = Layer(XmlNode("audio", linkedMapOf("id" to "2", "src" to "b.m4a", "startTime" to "6000", "endTime" to "8999", "hidden" to "true"), listOf(XmlNode("gain", mapOf("value" to "0")))))
+        val c = Layer(XmlNode("audio", linkedMapOf("id" to "3", "src" to "c.m4a", "startTime" to "0", "endTime" to "19999")))
+        val text = Layer(XmlNode("text", linkedMapOf("id" to "4", "startTime" to "0", "endTime" to "999")))
+        val scene = Scene.create("captions", 1080, 1920, 30, 0).add(a).add(b).add(c).add(text)
+        val input = scene.captionInput(listOf(2L, 1L))
+        assertEquals(2000, input.startMs)
+        assertEquals(9000, input.endMs)
+        assertEquals(listOf(1L, 2L), input.scene.layers.map { it.id })
+        assertTrue(input.scene.layers.none { it.hidden || it.node.child("gain") != null })
+        assertEquals(scene, scene.captionInput(emptyList()).scene)
+        assertTrue(runCatching { scene.captionInput(listOf(1L, 4L)) }.isFailure)
+    }
+
+    @Test fun installedModelsShowTheirNameWithoutTheDownloadSize() {
+        val res = java.io.File("../shared/res")
+        val labels = res.listFiles()!!.filter { it.name.startsWith("values") }.flatMap { dir ->
+            val xml = dir.resolve("strings.xml").takeIf { it.isFile }?.readText().orEmpty()
+            listOf("caption_model_standard", "caption_model_precision").mapNotNull { key -> Regex("name=\"$key\">([^<]*)<").find(xml)?.groupValues?.get(1) }
+        }
+        assertEquals(52, labels.size)
+        for (label in labels) {
+            val name = app.absentmotion.ui.editor.modelName(label)
+            assertTrue(label, name.isNotEmpty() && name.none { it.isDigit() } && name.length < label.length)
+        }
+    }
+
     @Test fun selectedClipKeepsItsTrimSpeedAndProjectPlacementWithoutOtherSound() {
         val clip = Layer(XmlNode("audio", linkedMapOf("id" to "1", "src" to "voice.m4a", "startTime" to "5000", "endTime" to "7999",
             "inTime" to "2000", "outTime" to "8000", "speed" to "2", "hidden" to "true"),

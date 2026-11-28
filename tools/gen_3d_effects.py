@@ -606,9 +606,9 @@ STANDARD = {
     ],
     'flip': [
         ('uniform float scale;\n',
-         'uniform float scale;\nuniform float style;\nuniform float alZ;\n'),
+         'uniform float scale;\nuniform float style;\nuniform float alZ;\nuniform float sourceInset;\n'),
         ('    float3 pv = float3(pivot / unit, pivotDepth);\n    float3 ro = (float3(0.0, 0.0, -dist) - pv) * m;\n',
-         '    float3 pv = float3(pivot / unit, pivotDepth);\n    if (style > 0.5) {\n        float3 bh = float3(h, 0.0096);\n        float3 rl = (float3(0.0, 0.0, -dist - alZ) - pv) * m + pv;\n        float3 rdl = rw * m;\n        float3 inv = 1.0 / max(abs(rdl), float3(0.000001)) * sign(rdl + 0.0000001);\n        float3 lo = min((-bh - rl) * inv, (bh - rl) * inv);\n        float3 hi = max((-bh - rl) * inv, (bh - rl) * inv);\n        float tn = max(max(lo.x, lo.y), lo.z);\n        if (tn > min(min(hi.x, hi.y), hi.z) || tn <= 0.0) return half4(0.0);\n        float3 q = rl + rdl * tn;\n        bool face = lo.z >= max(lo.x, lo.y);\n        float4 c = tex(face ? q.xy / h * 0.5 + 0.5 : float2(0.5 - q.y / h.y * 0.5, 0.5 + q.z / bh.z * 0.5), h);\n        if (face && rdl.z < 0.0 && back > 1.5) c = float4(backColor.rgb * backColor.a, backColor.a);\n        else if (face && rdl.z < 0.0 && back > 0.5) c = tex(float2(0.5 - q.x / h.x * 0.5, 0.5 + q.y / h.y * 0.5), h);\n        return half4(shade(c, normalize(m * (face ? float3(0.0, 0.0, -sign(rdl.z)) : float3(sign(q.x), 0.0, 0.0))), -rw));\n    }\n    float3 ro = (float3(0.0, 0.0, -dist) - pv) * m;\n'),
+         '    float3 pv = float3(pivot / unit, pivotDepth);\n    if (style > 0.5) {\n        float3 bh = float3(h * (1.0 - sourceInset), 0.01);\n        float3 rl = (float3(0.0, 0.0, -dist - alZ) - pv) * m + pv;\n        float3 rdl = rw * m;\n        float3 inv = 1.0 / max(abs(rdl), float3(0.000001)) * sign(rdl + 0.0000001);\n        float3 lo = min((-bh - rl) * inv, (bh - rl) * inv);\n        float3 hi = max((-bh - rl) * inv, (bh - rl) * inv);\n        float tn = max(max(lo.x, lo.y), lo.z);\n        if (tn > min(min(hi.x, hi.y), hi.z) || tn <= 0.0) return half4(0.0);\n        float3 q = rl + rdl * tn;\n        bool face = lo.z >= max(lo.x, lo.y);\n        bool horizontalEdge = lo.y > lo.x;\n        float2 uv = face ? q.xy / h : horizontalEdge ? -q.zx / float2(bh.z, h.x) : float2(-q.y / h.y, q.z / bh.z);\n        float4 c = tex(uv * 0.5 + 0.5, h);\n        if (face && rdl.z < 0.0 && back > 1.5) c = float4(backColor.rgb * backColor.a, backColor.a);\n        else if (face && rdl.z < 0.0 && back > 0.5) c = tex(float2(0.5 - q.x / h.x * 0.5, 0.5 + q.y / h.y * 0.5), h);\n        float3 normal = face ? float3(0.0, 0.0, -sign(rdl.z)) : horizontalEdge ? float3(0.0, sign(q.y), 0.0) : float3(sign(q.x), 0.0, 0.0);\n        return half4(shade(c, normalize(m * normal), -rw));\n    }\n    float3 ro = (float3(0.0, 0.0, -dist) - pv) * m;\n'),
     ],
     'tunnel': [
         ('uniform float scale;\n',
@@ -628,9 +628,36 @@ ALIGHT_EXTRA = {"octahedron": [dict(number("alHeight", "Height", 1, 0.0001, 1000
                 "box": [{"id": "faceStyle", "label": "Style", "type": "choice", "default": 0, "options": ["Classic", "Standard"], "when": {"faceStyle": [2]}},
                         {"id": "lightStyle", "label": "Style", "type": "choice", "default": 0, "options": ["Classic", "Standard"], "when": {"lightStyle": [2]}}]}
 
+INSET_BOX = """half4 insetBox(float3 ro, float3 rd, float3x3 m) {
+    float3 h = dims() * float3(1.0 - sourceInset, 1.0 - sourceInset, 1.0);
+    float3 direction = 2.0 * step(float3(0.0), rd) - 1.0;
+    float3 inv = direction / max(abs(rd), float3(0.000001));
+    float3 a = (-h - ro) * inv;
+    float3 b = (h - ro) * inv;
+    float3 enter = min(a, b);
+    float3 exit = max(a, b);
+    float near = max(max(enter.x, enter.y), enter.z);
+    float far = min(min(exit.x, exit.y), exit.z);
+    if (far < max(near, 0.0)) return half4(0.0);
+    bool outside = near >= 0.0;
+    float t = outside ? near : far;
+    float3 hit = outside ? enter : exit;
+    float3 n = hit.z == t ? float3(0.0, 0.0, direction.z)
+             : hit.y == t ? float3(0.0, direction.y, 0.0)
+                          : float3(direction.x, 0.0, 0.0);
+    if (outside) n = -n;
+    return half4(alShade(surface(ro + rd * t, n), normalize(m * n)));
+}
+
+"""
+
 ALIGHT_POST = {"pyramid": [("    float4 col = alShade(surface(p, n), normalize(m * n));", "    float4 col = alShade(surfaceV(p, n, rd), normalize(m * n));")],
-               "box": [("float4 alShade(float4 c, float3 n) {\n",
-                        "float4 alShade(float4 c, float3 n) {\n    if (lightStyle > 0.5) return float4(min(c.rgb * c.rgb / max(c.a, 0.0001) * 1.49, float3(c.a)), c.a);\n")]}
+               "box": [("uniform float lightStyle;\n", "uniform float lightStyle;\nuniform float sourceInset;\n"),
+                       ("float4 alShade(float4 c, float3 n) {\n",
+                        "float4 alShade(float4 c, float3 n) {\n    if (lightStyle > 0.5) return float4(min(c.rgb * c.rgb / max(c.a, 0.0001) * 1.49, float3(c.a)), c.a);\n"),
+                       ("half4 alMain(float2 coord)", INSET_BOX + "half4 alMain(float2 coord)"),
+                       ("    float3 ro = -c * m;\n    float3 rd = rw * m;\n",
+                        "    float3 ro = -c * m;\n    float3 rd = rw * m;\n    if (faceStyle > 0.5 && sourceInset > 0.0 && smoothing == 0.0) return insetBox(ro, rd, m);\n")]}
 
 ALIGHT_MAIN = """
 float4 alShade(float4 c, float3 n) {

@@ -125,7 +125,7 @@ internal fun Yuv.argbInto(out: IntArray, outWidth: Int, outHeight: Int, standard
 private fun channel(v: Float): Int = v.roundToInt().coerceIn(0, 255)
 
 internal val MatteFollowedEffects = setOf(
-    "absent.autoshake", "absent.bend", "absent.box", "absent.bulge", "absent.pagecurl", "absent.scatterrepeat",
+    "absent.autoshake", "absent.bend", "absent.box", "absent.brokenglass", "absent.bulge", "absent.pagecurl", "absent.scatterrepeat",
     "absent.circularripple", "absent.cross", "absent.cube", "absent.curl",
     "absent.cylinder", "absent.puppet", "absent.displacementmap", "absent.echo", "absent.ellipsoid", "absent.facetrack",
     "absent.flip", "absent.fractalwarp", "absent.glass", "absent.glitch",
@@ -136,7 +136,7 @@ internal val MatteFollowedEffects = setOf(
     "absent.ominoglass", "absent.oscillate", "absent.parenthelper", "absent.polar", "absent.polardisplacement",
     "absent.pulsesize", "absent.pyramid", "absent.radialrepeat",
     "absent.randomdisplace", "absent.randomjitter", "absent.rasterextrude", "absent.rastertransform", "absent.reorient360", "absent.ring",
-    "absent.repeat", "absent.repeatalongpath", "absent.ripple", "absent.scaleassist", "absent.scatter3d", "absent.scatterfield", "absent.fracture3d", "absent.videofeedback",
+    "absent.repeat", "absent.repeatalongpath", "absent.ripple", "absent.scaleassist", "absent.scatter3d", "absent.stabilizer", "absent.scatterfield", "absent.fracture3d", "absent.videofeedback",
     "absent.shutterblur", "absent.spherize", "absent.spin", "absent.squeeze",
     "absent.starpolyhedron", "absent.starprism", "absent.stretch", "absent.stretchaxis",
     "absent.swing", "absent.tile", "absent.tilerotate", "absent.tiles",
@@ -349,6 +349,24 @@ internal class MatteEncoder private constructor(private val codec: MediaCodec, p
 
 internal class VideoMatte(val media: AiMedia, val frameWidth: Int, val frameHeight: Int)
 
+internal suspend fun uprightMatte(matte: suspend (IntArray, Int, Int) -> ByteArray, pixels: IntArray, width: Int, height: Int, orientation: Int): ByteArray {
+    val turn = ((orientation % 360) + 360) % 360
+    if (turn != 90 && turn != 180 && turn != 270) return matte(pixels, width, height)
+    val sideways = turn != 180
+    val alpha = matte(IntArray(pixels.size) { pixels[storedIndex(it, width, height, turn)] }, if (sideways) height else width, if (sideways) width else height)
+    if (alpha.size != pixels.size) return alpha
+    val back = ByteArray(alpha.size)
+    for (i in back.indices) back[storedIndex(i, width, height, turn)] = alpha[i]
+    return back
+}
+
+internal fun storedIndex(upright: Int, width: Int, height: Int, turn: Int): Int = when (turn) {
+    90 -> (height - 1 - upright % height) * width + upright / height
+    180 -> width * height - 1 - upright
+    270 -> (upright % height) * width + width - 1 - upright / height
+    else -> upright
+}
+
 internal object VideoBackground {
     suspend fun run(context: Context, layer: Layer, media: MediaDeclaration, side: Int, keep: List<Tap>, progress: AiProgress): VideoMatte {
         if (app.absentmotion.platform.PlatformFeatures.desktop) return app.absentmotion.platform.desktopVideoMatte(context, layer, media, side, keep, progress)
@@ -382,7 +400,7 @@ internal object VideoBackground {
                         for (batch in stamps.chunked(BATCH)) {
                             reader.read(batch) { pts, yuv ->
                                 frame = yuv.width to yuv.height
-                                val alpha = matte(yuv.argb(w, h, reader.colorStandard, reader.fullRange), w, h)
+                                val alpha = uprightMatte(matte, yuv.argb(w, h, reader.colorStandard, reader.fullRange), w, h, media.orientation)
                                 check(alpha.size == w * h) { AppText.get(R.string.ai_mask_unexpected_size) }
                                 smoother.push(pts, follower?.next(alpha, w, h) ?: alpha)?.let { (p, m) -> encoder.write(p, encodeMatte(m, w, h)) }
                                 done++

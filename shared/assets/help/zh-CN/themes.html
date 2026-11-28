@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh-CN" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>主题 | AbsentMotion</title><meta name="description" content="在应用中或通过文件创建自己的主题，分享主题，并了解每种主题颜色的用途。"><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="../assets/site.css"></head><body class="app" data-page="guide"><header class="top appbar"><nav class="main" aria-label="帮助"><a href="index.html">目录</a><a href="effects/index.html">特效</a></nav></header><div class="wrap"><main id="main"><h1>主题</h1><p class="lead">在应用中或通过文件创建自己的主题，分享主题，并了解每种主题颜色的用途。</p><details class="toc"><summary>本页内容</summary><ul><li><a href="#pick-a-theme">选择主题</a></li><li><a href="#make-a-theme-in-the-app">在应用中制作主题</a></li><li><a href="#make-a-theme-file">制作主题文件</a></li><li><a href="#tips">提示</a></li><li><a href="#every-color">所有颜色</a></li><li><a href="#full-example-light-green">完整示例：浅绿</a></li></ul></details><p>主题会改变整个应用的配色，包括编辑器、时间轴、主屏幕和菜单。你可以选择内置主题，在应用中自行制作，也可以加载别人分享的主题文件。</p>
+<h2 id="pick-a-theme">选择主题</h2>
+<p>打开 <strong>设置</strong>，在 <strong>选择主题</strong> 中选择 <strong>跟随系统</strong>、<strong>浅色</strong>、<strong>深色</strong>、<strong>日光</strong>、<strong>浅绿</strong> 或 <strong>自定义</strong>（制作或导入自己的主题后可用）。下方的 <strong>主题颜色</strong> 只会更改当前主题的强调色。见<a href="settings.html">设置</a>。</p>
+<h2 id="make-a-theme-in-the-app">在应用中制作主题</h2>
+<p>打开 <strong>设置</strong>，点按 <strong>选择主题</strong>，然后选择 <strong>创建主题…</strong>。页面会分组列出所有主题颜色，并显示使用位置和颜色代码。</p>
+<ul><li><strong>导入主题文件…</strong> 位于顶部，可把主题文件（例如别人分享的）载入页面，方便你在保存前修改。</li><li><strong>以此为起点</strong> 会用内置主题（或自己的自定义主题）填充所有颜色，你只需改动想改的颜色。</li><li>点按某个颜色即可打开取色器。编辑时整个应用会实时更新，你可以直接看到颜色用在各处的效果。</li><li>为主题填写 <strong>名称</strong>，再点按 <strong>保存主题</strong>。它会成为你的 <strong>自定义</strong> 主题并立即生效。保存时 <strong>主题颜色</strong> 会恢复为 <strong>默认</strong>，以显示主题自带的强调色。</li><li><strong>导出</strong> 会将主题保存为 <code>.json</code> 文件，方便分享或留存。</li><li>直接关闭页面，应用会恢复原来的主题。</li></ul>
+<p>应用只保留一个自定义主题。保存或导入新主题会替换原有主题。</p>
+<h2 id="make-a-theme-file">制作主题文件</h2>
+<p>主题文件是一个小型 JSON 文本文件，只需列出你想修改的颜色。将以下内容保存为 <code>mint.json</code>。</p>
+<pre><code>{
+  "name": "Mint",
+  "Accent": "#5BD6A4",
+  "HomeAccent": "#1B7A4A"
+}</code></pre>
+<p>通过 <strong>设置 &gt; 选择主题 &gt; 导入主题文件…</strong> 加载。应用外观大体保持原样，强调色会变成薄荷绿。</p>
+<ul><li>使用 UTF-8 编码的 JSON 纯文本，文件扩展名为 <code>.json</code>，大小不超过 <strong>64 KB</strong>。</li><li><code>name</code> 可省略，超过 40 个字符会被截断。</li><li>其他每一行都由下表中的颜色名、一个冒号和用引号括起的颜色值组成。名称的大小写必须与表中完全一致。除最后一行外，每行末尾加逗号。</li><li>颜色写为 <code>"#RRGGBB"</code>（红、绿、蓝）或 <code>"#AARRGGBB"</code>（最前面为 Alpha）。应用不支持 <code>#RGB</code> 简写。</li><li><strong>Alpha（不透明度）</strong> 决定颜色有多实。<code>FF</code> 完全不透明，<code>80</code> 半透明，<code>00</code> 完全透明。大多数颜色应当不透明。Alpha 用于遮罩和按压高亮，即 <code>Scrim</code>、<code>MenuScrim</code>、<code>PressEditor</code> 和 <code>PressHome</code>。</li><li>未列出的颜色保留 AbsentMotion 的配色。如果设置了 <code>Gold</code> 而省略 <code>Favorite</code>，收藏星标会使用 <code>Gold</code> 的颜色。 <code>SelectionBorder</code> 和 <code>SelectionHandle</code> 也以同样方式分别跟随 <code>Accent</code> 和 <code>OnDark</code>。</li><li>不在表中的名称会被忽略。文件至少要包含一种颜色。如果颜色格式有误，应用会拒绝加载文件，并指出有问题的颜色。</li></ul>
+<h2 id="tips">提示</h2>
+<ul><li>编辑器与主屏幕独立配色。AbsentMotion 默认外观使用深色编辑器和浅色主屏幕，你可以分别将它们调成浅色或深色。</li><li>确保文字易读。文字颜色（<code>OnDark</code>、<code>HomeInk</code> 及其他以 <code>On</code> 开头的颜色）应与背景有足够的对比度。</li><li>有些颜色只在少数位置显示，例如数字键盘、导出预览或已开启的开关。编辑时可以打开相应界面检查效果。</li><li>要分享主题，请在 <strong>创建主题…</strong> 中导出并发送 <code>.json</code> 文件。收到文件的人可以用 <strong>导入主题文件…</strong> 加载。</li></ul>
+<h2 id="every-color">所有颜色</h2>
+<p>颜色按用途分组。第二列列出各颜色主要出现的位置，有些颜色还会用在其他地方。</p>
+<h3 id="editor">编辑器</h3>
+<div class="table-wrap"><table><thead><tr><th>名称</th><th>使用位置</th></tr></thead><tbody><tr><td data-label="名称"><code>TopBar</code></td><td data-label="使用位置">编辑器的主要背景，包括顶栏、面板后方的页面，以及预设等全屏工具界面。</td></tr><tr><td data-label="名称"><code>PreviewBg</code></td><td data-label="使用位置">视频预览后方、面板内的深色区域（滑块、选择器），以及时间轴末尾之后的空白区域。</td></tr><tr><td data-label="名称"><code>TimelineBg</code></td><td data-label="使用位置">时间轴背景、预览下方的播放栏和图层标签所在行的背景。</td></tr><tr><td data-label="名称"><code>Panel</code></td><td data-label="使用位置">从底部弹出的面板、工具面板（语音、字幕、拉伸）、电脑端媒体库和电平表。</td></tr><tr><td data-label="名称"><code>PanelInset</code></td><td data-label="使用位置">面板上的区块，例如元素库中的卡片、字体浏览器、未按下的数字键和未选中的选项。</td></tr><tr><td data-label="名称"><code>Button</code></td><td data-label="使用位置">编辑器中的按钮、卡片、效果行，以及时间轴上图层名称与图层条之间的分隔线。</td></tr><tr><td data-label="名称"><code>Field</code></td><td data-label="使用位置">编辑器中的对话框、文本框、列表行和菜单背景。</td></tr><tr><td data-label="名称"><code>FieldHi</code></td><td data-label="使用位置">选中或凸起的元素，例如切换控件中选中的标签、滑块轨道的未填充部分、项目安全确认框的边缘，以及电脑端主屏幕上的部分按钮。</td></tr><tr><td data-label="名称"><code>Chosen</code></td><td data-label="使用位置">缓动面板的曲线图背景、边框和阴影中选中的项目，以及渐变预览的深色端。</td></tr><tr><td data-label="名称"><code>Well</code></td><td data-label="使用位置">深色凹槽，例如媒体和音频标签页中的卡片、滑块轨道（混合和开关），以及数字键盘上的完成键。</td></tr><tr><td data-label="名称"><code>Deepest</code></td><td data-label="使用位置">最深色的区域，例如顶栏下划线、取色器网格、电平表背景和文本编辑器顶端的色条。</td></tr><tr><td data-label="名称"><code>Line</code></td><td data-label="使用位置">细分隔线，例如时间轴刻度和标题栏边缘、菜单列表的分隔线，以及教程卡片和字体浏览器的边框。</td></tr><tr><td data-label="名称"><code>MenuLine</code></td><td data-label="使用位置">编辑器菜单和缓动面板菜单内的分隔线。</td></tr><tr><td data-label="名称"><code>PressEditor</code></td><td data-label="使用位置">电脑端编辑器中按压或鼠标悬停时的高亮。</td></tr></tbody></table></div>
+<h3 id="timeline">时间轴</h3>
+<p>这些颜色用于时间轴上的图层条和标记。</p>
+<div class="table-wrap"><table><thead><tr><th>名称</th><th>使用位置</th></tr></thead><tbody><tr><td data-label="名称"><code>LayerBar</code></td><td data-label="使用位置">时间轴上普通图层（视频、图片、形状等）的图层条。</td></tr><tr><td data-label="名称"><code>LayerBarStripe</code></td><td data-label="使用位置">图层条上的条纹。</td></tr><tr><td data-label="名称"><code>TextBar</code></td><td data-label="使用位置">时间轴上的文本图层条。</td></tr><tr><td data-label="名称"><code>TextBarStripe</code></td><td data-label="使用位置">文本图层条上的条纹。</td></tr><tr><td data-label="名称"><code>AudioBar</code></td><td data-label="使用位置">时间轴上的音频图层条。</td></tr><tr><td data-label="名称"><code>AudioWave</code></td><td data-label="使用位置">音频条内的波形。</td></tr><tr><td data-label="名称"><code>OnBar</code></td><td data-label="使用位置">普通图层条和文本图层条上显示的图层名称。</td></tr><tr><td data-label="名称"><code>OnAudioBar</code></td><td data-label="使用位置">音频图层条上显示的图层名称。</td></tr><tr><td data-label="名称"><code>Bookmark</code></td><td data-label="使用位置">时间轴上的书签标记。</td></tr><tr><td data-label="名称"><code>Gold</code></td><td data-label="使用位置">时间轴上的变速标记、预览中未选中的点、字体浏览器中的搜索文字和进度环、滑块的微调线，以及数字键盘上超出范围的数字。</td></tr><tr><td data-label="名称"><code>SelectionBorder</code></td><td data-label="使用位置">电脑上时间轴中所选片段的边框。省略时跟随 <code>Accent</code>。</td></tr><tr><td data-label="名称"><code>SelectionHandle</code></td><td data-label="使用位置">电脑上时间轴中所选片段两端的修剪手柄。省略时跟随 <code>OnDark</code>。</td></tr></tbody></table></div>
+<h3 id="keypad-and-menus">数字键盘和菜单</h3>
+<p>这些颜色用于图层工具中的数字键盘，以及预览后方的深色区域。</p>
+<div class="table-wrap"><table><thead><tr><th>名称</th><th>使用位置</th></tr></thead><tbody><tr><td data-label="名称"><code>KeyDigit</code></td><td data-label="使用位置">图层工具数字键盘上的 0 到 9 键。</td></tr><tr><td data-label="名称"><code>KeySymbol</code></td><td data-label="使用位置">同一数字键盘上的正负号、小数点和退格键。</td></tr><tr><td data-label="名称"><code>Cool</code></td><td data-label="使用位置">数字键盘上按键的蓝色标签，以及运动面板中入场侧的轮廓线。</td></tr><tr><td data-label="名称"><code>CoolDeep</code></td><td data-label="使用位置">数字键盘按键上选中数字的背景。</td></tr><tr><td data-label="名称"><code>Scrim</code></td><td data-label="使用位置">预览后方的深色区块，包括主屏幕上的工具预览（范围、压缩、工具箱）、导出预览和导出完成页，以及社区中没有图片的缩略图。</td></tr><tr><td data-label="名称"><code>OnScrim</code></td><td data-label="使用位置">深色区块上的文字和图标，例如导出预览按钮、页数、播放按钮和社区内容的占位图标。</td></tr></tbody></table></div>
+<h3 id="accent">强调色</h3>
+<div class="table-wrap"><table><thead><tr><th>名称</th><th>使用位置</th></tr></thead><tbody><tr><td data-label="名称"><code>Accent</code></td><td data-label="使用位置">主色，用于选中项、活动滑块、编辑器顶栏上的导出按钮、时间轴吸附线和选区、播放标记及主要按钮。这是用途最广的颜色之一。</td></tr><tr><td data-label="名称"><code>AccentLit</code></td><td data-label="使用位置">较亮的强调色，用于音量和混合滑块、编辑器开关的圆钮，以及电脑端编辑器的文件夹图标。</td></tr><tr><td data-label="名称"><code>AccentGlow</code></td><td data-label="使用位置">面板中用于高亮的浅强调色，例如数字键盘上当前按键的边框和标签。</td></tr><tr><td data-label="名称"><code>AccentDeep</code></td><td data-label="使用位置">深强调色，用于编辑器中开启的开关轨道、预览手柄和所选颜色的圆环。</td></tr><tr><td data-label="名称"><code>OnAccent</code></td><td data-label="使用位置">强调色上的文字和图标，例如导出图标、强调色按钮和选中的标签按钮。</td></tr><tr><td data-label="名称"><code>Warning</code></td><td data-label="使用位置">警告与错误，例如预览过期、文件缺失、片段超出限制，以及项目安全确认框上的删除按钮或危险操作按钮。</td></tr><tr><td data-label="名称"><code>Favorite</code></td><td data-label="使用位置">文本编辑器和效果浏览器中代表收藏的实心星标。</td></tr></tbody></table></div>
+<h3 id="text-on-dark">深色背景上的文字</h3>
+<p>这些颜色用于编辑器中的文字和图标。</p>
+<div class="table-wrap"><table><thead><tr><th>名称</th><th>使用位置</th></tr></thead><tbody><tr><td data-label="名称"><code>OnDark</code></td><td data-label="使用位置">编辑器的主要文字和图标。这是最常用的颜色。</td></tr><tr><td data-label="名称"><code>OnDarkDim</code></td><td data-label="使用位置">较淡的文字和图标，例如计数、提示、空列表提示以及电脑端编辑器中的小图标。</td></tr><tr><td data-label="名称"><code>Caption</code></td><td data-label="使用位置">面板中的小号提示文字和箭头，以及点编辑器中的引导线。</td></tr><tr><td data-label="名称"><code>Faint</code></td><td data-label="使用位置">低对比度的图标和线条，例如点编辑器中未选中的图标、混合及边框和阴影的图标、刻度和取色器的闲置状态。</td></tr><tr><td data-label="名称"><code>Inactive</code></td><td data-label="使用位置">关闭或闲置的元素，例如时间轴标尺的刻度和手柄、关闭的开关轨道，以及移动面板中的链接和相机区块。</td></tr></tbody></table></div>
+<h3 id="home-screen">主屏幕</h3>
+<p>这些颜色用于主屏幕、设置抽屉、新建项目面板、导出页面和初次使用时的引导页面。</p>
+<div class="table-wrap"><table><thead><tr><th>名称</th><th>使用位置</th></tr></thead><tbody><tr><td data-label="名称"><code>HomeBg</code></td><td data-label="使用位置">主屏幕背景和其中配色柔和的区块，例如更新内容的标题栏及对话框中的文本框。</td></tr><tr><td data-label="名称"><code>Card</code></td><td data-label="使用位置">主屏幕上的卡片与列表行，包括工具、模板、设置抽屉中的行、菜单、导出页面顶栏和教程卡片。</td></tr><tr><td data-label="名称"><code>SheetBg</code></td><td data-label="使用位置">面板和页面的背景，包括新建项目面板、导出页面、初次使用时的引导页面和关于页面。</td></tr><tr><td data-label="名称"><code>HomeDrawer</code></td><td data-label="使用位置">设置抽屉背景（手机和平板）。</td></tr><tr><td data-label="名称"><code>HomePanel</code></td><td data-label="使用位置">主屏幕上低对比度的区块，例如设置抽屉中分组显示的列表行、没有图片的社区内容和安全确认框的按钮。</td></tr><tr><td data-label="名称"><code>Navy</code></td><td data-label="使用位置">主屏幕的主深色，用于标题、图标、选中的标签页和标签按钮、选中的按钮和复选框，以及进度条。虽然名为 Navy，实际可设为任意颜色。</td></tr><tr><td data-label="名称"><code>OnNavy</code></td><td data-label="使用位置">Navy 底色上的文字和图标，例如选中的标签或按钮上的文字和图标。</td></tr><tr><td data-label="名称"><code>OnNavyAccent</code></td><td data-label="使用位置">Navy 底色上的强调文字和图标，包括所选选项和导出按钮的标签，以及主屏幕为浅色时导出页面进度区域的温度文字。</td></tr><tr><td data-label="名称"><code>NavyHi</code></td><td data-label="使用位置">设置抽屉列表中选中的行。</td></tr><tr><td data-label="名称"><code>NavyLine</code></td><td data-label="使用位置">设置抽屉列表、新建项目面板列表及模板页标签按钮上的线条和边框。</td></tr><tr><td data-label="名称"><code>HomeAccent</code></td><td data-label="使用位置">主屏幕的强调色，用于开启的开关、单选按钮、菜单勾选标记、导出页面的提醒文字，以及主屏幕安全确认框中的危险操作按钮。</td></tr><tr><td data-label="名称"><code>HomeInk</code></td><td data-label="使用位置">主屏幕的主要文字。</td></tr><tr><td data-label="名称"><code>HomeMid</code></td><td data-label="使用位置">主屏幕的次要文字和图标，例如版本信息、箭头、手柄和标签。</td></tr><tr><td data-label="名称"><code>HomeDim</code></td><td data-label="使用位置">主屏幕的辅助文字，例如提示、工具说明和小箭头。</td></tr><tr><td data-label="名称"><code>HomeFaint</code></td><td data-label="使用位置">主屏幕最淡的元素，例如未选中的分页圆点和新建项目面板中的链接图标。</td></tr><tr><td data-label="名称"><code>HomeLine</code></td><td data-label="使用位置">主屏幕上的细线和边框、进度条轨道，以及工具中选中的范围按钮。</td></tr><tr><td data-label="名称"><code>MenuScrim</code></td><td data-label="使用位置">在手机或平板上打开菜单时覆盖主屏幕的遮罩。</td></tr><tr><td data-label="名称"><code>PressHome</code></td><td data-label="使用位置">主屏幕上按压或鼠标悬停时的高亮。</td></tr></tbody></table></div>
+<h3 id="switches-and-others">开关和其他元素</h3>
+<div class="table-wrap"><table><thead><tr><th>名称</th><th>使用位置</th></tr></thead><tbody><tr><td data-label="名称"><code>SwitchOff</code></td><td data-label="使用位置">设置抽屉和导出页面中关闭的开关轨道。</td></tr><tr><td data-label="名称"><code>Thumb</code></td><td data-label="使用位置">导出页面和编辑器中关闭的开关圆钮，以及编辑器滑块上的标记。</td></tr></tbody></table></div>
+<h2 id="full-example-light-green">完整示例：浅绿</h2>
+<p>浅绿是应用内置主题。下面是同一主题的文件版本，可以用来制作自己的主题。编辑器为深蓝紫色，搭配亮绿色强调色，浅色主屏幕也使用同一种绿色。</p>
+<pre><code>{
+ "name": "Light Green",
+ "TopBar": "#202332",
+ "PreviewBg": "#141620",
+ "TimelineBg": "#191B27",
+ "Panel": "#333750",
+ "PanelInset": "#292D40",
+ "Button": "#292D40",
+ "Field": "#141620",
+ "FieldHi": "#3B3F54",
+ "Chosen": "#141620",
+ "Well": "#191B27",
+ "Deepest": "#0C0D13",
+ "Line": "#222535",
+ "MenuLine": "#222535",
+ "KeyDigit": "#626575",
+ "KeySymbol": "#252944",
+ "Scrim": "#F2050508",
+ "PressEditor": "#1CFFFFFF",
+ "OnDark": "#FFFFFF",
+ "OnDarkDim": "#A9ABB4",
+ "Caption": "#B8B9C2",
+ "Faint": "#7F8290",
+ "Inactive": "#626575",
+ "OnScrim": "#FFFFFF",
+ "Accent": "#00FFA8",
+ "AccentLit": "#69FC97",
+ "AccentGlow": "#9CFFD6",
+ "AccentDeep": "#316463",
+ "OnAccent": "#000000",
+ "Gold": "#FFCD4B",
+ "Favorite": "#FFCD4B",
+ "HomeBg": "#F6F6F6",
+ "Card": "#FFFFFF",
+ "SheetBg": "#EAEAEC",
+ "Navy": "#1E2239",
+ "HomeAccent": "#009965",
+ "OnNavy": "#FFFFFF",
+ "OnNavyAccent": "#00FFA8",
+ "NavyHi": "#333750",
+ "NavyLine": "#43486B",
+ "HomeInk": "#000000",
+ "HomeMid": "#494C5A",
+ "HomeDim": "#5D606F",
+ "HomeFaint": "#BBBBBB",
+ "HomeLine": "#D9D9DD",
+ "HomePanel": "#EAEAEC",
+ "HomeDrawer": "#FFFFFF",
+ "SwitchOff": "#A3A3A5",
+ "Thumb": "#ECECEC",
+ "MenuScrim": "#B30F1010",
+ "PressHome": "#12000000"
+}</code></pre><nav class="pager" aria-label="上一页和下一页"><a rel="prev" href="settings.html">&larr; 设置</a><a rel="next" href="keyframes.html">关键帧和缓动 &rarr;</a></nav></main></div></body></html>

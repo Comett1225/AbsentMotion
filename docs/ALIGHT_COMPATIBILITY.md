@@ -8,7 +8,7 @@ Export the project from Alight Motion as XML and open it in AbsentMotion. After 
 
 ## In short
 
-- **191** Alight effects look the same and **7** are very close.
+- **192** Alight effects look the same and **6** are very close.
 - **56** are converted to a similar effect that does not look identical.
 - **2** are converted but have not been compared side by side yet.
 - Not converted yet: **0**.
@@ -52,6 +52,7 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | Copy Background | Copy Background | Same look |
 | Count Up/Down | Count Up/Down | Same look |
 | Cube | Cube | Same look |
+| cube | Box | Same look |
 | Curl | Curl | Same look |
 | Cylinder | Cylinder | Same look |
 | Dark Glow | Dark Glow | Same look |
@@ -212,7 +213,6 @@ Something imports wrong? [Send the project as an Import problem](https://github.
 | zoomblur | Zoom Blur | Same look |
 | zoomblur2 | Zoom Blur | Same look |
 | 360º Reorient Sphere | 360º Reorient Sphere | Very close |
-| cube | Box | Very close |
 | flip | Flip Layer | Very close |
 | Hexagon Array | Hexagon Array | Very close |
 | Simple Starfield | Simple Starfield | Very close |

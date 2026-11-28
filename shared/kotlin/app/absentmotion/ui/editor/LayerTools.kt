@@ -54,6 +54,7 @@ import app.absentmotion.editor.picksFrames
 import app.absentmotion.model.FrameRef
 import app.absentmotion.model.formatFloats
 import app.absentmotion.model.shownFrame
+import app.absentmotion.model.speedable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -166,7 +167,7 @@ fun LayerTools(state: EditorState, modifier: Modifier = Modifier, side: Boolean 
     }
     Column(modifier.background(Am.Panel).deskVerticalScroll().padding(start = 62.px, top = 42.px, end = 62.px)) {
         Row(Modifier.fillMaxWidth().height(107.px)) {
-            SmallTool(PanelIcons.Speed, stringResource(R.string.a11y_speed), Modifier.width(183.px), ToolShape, enabled = still?.mediaFill?.video == true || still?.kind == "audio") { state.panel = EditorPanel.Speed }
+            SmallTool(PanelIcons.Speed, stringResource(R.string.a11y_speed), Modifier.width(183.px), ToolShape, enabled = still?.speedable == true) { state.panel = EditorPanel.Speed }
             Spacer(Modifier.width(17.px))
             Row(Modifier.weight(1f).fillMaxHeight(), Arrangement.spacedBy(3.px)) {
                 val clipStart = still?.startTime

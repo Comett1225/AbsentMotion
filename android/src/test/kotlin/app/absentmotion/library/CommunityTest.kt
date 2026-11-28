@@ -186,6 +186,18 @@ class CommunityTest {
         assertNull(effect.thumbnail)
     }
 
+    @Test fun officialEffectPacksMayBeBigAndCountAsDownloadedOnceEveryEffectIsInstalled() {
+        fun item(name: String, bytes: Int, official: Boolean) =
+            """{"kind":"effect","name":"$name","title":"Pack","file":"effects/$name/$name.abmfx","bytes":$bytes,"sha256":"$shaA","official":$official,""" +
+                """"contents":[{"id":"maker.one","name":"One","version":1},{"id":"maker.two","name":"Two","version":2}]}"""
+        val items = parseCommunityIndex("""{"format":"absentmotion-community","version":2,"items":[${item("big", 2 shl 20, true)},${item("plain", 2 shl 20, false)}]}""", 60).items
+        val pack = items.single()
+        assertTrue(pack.official)
+        fun added(key: String, version: Long) = app.absentmotion.effects.EffectDefinition("user.$key", key, key, "color", "", emptyList(), addedVersion = version)
+        assertFalse(pack.installedIn(app.absentmotion.effects.EffectCatalog(listOf(added("maker.one", 1), added("maker.two", 1)))))
+        assertTrue(pack.installedIn(app.absentmotion.effects.EffectCatalog(listOf(added("maker.one", 1), added("maker.two", 2)))))
+    }
+
     @Test fun parsesCreditAndUsableContentsAndPicksPacksForTheRequiredVersions() {
         fun entry(id: String, version: String, name: String = "Colour") =
             """{"id":"$id","name":"$name","version":$version}"""

@@ -105,6 +105,7 @@ import app.absentmotion.ui.home.DeskMessage
 import app.absentmotion.ui.home.DeskSettings
 import app.absentmotion.ui.home.SettingsPage
 import app.absentmotion.ui.home.UpdateDialog
+import app.absentmotion.ui.home.PackUpdateAlert
 import app.absentmotion.ui.home.OpeningOverlay
 import app.absentmotion.library.ProjectLinkImportFailure
 import app.absentmotion.ui.home.LocalImportLink
@@ -499,6 +500,7 @@ private fun DeskContent(app: DeskAppState, scale: Float) {
         ) { app.editor?.projectId }
     }
     LaunchedEffect(Unit) { if (app.settings.autoUpdateCheck) Updates.atStart(app.context, app.settings) }
+    PackUpdateAlert(app.settings) { app.engine }
     LaunchedEffect(Unit) { app.startup() }
     LaunchedEffect(Unit) {
         DeviceSend.importer = { file -> app.importFiles(listOf(Uri.fromFile(file)), quiet = true) }

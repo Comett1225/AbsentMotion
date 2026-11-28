@@ -55,7 +55,7 @@ internal suspend fun desktopVideoMatte(context: Context, layer: Layer, media: Me
                 if (read == 0) break
                 check(read == bytes.size) { AppText.get(R.string.ai_unable_to_process) }
                 for (i in pixels.indices) pixels[i] = (0xff shl 24) or ((bytes[3 * i].toInt() and 255) shl 16) or ((bytes[3 * i + 1].toInt() and 255) shl 8) or (bytes[3 * i + 2].toInt() and 255)
-                val alpha = matte(pixels, width, height)
+                val alpha = uprightMatte(matte, pixels, width, height, stream.rotation)
                 check(alpha.size == pixels.size) { AppText.get(R.string.ai_unable_to_process) }
                 smoother.push(done.toLong(), follower?.next(alpha, width, height) ?: alpha)?.let { output.write(encodeMatte(it.second, width, height)) }
                 done++

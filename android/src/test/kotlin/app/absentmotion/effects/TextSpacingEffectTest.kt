@@ -72,7 +72,6 @@ class TextSpacingEffectTest {
         assertEquals(listOf("letterspacing", "linespacing"), effect.params.map { it.id })
         assertTrue(letters.percent && letters.default.toFloat() == 0f && letters.min < 0f && letters.max > 1f)
         assertTrue(lines.percent && lines.default.toFloat() == 1f && lines.min == 0f && lines.max > 2f)
-        assertTrue(TEXT_SPACING_EFFECT in catalog.listed("new").map { it.id })
         val plain = scene("").layers.single()
         val added = plain.copy(node = plain.node.copy(children = plain.node.children + effect.instance()))
         assertEquals(0f, added.letters(), 0f)

@@ -62,6 +62,11 @@ import app.absentmotion.editor.EditorState
 import app.absentmotion.editor.FaceState
 import app.absentmotion.editor.faceState
 import app.absentmotion.editor.pickFace
+import app.absentmotion.editor.StabState
+import app.absentmotion.editor.analyzeShake
+import app.absentmotion.editor.stabLevel
+import app.absentmotion.editor.stabState
+import app.absentmotion.editor.withStabSource
 import app.absentmotion.editor.FullColor
 import app.absentmotion.editor.KeypadField
 import app.absentmotion.editor.KeypadRequest
@@ -114,6 +119,7 @@ internal fun EffectSettings(state: EditorState, layer: Layer, instance: XmlNode,
         }
     }
     if (definition.key == "facetrack") FaceTrackRow(state, layer, instance, enabled)
+    if (definition.key == "stabilizer") StabilizerRow(state, layer, instance, enabled)
     val mix = definition.key in PieceEffects && (definition.key != "particles" || instance.effectProperty("depth")?.valueAt(layer.t) == "true")
     if (mix && !deskLayout) MixPiecesRow(state, layer, enabled)
     fun raw(param: EffectParam): String =
@@ -163,7 +169,7 @@ private fun EffectRow(state: EditorState, layer: Layer, instance: XmlNode, defin
             Text(param.label, Modifier.weight(1f), color = Am.OnDark, fontSize = 14.sp)
             PanelSwitch(raw == "true") { if (enabled) set(param, it.toString(), false) }
         }
-        "color" -> key(layer.id, state.effectIndex, param.id) { EffectColor(state, param, raw, enabled, active == param, keyed, { select(param) }) { text, gesture -> set(param, text, gesture) } }
+        "color" -> key(layer.id, state.effectIndex, param.id) { EffectColor(state, layer.id, state.effectIndex, param, raw, enabled, active == param, keyed, { select(param) }) { text, gesture -> set(param, text, gesture) } }
         "choice" -> if (definition.key == "textblips" && param.id == "voice") BlipVoice(state, param, raw, instance["src"] != null, enabled) { set(param, it, false) }
             else EffectChoice(param, raw, enabled, definition.key) { set(param, it, false) }
         "text" -> if (param.palette) EffectPalette(param, raw, enabled, "${layer.id}:${state.effectIndex}") { set(param, it, false) }
@@ -542,6 +548,60 @@ private fun FaceTrackRow(state: EditorState, layer: Layer, instance: XmlNode, en
 }
 
 @Composable
+private fun StabilizerRow(state: EditorState, layer: Layer, instance: XmlNode, enabled: Boolean) {
+    val index = state.effectIndex
+    val scene = state.scene
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val status = remember(layer.node, instance, scene.fps) { scene.stabState(layer, instance) }
+    var job by remember(layer.id) { mutableStateOf<kotlinx.coroutines.Job?>(null) }
+    var progress by remember(layer.id) { mutableFloatStateOf(0f) }
+    var note by remember(layer.id) { mutableStateOf<String?>(null) }
+    val failed = stringResource(R.string.track_motion_failed)
+    val cancelled = stringResource(R.string.stabilizer_cancelled)
+    DisposableEffect(layer.id) { onDispose { job?.cancel() } }
+    fun analyze() {
+        if (job != null) return
+        val document = state.scene
+        val uri = layer.mediaFill?.uri
+        progress = 0f
+        note = null
+        job = scope.launch {
+            try {
+                val source = document.analyzeShake(context, layer.id) { withContext(Dispatchers.Main) { progress = it } }
+                if (source == null) note = failed
+                else state.edit { s -> if (s.layer(layer.id)?.mediaFill?.uri != uri) s else s.withStabSource(layer.id, index, source) }
+            } catch (_: kotlinx.coroutines.CancellationException) {
+                note = cancelled
+            } catch (e: Exception) {
+                note = app.absentmotion.i18n.failureText(failed, e)
+            } finally {
+                job = null
+            }
+        }
+    }
+    val wanted = stabLevel(instance) > 0 && (status == StabState.None || status == StabState.Partial)
+    LaunchedEffect(layer.id, wanted) { if (wanted && enabled) analyze() }
+    Row(Modifier.fillMaxWidth().height(48.dp).padding(horizontal = 8.dp).alpha(if (enabled) 1f else 0.35f), verticalAlignment = Alignment.CenterVertically) {
+        if (job != null) {
+            Column(Modifier.weight(1f).padding(end = 8.dp)) {
+                Text(stringResource(R.string.stabilizer_analyzing, (progress * 100).toInt().toString()), color = Am.Caption, fontSize = 12.sp, maxLines = 1)
+                androidx.compose.material3.LinearProgressIndicator(progress = { progress }, Modifier.fillMaxWidth().padding(top = 6.dp), color = Am.Accent)
+            }
+            PaletteButton(stringResource(R.string.cancel), true) { job?.cancel() }
+        } else {
+            Text(note ?: stringResource(when (status) {
+                StabState.NotVideo -> R.string.stabilizer_video_only
+                StabState.None -> R.string.stabilizer_none
+                StabState.Partial -> R.string.stabilizer_partial
+                StabState.Ready -> R.string.stabilizer_ready
+            }), Modifier.weight(1f).padding(end = 8.dp), color = Am.Caption, fontSize = 12.sp, lineHeight = 15.sp, maxLines = 2)
+            PaletteButton(stringResource(R.string.stabilizer_analyze), enabled && status != StabState.NotVideo) { analyze() }
+        }
+    }
+}
+
+@Composable
 private fun PaletteButton(text: String, enabled: Boolean, onClick: () -> Unit) {
     Text(text, Modifier.clip(PanelShape).background(Color(0x33000000)).clickable(enabled = enabled, onClick = onClick).padding(horizontal = 10.dp, vertical = 8.dp),
         color = Am.OnDark, fontSize = 13.sp, maxLines = 1)
@@ -615,7 +675,7 @@ internal fun pictureColors(bytes: ByteArray, limit: Int = Palettes.MAX_PICTURE_C
 }
 
 @Composable
-private fun EffectColor(state: EditorState, param: EffectParam, raw: String, enabled: Boolean, active: Boolean, keyed: Boolean, select: () -> Unit, set: (String, Boolean) -> Unit) {
+private fun EffectColor(state: EditorState, layerId: Long, effectIndex: Int, param: EffectParam, raw: String, enabled: Boolean, active: Boolean, keyed: Boolean, select: () -> Unit, set: (String, Boolean) -> Unit) {
     val color = parseColor(raw) ?: 0xFFFFFFFF.toInt()
     var expanded by remember(param.id) { mutableStateOf(false) }
     var library by remember(param.id) { mutableStateOf(false) }
@@ -625,6 +685,11 @@ private fun EffectColor(state: EditorState, param: EffectParam, raw: String, ena
     val picking = state.eyedropper === apply
     val stopPicking = { if (state.eyedropper === apply) state.eyedropper = null }
     DisposableEffect(state) { onDispose(stopPicking) }
+    val unaffected = remember(layerId, effectIndex) { { scene: Scene -> scene.update(layerId) { l -> l.effects.indices.drop(effectIndex).fold(l) { acc, i -> acc.withEffect(i) { it.with("hidden", "true") } } } } }
+    if (picking) DisposableEffect(unaffected) {
+        state.previewChange = unaffected
+        onDispose { if (state.previewChange === unaffected) state.previewChange = null }
+    }
     if (library) PaletteSheet(color) { library = false }
     val picker = stringResource(R.string.a11y_full_color_picker)
     val eyedropper = stringResource(R.string.a11y_eyedropper)

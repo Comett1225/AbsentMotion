@@ -10027,6 +10027,63 @@
      "label": "Recorte"
     }
    }
+  },
+  "warmglow": {
+   "description": "Desenfoca la capa y conserva en cada color lo más oscuro entre el desenfoque y la imagen, de modo que las sombras se extienden suavemente hacia las partes brillantes. Máscara limita el efecto a un rectángulo, una elipse o un polígono.",
+   "name": "Resplandor cálido",
+   "params": {
+    "blur": {
+     "label": "Nivel"
+    },
+    "mask": {
+     "label": "Máscara",
+     "options": [
+      "Ninguno",
+      "Rectángulo",
+      "Elipse",
+      "Polígono"
+     ]
+    },
+    "maskCenter": {
+     "label": "Posición de la máscara"
+    },
+    "maskWidth": {
+     "label": "Ancho de la máscara"
+    },
+    "maskHeight": {
+     "label": "Alto de la máscara"
+    },
+    "sides": {
+     "label": "Lados"
+    },
+    "feather": {
+     "label": "Difuminado"
+    }
+   }
+  },
+  "brokenglass": {
+   "description": "Hace añicos la imagen como un cristal golpeado cerca del centro: las grietas salen del punto de impacto y cada fragmento se desplaza y gira un poco. Fragmentos define en cuántas piezas se rompe y cuánto se mueven.",
+   "name": "Cristal roto",
+   "params": {
+    "debris": {
+     "label": "Fragmentos"
+    }
+   }
+  },
+  "stabilizer": {
+   "description": "Estabiliza una capa de vídeo temblorosa. Elige Baja, Media o Alta y el movimiento de cámara del clip se mide una sola vez y se guarda con el proyecto; después la imagen se mueve y gira contra la sacudida, con el zoom justo para ocultar los bordes. Los niveles más altos mantienen la imagen más estable.",
+   "name": "Estabilizador",
+   "params": {
+    "stabilization": {
+     "label": "Estabilización",
+     "options": [
+      "Desactivado",
+      "Baja",
+      "Media",
+      "Alta"
+     ]
+    }
+   }
   }
  }
 }

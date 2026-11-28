@@ -773,7 +773,7 @@ Drawn DrawBody(SkCanvas* canvas, const Layer& l, double timeMs, float t, const S
             canvas->clipPath(TextGlyphPath(l), true);
         }
         if (l.fillType == "media") {
-            DrawMedia(canvas, l, path, alpha, pictures);
+            DrawMedia(canvas, l, path, alpha, pictures, t);
         } else {
             SkPaint paint;
             paint.setAntiAlias(true);

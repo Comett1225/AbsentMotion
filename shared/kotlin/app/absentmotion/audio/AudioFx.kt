@@ -79,6 +79,13 @@ enum class FxKind(val id: Int, val xml: String, @StringRes val label: Int, val p
         FxParam("reverb", R.string.audio_fx_reverb, 0f, 1f, 0f, "%"),
         FxParam("pingPong", R.string.audio_param_ping_pong, 0f, 1f, 0f, choices = listOf(R.string.audio_choice_off, R.string.audio_choice_on)),
     ), units = 7),
+    Vibrato(9, "vibrato", R.string.audio_fx_vibrato, listOf(
+        FxParam("rate", R.string.audio_param_rate, 0.5f, 12f, 5f, "Hz", log = true),
+        FxParam("depth", R.string.audio_param_depth, 0f, 1f, 0.3f, "%"),
+    )),
+    RingModulator(10, "ringmod", R.string.audio_fx_ring_modulator, listOf(
+        FxParam("freq", R.string.audio_param_frequency, 5f, 5000f, 100f, "Hz", log = true),
+    )),
 }
 
 private fun filter(cutoff: Float) = listOf(

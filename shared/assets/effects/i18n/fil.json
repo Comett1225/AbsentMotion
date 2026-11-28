@@ -10027,6 +10027,63 @@
      "label": "Crop"
     }
    }
+  },
+  "warmglow": {
+   "description": "Binu-blur ang layer at pinapanatili ang mas madilim sa pagitan ng blur at ng larawan sa bawat kulay, kaya malambot na kumakalat ang mga anino sa maliliwanag na bahagi. Nililimitahan ng Mask ang epekto sa isang parihaba, ellipse o polygon.",
+   "name": "Warm Glow",
+   "params": {
+    "blur": {
+     "label": "Antas"
+    },
+    "mask": {
+     "label": "Mask",
+     "options": [
+      "Wala",
+      "Parihaba",
+      "Ellipse",
+      "Polygon"
+     ]
+    },
+    "maskCenter": {
+     "label": "Posisyon ng Mask"
+    },
+    "maskWidth": {
+     "label": "Lapad ng Mask"
+    },
+    "maskHeight": {
+     "label": "Taas ng Mask"
+    },
+    "sides": {
+     "label": "Gilid"
+    },
+    "feather": {
+     "label": "Feather"
+    }
+   }
+  },
+  "brokenglass": {
+   "description": "Binabasag ang larawan na parang salaming tinamaan malapit sa gitna: lumalabas ang mga bitak mula sa tama at bahagyang inililipat at iniikot ang bawat piraso. Itinatakda ng Mga Basag kung ilang piraso ang mababasag at gaano kalayo ang galaw ng mga ito.",
+   "name": "Basag na Salamin",
+   "params": {
+    "debris": {
+     "label": "Mga Basag"
+    }
+   }
+  },
+  "stabilizer": {
+   "description": "Pinapatatag ang nanginginig na video layer. Piliin ang Mababa, Katamtaman o Mataas at isang beses susukatin ang galaw ng camera ng clip at itatabi kasama ng project; saka ililipat at iikutin ang larawan laban sa pagyanig, na may sapat na zoom lang para itago ang mga gilid. Mas matatag ang larawan sa mas mataas na antas.",
+   "name": "Stabilizer",
+   "params": {
+    "stabilization": {
+     "label": "Stabilization",
+     "options": [
+      "Naka-off",
+      "Mababa",
+      "Katamtaman",
+      "Mataas"
+     ]
+    }
+   }
   }
  }
 }

@@ -10027,6 +10027,63 @@
      "label": "Kırp"
     }
    }
+  },
+  "warmglow": {
+   "description": "Katmanı bulanıklaştırır ve her renkte bulanıklık ile görüntüden koyu olanı korur, böylece gölgeler parlak bölgelere yumuşakça yayılır. Maske efekti bir dikdörtgenle, elipsle veya çokgenle sınırlar.",
+   "name": "Sıcak Parıltı",
+   "params": {
+    "blur": {
+     "label": "Seviye"
+    },
+    "mask": {
+     "label": "Maske",
+     "options": [
+      "Yok",
+      "Dikdörtgen",
+      "Elips",
+      "Çokgen"
+     ]
+    },
+    "maskCenter": {
+     "label": "Maske Konumu"
+    },
+    "maskWidth": {
+     "label": "Maske Genişliği"
+    },
+    "maskHeight": {
+     "label": "Maske Yüksekliği"
+    },
+    "sides": {
+     "label": "Kenarlar"
+    },
+    "feather": {
+     "label": "Kenar yumuşatma"
+    }
+   }
+  },
+  "brokenglass": {
+   "description": "Görüntüyü ortasına yakın yerden vurulmuş bir cam gibi parçalar: çatlaklar çarpma noktasından yayılır ve her parça biraz kayıp döner. Parçalar kaç parçaya ayrılacağını ve ne kadar uzağa gideceklerini belirler.",
+   "name": "Kırık Cam",
+   "params": {
+    "debris": {
+     "label": "Parçalar"
+    }
+   }
+  },
+  "stabilizer": {
+   "description": "Titreyen bir video katmanını sabitler. Düşük, Orta veya Yüksek seçin; klibin kamera hareketi bir kez ölçülüp projeyle birlikte saklanır, sonra görüntü sarsıntının tersine kaydırılır ve döndürülür, kenarları gizleyecek kadar yakınlaştırılır. Yüksek seviyeler görüntüyü daha sabit tutar.",
+   "name": "Sabitleyici",
+   "params": {
+    "stabilization": {
+     "label": "Sabitleme",
+     "options": [
+      "Kapalı",
+      "Düşük",
+      "Orta",
+      "Yüksek"
+     ]
+    }
+   }
   }
  }
 }

@@ -42,6 +42,7 @@ class EffectPackTest {
                 (if ("screen" in uniforms) mapOf("screen" to ("float4" to false)) else emptyMap()) +
                 (if ("visible" in uniforms) mapOf("visible" to ("float4" to false)) else emptyMap()) +
                 (if ("pixel" in uniforms) mapOf("pixel" to ("float" to false)) else emptyMap()) +
+                (if (effect.key == "box" || effect.key == "flip") mapOf("sourceInset" to ("float" to false)) else emptyMap()) +
                 (if ("layer" in uniforms) mapOf("layer" to ("float2" to false)) else emptyMap()) +
                 listOf("toLayer", "fromLayer", "orient").filter { it in uniforms }.associateWith { "float3x3" to false } +
                 listOf("palette", "thresholds", "glyphs").filter { it in uniforms }.associateWith { "shader" to false } +

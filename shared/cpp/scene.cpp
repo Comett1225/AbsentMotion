@@ -617,6 +617,19 @@ bool ParseLayer(const XmlNode& node, int fps, Layer* out) {
                 effect.props.push_back(std::move(base));
                 break;
             }
+            for (const auto& p : c->children) if (p->name == "stabpath") {
+                Property path{"stabpath", "path", {}, ""};
+                const std::vector<float> v = ParseValue(p->attr("path"));
+                for (size_t i = 0; i + 3 < v.size(); i += 4) {
+                    if (std::isfinite(v[i]) && std::isfinite(v[i + 1]) && std::isfinite(v[i + 2]) && std::isfinite(v[i + 3])) path.anim.keys.push_back({v[i], {v[i + 1], v[i + 2], v[i + 3]}, Easing{}});
+                }
+                std::stable_sort(path.anim.keys.begin(), path.anim.keys.end(), [](const Keyframe& x, const Keyframe& y) { return x.t < y.t; });
+                Property zoom{"stabzoom", "path", {}, ""};
+                zoom.anim.value = {strtof(StrAttr(*p, "zoom").c_str(), nullptr)};
+                effect.props.push_back(std::move(path));
+                effect.props.push_back(std::move(zoom));
+                break;
+            }
             l.effects.push_back(std::move(effect));
         }
         if (c->name != "property") continue;
@@ -769,8 +782,27 @@ SkRect MediaRect(const Layer& layer, const SkRect& bounds, int width, int height
     return SkRect::MakeXYWH(bounds.centerX() - w / 2, bounds.centerY() - h / 2, w, h);
 }
 
+static bool Steadied(const Layer& layer, float t, const SkRect& dst, SkMatrix* m) {
+    if (!(t >= 0)) return false;
+    for (const LayerEffect& e : layer.effects) {
+        if (e.hidden || e.id != "absent.stabilizer") continue;
+        const Property* path = e.prop("stabpath");
+        const Property* zoom = e.prop("stabzoom");
+        if (!path || path->anim.keys.empty() || !zoom || zoom->anim.value.empty()) return false;
+        const float z = std::clamp(zoom->anim.value[0], 1.0f, 4.0f);
+        const float w = dst.width();
+        m->setTranslate(dst.centerX(), dst.centerY());
+        m->preScale(z, z);
+        m->preTranslate(path->anim.get(0, t, 0) * w, path->anim.get(1, t, 0) * w);
+        m->preRotate(path->anim.get(2, t, 0));
+        m->preTranslate(-dst.centerX(), -dst.centerY());
+        return m->isFinite();
+    }
+    return false;
+}
+
 void DrawMedia(SkCanvas* canvas, const Layer& layer, const SkPath& path, float opacity,
-               const MediaPictures& pictures) {
+               const MediaPictures& pictures, float t) {
     auto image = pictures(layer.mediaUri, layer.id);
     if (!image) return;
     const SkRect bounds = path.getBounds();
@@ -782,6 +814,8 @@ void DrawMedia(SkCanvas* canvas, const Layer& layer, const SkPath& path, float o
     paint.setAlphaf(std::clamp(opacity, 0.0f, 1.0f));
     canvas->save();
     canvas->clipPath(path, !hard);
+    SkMatrix steady;
+    if (Steadied(layer, t, dst, &steady)) canvas->concat(steady);
     const float density = canvas->getTotalMatrix().getMinScale() * dst.width() / std::max(image->width(), 1);
     const bool minified = !layer.alight && density > 0 && density < 0.25f && (image->hasMipmaps() || !image->isTextureBacked());
     canvas->drawImageRect(image, dst, minified ? SkSamplingOptions(SkFilterMode::kLinear, SkMipmapMode::kLinear) : SkSamplingOptions(SkFilterMode::kLinear), &paint);

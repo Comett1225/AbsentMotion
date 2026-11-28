@@ -73,6 +73,24 @@ class CrashLogsTest {
         assertEquals(emptyList<Pair<Exit, CrashReason>>(), exitsToRecord(exits, seen = 400_000, logged = emptyList()))
     }
 
+    @Test fun aNativeCrashListsTheThreadThatCrashedFirst() {
+        fun varint(v: Long): ByteArray { var x = v; val out = ArrayList<Byte>(); while (true) { if (x < 128) { out += x.toByte(); return out.toByteArray() }; out += ((x and 127) or 128).toByte(); x = x ushr 7 } }
+        fun num(field: Int, v: Long) = varint((field shl 3).toLong()) + varint(v)
+        fun bytes(field: Int, b: ByteArray) = varint((field shl 3 or 2).toLong()) + varint(b.size.toLong()) + b
+        fun text(field: Int, s: String) = bytes(field, s.toByteArray())
+        fun frame(pc: Long, file: String, function: String = "") = bytes(4, num(1, pc) + (if (function.isEmpty()) ByteArray(0) else text(4, function) + num(5, 12)) + text(6, file) + text(8, "abc123"))
+        fun thread(id: Int, name: String, vararg frames: ByteArray) = bytes(16, num(1, id.toLong()) + bytes(2, num(1, id.toLong()) + text(2, name) + frames.fold(ByteArray(0)) { a, b -> a + b }))
+        val tombstone = num(5, 7154) + num(6, 7200) + bytes(10, num(1, 11) + text(2, "SIGSEGV") + text(4, "SEGV_MAPERR") + num(8, 1) + num(9, 0)) +
+            bytes(15, text(1, "null pointer dereference")) +
+            thread(7154, "app.absentmotion", frame(0x9f000, "/apex/com.android.runtime/lib64/bionic/libc.so", "__epoll_pwait")) +
+            thread(7200, "am-render", frame(0, ""), frame(0x1a2b, "/data/app/~~x/app.absentmotion-y/base.apk!libamengine.so", "Renderer::draw"))
+        val shown = tombstoneText(tombstone, 10_000)!!
+        assertTrue(shown, shown.startsWith("SIGSEGV (SEGV_MAPERR), fault address 0x0\nCause: null pointer dereference\n\nCrashed thread 7200 am-render:\n"))
+        assertTrue(shown, "#01 pc 0x1a2b base.apk!libamengine.so (Renderer::draw+12) (BuildId: abc123)" in shown)
+        assertTrue(shown, shown.indexOf("am-render") < shown.indexOf("Thread 7154 app.absentmotion:"))
+        assertNull(tombstoneText("not a tombstone".toByteArray(), 100))
+    }
+
     @Test fun nativeTracesAreReducedToReadableText() {
         val bytes = byteArrayOf(10, 2) + "SIGABRT".toByteArray() + byteArrayOf(0, 18, 1) + "ab".toByteArray() + byteArrayOf(-1) +
             "libamengine.so".toByteArray() + byteArrayOf(0)

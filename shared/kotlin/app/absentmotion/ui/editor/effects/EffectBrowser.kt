@@ -121,6 +121,7 @@ import app.absentmotion.ui.theme.Motion
 import app.absentmotion.ui.theme.withUiFont
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import app.absentmotion.library.installedIn
 import kotlin.math.abs
 import kotlin.math.sign
 import app.absentmotion.ui.HoldName
@@ -188,6 +189,10 @@ private fun BrowserBody(state: EditorState, pickFile: () -> Unit) {
     val hasSound = audio || layer?.mediaFill?.video == true
     var category by remember { mutableStateOf<String?>(state.effectCategory ?: if (audio) "audio" else null) }
     var creator by remember { mutableStateOf<String?>(null) }
+    var packCategory by remember { mutableStateOf<String?>(null) }
+    var askPack by remember { mutableStateOf<app.absentmotion.library.CommunityItem?>(null) }
+    var openPack by remember { mutableStateOf<app.absentmotion.library.CommunityItem?>(null) }
+    val officialPacks = remember(context) { officialEffectPacks(context) }
     var searching by remember { mutableStateOf(false) }
     var helpPage by remember { mutableStateOf<String?>(null) }
     var captionClip by remember { mutableStateOf<Long?>(null) }
@@ -211,6 +216,8 @@ private fun BrowserBody(state: EditorState, pickFile: () -> Unit) {
         effects.maxByOrNull { it.addedModified }?.addedAuthor?.ifBlank { otherCreators } ?: otherCreators
     val categoryCreator = category?.takeIf { it.startsWith(CreatorCategoryPrefix) }?.removePrefix(CreatorCategoryPrefix)
     val creatorPage = categoryCreator ?: creator
+    LaunchedEffect(creatorPage) { packCategory = null }
+    val folderCategories = creatorPage?.let { creators[it] }?.takeIf { it.size > FolderCategoryMin }?.groupBy { it.category ?: "other" }?.takeIf { it.size > 1 }
     LaunchedEffect(creators, creatorPage) {
         if (creatorPage != null && creatorPage !in creators) {
             if (categoryCreator != null) category = null else creator = null
@@ -221,6 +228,7 @@ private fun BrowserBody(state: EditorState, pickFile: () -> Unit) {
         when {
             detail != null -> if (state.effectDetail != null) close() else detail = null
             searching -> { hideKeyboard(); searching = false; query = ""; grids.keys.removeAll { it.startsWith("search:") } }
+            packCategory != null -> packCategory = null
             creator != null -> creator = null
             fromAudio -> { fromAudio = false; category = "audio" }
             category != null && !audio -> { category = null; grids.clear() }
@@ -279,6 +287,7 @@ private fun BrowserBody(state: EditorState, pickFile: () -> Unit) {
     val stepping = (category != null && !audio) || detail != null || searching || fromAudio
     val categoryNames = catalog.categories.toMap()
     val heading = detail?.let { categoryNames[it.category] ?: it.name } ?: when {
+        creatorPage != null && packCategory != null -> categoryNames[packCategory] ?: creatorName(creators[creatorPage].orEmpty())
         creatorPage != null -> creatorName(creators[creatorPage].orEmpty())
         category == "audio" -> audioName
         category == "voice" -> voiceName
@@ -452,6 +461,7 @@ private fun BrowserBody(state: EditorState, pickFile: () -> Unit) {
             val byPreset = if (audio || !searching) emptyList() else catalog.definitions.filter { d -> d !in byName && query.isNotBlank() && d.presets.any { matchesSearch(query, it.name) } }
             val addedPage = !searching && category == AddedEffectCategory
             val results = when {
+                !searching && creatorPage != null && folderCategories != null -> packCategory?.let { folderCategories[it] }.orEmpty()
                 !searching && creatorPage != null -> creators[creatorPage].orEmpty()
                 addedPage || audio -> emptyList()
                 searching -> byName + byPreset
@@ -463,7 +473,16 @@ private fun BrowserBody(state: EditorState, pickFile: () -> Unit) {
                 if (app.absentmotion.platform.PlatformFeatures.ai && hasSound && (category == "ai" || searching && matchesSearch(query, context.getString(R.string.auto_captions)))) {
                     item(key = "ai-captions") { AudioTile(stringResource(R.string.auto_captions), 5, true) { state.playing = false; captionClip = layer.id } }
                 }
+                if (!searching && folderCategories != null && packCategory == null) {
+                    val names = catalog.categories.toMap()
+                    items(folderCategories.entries.sortedBy { (key, _) -> catalog.categories.indexOfFirst { it.first == key }.let { if (it < 0) Int.MAX_VALUE else it } }.toList(), key = { "folder-${it.key}" }) { (key, effects) ->
+                        FolderCategoryTile(catalog, names[key] ?: key, effects.size, effects.firstNotNullOfOrNull { it.addedPicture }, 100f) { packCategory = key }
+                    }
+                }
                 if (addedPage && creator == null) {
+                    items(officialPacks, key = { "pack-${it.name}" }, span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) { pack ->
+                        OfficialPackCard(pack, catalog) { if (app.absentmotion.ui.home.sessionAllowed) openPack = pack else askPack = pack }
+                    }
                     item(key = "add-effect") { AddEffectTile(100f, pickFile) }
                     items(creatorTiles, key = { "creator-${it.key}" }) { (slug, effects) ->
                         AddedCreatorTile(catalog, slug, creatorName(effects), effects.firstNotNullOfOrNull { it.addedPicture }, 100f) { creator = slug }
@@ -539,6 +558,24 @@ private fun BrowserBody(state: EditorState, pickFile: () -> Unit) {
         }
         }
     }
+    askPack?.let { pack ->
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { askPack = null },
+            title = { Text(stringResource(R.string.community_ask_title), color = Am.Navy) },
+            text = { Text(stringResource(R.string.community_ask_note), color = Am.HomeMid) },
+            confirmButton = { app.absentmotion.ui.home.DialogPill(stringResource(R.string.community_ask_button)) { app.absentmotion.ui.home.sessionAllowed = true; askPack = null; openPack = pack } },
+            dismissButton = { app.absentmotion.ui.home.DialogPill(stringResource(R.string.cancel), primary = false) { askPack = null } },
+            containerColor = Am.Card,
+        )
+    }
+    openPack?.let { pack ->
+        val importer = LocalAddedEffectImport.current
+        val client = remember(context) { app.absentmotion.library.CommunityClient(context.cacheDir) }
+        app.absentmotion.ui.home.CommunityItemSheet(
+            item = pack, thumb = null, client = client, engine = { state.engine }, count = null, onDismiss = { openPack = null }, onImport = {},
+            onEffect = importer?.let { i -> { file -> scope.launch { i.pickCommunity(file, pack) } } }, onPresetBundle = null,
+        )
+    }
     AiVideoDialog(ai, state.scene)
     AiNoiseDialog(ai)
     AiCutoutDialog(ai, state.scene)
@@ -549,7 +586,7 @@ private fun BrowserBody(state: EditorState, pickFile: () -> Unit) {
 
 internal val VoiceOrder = listOf(FxKind.HighPitch, FxKind.LowPitch, FxKind.Voice)
 
-internal val AudioOrder = listOf(FxKind.Reverb, FxKind.Echo, FxKind.Eq, FxKind.LowPass, FxKind.HighPass, FxKind.Compressor, FxKind.Gate)
+internal val AudioOrder = listOf(FxKind.Reverb, FxKind.Echo, FxKind.Eq, FxKind.LowPass, FxKind.HighPass, FxKind.Compressor, FxKind.Gate, FxKind.Vibrato, FxKind.RingModulator)
 
 private val BrowserBg get() = Am.Field
 private val RecommendedBg get() = Am.PanelInset
@@ -707,6 +744,49 @@ private fun EffectTile(catalog: EffectCatalog, effect: EffectDefinition, width: 
         }
         Text(preset?.name ?: effect.name, Modifier.fillMaxWidth().padding(top = 4.dp), color = Am.OnDark, fontSize = if (deskLayout) 12.sp else if (recommended || width > 100) 10.sp else 8.sp,
             lineHeight = if (deskLayout) 14.sp else if (recommended) 12.sp else 9.sp, textAlign = TextAlign.Center, maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+    }
+}
+
+private const val FolderCategoryMin = 24
+
+internal fun officialEffectPacks(context: app.absentmotion.platform.Context): List<app.absentmotion.library.CommunityItem> = runCatching {
+    val text = context.assets.open("effect-packs.json").use { it.readBytes().toString(Charsets.UTF_8) }
+    app.absentmotion.library.parseCommunityIndex(text, app.absentmotion.BuildConfig.VERSION_CODE).items.filter { it.official }
+}.getOrDefault(emptyList())
+
+@Composable
+private fun OfficialPackCard(pack: app.absentmotion.library.CommunityItem, catalog: EffectCatalog, onOpen: () -> Unit) {
+    val installed = pack.installedIn(catalog)
+    Row(
+        Modifier.fillMaxWidth().padding(5.dp).clip(RoundedCornerShape(8.dp)).background(RecommendedBg).hoverFill(8.dp, Am.Field).handCursor()
+            .clickable(onClick = onOpen).padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(Modifier.size(44.dp).clip(RoundedCornerShape(8.dp)).background(Am.Accent), Alignment.Center) {
+            Icon(app.absentmotion.ui.home.HomeIcons.Folder, null, Modifier.size(24.dp), tint = Am.OnAccent)
+        }
+        Column(Modifier.weight(1f).padding(horizontal = 12.dp)) {
+            Text(pack.title, color = Am.OnDark, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(androidx.compose.ui.res.pluralStringResource(R.plurals.effects_count, pack.contents.size, pack.contents.size.toString()) + " · " + pack.creator,
+                color = Am.OnDarkDim, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
+        Text(stringResource(if (installed) R.string.community_downloaded else R.string.update_download), color = if (installed) Am.OnDarkDim else Am.Accent,
+            fontSize = 13.sp, fontWeight = FontWeight.Medium)
+    }
+}
+
+@Composable
+private fun FolderCategoryTile(catalog: EffectCatalog, name: String, count: Int, picture: String?, width: Float, onClick: () -> Unit) {
+    Column(Modifier.width(width.dp).clip(RoundedCornerShape(6.dp)).hoverFill(6.dp, Am.Field).handCursor().clickable(onClick = onClick).padding(5.dp),
+        horizontalAlignment = Alignment.CenterHorizontally) {
+        Box(Modifier.size((width - 7).dp).clip(RoundedCornerShape(5.dp)).background(RecommendedBg), Alignment.Center) {
+            if (picture != null) Thumbnail(catalog, picture, Modifier.fillMaxSize())
+            Box(Modifier.align(Alignment.BottomEnd).padding(4.dp).size(24.dp).clip(RoundedCornerShape(4.dp)).background(RecommendedBg), Alignment.Center) {
+                Icon(app.absentmotion.ui.home.HomeIcons.Folder, null, Modifier.size(18.dp), tint = Am.OnDark)
+            }
+        }
+        Text("$name ($count)", Modifier.fillMaxWidth().padding(top = 4.dp), color = Am.OnDark, fontSize = if (deskLayout) 12.sp else 8.sp,
+            lineHeight = if (deskLayout) 14.sp else 9.sp, textAlign = TextAlign.Center, maxLines = 2, overflow = TextOverflow.Ellipsis)
     }
 }
 

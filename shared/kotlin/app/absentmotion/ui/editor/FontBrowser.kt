@@ -121,7 +121,7 @@ internal fun FontBrowser(library: FontLibrary, onSelect: (String) -> Unit, onClo
         }.let { filtered -> if (sorting == "Alphabetical") filtered.sortedBy { it.name.label.lowercase() } else filtered }
         val realCategories = categories.filter { it in 1..5 }
         GoogleFonts.arrange(kept(library.importedFonts().map { FontEntry(it, 100, emptySet()) }), kept(FontCatalog.entries),
-            if (searching || source == FontSource.Device) device.map { FontEntry(it, 0, emptySet()) } else emptyList(),
+            device.map { FontEntry(it, 100, emptySet()) },
             google.filter { realCategories.isEmpty() || it.category in realCategories }, search.orEmpty(), source)
     }
     val entries = results.local

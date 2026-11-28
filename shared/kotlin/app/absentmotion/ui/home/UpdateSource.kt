@@ -19,7 +19,7 @@ internal val GitHubReleaseAssetHosts = setOf("objects.githubusercontent.com", "r
 
 internal object GitHubSource : UpdateSource {
     private val repository = HOME_PAGE.removePrefix("https://github.com/").lowercase(Locale.ROOT)
-    override val releases = "https://api.github.com/repos/" + HOME_PAGE.removePrefix("https://github.com/") + "/releases?per_page=30"
+    override val releases = "https://api.github.com/repos/" + HOME_PAGE.removePrefix("https://github.com/") + "/releases?per_page=10"
     override val signers = setOf(RELEASE_SIGNER)
 
     override fun asset(tag: String, name: String) = "$HOME_PAGE/releases/download/$tag/$name"

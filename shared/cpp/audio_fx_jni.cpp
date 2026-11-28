@@ -8,7 +8,7 @@
 
 namespace {
 
-enum Kind { Eq = 0, LowPass = 1, HighPass = 2, Reverb = 3, Echo = 4, Compressor = 5, Gate = 6, Limiter = 7, Pitch = 8 };
+enum Kind { Eq = 0, LowPass = 1, HighPass = 2, Reverb = 3, Echo = 4, Compressor = 5, Gate = 6, Limiter = 7, Pitch = 8, Vibrato = 9, RingModulator = 10 };
 
 int paramCount(int kind) {
     switch (kind) {
@@ -20,6 +20,8 @@ int paramCount(int kind) {
     case Gate: return 5;
     case Limiter: return 3;
     case Pitch: return 1;
+    case Vibrato: return 2;
+    case RingModulator: return 1;
     default: return -1;
     }
 }
@@ -34,6 +36,8 @@ struct Unit {
     std::unique_ptr<dsp::NoiseGate> gate;
     std::unique_ptr<dsp::Limiter> limiter;
     std::unique_ptr<dsp::PitchShifter> pitch;
+    std::unique_ptr<dsp::Vibrato> vibrato;
+    std::unique_ptr<dsp::RingModulator> ring;
 };
 
 struct Rack {
@@ -61,6 +65,8 @@ bool attach(Rack& rack, Unit& unit) {
     case Gate: unit.gate = std::make_unique<dsp::NoiseGate>(); return rack.chain.add(*unit.gate);
     case Limiter: unit.limiter = std::make_unique<dsp::Limiter>(); return rack.chain.add(*unit.limiter);
     case Pitch: unit.pitch = std::make_unique<dsp::PitchShifter>(); return rack.chain.add(*unit.pitch);
+    case Vibrato: unit.vibrato = std::make_unique<dsp::Vibrato>(); return rack.chain.add(*unit.vibrato);
+    case RingModulator: unit.ring = std::make_unique<dsp::RingModulator>(); return rack.chain.add(*unit.ring);
     default: return false;
     }
 }
@@ -113,6 +119,13 @@ void apply(Unit& unit, const float* p) {
     }
     case Pitch:
         unit.pitch->params.semitones = p[0];
+        break;
+    case Vibrato:
+        unit.vibrato->params.rateHz = p[0];
+        unit.vibrato->params.depth = p[1];
+        break;
+    case RingModulator:
+        unit.ring->params.frequencyHz = p[0];
         break;
     default: break;
     }

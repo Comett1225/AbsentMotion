@@ -51,7 +51,7 @@ fun EditorState.retimeVideo(start: Boolean) {
 fun EditorState.setVideoSpeed(value: Float, original: Layer) {
     if (selectedId != original.id || value.isNaN() || original.remapped) return
     val speed = value.coerceIn(SLOWEST_SPEED, FASTEST_SPEED)
-    val changed = original.withNormalSpeed(speed)
+    val changed = if (original.mediaTimed) original.withNormalSpeed(speed) else original.withLayerSpeed(speed)
     if (!scene.showsAnyFrame(changed.startTime, changed.endTime)) return
     edit("video-speed") { it.update(original.id) { changed } }
 }

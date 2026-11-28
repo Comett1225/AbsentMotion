@@ -446,7 +446,7 @@ class MainActivity : ComponentActivity() {
                         if (Tutorial.running || Tutorial.offerDismissed || settings.tutorialAsk != Tutorial.ASK) {
                             SharedMediaDialog(sharedMedia, store, projectsChanged, { openShared(null) }, ::openShared) { sharedMedia = emptyList() }
                         }
-                    } else if (settings.updatesAsked) UpdateDialog() else UpdateAskDialog(settings)
+                    } else if (settings.updatesAsked) { UpdateDialog(); app.absentmotion.ui.home.PackUpdateAlert(settings) { engine } } else UpdateAskDialog(settings)
                 }
                 app.absentmotion.ui.tutorial.TutorialHost(
                     open, store, settings,
@@ -471,19 +471,7 @@ class MainActivity : ComponentActivity() {
     @androidx.compose.runtime.Composable
     private fun DeskSheetHost(sheet: DeskSheet, onClose: () -> Unit) {
         when (sheet) {
-            DeskSheet.Settings -> {
-                val drawer = androidx.compose.material3.rememberDrawerState(androidx.compose.material3.DrawerValue.Closed)
-                LaunchedEffect(Unit) {
-                    launch { drawer.open() }
-                    androidx.compose.runtime.snapshotFlow { drawer.targetValue }.first { it == androidx.compose.material3.DrawerValue.Open }
-                    androidx.compose.runtime.snapshotFlow { drawer.currentValue == androidx.compose.material3.DrawerValue.Closed && drawer.targetValue == androidx.compose.material3.DrawerValue.Closed }.first { it }
-                    onClose()
-                }
-                androidx.compose.material3.ModalNavigationDrawer(
-                    drawerContent = { app.absentmotion.ui.home.SettingsDrawer(settings, drawer, onRestored = { projectsChanged++ }) },
-                    drawerState = drawer, gesturesEnabled = drawer.isOpen, scrimColor = Color.Black.copy(alpha = 0.94f),
-                ) { Box(Modifier.fillMaxSize()) }
-            }
+            DeskSheet.Settings -> app.absentmotion.ui.home.SettingsPage(settings, onRestored = { projectsChanged++ }, onClose = onClose)
             DeskSheet.Help -> app.absentmotion.ui.home.HelpScreen(onClose = onClose)
             DeskSheet.About -> app.absentmotion.ui.home.AboutScreen(settings, onClose)
             DeskSheet.CrashLogs -> app.absentmotion.ui.home.CrashLogsScreen(onClose)
@@ -862,7 +850,7 @@ class MainActivity : ComponentActivity() {
             closing.saver.snapshot(xml)
             engine.audio?.release()
             MultiSelect.clear()
-            if (editor === closing) editor = null
+            if (editor === closing) { editor = null; engine.still = null }
             closingEditor = false
             addedEffectsOnHome = false
             val id = closing.projectId

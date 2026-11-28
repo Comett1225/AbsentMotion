@@ -346,6 +346,8 @@ void customize(dsp::Compressor& e) { e.params.thresholdDb = -25.0f; }
 void customize(dsp::NoiseGate& e) { e.params.thresholdDb = -10.0f; }
 void customize(dsp::Limiter& e) { e.params.ceilingDb = -6.0f; }
 void customize(dsp::PitchShifter& e) { e.params.semitones = 5.0f; }
+void customize(dsp::Vibrato& e) { e.params.rateHz = 6.5f; e.params.depth = 0.8f; }
+void customize(dsp::RingModulator& e) { e.params.frequencyHz = 440.0f; }
 
 void automate(dsp::Equalizer& e) { e.params.lowShelf.gainDb = -12.0f; e.params.peaks[1].frequency = 4000.0f; }
 void automate(dsp::Filters& e) { e.params.lowPassHz = 500.0f; e.params.highPass = false; e.params.slope = 12; }
@@ -355,6 +357,8 @@ void automate(dsp::Compressor& e) { e.params.ratio = 10.0f; e.params.attackMs = 
 void automate(dsp::NoiseGate& e) { e.params.thresholdDb = -3.0f; e.params.rangeDb = 35.0f; }
 void automate(dsp::Limiter& e) { e.params.lookaheadMs = 5.0f; e.params.ceilingDb = -12.0f; }
 void automate(dsp::PitchShifter& e) { e.params.semitones = -7.0f; }
+void automate(dsp::Vibrato& e) { e.params.rateHz = 0.5f; e.params.depth = 1.0f; }
+void automate(dsp::RingModulator& e) { e.params.frequencyHz = 37.0f; }
 
 template <typename Effect>
 void testStreaming(const char* name) {
@@ -431,6 +435,82 @@ void testPitch() {
     runBlocks(noise, data, 480);
     for (float sample : data) require(std::abs(sample) < 2.0f, "Pitch shifter exploded on noise");
     std::printf("PASS Pitch shifter frequency and level over rates, shifts and tones\n");
+}
+
+void testVibrato() {
+    for (int rate : {22050, 44100, 48000, 96000}) for (double hz : {3.0, 6.0}) for (double depth : {0.25, 1.0}) {
+        dsp::Vibrato vibrato;
+        vibrato.params.rateHz = static_cast<float>(hz);
+        vibrato.params.depth = static_cast<float>(depth);
+        vibrato.prepare(rate, 4096);
+        const int frames = 3 * rate;
+        std::vector<float> data(static_cast<std::size_t>(2 * frames));
+        for (int i = 0; i < frames; ++i)
+            data[static_cast<std::size_t>(2 * i)] = data[static_cast<std::size_t>(2 * i + 1)] = static_cast<float>(0.3 * std::sin(2.0 * pi * 440.0 * i / rate));
+        runBlocks(vibrato, data, 333);
+        double last = -1.0, low = 1.0e9, high = 0.0, energy = 0.0;
+        int cycles = 0;
+        double first = -1.0;
+        for (int i = rate; i < frames; ++i) {
+            const double a = data[static_cast<std::size_t>(2 * i - 2)], b = data[static_cast<std::size_t>(2 * i)];
+            require(data[static_cast<std::size_t>(2 * i + 1)] == data[static_cast<std::size_t>(2 * i)], "Vibrato channels differ");
+            energy += b * b;
+            if (a < 0.0 && b >= 0.0) {
+                const double at = i - 1 + a / (a - b);
+                if (last >= 0.0) {
+                    const double f = rate / (at - last);
+                    low = std::min(low, f);
+                    high = std::max(high, f);
+                    ++cycles;
+                } else {
+                    first = at;
+                }
+                last = at;
+            }
+        }
+        const double swing = std::pow(2.0, 2.0 * depth / 12.0) - 1.0;
+        const double mean = cycles * rate / (last - first);
+        require(std::abs(mean - 440.0) < 1.5, "Vibrato moved the average pitch (" + std::to_string(mean) + ")");
+        require(std::abs(high - 440.0 * (1.0 + swing)) < 0.25 * 440.0 * swing + 1.5, "Vibrato peak pitch is wrong (" + std::to_string(high) + ")");
+        require(std::abs(low - 440.0 * (1.0 - swing)) < 0.25 * 440.0 * swing + 1.5, "Vibrato lowest pitch is wrong (" + std::to_string(low) + ")");
+        const double rms = std::sqrt(energy / (frames - rate));
+        require(std::abs(rms - 0.3 * 0.70710678) < 0.01, "Vibrato changed the level (" + std::to_string(rms) + ")");
+    }
+    dsp::Vibrato still;
+    still.params.depth = 0.0f;
+    still.prepare(48000, 4096);
+    std::vector<float> click(200, 0.0f);
+    click[20] = 1.0f;
+    click[21] = -0.5f;
+    runBlocks(still, click, 7);
+    require(click[22] == 1.0f && click[23] == -0.5f && click[20] == 0.0f, "Vibrato with no depth is not a one-sample delay");
+    std::printf("PASS Vibrato swings the pitch by its depth at its rate and keeps the level\n");
+}
+
+void testRingModulator() {
+    for (int rate : {22050, 44100, 48000, 96000}) for (double carrier : {30.0, 200.0, 1500.0}) {
+        dsp::RingModulator ring;
+        ring.params.frequencyHz = static_cast<float>(carrier);
+        ring.prepare(rate, 4096);
+        std::vector<float> data(static_cast<std::size_t>(2 * rate));
+        for (int i = 0; i < rate; ++i) {
+            data[static_cast<std::size_t>(2 * i)] = static_cast<float>(0.5 * std::sin(2.0 * pi * 2000.0 * i / rate));
+            data[static_cast<std::size_t>(2 * i + 1)] = static_cast<float>(0.25 * std::sin(2.0 * pi * 2000.0 * i / rate));
+        }
+        runBlocks(ring, data, 255);
+        const auto level = [&](double hz, int channel) {
+            double re = 0.0, im = 0.0;
+            for (int i = 0; i < rate; ++i) {
+                re += data[static_cast<std::size_t>(2 * i + channel)] * std::cos(2.0 * pi * hz * i / rate);
+                im += data[static_cast<std::size_t>(2 * i + channel)] * std::sin(2.0 * pi * hz * i / rate);
+            }
+            return 2.0 * std::hypot(re, im) / rate;
+        };
+        require(std::abs(level(2000.0 - carrier, 0) - 0.25) < 0.005 && std::abs(level(2000.0 + carrier, 0) - 0.25) < 0.005, "Ring modulator sidebands are wrong");
+        require(std::abs(level(2000.0 - carrier, 1) - 0.125) < 0.005, "Ring modulator right channel is wrong");
+        require(level(2000.0, 0) < 0.002, "Ring modulator left the original tone in");
+    }
+    std::printf("PASS Ring modulator turns a tone into its two sidebands\n");
 }
 
 void testChain() {
@@ -566,7 +646,11 @@ int main() {
         testStreaming<dsp::NoiseGate>("NoiseGate");
         testStreaming<dsp::Limiter>("Limiter");
         testStreaming<dsp::PitchShifter>("Pitch");
+        testStreaming<dsp::Vibrato>("Vibrato");
+        testStreaming<dsp::RingModulator>("Ring");
         testPitch();
+        testVibrato();
+        testRingModulator();
         testChain();
         timing<dsp::Equalizer>("Equalizer");
         timing<dsp::Filters>("Filters");
@@ -576,6 +660,8 @@ int main() {
         timing<dsp::NoiseGate>("NoiseGate");
         timing<dsp::Limiter>("Limiter");
         timing<dsp::PitchShifter>("Pitch");
+        timing<dsp::Vibrato>("Vibrato");
+        timing<dsp::RingModulator>("Ring");
         timingChain();
         std::puts("ALL TESTS PASSED");
         return 0;

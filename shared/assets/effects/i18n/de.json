@@ -10027,6 +10027,63 @@
      "label": "Zuschnitt"
     }
    }
+  },
+  "warmglow": {
+   "description": "Weichzeichnet die Ebene und behält in jeder Farbe das Dunklere von Weichzeichnung und Bild, sodass Schatten sanft in die hellen Bereiche laufen. Maske begrenzt den Effekt auf ein Rechteck, eine Ellipse oder ein Polygon.",
+   "name": "Warmes Leuchten",
+   "params": {
+    "blur": {
+     "label": "Stufe"
+    },
+    "mask": {
+     "label": "Maske",
+     "options": [
+      "Keine",
+      "Rechteck",
+      "Ellipse",
+      "Polygon"
+     ]
+    },
+    "maskCenter": {
+     "label": "Maskenposition"
+    },
+    "maskWidth": {
+     "label": "Maskenbreite"
+    },
+    "maskHeight": {
+     "label": "Maskenhöhe"
+    },
+    "sides": {
+     "label": "Seiten"
+    },
+    "feather": {
+     "label": "Weiche Kante"
+    }
+   }
+  },
+  "brokenglass": {
+   "description": "Lässt das Bild wie eine Glasscheibe zerspringen, die nahe der Mitte getroffen wurde: Risse laufen vom Aufprallpunkt aus, und jede Scherbe wird etwas verschoben und gedreht. Splitter legt fest, in wie viele Stücke es zerbricht und wie weit sie sich bewegen.",
+   "name": "Zerbrochenes Glas",
+   "params": {
+    "debris": {
+     "label": "Splitter"
+    }
+   }
+  },
+  "stabilizer": {
+   "description": "Beruhigt eine verwackelte Videoebene. Wähle Niedrig, Mittel oder Hoch; die Kamerabewegung des Clips wird einmal gemessen und im Projekt gespeichert, danach wird das Bild gegen das Wackeln verschoben und gedreht, mit gerade so viel Zoom, dass die Ränder verborgen bleiben. Höhere Stufen halten das Bild ruhiger.",
+   "name": "Stabilisator",
+   "params": {
+    "stabilization": {
+     "label": "Stabilisierung",
+     "options": [
+      "Aus",
+      "Niedrig",
+      "Mittel",
+      "Hoch"
+     ]
+    }
+   }
   }
  }
 }

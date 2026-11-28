@@ -825,7 +825,7 @@ sk_sp<SkImageFilter> BuiltInFilter(const std::string& id, const std::function<fl
 const int kDiffuse = 12, kMethods = 23, kExact = 4, kMaxColors = 512;
 
 thread_local Upload tUpload;
-thread_local float tPixel = 1, tOuter = 0;
+thread_local float tPixel = 1, tOuter = 0, tEffectScale = 1;
 
 sk_sp<SkImage> OnGpu(const sk_sp<SkImage>& image) {
     return image && tUpload ? tUpload(image) : image;
@@ -1396,7 +1396,7 @@ bool EffectRuntime::turnCorners(const Layer& layer, double timeMs, SkPoint corne
 
 sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer, double timeMs, const SkRect& area, const SkRect& seen,
                                           const SkRect& drawn, const SkMatrix& placed, sk_sp<SkImageFilter> content,
-                                          sk_sp<SkImageFilter> below, int before, int from, const SkRect* window) const {
+                                          sk_sp<SkImageFilter> below, int before, int from, const SkRect* window, float sourceInset) const {
     const float t = layer.localTime(timeMs), seconds = (float)((layer.steppedMs(timeMs) - layer.startTime) / 1000.0);
     const float reach = std::max({(float)scene.width, (float)scene.height, seen.width(), seen.height()});
     const SkRect bounds = seen.makeOffset(-area.left(), -area.top()).makeOutset(before >= 0 ? reach : 0, before >= 0 ? reach : 0);
@@ -1512,13 +1512,17 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
                     v = {r.left(), r.top(), r.right(), r.bottom()};
                 }
                 else if (automatic && name == "pixel") v = {tPixel > 0 ? tPixel : 1.0f};
+                else if (automatic && name == "sourceInset" && (e.id == "absent.box" || e.id == "absent.flip")) v = {any ? 0.0f : sourceInset};
                 else if (automatic && name == "screen") v = {-area.left(), -area.top(), (float)scene.width, (float)scene.height};
                 else if (automatic && name == "beat") v = {particles::Envelope(beatNow().since, Value(e, defaults, "decay", 0, t, 0.4f))};
                 else if (automatic && name == "beatTime") v = {(float)beatNow().since};
                 else if (automatic && name == "beatIndex") v = {(float)beatNow().index};
                 else if (u.isColor() && n == 4) v = {Value(e, defaults, name, 1, t, 0), Value(e, defaults, name, 2, t, 0),
                                                      Value(e, defaults, name, 3, t, 0), Value(e, defaults, name, 0, t, 1)};
-                else for (int i = 0; i < n; i++) v[i] = Value(e, defaults, name, i, t, 0);
+                else {
+                    const float paramScale = e.id == "absent.flip" && (name == "position" || name == "pivot") ? tEffectScale : 1;
+                    for (int i = 0; i < n; i++) v[i] = Value(e, defaults, name, i, t, 0) * paramScale;
+                }
                 v.resize(n);
                 if (u.type >= SkRuntimeEffect::Uniform::Type::kInt) {
                     std::vector<int> ints(v.begin(), v.end());
@@ -1661,30 +1665,45 @@ sk_sp<SkImageFilter> EffectRuntime::chain(const Scene& scene, const Layer& layer
 
 bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& layer, double timeMs, const SkRect& area, const SkMatrix& placed,
                          const std::function<void(SkCanvas*)>& source, const std::function<void(SkCanvas*)>& below, const Grab& grab,
-                         const Upload& upload) const {
+                         const Upload& upload, float sourceInset) const {
     tUpload = upload;
+    tEffectScale = tOuter > 0 ? tOuter : 1;
     tPixel = tOuter > 0 ? tOuter : canvas->getTotalMatrix().getMinScale();
     tOuter = 0;
     const SkMatrix device = canvas->getTotalMatrix();
     const float ds = device.getScaleX();
     bool sharp = device.isScaleTranslate() && ds > 0 && ds < 0.999f && std::abs(device.getScaleY() - ds) < 1e-4f * ds;
+    bool first = true, insetSource = false;
     for (const LayerEffect& e : layer.effects) {
         if (!sharp || e.hidden) continue;
         const Definition* d = find(e.id);
         const float lt = layer.localTime(timeMs);
         static const std::array<std::string_view, 5> kSharp = {"absent.hexgrid", "absent.hexagontilerotate", "absent.star", "absent.glowscan", "absent.cross"};
-        sharp = d && ((layer.alight && (std::find(kSharp.begin(), kSharp.end(), e.id) != kSharp.end() || (e.id == "absent.box" && Value(e, &d->defaults, "faceStyle", 0, lt, 0) > 0.5f))) || (e.id == "absent.pagecurl" && Value(e, &d->defaults, "space", 0, lt, 0) > 0.5f) ||
+        const bool cube = d && layer.alight && e.id == "absent.box" && Value(e, &d->defaults, "faceStyle", 0, lt, 0) > 0.5f;
+        const bool card = d && layer.alight && e.id == "absent.flip" && Value(e, &d->defaults, "style", 0, lt, 0) > 0.5f;
+        if (first) insetSource = cube || card;
+        first = false;
+        sharp = d && (cube || card || (layer.alight && std::find(kSharp.begin(), kSharp.end(), e.id) != kSharp.end()) ||
+                      (e.id == "absent.pagecurl" && Value(e, &d->defaults, "space", 0, lt, 0) > 0.5f) ||
                       (e.id == "absent.tunnel" && Value(e, &d->defaults, "style", 0, lt, 0) > 0.5f && Value(e, &d->defaults, "wrapStyle", 0, lt, 0) > 0.5f));
     }
     if (sharp) {
-        const auto up = [ds](const std::function<void(SkCanvas*)>& f) {
-            return f ? std::function<void(SkCanvas*)>([ds, &f](SkCanvas* c) { c->save(); c->scale(ds, ds); f(c); c->restore(); }) : f;
+        const SkMatrix resized = SkMatrix::Scale(ds, ds);
+        SkMatrix texture = resized;
+        const float span = std::max(area.width(), area.height());
+        const float inset = insetSource && layer.fillType == "media" && layer.shape == ".rect" && span > 2 ? 1 / span : 0;
+        if (inset > 0) {
+            const float scale = 1 - inset;
+            texture.preScale(scale, scale, area.centerX(), area.centerY());
+        }
+        const auto up = [](const std::function<void(SkCanvas*)>& f, const SkMatrix& matrix) {
+            return f ? std::function<void(SkCanvas*)>([matrix, &f](SkCanvas* c) { c->save(); c->concat(matrix); f(c); c->restore(); }) : f;
         };
         canvas->save();
         canvas->scale(1 / ds, 1 / ds);
         tOuter = ds;
-        const bool done = draw(canvas, scene, layer, timeMs, SkMatrix::Scale(ds, ds).mapRect(area), SkMatrix::Scale(ds, ds) * placed, up(source), up(below),
-                               grab, upload);
+        const bool done = draw(canvas, scene, layer, timeMs, resized.mapRect(area), resized * placed, up(source, texture), up(below, resized),
+                               grab, upload, inset);
         canvas->restore();
         return done;
     }
@@ -1925,7 +1944,7 @@ bool EffectRuntime::draw(SkCanvas* canvas, const Scene& scene, const Layer& laye
         layerBounds.join(inside.makeOffset(at.left(), at.top()).makeOutset(spread, spread));
     }
     sk_sp<SkImageFilter> filter = this->chain(scene, layer, timeMs, at, layerBounds, inside, placed, std::move(content), std::move(under), -1, -1,
-                                              capture && !window.isEmpty() ? &window : nullptr);
+                                              capture && !window.isEmpty() ? &window : nullptr, sourceInset);
     if (!filter && lift < 0) return false;
     if (seesBehind) {
         float reach = 0;

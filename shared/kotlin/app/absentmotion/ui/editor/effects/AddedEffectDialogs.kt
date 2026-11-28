@@ -126,12 +126,13 @@ internal class AddedEffectImport(private val context: Context, private val getEn
         present(withContext(Dispatchers.IO) { uris.mapNotNull { readAddedEffectUri(context, it, fromPicker = true) } })
     }
 
-    suspend fun pickCommunity(file: File, item: CommunityItem) {
-        val entries = withContext(Dispatchers.IO) {
+    suspend fun pickCommunity(file: File, item: CommunityItem, only: Set<String>? = null) {
+        val all = withContext(Dispatchers.IO) {
             runCatching {
-                file.inputStream().use { readAddedEffectEntries(item.file.substringAfterLast('/'), it, context.cacheDir) }
+                file.inputStream().use { readAddedEffectEntries(item.file.substringAfterLast('/'), it, context.cacheDir, item.official) }
             }.getOrElse { listOf(item.title.ifBlank { item.name } to Result.failure(it)) }
         }
+        val entries = if (only == null) all else all.filter { it.second.getOrNull()?.definition?.key in only }
         val source = AddedEffectSource(item.name, item.sha256)
         val rejected = entries.filter { it.second.isFailure }.map { it.first }
         present(entries.map { (_, effect) -> effect.map { listOf(it.from(source)) } }, skipped(rejected), communityPictures(item))
@@ -148,7 +149,7 @@ internal class AddedEffectImport(private val context: Context, private val getEn
         try {
             if (effects.isNotEmpty()) {
                 engine.awaitEffects()
-                previews = previews + preview(effects).withPictures(pictures)
+                previews = previews + preview(effects, pictures.filterValues { it.first != null }.keys).withPictures(pictures)
             }
             if (files.any { it.isFailure }) error = problem ?: txt(R.string.added_effect_bad_file)
         } finally {
@@ -170,6 +171,11 @@ internal class AddedEffectImport(private val context: Context, private val getEn
         error = null
         try {
             if (installWorking(working)) {
+                for (preview in working) preview.effect.json.optJSONObject("source")?.let { source ->
+                    val pack = source.optString("pack")
+                    val sha = source.optString("sha256")
+                    if (pack.isNotEmpty() && sha.isNotEmpty()) app.absentmotion.library.PackUpdates.remember(context, pack, sha)
+                }
                 previews = emptyList()
                 val missing = projectPrompt as? ProjectEffectPrompt.Missing
                 if (missing != null) {
@@ -296,7 +302,7 @@ internal class AddedEffectImport(private val context: Context, private val getEn
             val source = AddedEffectSource(item.name, item.sha256)
             val entries = withContext(Dispatchers.IO) {
                 runCatching {
-                    file.inputStream().use { readAddedEffectEntries(item.file.substringAfterLast('/'), it, context.cacheDir) }
+                    file.inputStream().use { readAddedEffectEntries(item.file.substringAfterLast('/'), it, context.cacheDir, item.official) }
                 }.getOrElse {
                     return@withContext listOf(label to Result.failure<AddedEffect>(it))
                 }.map { (name, effect) -> name to effect.map { it.from(source) } }
@@ -371,7 +377,7 @@ internal class AddedEffectImport(private val context: Context, private val getEn
         projectPrompt = ProjectEffectPrompt.Progress(txt(R.string.community_adding), cancellable = false)
         try {
             val candidates = entries.mapNotNull { (_, entry) -> entry.getOrNull()?.takeIf(::isNewer) }
-            val tested = preview(candidates).withPictures(pictures)
+            val tested = preview(candidates, pictures.filterValues { it.first != null }.keys).withPictures(pictures)
             val broken = tested.filterNot { it.works }.map { it.effect.definition.name }.distinct()
             val rejected = entries.filter { it.second.isFailure }.map { it.first }.distinct()
             val working = tested.filter { it.works }.groupBy { it.effect.definition.id }
@@ -387,8 +393,8 @@ internal class AddedEffectImport(private val context: Context, private val getEn
         }
     }
 
-    private suspend fun preview(effects: List<AddedEffect>): List<AddedEffectPreview> = try {
-        engine.previewAddedEffects(context, effects)
+    private suspend fun preview(effects: List<AddedEffect>, pictured: Set<String> = emptySet()): List<AddedEffectPreview> = try {
+        engine.previewAddedEffects(context, effects, pictured)
     } catch (e: CancellationException) {
         throw e
     } catch (_: Exception) {

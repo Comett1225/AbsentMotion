@@ -10027,6 +10027,63 @@
      "label": "Pangkas"
     }
    }
+  },
+  "warmglow": {
+   "description": "Mengaburkan lapisan dan menjaga bagian yang lebih gelap antara blur dan gambar di setiap warna, sehingga bayangan menyebar lembut ke bagian yang terang. Masker membatasi efek pada persegi panjang, elips, atau poligon.",
+   "name": "Cahaya Hangat",
+   "params": {
+    "blur": {
+     "label": "Tingkat"
+    },
+    "mask": {
+     "label": "Masker",
+     "options": [
+      "Tidak ada",
+      "Persegi Panjang",
+      "Elips",
+      "Poligon"
+     ]
+    },
+    "maskCenter": {
+     "label": "Posisi Masker"
+    },
+    "maskWidth": {
+     "label": "Lebar Masker"
+    },
+    "maskHeight": {
+     "label": "Tinggi Masker"
+    },
+    "sides": {
+     "label": "Sisi"
+    },
+    "feather": {
+     "label": "Pelembutan"
+    }
+   }
+  },
+  "brokenglass": {
+   "description": "Memecahkan gambar seperti kaca yang terpukul dekat bagian tengah: retakan menyebar dari titik benturan dan tiap pecahan bergeser serta berputar sedikit. Serpihan mengatur jumlah pecahan dan seberapa jauh bergeraknya.",
+   "name": "Kaca Pecah",
+   "params": {
+    "debris": {
+     "label": "Serpihan"
+    }
+   }
+  },
+  "stabilizer": {
+   "description": "Menstabilkan lapisan video yang goyang. Pilih Rendah, Sedang, atau Tinggi; gerakan kamera klip diukur sekali dan disimpan bersama proyek, lalu gambar digeser dan diputar melawan guncangan dengan zoom secukupnya untuk menyembunyikan tepi. Tingkat yang lebih tinggi menjaga gambar lebih stabil.",
+   "name": "Stabilizer",
+   "params": {
+    "stabilization": {
+     "label": "Stabilisasi",
+     "options": [
+      "Nonaktif",
+      "Rendah",
+      "Sedang",
+      "Tinggi"
+     ]
+    }
+   }
   }
  }
 }

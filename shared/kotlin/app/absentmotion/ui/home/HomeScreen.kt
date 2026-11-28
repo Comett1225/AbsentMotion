@@ -225,6 +225,7 @@ fun HomeScreen(
     var search by remember { mutableStateOf<String?>(null) }
     val query = app.absentmotion.ui.editor.debounced(search.orEmpty())
     val drawer = rememberDrawerState(DrawerValue.Closed)
+    var settingsOpen by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val navInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
@@ -264,7 +265,7 @@ fun HomeScreen(
 
     val rtl = androidx.compose.ui.platform.LocalLayoutDirection.current == LayoutDirection.Rtl
     ModalNavigationDrawer(
-        drawerContent = { SettingsDrawer(settings, drawer, onRestored = { version++ }) },
+        drawerContent = { SettingsDrawer(settings, drawer) { scope.launch { drawer.close() }; settingsOpen = true } },
         drawerState = drawer,
         scrimColor = Color.Black.copy(alpha = 0.94f),
         gesturesEnabled = drawer.isOpen,
@@ -280,7 +281,7 @@ fun HomeScreen(
                     onDuplicate = { val ids = picked.map { it.id }; chosen = emptySet(); duplicate(ids) },
                     onSend = { picked.singleOrNull()?.let { chosen = emptySet(); DeviceSend.scan(context, it) } },
                     onDelete = { deletingMany = picked },
-                ) else TopBar(onMenu = { scope.launch { drawer.open() } }, search, page, { search = it }, settings, onCustomizeTools = { customizingTools = true })
+                ) else TopBar(onMenu = { scope.launch { drawer.open() } }, onSettings = { settingsOpen = true }, search, page, { search = it }, settings, onCustomizeTools = { customizingTools = true })
                 val fill = Modifier.weight(1f)
                 if (page == 3) CommunityTab(fill, engine) { onImportFile(Uri.fromFile(it)) }
                 else if (page == 2) ToolsTab(fill, store, settings, customizingTools, { customizingTools = it }, onImportLink = { onImportLink?.invoke() }) { id -> version++; onOpen(id) }
@@ -300,14 +301,6 @@ fun HomeScreen(
                 Spacer(Modifier.height(BarHeight + navInset))
             }
             BottomBar(onNew = newProject, page, { page = it; if (it >= 2) search = null; if (it != 2) customizingTools = false }, Modifier.align(Alignment.BottomCenter), navInset, wide, settings.vibration)
-            if (drawer.isOpen || drawer.targetValue == DrawerValue.Open || drawer.isAnimationRunning) Box(Modifier.fillMaxSize().pointerInput(Unit) {
-                awaitEachGesture {
-                    awaitFirstDown(requireUnconsumed = false).consume()
-                    val up = waitForUpOrCancellation()
-                    up?.consume()
-                    if (up != null) scope.launch { drawer.close() }
-                }
-            })
             deletingMany?.let { targets ->
                 val elements = targets.all { it.isElement }
                 val users by produceState(emptyList<String>(), targets) { value = withContext(Dispatchers.IO) { targets.filter { it.isElement }.flatMap { store.linkedBy(it.id) }.distinct() } }
@@ -327,6 +320,15 @@ fun HomeScreen(
                     onOpen = { id -> lastScroll.fill(0); version++; onOpen(id) },
                 )
             }
+            if (drawer.isOpen || drawer.targetValue == DrawerValue.Open || drawer.isAnimationRunning) Box(Modifier.fillMaxSize().pointerInput(Unit) {
+                awaitEachGesture {
+                    awaitFirstDown(requireUnconsumed = false).consume()
+                    val up = waitForUpOrCancellation()
+                    up?.consume()
+                    if (up != null) scope.launch { drawer.close() }
+                }
+            })
+            Presence(settingsOpen) { SettingsPage(settings, onRestored = { version++ }) { settingsOpen = false } }
         }
     }
 }
@@ -356,7 +358,7 @@ private val lastScroll = intArrayOf(0, 0)
 private const val SearchAnimMs = 200
 
 @Composable
-private fun TopBar(onMenu: () -> Unit, search: String?, page: Int, onSearch: (String?) -> Unit, settings: AppSettings, onCustomizeTools: () -> Unit) {
+private fun TopBar(onMenu: () -> Unit, onSettings: () -> Unit, search: String?, page: Int, onSearch: (String?) -> Unit, settings: AppSettings, onCustomizeTools: () -> Unit) {
     val searching = search != null
     var shownText by remember { mutableStateOf(search.orEmpty()) }
     if (search != null) shownText = search
@@ -375,6 +377,14 @@ private fun TopBar(onMenu: () -> Unit, search: String?, page: Int, onSearch: (St
         }
         AnimatedVisibility(
             !searching,
+            Modifier.align(Alignment.CenterStart).padding(start = 50.dp),
+            enter = fadeIn(fade),
+            exit = fadeOut(fade),
+        ) {
+            ChangelogButton(settings)
+        }
+        AnimatedVisibility(
+            !searching,
             Modifier.align(Alignment.Center),
             enter = fadeIn(fade),
             exit = fadeOut(fade),
@@ -387,7 +397,10 @@ private fun TopBar(onMenu: () -> Unit, search: String?, page: Int, onSearch: (St
             enter = fadeIn(fade),
             exit = fadeOut(fade),
         ) {
-            ChangelogButton(settings)
+            Box(Modifier.size(50.dp).clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = onSettings), contentAlignment = Alignment.Center) {
+                Icon(app.absentmotion.ui.editor.ChromeIcons.Gear, stringResource(R.string.settings_advanced_open), Modifier.size(24.dp), tint = Am.Navy)
+                HoldName(stringResource(R.string.settings_advanced_open))
+            }
         }
         Box(Modifier.matchParentSize().padding(horizontal = 56.dp), contentAlignment = Alignment.CenterEnd) {
             AnimatedVisibility(

@@ -226,6 +226,42 @@ private:
     double read(double position, std::size_t channel) const noexcept;
 };
 
+struct Vibrato {
+    struct Params {
+        float rateHz = 5.0f;
+        float depth = 0.3f;
+    } params;
+    void prepare(double sampleRate, int maxBlock);
+    void reset() noexcept;
+    void process(float* data, int frames) noexcept;
+
+private:
+    double sampleRate_ = 48000.0;
+    int rampSamples_ = 720;
+    bool prepared_ = false;
+    double phase_ = 0.0;
+    detail::StereoBuffer buffer_;
+    std::array<detail::Ramp, 2> controls_;
+    void configure(int samples) noexcept;
+};
+
+struct RingModulator {
+    struct Params {
+        float frequencyHz = 100.0f;
+    } params;
+    void prepare(double sampleRate, int maxBlock);
+    void reset() noexcept;
+    void process(float* data, int frames) noexcept;
+
+private:
+    double sampleRate_ = 48000.0;
+    int rampSamples_ = 720;
+    bool prepared_ = false;
+    double phase_ = 0.0;
+    detail::Ramp step_;
+    void configure(int samples) noexcept;
+};
+
 struct Limiter {
     struct Params {
         float lookaheadMs = 3.0f;

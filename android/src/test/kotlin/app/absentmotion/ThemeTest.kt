@@ -56,12 +56,12 @@ class ThemeTest {
     @Test fun missingKeysTakeTheDefaultPalette() {
         val theme = ThemeFile.parse("""{"TopBar":"#010203","OnDark":"#040506"}""")
         assertEquals(Color(0xFF010203), theme.palette.TopBar)
-        assertOnlyChanged(theme.palette, "TopBar", "OnDark")
+        assertOnlyChanged(theme.palette, "TopBar", "OnDark", "SelectionHandle")
     }
 
     @Test fun unknownKeysAreIgnored() {
         val theme = ThemeFile.parse("""{"name":"x","author":"me","Nope":"not a colour","Accent":"#123456","topbar":"#000000"}""")
-        assertOnlyChanged(theme.palette, "Accent")
+        assertOnlyChanged(theme.palette, "Accent", "SelectionBorder")
         assertEquals(Color(0xFF123456), theme.palette.Accent)
     }
 

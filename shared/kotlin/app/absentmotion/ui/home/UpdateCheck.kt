@@ -102,7 +102,7 @@ internal object Updates {
         scope.launch {
             val (release, inApp) = withContext(Dispatchers.IO) {
                 val release = try {
-                    fetchLatest(from, quiet = !manual)
+                    fetchLatest(from, quiet = !manual, cache = java.io.File(app.cacheDir, "http"))
                 } catch (e: Exception) {
                     Log.i("AMUpdate", "update check failed: $e")
                     null
@@ -116,10 +116,9 @@ internal object Updates {
         }
     }
 
-    private fun fetchLatest(from: UpdateSource, quiet: Boolean): Release? = TrustedHttp(from, TIMEOUT_MS, TIMEOUT_MS, quiet).get(from.releases, mapOf("Accept" to "application/vnd.github+json")) { connection ->
-        if (connection.responseCode != HttpURLConnection.HTTP_OK) null
-        else parseReleases(connection.inputStream.use { it.readAtMost(MAX_BYTES) }.decodeToString(), source = from)
-    }
+    private fun fetchLatest(from: UpdateSource, quiet: Boolean, cache: java.io.File): Release? =
+        HttpCache(cache).get(TrustedHttp(from, TIMEOUT_MS, TIMEOUT_MS, quiet), from.releases, MAX_BYTES, mapOf("Accept" to "application/vnd.github+json"))
+            ?.let { parseReleases(it.decodeToString(), source = from) }
 
     private const val TIMEOUT_MS = 5_000
     private const val MAX_BYTES = 4 shl 20

@@ -10027,6 +10027,63 @@
      "label": "Xén"
     }
    }
+  },
+  "warmglow": {
+   "description": "Làm mờ lớp và giữ phần tối hơn giữa ảnh mờ và ảnh gốc ở mỗi màu, nên bóng đổ lan nhẹ nhàng vào các vùng sáng. Mặt nạ giới hạn hiệu ứng trong một hình chữ nhật, hình elip hoặc đa giác.",
+   "name": "Ánh sáng ấm",
+   "params": {
+    "blur": {
+     "label": "Mức"
+    },
+    "mask": {
+     "label": "Mặt nạ",
+     "options": [
+      "Không",
+      "Hình chữ nhật",
+      "Hình elip",
+      "Đa giác"
+     ]
+    },
+    "maskCenter": {
+     "label": "Vị trí mặt nạ"
+    },
+    "maskWidth": {
+     "label": "Chiều rộng mặt nạ"
+    },
+    "maskHeight": {
+     "label": "Chiều cao mặt nạ"
+    },
+    "sides": {
+     "label": "Số cạnh"
+    },
+    "feather": {
+     "label": "Độ mềm"
+    }
+   }
+  },
+  "brokenglass": {
+   "description": "Làm vỡ hình ảnh như một tấm kính bị đập gần giữa: các vết nứt lan ra từ điểm va chạm và mỗi mảnh bị dịch và xoay một chút. Mảnh vỡ đặt số mảnh vỡ và độ xa chúng di chuyển.",
+   "name": "Kính vỡ",
+   "params": {
+    "debris": {
+     "label": "Mảnh vỡ"
+    }
+   }
+  },
+  "stabilizer": {
+   "description": "Làm vững lớp video bị rung. Chọn Thấp, Vừa hoặc Cao, chuyển động máy quay của clip được đo một lần và lưu cùng dự án; sau đó hình được dịch và xoay ngược chiều rung, với độ phóng vừa đủ để che các cạnh. Mức càng cao hình càng vững.",
+   "name": "Bộ ổn định",
+   "params": {
+    "stabilization": {
+     "label": "Ổn định",
+     "options": [
+      "Tắt",
+      "Thấp",
+      "Vừa",
+      "Cao"
+     ]
+    }
+   }
   }
  }
 }

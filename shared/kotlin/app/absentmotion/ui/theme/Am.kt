@@ -69,6 +69,8 @@ data class Palette(
     val Thumb: Color,
     val MenuScrim: Color,
     val PressHome: Color,
+    val SelectionBorder: Color? = null,
+    val SelectionHandle: Color? = null,
 ) {
     fun toMap(): Map<String, Color> = linkedMapOf(
         "TopBar" to TopBar,
@@ -133,6 +135,8 @@ data class Palette(
         "Thumb" to Thumb,
         "MenuScrim" to MenuScrim,
         "PressHome" to PressHome,
+        "SelectionBorder" to (SelectionBorder ?: Accent),
+        "SelectionHandle" to (SelectionHandle ?: OnDark),
     )
 
     companion object {
@@ -199,6 +203,8 @@ data class Palette(
             "Thumb",
             "MenuScrim",
             "PressHome",
+            "SelectionBorder",
+            "SelectionHandle",
         )
 
         fun from(colours: Map<String, Color>, base: Palette = AbsentMotion): Palette = Palette(
@@ -264,6 +270,8 @@ data class Palette(
             Thumb = colours["Thumb"] ?: base.Thumb,
             MenuScrim = colours["MenuScrim"] ?: base.MenuScrim,
             PressHome = colours["PressHome"] ?: base.PressHome,
+            SelectionBorder = colours["SelectionBorder"]?.takeIf { it != (colours["Accent"] ?: base.Accent) },
+            SelectionHandle = colours["SelectionHandle"]?.takeIf { it != (colours["OnDark"] ?: base.OnDark) },
         )
 
         val AbsentMotion = Palette(
@@ -555,4 +563,6 @@ object Am {
     val Thumb: Color get() = palette.Thumb
     val MenuScrim: Color get() = palette.MenuScrim
     val PressHome: Color get() = palette.PressHome
+    val SelectionBorder: Color get() = palette.SelectionBorder ?: palette.Accent
+    val SelectionHandle: Color get() = palette.SelectionHandle ?: palette.OnDark
 }

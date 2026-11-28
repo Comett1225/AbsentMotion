@@ -103,7 +103,6 @@ internal fun DeskLibraryRail(selected: Int, expanded: Boolean, modifier: Modifie
 
 @Composable
 internal fun DeskLibrary(state: EditorState, library: AddLibrary, tab: Int, modifier: Modifier, close: () -> Unit) {
-    var captions by remember { mutableStateOf(false) }
     Column(modifier.background(Am.Panel)) {
         Row(Modifier.fillMaxWidth().height(44.dp).padding(start = 12.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(Sections[tab].title), Modifier.weight(1f), color = Am.OnDark, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -120,7 +119,7 @@ internal fun DeskLibrary(state: EditorState, library: AddLibrary, tab: Int, modi
                 }
                 3 -> DeskGrid(Modifier.fillMaxSize()) {
                     item { DeskIconTile(state, stringResource(R.string.add_quick_text), ChromeIcons.TextTool) { state.addText() } }
-                    item { DeskIconTile(state, stringResource(R.string.add_quick_captions), ChromeIcons.Captions, direct = false) { captions = true } }
+                    item { DeskIconTile(state, stringResource(R.string.add_quick_captions), ChromeIcons.Captions, direct = false) { state.captionsOpen = true } }
                 }
                 4 -> DeskObjects(state)
                 5 -> DeskTemplates(state)
@@ -138,7 +137,6 @@ internal fun DeskLibrary(state: EditorState, library: AddLibrary, tab: Int, modi
             }
         }
     }
-    if (captions) CaptionsSheet(state) { captions = false }
 }
 
 @Composable

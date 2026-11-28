@@ -226,9 +226,9 @@ internal fun EditorState.addCaptions(chunks: List<Chunk>, style: CaptionStyle, f
 }
 
 internal suspend fun recogniseCaptions(
-    context: Context, scene: Scene, layerId: Long?, style: CaptionStyle, progress: (Float, String) -> Unit,
+    context: Context, scene: Scene, layerIds: Collection<Long>, style: CaptionStyle, progress: (Float, String) -> Unit,
 ): List<Chunk> {
-    val input = scene.captionInput(layerId)
+    val input = scene.captionInput(layerIds)
     val source = input.scene
     val startMs = input.startMs
     val endMs = input.endMs
@@ -253,13 +253,15 @@ internal suspend fun recogniseCaptions(
 
 internal data class CaptionInput(val scene: Scene, val startMs: Int, val endMs: Int)
 
-internal fun Scene.captionInput(layerId: Long?): CaptionInput {
-    if (layerId == null) return CaptionInput(this, 0, totalTime + 1)
-    val layer = layer(layerId)?.takeIf { it.soundUri != null }
-        ?: error(AppText.get(R.string.ai_no_sound_to_caption))
+internal fun Scene.captionInput(layerId: Long?): CaptionInput = captionInput(listOfNotNull(layerId))
+
+internal fun Scene.captionInput(layerIds: Collection<Long>): CaptionInput {
+    if (layerIds.isEmpty()) return CaptionInput(this, 0, totalTime + 1)
+    val chosen = layers.filter { it.id in layerIds && it.soundUri != null }
+    if (chosen.size != layerIds.toSet().size) error(AppText.get(R.string.ai_no_sound_to_caption))
     val source = Scene(node.copy(children = node.children.filter { it.name !in Scene.LAYER_TAGS } +
-        layer.node.with("hidden", null).let { it.copy(children = it.children.filterNot { c -> c.name == "gain" }) }))
-    return CaptionInput(source, layer.startTime, layer.endTime + 1)
+        chosen.map { layer -> layer.node.with("hidden", null).let { it.copy(children = it.children.filterNot { c -> c.name == "gain" }) } }))
+    return CaptionInput(source, chosen.minOf { it.startTime }, chosen.maxOf { it.endTime } + 1)
 }
 
 internal const val CAPTION_WINDOW_MS = 600_000

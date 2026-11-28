@@ -91,6 +91,8 @@ import app.absentmotion.library.COMMUNITY_COUNTS_TTL_MS
 import app.absentmotion.library.communityDownloadSource
 import app.absentmotion.library.CommunityIndex
 import app.absentmotion.library.CommunityItem
+import app.absentmotion.library.installedIn
+import androidx.compose.runtime.collectAsState
 import app.absentmotion.library.CommunityItemUnavailable
 import app.absentmotion.library.CommunityWriteException
 import app.absentmotion.platform.MobileDataRefused
@@ -769,7 +771,7 @@ private fun CommunityGridCard(
 }
 
 @Composable
-private fun CommunityItemSheet(
+internal fun CommunityItemSheet(
     item: CommunityItem,
     thumb: ImageBitmap?,
     client: CommunityClient,
@@ -782,6 +784,7 @@ private fun CommunityItemSheet(
 ) {
     val context = LocalContext.current
     val view = LocalView.current
+    val installed = engine?.let { e -> item.installedIn(e().effects.collectAsState().value) } == true
     val scope = rememberCoroutineScope()
     var activeDownload by remember(item) { mutableStateOf<ActiveDownload?>(null) }
     val downloading = activeDownload != null
@@ -920,10 +923,10 @@ private fun CommunityItemSheet(
                         if (downloading) stopDownload() else closeSheet()
                     }
                     BigButton(
-                        label = addLabel,
+                        label = if (installed) stringResource(R.string.community_downloaded) else addLabel,
                         modifier = Modifier.weight(1f).fillMaxHeight(),
-                        icon = HomeIcons.Plus,
-                        enabled = !downloading && (item.kind != CommunityKind.Effect || onEffect != null)
+                        icon = if (installed) null else HomeIcons.Plus,
+                        enabled = !installed && !downloading && (item.kind != CommunityKind.Effect || onEffect != null)
                     ) {
                         startDownload()
                     }

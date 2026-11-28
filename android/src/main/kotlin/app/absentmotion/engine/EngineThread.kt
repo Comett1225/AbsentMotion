@@ -89,7 +89,7 @@ class EngineThread(private val background: Int, context: Context? = null, privat
 
     internal suspend fun awaitEffects() { effectJob?.join() }
 
-    internal suspend fun previewAddedEffects(context: Context, added: List<AddedEffect>): List<AddedEffectPreview> {
+    internal suspend fun previewAddedEffects(context: Context, added: List<AddedEffect>, pictured: Set<String> = emptySet()): List<AddedEffectPreview> {
         if (added.isEmpty()) return emptyList()
         val sample = withContext(Dispatchers.IO) { runCatching { addedEffectSample(context) }.getOrNull() }
         return try {
@@ -98,7 +98,7 @@ class EngineThread(private val background: Int, context: Context? = null, privat
                 NativeEngine(engine().backend).use { preview ->
                     added.map {
                         coroutineContext.ensureActive()
-                        previewAddedEffect(preview, it, sample)
+                        previewAddedEffect(preview, it, sample.takeIf { _ -> it.definition.key !in pictured })
                     }
                 }
             }
@@ -347,6 +347,14 @@ class EngineThread(private val background: Int, context: Context? = null, privat
 
     private val shown = ArrayList<Shown>()
 
+    class Still(val bitmap: android.graphics.Bitmap, val view: PreviewView)
+    @Volatile var still: Still? = null
+    private val presentedTo = MutableStateFlow<Surface?>(null)
+    val presented = presentedTo.asStateFlow()
+    private val requestedFlow = MutableStateFlow(0L to null as PreviewView?)
+    val requested = requestedFlow.asStateFlow()
+    val shownView: PreviewView? get() = view
+
     private fun topSurface(): Surface? = shown.lastOrNull { it.surface?.isValid == true }?.surface
 
     fun attach(owner: Any, surface: Surface? = null) {
@@ -390,6 +398,8 @@ class EngineThread(private val background: Int, context: Context? = null, privat
             target = engine().attach(surface, forEncoder = false)
             this.surface = surface
             mediaScene?.let { videos?.update(it, requestedView?.timeMs ?: 0, playing) }
+            val own = synchronized(shown) { shown.lastOrNull { it.surface === surface }?.view } ?: return
+            if (own !== view) pendingView.set(own to viewSerial.incrementAndGet())
             renderNow()
         } catch (e: Exception) {
             Log.e("AMEngine", "preview attachment failed", e)
@@ -548,6 +558,7 @@ class EngineThread(private val background: Int, context: Context? = null, privat
         mediaScene?.let { videos?.update(it, view.timeMs, playing) }
         val serial = viewSerial.incrementAndGet()
         pendingView.set(view to serial)
+        requestedFlow.value = serial to view
         requestRender()
         return serial
     }
@@ -651,6 +662,7 @@ class EngineThread(private val background: Int, context: Context? = null, privat
                     }
                     if (RenderStats.recording) RenderStats.add((System.nanoTime() - started) / 1e6, v.timeMs)
                     renders++
+                    if (presentedTo.value !== surface) presentedTo.value = surface
                     if (exact) renderedView.value = RenderedView(shownSerial, v.timeMs)
                 }
             }

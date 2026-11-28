@@ -32,6 +32,7 @@ internal const val AddedEffectStoredBytes = AddedEffectMaxBytes + 16 * 1024
 internal const val AddedEffectCategory = "added"
 internal const val AddedEffectPrefix = "user."
 private const val MaxPackEffects = 20
+private const val OfficialPackEffects = 500
 private val effectKey = Regex("[a-z0-9-]{1,40}")
 internal val addedEffectKey = Regex("[a-z0-9](?:[a-z0-9]|-(?!-)){0,31}\\.[a-z0-9-]{1,40}")
 internal const val AddedEffectBundleLimit = 32 * 1024 * 1024
@@ -143,11 +144,12 @@ internal fun readAddedEffects(name: String, input: InputStream, cacheDir: File):
 private fun readAddedEffects(name: String, bytes: ByteArray, cacheDir: File): List<AddedEffect> =
     readAddedEffectEntries(name, bytes, cacheDir).map { (_, effect) -> effect.getOrThrow() }
 
-internal fun readAddedEffectEntries(name: String, input: InputStream, cacheDir: File) =
-    readAddedEffectEntries(name, input.effectBytes(), cacheDir)
+internal fun readAddedEffectEntries(name: String, input: InputStream, cacheDir: File, official: Boolean = false) =
+    readAddedEffectEntries(name, input.effectBytes(if (official) app.absentmotion.library.OfficialPackMaxBytes.toInt() else AddedEffectMaxBytes), cacheDir, official)
 
-private fun readAddedEffectEntries(name: String, bytes: ByteArray, cacheDir: File): List<Pair<String, Result<AddedEffect>>> {
-    require(isAddedEffectFile(name) && bytes.size in 1..AddedEffectMaxBytes)
+private fun readAddedEffectEntries(name: String, bytes: ByteArray, cacheDir: File, official: Boolean = false): List<Pair<String, Result<AddedEffect>>> {
+    val most = if (official) OfficialPackEffects else MaxPackEffects
+    require(isAddedEffectFile(name) && bytes.size in 1..(if (official) app.absentmotion.library.OfficialPackMaxBytes.toInt() else AddedEffectMaxBytes))
     if (name.endsWith(".json", ignoreCase = true)) return listOf(effectEntry(name, bytes))
     val temp = File.createTempFile("effect-pack-", ".abmfx", cacheDir)
     try {
@@ -155,8 +157,8 @@ private fun readAddedEffectEntries(name: String, bytes: ByteArray, cacheDir: Fil
         return ZipFile(temp).use { zip ->
             val entries = zip.entries().asSequence().filter {
                 !it.isDirectory && '/' !in it.name && '\\' !in it.name && it.name.endsWith(".json", ignoreCase = true)
-            }.take(MaxPackEffects + 1).toList()
-            require(entries.size in 1..MaxPackEffects)
+            }.take(most + 1).toList()
+            require(entries.size in 1..most)
             entries.map { entry -> zip.getInputStream(entry).use { effectEntry(entry.name, it.effectBytes()) } }.also { read ->
                 val keys = read.mapNotNull { it.second.getOrNull()?.definition?.key }
                 require(keys.size == keys.toSet().size)

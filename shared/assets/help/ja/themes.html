@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ja" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>テーマ | AbsentMotion</title><meta name="description" content="アプリ内やファイルで自分のテーマを作って共有し、各色がどこに反映されるか確認できます。"><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="../assets/site.css"></head><body class="app" data-page="guide"><header class="top appbar"><nav class="main" aria-label="ヘルプ"><a href="index.html">目次</a><a href="effects/index.html">エフェクト</a></nav></header><div class="wrap"><main id="main"><h1>テーマ</h1><p class="lead">アプリ内やファイルで自分のテーマを作って共有し、各色がどこに反映されるか確認できます。</p><details class="toc"><summary>このページ</summary><ul><li><a href="#pick-a-theme">テーマを選ぶ</a></li><li><a href="#make-a-theme-in-the-app">アプリでテーマを作る</a></li><li><a href="#make-a-theme-file">テーマファイルを作る</a></li><li><a href="#tips">ヒント</a></li><li><a href="#every-color">色の一覧</a></li><li><a href="#full-example-light-green">完全なサンプル：ライトグリーン</a></li></ul></details><p>テーマを変えると、エディター、タイムライン、ホーム画面、メニューなど、アプリ全体の色が変わります。内蔵テーマを選ぶほか、自分でテーマを作ったり、共有されたテーマファイルを読み込んだりできます。</p>
+<h2 id="pick-a-theme">テーマを選ぶ</h2>
+<p><strong>設定</strong>を開き、<strong>テーマを選択</strong>で<strong>システムのデフォルト</strong>、<strong>ライト</strong>、<strong>ダーク</strong>、<strong>デイライト</strong>、<strong>ライトグリーン</strong>、または自分のテーマを作成済みなら<strong>カスタム</strong>を選びます。その下の<strong>テーマカラー</strong>では、テーマのアクセントカラーだけを変更できます。<a href="settings.html">設定</a>を参照してください。</p>
+<h2 id="make-a-theme-in-the-app">アプリでテーマを作る</h2>
+<p><strong>設定</strong>を開き、<strong>テーマを選択</strong>をタップして<strong>テーマを作成…</strong>を選びます。ページにはテーマの色がグループ別に並び、それぞれのカラーコードと使用場所が表示されます。</p>
+<ul><li><strong>テーマファイルを読み込む…</strong>を一番上で選ぶと、誰かが共有したものなどのテーマファイルがページに読み込まれ、保存前に変更できます。</li><li><strong>元にするテーマ</strong>を選ぶと、内蔵テーマや自分のカスタムテーマからすべての色が読み込まれます。変えたい色だけを調整できます。</li><li>色をタップするとカラーピッカーが開きます。変更はアプリ全体にその場で反映されるので、実際の画面で色を確認できます。</li><li>テーマに<strong>名前</strong>を付けて<strong>テーマを保存</strong>をタップします。<strong>カスタム</strong>テーマとして保存され、すぐに適用されます。保存すると<strong>テーマカラー</strong>が<strong>デフォルト</strong>に戻り、そのテーマ本来のアクセントカラーが使われます。</li><li><strong>書き出し</strong>を選ぶと、テーマを <code>.json</code> ファイルとして保存できます。共有したり保管したりできます。</li><li>保存せずにページを閉じると、前のテーマに戻ります。</li></ul>
+<p>保存できるカスタムテーマは1つです。新しいテーマを保存または読み込むと、前のテーマが置き換わります。</p>
+<h2 id="make-a-theme-file">テーマファイルを作る</h2>
+<p>テーマファイルは、変えたい色をリストにした小さな JSON 形式のテキストファイルです。この例を <code>mint.json</code> として保存します。</p>
+<pre><code>{
+  "name": "Mint",
+  "Accent": "#5BD6A4",
+  "HomeAccent": "#1B7A4A"
+}</code></pre>
+<p><strong>設定 &gt; テーマを選択 &gt; テーマファイルを読み込む…</strong>で読み込みます。これまでの外観のまま、アクセントカラーだけがミントグリーンになります。</p>
+<ul><li>ファイルは JSON 形式のプレーンテキストです。拡張子は <code>.json</code>、文字コードは UTF-8、サイズは <strong>64 KB</strong> 以下にします。</li><li><code>name</code> は省略できます。40文字を超える部分は切り詰められます。</li><li>ほかの行は、下の表にある色名、コロン、引用符で囲んだ色の順に書きます。大文字と小文字も表と同じにしてください。最後の行を除き、各行の末尾にカンマを付けます。</li><li>色は <code>"#RRGGBB"</code>（赤、緑、青）または <code>"#AARRGGBB"</code>（アルファ値が先頭）で書きます。<code>#RGB</code> は使えません。</li><li><strong>アルファ値</strong>は色の不透明度です。<code>FF</code> は不透明、<code>80</code> は半透明、<code>00</code> は透明です。通常は不透明な色を使います。アルファ値は、画面を暗くする幕や押したときの強調色（<code>Scrim</code>、<code>MenuScrim</code>、<code>PressEditor</code>、<code>PressHome</code>）に使います。</li><li>省略した色は AbsentMotion の標準のままです。<code>Gold</code> を指定して <code>Favorite</code> を省略すると、お気に入りの星に <code>Gold</code> の色が使われます。 <code>SelectionBorder</code> と <code>SelectionHandle</code> も同様に、それぞれ <code>Accent</code> と <code>OnDark</code> に従います。</li><li>表にない名前は無視されます。ファイルには色が少なくとも1つ必要です。色の書き方が正しくない場合、アプリはファイルを読み込まず、該当する色名を表示します。</li></ul>
+<h2 id="tips">ヒント</h2>
+<ul><li>エディターとホーム画面の色は別々です。AbsentMotion の標準ではエディターが暗く、ホーム画面が明るくなっています。それぞれ明るくも暗くもできます。</li><li>文字が読みやすいように、文字色（<code>OnDark</code>、<code>HomeInk</code>、そのほか <code>On</code> で始まるもの）と背景色の差を十分に付けてください。</li><li>テンキーや書き出しプレビュー、オンのスイッチなど、一部の場所にだけ表示される色もあります。編集中に該当する画面を開いて確認してください。</li><li>テーマを共有するには、<strong>テーマを作成…</strong>から書き出して <code>.json</code> ファイルを送ります。受け取った人は<strong>テーマファイルを読み込む…</strong>で読み込めます。</li></ul>
+<h2 id="every-color">色の一覧</h2>
+<p>色はグループに分かれています。2列目は主な使用場所です。ほかの場所にも使われる色があります。</p>
+<h3 id="editor">エディター</h3>
+<div class="table-wrap"><table><thead><tr><th>名前</th><th>使われる場所</th></tr></thead><tbody><tr><td data-label="名前"><code>TopBar</code></td><td data-label="使われる場所">エディターの主な背景色です。上部バー、パネルの背後、プリセットなどの全画面ツールに使われます。</td></tr><tr><td data-label="名前"><code>PreviewBg</code></td><td data-label="使われる場所">動画プレビューの背景、パネル内の暗い枠（スライダーやピッカー）、タイムラインの終端より後ろの空き部分。</td></tr><tr><td data-label="名前"><code>TimelineBg</code></td><td data-label="使われる場所">タイムラインの背景、プレビュー下の再生バー、レイヤータブの背後の行。</td></tr><tr><td data-label="名前"><code>Panel</code></td><td data-label="使われる場所">下から開くシート、ツールパネル（音声、キャプション、ストレッチ）、パソコンのメディアライブラリ、レベルメーター。</td></tr><tr><td data-label="名前"><code>PanelInset</code></td><td data-label="使われる場所">パネル上の枠。素材ライブラリのタイル、フォントブラウザー、数字キーの通常時の色、選択していない項目など。</td></tr><tr><td data-label="名前"><code>Button</code></td><td data-label="使われる場所">エディターのボタンやタイル、エフェクトの行、タイムラインのレイヤー名とバーの間の線。</td></tr><tr><td data-label="名前"><code>Field</code></td><td data-label="使われる場所">エディターのダイアログ、テキスト入力欄、リストの行、メニューの背景。</td></tr><tr><td data-label="名前"><code>FieldHi</code></td><td data-label="使われる場所">選択中または浮き出た項目。切り替えで選んだタブ、スライダーの空き部分、プロジェクトの安全確認ダイアログの縁、パソコンのホーム画面の一部のボタンなど。</td></tr><tr><td data-label="名前"><code>Chosen</code></td><td data-label="使われる場所">イージングパネルのグラフ背景、「枠線と影」の選択項目、グラデーションプレビューの暗い端。</td></tr><tr><td data-label="名前"><code>Well</code></td><td data-label="使われる場所">暗いくぼみ。メディアとオーディオのタブのタイル、ブレンドのスライダーやスイッチの溝、テンキーの「完了」キーなど。</td></tr><tr><td data-label="名前"><code>Deepest</code></td><td data-label="使われる場所">最も暗い部分。上部バーの下線、カラーピッカーのグリッド、レベルメーターの背景、テキストエディターの上部帯。</td></tr><tr><td data-label="名前"><code>Line</code></td><td data-label="使われる場所">細い区切り線。タイムラインの目盛りとヘッダーの縁、メニュー内のリストの線、チュートリアルカードとフォントブラウザーの枠など。</td></tr><tr><td data-label="名前"><code>MenuLine</code></td><td data-label="使われる場所">エディターのメニュー内と、イージングパネルのメニュー内の区切り線。</td></tr><tr><td data-label="名前"><code>PressEditor</code></td><td data-label="使われる場所">パソコンのエディターで押したときやポインターを重ねたときの強調色。</td></tr></tbody></table></div>
+<h3 id="timeline">タイムライン</h3>
+<p>タイムライン上のレイヤーバーや目印に使われる色です。</p>
+<div class="table-wrap"><table><thead><tr><th>名前</th><th>使われる場所</th></tr></thead><tbody><tr><td data-label="名前"><code>LayerBar</code></td><td data-label="使われる場所">タイムライン上の通常レイヤー（動画、画像、図形など）のバー。</td></tr><tr><td data-label="名前"><code>LayerBarStripe</code></td><td data-label="使われる場所">レイヤーバーに重ねる縞模様。</td></tr><tr><td data-label="名前"><code>TextBar</code></td><td data-label="使われる場所">タイムライン上のテキストレイヤーのバー。</td></tr><tr><td data-label="名前"><code>TextBarStripe</code></td><td data-label="使われる場所">テキストレイヤーのバーに重ねる縞模様。</td></tr><tr><td data-label="名前"><code>AudioBar</code></td><td data-label="使われる場所">タイムライン上の音声レイヤーのバー。</td></tr><tr><td data-label="名前"><code>AudioWave</code></td><td data-label="使われる場所">音声バー内に描かれる波形。</td></tr><tr><td data-label="名前"><code>OnBar</code></td><td data-label="使われる場所">レイヤーバーとテキストバー上のレイヤー名。</td></tr><tr><td data-label="名前"><code>OnAudioBar</code></td><td data-label="使われる場所">音声バー上のレイヤー名。</td></tr><tr><td data-label="名前"><code>Bookmark</code></td><td data-label="使われる場所">タイムラインに表示されるブックマークの目印。</td></tr><tr><td data-label="名前"><code>Gold</code></td><td data-label="使われる場所">タイムラインの速度変更マーク、プレビューの未選択の点、フォントブラウザーの検索文字と進捗リング、スライダーの微調整線、テンキーの範囲外の数値。</td></tr><tr><td data-label="名前"><code>SelectionBorder</code></td><td data-label="使われる場所">パソコンのタイムラインで、選択したクリップを囲む枠線の色です。省略すると <code>Accent</code> と同じ色になります。</td></tr><tr><td data-label="名前"><code>SelectionHandle</code></td><td data-label="使われる場所">パソコンのタイムラインで、選択したクリップの両端にあるトリムハンドルの色です。省略すると <code>OnDark</code> と同じ色になります。</td></tr></tbody></table></div>
+<h3 id="keypad-and-menus">テンキーとメニュー</h3>
+<p>レイヤーツールのテンキーや、プレビューの背後の暗い枠に使われる色です。</p>
+<div class="table-wrap"><table><thead><tr><th>名前</th><th>使われる場所</th></tr></thead><tbody><tr><td data-label="名前"><code>KeyDigit</code></td><td data-label="使われる場所">レイヤーツールのテンキーにある0〜9の数字キー。</td></tr><tr><td data-label="名前"><code>KeySymbol</code></td><td data-label="使われる場所">同じテンキーの符号、小数点、削除のキー。</td></tr><tr><td data-label="名前"><code>Cool</code></td><td data-label="使われる場所">テンキーの青いラベルと、モーションシートの入り側の輪郭。</td></tr><tr><td data-label="名前"><code>CoolDeep</code></td><td data-label="使われる場所">テンキーで選択中の数字の背後。</td></tr><tr><td data-label="名前"><code>Scrim</code></td><td data-label="使われる場所">プレビューの背後にある暗い枠。ホーム画面のツールプレビュー（範囲、圧縮、ツールキット）、書き出しプレビューと書き出し完了画面、コミュニティの画像がないサムネイルなど。</td></tr><tr><td data-label="名前"><code>OnScrim</code></td><td data-label="使われる場所">Scrim の上の文字やアイコン。書き出しプレビューのボタン、ページ数、再生ボタン、コミュニティの画像がない項目に出る仮のアイコン。</td></tr></tbody></table></div>
+<h3 id="accent">アクセント</h3>
+<div class="table-wrap"><table><thead><tr><th>名前</th><th>使われる場所</th></tr></thead><tbody><tr><td data-label="名前"><code>Accent</code></td><td data-label="使われる場所">主なアクセントカラーです。選択項目、操作中のスライダー、エディター上部の書き出しボタン、タイムラインのスナップ線や選択範囲、再生位置マーカー、主要ボタンなど、特に多くの場所で使われます。</td></tr><tr><td data-label="名前"><code>AccentLit</code></td><td data-label="使われる場所">より明るいアクセント。音量やブレンドのスライダー、エディターのスイッチのつまみ、パソコンのエディターのフォルダーアイコン。</td></tr><tr><td data-label="名前"><code>AccentGlow</code></td><td data-label="使われる場所">パネル内を強調する明るいアクセント。操作中のテンキーの枠やラベルなど。</td></tr><tr><td data-label="名前"><code>AccentDeep</code></td><td data-label="使われる場所">暗いアクセント。エディターのオンのスイッチの溝、プレビューのハンドル、選択色の周りのリングなど。</td></tr><tr><td data-label="名前"><code>OnAccent</code></td><td data-label="使われる場所">アクセントカラーの上の文字とアイコン。書き出しアイコン、アクセント色のボタン、選択中のチップなど。</td></tr><tr><td data-label="名前"><code>Warning</code></td><td data-label="使われる場所">古いプレビュー、見つからないファイル、クリップが制限を超えた場合などの警告とエラー。プロジェクトの安全確認ダイアログの削除や危険な操作のボタンにも使われます。</td></tr><tr><td data-label="名前"><code>Favorite</code></td><td data-label="使われる場所">テキストエディターとエフェクトブラウザーのお気に入りを示す塗りつぶしの星。</td></tr></tbody></table></div>
+<h3 id="text-on-dark">暗い背景の文字</h3>
+<p>エディターの文字やアイコンに使われる色です。</p>
+<div class="table-wrap"><table><thead><tr><th>名前</th><th>使われる場所</th></tr></thead><tbody><tr><td data-label="名前"><code>OnDark</code></td><td data-label="使われる場所">エディターの主な文字とアイコン。使用頻度が最も高い色です。</td></tr><tr><td data-label="名前"><code>OnDarkDim</code></td><td data-label="使われる場所">控えめな文字とアイコン。件数、ヒント、リストが空のときのメッセージ、パソコンのエディターの小さなアイコンなど。</td></tr><tr><td data-label="名前"><code>Caption</code></td><td data-label="使われる場所">パネル内の小さなヘルプ文と矢印、点のエディターのガイド線。</td></tr><tr><td data-label="名前"><code>Faint</code></td><td data-label="使われる場所">控えめなアイコンや線。点のエディターの未選択アイコン、ブレンドや「枠線と影」のアイコン、目盛り、カラーピッカーの通常時など。</td></tr><tr><td data-label="名前"><code>Inactive</code></td><td data-label="使われる場所">オフや未操作の項目。タイムラインの定規の目盛りとつまみ、オフのスイッチの溝、移動パネルのリンクとカメラの枠など。</td></tr></tbody></table></div>
+<h3 id="home-screen">ホーム画面</h3>
+<p>ホーム画面、設定パネル、新規プロジェクトシート、書き出し画面、初回ガイドに使われる色です。</p>
+<div class="table-wrap"><table><thead><tr><th>名前</th><th>使われる場所</th></tr></thead><tbody><tr><td data-label="名前"><code>HomeBg</code></td><td data-label="使われる場所">ホーム画面の背景と、新着情報の見出しやダイアログの入力欄などの淡い枠。</td></tr><tr><td data-label="名前"><code>Card</code></td><td data-label="使われる場所">ホーム画面のカードと行。ツール、テンプレート、設定パネルの行、メニュー、書き出し画面の上部バー、チュートリアルカードなど。</td></tr><tr><td data-label="名前"><code>SheetBg</code></td><td data-label="使われる場所">各シートの背景。新規プロジェクトシート、書き出し画面、初回ガイド、アプリについて画面。</td></tr><tr><td data-label="名前"><code>HomeDrawer</code></td><td data-label="使われる場所">設定パネルの背景（スマートフォンとタブレット）。</td></tr><tr><td data-label="名前"><code>HomePanel</code></td><td data-label="使われる場所">ホーム画面の控えめなパネル。設定パネルでグループ化された行、コミュニティの画像がない項目、安全確認ダイアログのボタン。</td></tr><tr><td data-label="名前"><code>Navy</code></td><td data-label="使われる場所">ホーム画面の主な暗色。見出し、アイコン、選択中のタブやチップ、選択済みのボタンやチェックボックス、進捗バーに使われます。名前に関係なく、どんな色でも指定できます。</td></tr><tr><td data-label="名前"><code>OnNavy</code></td><td data-label="使われる場所">Navy の上の文字とアイコン。選択中のタブやボタンなど。</td></tr><tr><td data-label="名前"><code>OnNavyAccent</code></td><td data-label="使われる場所">Navy の上のアクセント色の文字とアイコン。選択中の項目や書き出しボタンのラベル、ホーム画面が明るいときに書き出し画面に出る温度の表示。</td></tr><tr><td data-label="名前"><code>NavyHi</code></td><td data-label="使われる場所">設定パネルのリストで選んだ行。</td></tr><tr><td data-label="名前"><code>NavyLine</code></td><td data-label="使われる場所">設定パネルや新規プロジェクトシートのリスト、テンプレートタブのチップの線と枠。</td></tr><tr><td data-label="名前"><code>HomeAccent</code></td><td data-label="使われる場所">ホーム画面のアクセント。オンのスイッチ、ラジオボタン、メニューのチェックマーク、書き出しの警告文、安全確認ダイアログで危険な操作を行うボタンなど。</td></tr><tr><td data-label="名前"><code>HomeInk</code></td><td data-label="使われる場所">ホーム画面の主な文字。</td></tr><tr><td data-label="名前"><code>HomeMid</code></td><td data-label="使われる場所">ホーム画面の補助的な文字とアイコン。バージョン表記、矢印、ハンドル、ラベルなど。</td></tr><tr><td data-label="名前"><code>HomeDim</code></td><td data-label="使われる場所">ホーム画面でさらに控えめな文字。ヘルプ文、ツールの説明、小さな山形の矢印など。</td></tr><tr><td data-label="名前"><code>HomeFaint</code></td><td data-label="使われる場所">ホーム画面の最も控えめな項目。未選択のページを表す点と、新規プロジェクトシートのリンクアイコン。</td></tr><tr><td data-label="名前"><code>HomeLine</code></td><td data-label="使われる場所">ホーム画面の細い線と枠、進捗バーの溝、ツールで選択中の範囲ボタン。</td></tr><tr><td data-label="名前"><code>MenuScrim</code></td><td data-label="使われる場所">メニューを開いたときにホーム画面を覆う幕（スマートフォンとタブレット）。</td></tr><tr><td data-label="名前"><code>PressHome</code></td><td data-label="使われる場所">ホーム画面で押したときやポインターを重ねたときの強調色。</td></tr></tbody></table></div>
+<h3 id="switches-and-others">スイッチなど</h3>
+<div class="table-wrap"><table><thead><tr><th>名前</th><th>使われる場所</th></tr></thead><tbody><tr><td data-label="名前"><code>SwitchOff</code></td><td data-label="使われる場所">設定パネルや書き出し画面でオフになっているスイッチの溝。</td></tr><tr><td data-label="名前"><code>Thumb</code></td><td data-label="使われる場所">書き出し画面やエディターでオフになっているスイッチの丸いつまみと、エディターのスライダーの目印。</td></tr></tbody></table></div>
+<h2 id="full-example-light-green">完全なサンプル：ライトグリーン</h2>
+<p>ライトグリーンはアプリの内蔵テーマです。同じテーマのファイルを下に示します。自分のテーマを作るときの土台にできます。エディターは濃い青紫に鮮やかな緑のアクセントで、明るいホーム画面にも同じ緑が使われます。</p>
+<pre><code>{
+ "name": "Light Green",
+ "TopBar": "#202332",
+ "PreviewBg": "#141620",
+ "TimelineBg": "#191B27",
+ "Panel": "#333750",
+ "PanelInset": "#292D40",
+ "Button": "#292D40",
+ "Field": "#141620",
+ "FieldHi": "#3B3F54",
+ "Chosen": "#141620",
+ "Well": "#191B27",
+ "Deepest": "#0C0D13",
+ "Line": "#222535",
+ "MenuLine": "#222535",
+ "KeyDigit": "#626575",
+ "KeySymbol": "#252944",
+ "Scrim": "#F2050508",
+ "PressEditor": "#1CFFFFFF",
+ "OnDark": "#FFFFFF",
+ "OnDarkDim": "#A9ABB4",
+ "Caption": "#B8B9C2",
+ "Faint": "#7F8290",
+ "Inactive": "#626575",
+ "OnScrim": "#FFFFFF",
+ "Accent": "#00FFA8",
+ "AccentLit": "#69FC97",
+ "AccentGlow": "#9CFFD6",
+ "AccentDeep": "#316463",
+ "OnAccent": "#000000",
+ "Gold": "#FFCD4B",
+ "Favorite": "#FFCD4B",
+ "HomeBg": "#F6F6F6",
+ "Card": "#FFFFFF",
+ "SheetBg": "#EAEAEC",
+ "Navy": "#1E2239",
+ "HomeAccent": "#009965",
+ "OnNavy": "#FFFFFF",
+ "OnNavyAccent": "#00FFA8",
+ "NavyHi": "#333750",
+ "NavyLine": "#43486B",
+ "HomeInk": "#000000",
+ "HomeMid": "#494C5A",
+ "HomeDim": "#5D606F",
+ "HomeFaint": "#BBBBBB",
+ "HomeLine": "#D9D9DD",
+ "HomePanel": "#EAEAEC",
+ "HomeDrawer": "#FFFFFF",
+ "SwitchOff": "#A3A3A5",
+ "Thumb": "#ECECEC",
+ "MenuScrim": "#B30F1010",
+ "PressHome": "#12000000"
+}</code></pre><nav class="pager" aria-label="前後のページ"><a rel="prev" href="settings.html">&larr; 設定</a><a rel="next" href="keyframes.html">キーフレームとイージング &rarr;</a></nav></main></div></body></html>

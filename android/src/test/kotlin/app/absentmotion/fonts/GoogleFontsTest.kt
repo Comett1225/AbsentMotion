@@ -48,7 +48,7 @@ class GoogleFontsTest {
         assertEquals(null, GoogleFamily("X", 1, emptySet(), emptySet()).nearest(400, false))
     }
 
-    @Test fun importedThenAppThenDeviceThenGoogleWithoutDuplicates() {
+    @Test fun importedThenInstalledThenAppThenGoogleWithoutDuplicates() {
         val google = GoogleFonts.parse(list)
         val result = GoogleFonts.arrange(listOf(entry("Zilla.ttf", 100)), FontCatalog.entries.filter { it.name.family == "Roboto" }.take(1),
             listOf(entry("Dancing Script"), entry("Roboto")), google, "", FontSource.All)
@@ -59,7 +59,7 @@ class GoogleFontsTest {
         assertEquals(listOf("Zilla Slab"), searched.google.map { it.family })
         val all = GoogleFonts.arrange(listOf(FontEntry(FontName("imported", "Rob.ttf"), 100, emptySet())), FontCatalog.entries.filter { it.name.family == "Roboto" }.take(1),
             listOf(entry("Dancing Script"), entry("Roboto")), google, "r", FontSource.All)
-        assertEquals(listOf("Rob.ttf", "Roboto", "Dancing Script"), all.local.map { it.name.family })
+        assertEquals(listOf("Rob.ttf", "Dancing Script", "Roboto"), all.local.map { it.name.family })
         assertEquals(listOf("Lobster"), all.google.map { it.family })
         assertTrue(all.google.none { it.family == "Roboto" || it.family == "Dancing Script" })
     }

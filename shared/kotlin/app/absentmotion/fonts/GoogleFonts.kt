@@ -60,6 +60,6 @@ object GoogleFonts {
         val deviceKeys = deviceShown.map { key(it.name.family) }.toSet()
         val remote = if (query.isBlank() || source != FontSource.All && source != FontSource.Google) emptyList()
             else google.filter { key(it.family) !in appKeys && key(it.family) !in deviceKeys && matchesSearch(query, it.family) }
-        return FontResults(pick(imported, FontSource.Imported) + pick(app, FontSource.App) + pick(deviceShown, FontSource.Device), remote)
+        return FontResults(pick(imported, FontSource.Imported) + pick(deviceShown, FontSource.Device) + pick(app, FontSource.App), remote)
     }
 }

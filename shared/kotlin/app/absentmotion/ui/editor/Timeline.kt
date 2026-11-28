@@ -69,6 +69,8 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.draw.drawWithContent
+import app.absentmotion.model.mediaUris
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -282,8 +284,8 @@ private val SnapColor get() = Am.Accent
 private class TimelineStyles(font: androidx.compose.ui.text.font.FontFamily?) {
     val ruler = TextStyle(color = Am.OnDarkDim, fontSize = 12.sp, fontFamily = font)
     val timecode = TextStyle(color = Am.OnDark, fontSize = 14.sp, fontFamily = font)
-    val label = TextStyle(color = Am.OnBar, fontSize = if (deskLayout) 12.sp else 11.sp, fontFamily = font, textDirection = androidx.compose.ui.text.style.TextDirection.Content)
-    val mediaLabel = label.copy(color = Color.White)
+    val label = TextStyle(color = Am.OnBar, fontSize = if (deskLayout) 12.sp else 11.sp, fontWeight = if (deskLayout) androidx.compose.ui.text.font.FontWeight.SemiBold else null, fontFamily = font, textDirection = androidx.compose.ui.text.style.TextDirection.Content)
+    val mediaLabel = label.copy(color = Color.White, fontWeight = null)
     val audioLabel = label.copy(color = Am.OnAudioBar)
     val header = TextStyle(color = Am.OnDark, fontSize = 13.sp, fontFamily = font)
     val hiddenHeader = TextStyle(color = Am.OnDarkDim, fontSize = 13.sp, fontFamily = font)
@@ -542,6 +544,11 @@ private fun HeaderPictures(view: TimelineView, drawLift: DrawScope.() -> Unit) {
                                 transformOrigin = TransformOrigin((view.size.width / 2f - ThumbLeft.toPx()) / ThumbSize.toPx(), 0.5f)
                             } else Modifier)
                             .size(ThumbSize)
+                            .then(if (layer.usesMissing(view.state.missingMedia)) Modifier.drawWithContent {
+                                drawContent()
+                                drawRect(Color.Black, alpha = 0.5f)
+                                drawNoEntry(center, size.minDimension * 0.28f)
+                            } else Modifier)
                             .alpha(if (layer.hidden) HIDDEN_ALPHA else 1f),
                     )
                 }
@@ -1955,7 +1962,7 @@ private fun DrawScope.drawTimeline(view: TimelineView, measurer: TextMeasurer, s
     val stripe = TimelineMath.frameTimeMs(2 * step, fps) * time.pxPerMs
     fun paint(row: Int, layer: Layer) {
         val rowTime = view.timeFor(layer.id, time)
-        drawRow(layer, layer.id == state.selectedId, view.shownTop(row, layer.id), rowTime, stripe, measurer, styles, if (layer.hidden) eyeOff else eye, locks.of(layer), outline, state.scene, state.frame, pictures[layer.id], view.keyFrames(layer), appear, view.keyFrame.takeIf { layer.id == view.keyId }, view.limits[layer.id], view.headerWidth, layer.id == view.hoveredId, view.hoveredKey?.takeIf { it.first == layer.id }?.second, view.otherKeyFrames(layer))
+        drawRow(layer, layer.id == state.selectedId, view.shownTop(row, layer.id), rowTime, stripe, measurer, styles, if (layer.hidden) eyeOff else eye, locks.of(layer), outline, state.scene, state.frame, pictures[layer.id], view.keyFrames(layer), appear, view.keyFrame.takeIf { layer.id == view.keyId }, view.limits[layer.id], view.headerWidth, layer.id == view.hoveredId, view.hoveredKey?.takeIf { it.first == layer.id }?.second, view.otherKeyFrames(layer), state.sourcePick?.let { layer.id in it.usable }, layer.usesMissing(state.missingMedia))
         layer.mediaFill?.takeIf { it.video }?.let { proxies[it.uri] }?.let { done ->
             drawProxyProgress(rowTime.x(layer.startTime.toFloat()), rowTime.x(layer.endTime + 1f), view.shownTop(row, layer.id), done)
         }
@@ -2077,7 +2084,7 @@ private fun DrawScope.drawLifted(view: TimelineView, measurer: TextMeasurer, sty
             val step = LiftShadowStep.toPx()
             for (i in 1..4) drawRect(Color.Black, Offset(-i * step, top - i * step + step), Size(size.width + 2 * i * step, rowH + 2 * i * step), alpha = LIFT_SHADOW_ALPHA * amount)
             drawRect(Am.TimelineBg, Offset(0f, top), Size(size.width, rowH), alpha = amount)
-            drawRow(layer, id == state.selectedId, top, view.timeFor(id, time), stripe, measurer, styles, if (layer.hidden) eyeOff else eye, locks.of(layer), outline, state.scene, state.frame, pictures[id], view.keyFrames(layer), appear, headerWidth = view.headerWidth, hovered = id == view.hoveredId)
+            drawRow(layer, id == state.selectedId, top, view.timeFor(id, time), stripe, measurer, styles, if (layer.hidden) eyeOff else eye, locks.of(layer), outline, state.scene, state.frame, pictures[id], view.keyFrames(layer), appear, headerWidth = view.headerWidth, hovered = id == view.hoveredId, usable = state.sourcePick?.let { id in it.usable }, missing = layer.usesMissing(state.missingMedia))
         }
     }
 }
@@ -2163,7 +2170,7 @@ private fun DrawScope.drawRetimeMarks(scene: Scene, time: TimeScale) {
 
 private fun DrawScope.drawRow(
     layer: Layer, selected: Boolean, top: Float, time: TimeScale, stripe: Float,
-    measurer: TextMeasurer, styles: TimelineStyles, eye: Painter, lock: Painter, outline: Path, scene: Scene, frame: Int, picture: StripPicture?, keyFrames: List<Int>, appear: Float = 1f, held: Int? = null, limit: Boolean? = null, headerWidth: Float = 0f, hovered: Boolean = false, hoverKey: Int? = null, otherKeys: List<Int> = emptyList(),
+    measurer: TextMeasurer, styles: TimelineStyles, eye: Painter, lock: Painter, outline: Path, scene: Scene, frame: Int, picture: StripPicture?, keyFrames: List<Int>, appear: Float = 1f, held: Int? = null, limit: Boolean? = null, headerWidth: Float = 0f, hovered: Boolean = false, hoverKey: Int? = null, otherKeys: List<Int> = emptyList(), usable: Boolean? = null, missing: Boolean = false,
 ) {
     val barTop = top + BarInset.toPx()
     val barBottom = top + (RowHeight - BarInset).toPx()
@@ -2177,8 +2184,9 @@ private fun DrawScope.drawRow(
     else drawBar(outline, left, right, barTop, barBottom, stripe, picture, layer.startTime, time.pxPerMs, layer.kind == "text", layer.kind == "camera")
     layer.labelColour?.let { drawTagCorner(outline, left, barTop, (barBottom - barTop) / 2, Color(it.start)) }
     val mediaLabel = deskLayout && picture != null
-    val labelStyle = if (mediaLabel) styles.mediaLabel else if (layer.kind == "audio") styles.audioLabel else styles.label
-    drawLabel(layer.shownName(), measurer, if (deskLayout) max(left, headerWidth) else left, right, barTop, barBottom, labelStyle, mediaLabel)
+    val labelStyle = if (mediaLabel || missing) styles.mediaLabel else if (layer.kind == "audio") styles.audioLabel else styles.label
+    val labelLeft = if (deskLayout) max(left, headerWidth) else left
+    drawLabel(layer.shownName(), measurer, if (missing && right > left) drawMissingBar(outline, left, right, barTop, barBottom, labelLeft) else labelLeft, right, barTop, barBottom, labelStyle, mediaLabel)
     drawOtherKeys(otherKeys, scene, time, left, right, centre, outline)
     drawKeyframes(keyFrames, scene, selected, frame, time, left, right, centre, outline, appear, held, hoverKey)
     if (deskLayout) {
@@ -2194,6 +2202,8 @@ private fun DrawScope.drawRow(
         }
         drawHeader(top, eye, lock, layer.locked || layer.timingLocked, layer.labelColour, layer.id in MultiSelect.ids, layer.node["clippingMask"] == "true")
     }
+    if (usable == false) drawRect(Am.TimelineBg, Offset(0f, top), Size(size.width, RowHeight.toPx()), alpha = 0.7f)
+    else if (usable == true && right > left) drawRoundRect(Am.Accent, Offset(left + 1.dp.toPx(), barTop + 1.dp.toPx()), Size(right - left - 2.dp.toPx(), barBottom - barTop - 2.dp.toPx()), CornerRadius(BarRadius.toPx()), style = Stroke(2.dp.toPx()))
 }
 
 private fun DrawScope.drawDeskClipFrame(left: Float, right: Float, top: Float, bottom: Float, headerWidth: Float, chosen: Boolean, hovered: Boolean, limit: Boolean?) {
@@ -2202,7 +2212,7 @@ private fun DrawScope.drawDeskClipFrame(left: Float, right: Float, top: Float, b
     if (to <= from || !chosen && !hovered) return
     val stroke = (if (chosen) 2.dp else 1.dp).toPx()
     val inset = stroke / 2
-    drawRoundRect(if (chosen) Am.Accent else Color.White.copy(alpha = 0.65f), Offset(from + inset, top + inset), Size(to - from - stroke, bottom - top - stroke), CornerRadius(BarRadius.toPx()), style = Stroke(stroke))
+    drawRoundRect(if (chosen) Am.SelectionBorder else Color.White.copy(alpha = 0.65f), Offset(from + inset, top + inset), Size(to - from - stroke, bottom - top - stroke), CornerRadius(BarRadius.toPx()), style = Stroke(stroke))
     if (!chosen) return
     val width = 3.dp.toPx()
     val height = (bottom - top) * 0.5f
@@ -2211,7 +2221,7 @@ private fun DrawScope.drawDeskClipFrame(left: Float, right: Float, top: Float, b
         val edge = if (start) left else right
         if (edge < headerWidth || edge > size.width) continue
         val x = if (start) edge + 3.dp.toPx() else edge - 3.dp.toPx() - width
-        drawRoundRect(if (limit == start) LimitColor else Am.OnDark, Offset(x, (top + bottom - height) / 2), Size(width, height), CornerRadius(width / 2))
+        drawRoundRect(if (limit == start) LimitColor else Am.SelectionHandle, Offset(x, (top + bottom - height) / 2), Size(width, height), CornerRadius(width / 2))
     }
 }
 
@@ -2238,6 +2248,26 @@ private fun DrawScope.drawDeskHeader(layer: Layer, chosen: Boolean, hovered: Boo
     if (room < 1) return
     val text = measurer.measure(layer.shownName(), if (layer.hidden) styles.hiddenHeader else styles.header, TextOverflow.Ellipsis, maxLines = 1, constraints = Constraints(maxWidth = room))
     drawText(text, topLeft = Offset(left, top + (height - text.size.height) / 2))
+}
+
+internal fun Layer.usesMissing(missing: Set<String>) = missing.isNotEmpty() && node.mediaUris().any { it in missing }
+
+private val MissingShade = Color(0xF0595959)
+
+private fun DrawScope.drawMissingBar(outline: Path, left: Float, right: Float, top: Float, bottom: Float, labelLeft: Float): Float {
+    outline.rewind()
+    outline.addRoundRect(RoundRect(left, top, right, bottom, CornerRadius(BarRadius.toPx())))
+    clipPath(outline) { drawRect(MissingShade, Offset(left, top), Size(right - left, bottom - top)) }
+    val r = (bottom - top) * 0.22f
+    val c = Offset(max(labelLeft, left) + 6.dp.toPx() + r, (top + bottom) / 2)
+    drawNoEntry(c, r)
+    return c.x + r + 2.dp.toPx()
+}
+
+internal fun DrawScope.drawNoEntry(c: Offset, r: Float) {
+    val w = max(1.5f, r * 0.3f)
+    drawCircle(Color.White, r, c, style = Stroke(w))
+    drawLine(Color.White, Offset(c.x - r * 1.2f, c.y + r * 1.2f), Offset(c.x + r * 1.2f, c.y - r * 1.2f), w, StrokeCap.Round)
 }
 
 private fun DrawScope.drawBar(outline: Path, left: Float, right: Float, top: Float, bottom: Float, stripe: Float, picture: StripPicture?, startTime: Int, pxPerMs: Float, text: Boolean = false, camera: Boolean = false) {

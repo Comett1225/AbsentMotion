@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.asAndroidPath
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import kotlin.math.roundToInt
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.composed
 import androidx.compose.ui.input.pointer.isAltPressed
@@ -55,20 +56,58 @@ fun appVersion(): String {
 }
 @androidx.compose.runtime.Composable
 fun SceneSurface(engine: app.absentmotion.engine.EngineThread, divisor: Int, size: androidx.compose.ui.unit.IntSize, modifier: androidx.compose.ui.Modifier, onView: (Any) -> Unit = {}) {
-    androidx.compose.ui.viewinterop.AndroidView(modifier = if (Build.VERSION.SDK_INT < 33) modifier.clipToBounds() else modifier, factory = { context ->
-        android.view.SurfaceView(context).apply {
-            onView(this)
-            engine.attach(this)
-            holder.addCallback(object : android.view.SurfaceHolder.Callback {
-                override fun surfaceCreated(holder: android.view.SurfaceHolder) {}
-                override fun surfaceChanged(holder: android.view.SurfaceHolder, format: Int, width: Int, height: Int) = engine.attach(this@apply, holder.surface)
-                override fun surfaceDestroyed(holder: android.view.SurfaceHolder) = engine.detach(holder.surface)
-            })
+    var surfaceView by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<android.view.SurfaceView?>(null) }
+    val createdAt = androidx.compose.runtime.remember { engine.requested.value.first }
+    androidx.compose.foundation.layout.Box(modifier) {
+        androidx.compose.ui.viewinterop.AndroidView(modifier = if (Build.VERSION.SDK_INT < 33) androidx.compose.ui.Modifier.fillMaxSize().clipToBounds() else androidx.compose.ui.Modifier.fillMaxSize(), factory = { context ->
+            android.view.SurfaceView(context).apply {
+                surfaceView = this
+                onView(this)
+                engine.attach(this)
+                holder.addCallback(object : android.view.SurfaceHolder.Callback {
+                    override fun surfaceCreated(holder: android.view.SurfaceHolder) {}
+                    override fun surfaceChanged(holder: android.view.SurfaceHolder, format: Int, width: Int, height: Int) = engine.attach(this@apply, holder.surface)
+                    override fun surfaceDestroyed(holder: android.view.SurfaceHolder) = engine.detach(holder.surface)
+                })
+            }
+        }, onRelease = { engine.forget(it) }, update = { view ->
+            if (divisor > 1 && size.width > 0) view.holder.setFixedSize((size.width / divisor).coerceAtLeast(1), (size.height / divisor).coerceAtLeast(1))
+            else view.holder.setSizeFromLayout()
+        })
+        val presented by engine.presented.collectAsState()
+        val mine = surfaceView?.holder?.surface
+        val rendered by engine.rendered.collectAsState()
+        androidx.compose.runtime.LaunchedEffect(rendered, mine, presented === mine) {
+            val view = surfaceView ?: return@LaunchedEffect
+            if (mine == null || presented !== mine) return@LaunchedEffect
+            kotlinx.coroutines.delay(300)
+            val shot = engine.shownView ?: return@LaunchedEffect
+            val frame = view.holder.surfaceFrame
+            if (frame.width() <= 0 || frame.height() <= 0 || mine.isValid.not()) return@LaunchedEffect
+            val bitmap = android.graphics.Bitmap.createBitmap(frame.width(), frame.height(), android.graphics.Bitmap.Config.ARGB_8888)
+            runCatching {
+                android.view.PixelCopy.request(view, bitmap, { result ->
+                    if (result == android.view.PixelCopy.SUCCESS) engine.still = app.absentmotion.engine.EngineThread.Still(bitmap, shot)
+                }, android.os.Handler(android.os.Looper.getMainLooper()))
+            }
         }
-    }, onRelease = { engine.forget(it) }, update = { view ->
-        if (divisor > 1 && size.width > 0) view.holder.setFixedSize((size.width / divisor).coerceAtLeast(1), (size.height / divisor).coerceAtLeast(1))
-        else view.holder.setSizeFromLayout()
-    })
+        val still = engine.still
+        val requested by engine.requested.collectAsState()
+        val next = requested.second.takeIf { requested.first > createdAt } ?: still?.view
+        if (still != null && next != null && presented !== mine) {
+            val image = androidx.compose.runtime.remember(still) { still.bitmap.asImageBitmap() }
+            val background = app.absentmotion.ui.theme.Am.PreviewBg
+            androidx.compose.foundation.Canvas(androidx.compose.ui.Modifier.fillMaxSize()) {
+                val k = next.scale / still.view.scale
+                val f = if (divisor > 1) divisor.toFloat() else 1f
+                drawRect(background)
+                drawImage(image,
+                    dstOffset = androidx.compose.ui.unit.IntOffset(((next.dx - still.view.dx * k) * f).roundToInt(), ((next.dy - still.view.dy * k) * f).roundToInt()),
+                    dstSize = androidx.compose.ui.unit.IntSize((image.width * k * f).roundToInt().coerceAtLeast(1), (image.height * k * f).roundToInt().coerceAtLeast(1)),
+                    filterQuality = androidx.compose.ui.graphics.FilterQuality.Low)
+            }
+        }
+    }
 }
 
 typealias ContentResolver = android.content.ContentResolver

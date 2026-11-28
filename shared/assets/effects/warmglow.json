@@ -1,0 +1,115 @@
+{
+ "id": "warmglow",
+ "name": "Warm Glow",
+ "category": "blur",
+ "since": "5.4.0",
+ "description": "Blurs the layer and keeps the darker of the blur and the picture in each color, so shadows spread softly into the bright parts. Mask limits the effect to a rectangle, an ellipse or a polygon.",
+ "params": [
+  {
+   "id": "blur",
+   "label": "Level",
+   "type": "float",
+   "default": 50,
+   "min": 1,
+   "max": 100,
+   "step": 1
+  },
+  {
+   "id": "mask",
+   "label": "Mask",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "None",
+    "Rectangle",
+    "Ellipse",
+    "Polygon"
+   ]
+  },
+  {
+   "id": "maskCenter",
+   "label": "Mask Position",
+   "type": "point",
+   "default": [
+    0.5,
+    0.5
+   ],
+   "min": -1,
+   "max": 2,
+   "step": 0.01,
+   "when": {
+    "mask": [
+     1,
+     2,
+     3
+    ]
+   }
+  },
+  {
+   "id": "maskWidth",
+   "label": "Mask Width",
+   "type": "float",
+   "default": 0.5,
+   "min": 0,
+   "max": 2,
+   "step": 0.01,
+   "percent": true,
+   "when": {
+    "mask": [
+     1,
+     2,
+     3
+    ]
+   }
+  },
+  {
+   "id": "maskHeight",
+   "label": "Mask Height",
+   "type": "float",
+   "default": 0.5,
+   "min": 0,
+   "max": 2,
+   "step": 0.01,
+   "percent": true,
+   "when": {
+    "mask": [
+     1,
+     2,
+     3
+    ]
+   }
+  },
+  {
+   "id": "sides",
+   "label": "Sides",
+   "type": "float",
+   "default": 6,
+   "min": 3,
+   "max": 12,
+   "step": 1,
+   "when": {
+    "mask": [
+     3
+    ]
+   }
+  },
+  {
+   "id": "feather",
+   "label": "Feather",
+   "type": "float",
+   "default": 0.1,
+   "min": 0,
+   "max": 1,
+   "step": 0.01,
+   "percent": true,
+   "when": {
+    "mask": [
+     1,
+     2,
+     3
+    ]
+   }
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform shader blurred;\nuniform float blur;\nuniform float mask;\nuniform float2 maskCenter;\nuniform float maskWidth;\nuniform float maskHeight;\nuniform float sides;\nuniform float feather;\nfloat inside(float2 coord) {\n    if (mask < 0.5) return 1.0;\n    float2 reach = max(float2(maskWidth, maskHeight) * size * 0.5, float2(0.5));\n    float2 p = coord - maskCenter * size;\n    float unit = min(reach.x, reach.y);\n    float d;\n    if (mask < 1.5) {\n        float2 q = abs(p) - reach;\n        d = length(max(q, float2(0.0))) + min(max(q.x, q.y), 0.0);\n    } else if (mask < 2.5) {\n        d = (length(p / reach) - 1.0) * unit;\n    } else {\n        float n = clamp(floor(sides + 0.5), 3.0, 12.0);\n        float2 u = p / reach;\n        float seg = 6.2831853 / n;\n        float a = atan(u.x, -u.y);\n        float k = (floor(a / seg) + 0.5) * seg;\n        d = (length(u) * cos(a - k) - cos(seg * 0.5)) * unit;\n    }\n    float soft = max(clamp(feather, 0.0, 1.0) * unit, 0.75);\n    return 1.0 - smoothstep(-soft, soft, d);\n}\nhalf4 main(float2 coord) {\n    float4 o = float4(image.eval(coord));\n    float m = inside(coord);\n    if (m <= 0.0) return half4(o);\n    float4 b = float4(blurred.eval(coord));\n    float4 r = float4(b.rgb + o.rgb - max(b.rgb * o.a, o.rgb * b.a), b.a + o.a - b.a * o.a);\n    return half4(mix(o, r, m));\n}\n"
+}

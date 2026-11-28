@@ -90,11 +90,12 @@ class FontLibrary(context: Context) {
         (listOf(File("/system/fonts"), File("/product/fonts")).flatMap { it.listFiles()?.toList().orEmpty() } +
             if (Build.VERSION.SDK_INT >= 29) android.graphics.fonts.SystemFonts.getAvailableFonts().mapNotNull { it.file } else emptyList()).distinct()
             .filter { it.isFile && it.extension.lowercase() in setOf("ttf", "otf", "ttc") }
-            .groupBy { familyKey(it.nameWithoutExtension.substringBefore('-')) }
+            .groupBy { familyKey(app.absentmotion.platform.systemFontFamily(it) ?: it.nameWithoutExtension.substringBefore('-')) }
     }
     fun deviceFonts(): List<FontName> = if (Build.VERSION.SDK_INT < 29) emptyList() else systemFiles.values.map { files ->
-        FontName("googlefonts", files.first().nameWithoutExtension.substringBefore('-').replace(Regex("(?<=[a-z])(?=[A-Z])"), " "))
-    }.sortedBy { it.family.lowercase() }
+        FontName("googlefonts", app.absentmotion.platform.systemFontFamily(files.first())
+            ?: files.first().nameWithoutExtension.substringBefore('-').replace(Regex("(?<=[a-z])(?=[A-Z])"), " "))
+    }.filterNot { it.family.startsWith(".") }.distinctBy { familyKey(it.family) }.sortedWith(compareBy({ it.family.startsWith("Noto") }, { it.family.lowercase() }))
     private val googleList = File(this.context.cacheDir, "google-fonts.json")
     private var googleListFailed = 0L
     suspend fun googleFonts(): List<GoogleFamily> = withContext(Dispatchers.IO) {

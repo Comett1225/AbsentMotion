@@ -10027,6 +10027,63 @@
      "label": "Recadrage"
     }
    }
+  },
+  "warmglow": {
+   "description": "Floute le calque et garde, dans chaque couleur, la plus sombre des valeurs entre le flou et l'image, si bien que les ombres se répandent doucement dans les parties claires. Masque limite l'effet à un rectangle, une ellipse ou un polygone.",
+   "name": "Lueur chaude",
+   "params": {
+    "blur": {
+     "label": "Niveau"
+    },
+    "mask": {
+     "label": "Masque",
+     "options": [
+      "Aucun",
+      "Rectangle",
+      "Ellipse",
+      "Polygone"
+     ]
+    },
+    "maskCenter": {
+     "label": "Position du masque"
+    },
+    "maskWidth": {
+     "label": "Largeur du masque"
+    },
+    "maskHeight": {
+     "label": "Hauteur du masque"
+    },
+    "sides": {
+     "label": "Côtés"
+    },
+    "feather": {
+     "label": "Contour progressif"
+    }
+   }
+  },
+  "brokenglass": {
+   "description": "Brise l'image comme une vitre frappée près du centre : des fissures partent du point d'impact et chaque éclat est un peu décalé et tourné. Éclats règle en combien de morceaux elle se brise et jusqu'où ils bougent.",
+   "name": "Verre brisé",
+   "params": {
+    "debris": {
+     "label": "Éclats"
+    }
+   }
+  },
+  "stabilizer": {
+   "description": "Stabilise un calque vidéo tremblant. Choisissez Faible, Moyen ou Élevé : le mouvement de la caméra du clip est mesuré une seule fois et conservé avec le projet ; l'image est ensuite déplacée et tournée à l'inverse des secousses, avec juste assez de zoom pour cacher les bords. Les niveaux élevés stabilisent davantage l'image.",
+   "name": "Stabilisateur",
+   "params": {
+    "stabilization": {
+     "label": "Stabilisation",
+     "options": [
+      "Désactivé",
+      "Faible",
+      "Moyen",
+      "Élevé"
+     ]
+    }
+   }
   }
  }
 }

@@ -10027,6 +10027,63 @@
      "label": "Corte"
     }
    }
+  },
+  "warmglow": {
+   "description": "Desfoca a camada e mantém em cada cor o mais escuro entre o desfoque e a imagem, de modo que as sombras se espalham suavemente pelas partes claras. Máscara limita o efeito a um retângulo, uma elipse ou um polígono.",
+   "name": "Brilho quente",
+   "params": {
+    "blur": {
+     "label": "Nível"
+    },
+    "mask": {
+     "label": "Máscara",
+     "options": [
+      "Nenhum",
+      "Retângulo",
+      "Elipse",
+      "Polígono"
+     ]
+    },
+    "maskCenter": {
+     "label": "Posição da máscara"
+    },
+    "maskWidth": {
+     "label": "Largura da máscara"
+    },
+    "maskHeight": {
+     "label": "Altura da máscara"
+    },
+    "sides": {
+     "label": "Lados"
+    },
+    "feather": {
+     "label": "Suavidade"
+    }
+   }
+  },
+  "brokenglass": {
+   "description": "Estilhaça a imagem como um vidro atingido perto do meio: rachaduras saem do ponto de impacto e cada caco é deslocado e girado um pouco. Estilhaços define em quantos pedaços ela quebra e o quanto eles se movem.",
+   "name": "Vidro quebrado",
+   "params": {
+    "debris": {
+     "label": "Estilhaços"
+    }
+   }
+  },
+  "stabilizer": {
+   "description": "Estabiliza uma camada de vídeo tremida. Escolha Baixa, Média ou Alta e o movimento da câmera do clipe é medido uma vez e salvo com o projeto; depois a imagem é movida e girada contra a tremedeira, com o zoom justo para esconder as bordas. Níveis mais altos deixam a imagem mais estável.",
+   "name": "Estabilizador",
+   "params": {
+    "stabilization": {
+     "label": "Estabilização",
+     "options": [
+      "Desligado",
+      "Baixa",
+      "Média",
+      "Alta"
+     ]
+    }
+   }
   }
  }
 }

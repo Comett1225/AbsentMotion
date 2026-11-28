@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.ui.draw.clip
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,6 +27,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.key
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.runtime.withFrameNanos
@@ -56,6 +59,7 @@ import app.absentmotion.ui.theme.enterFade
 import app.absentmotion.ui.theme.presence
 import app.absentmotion.editor.FullColor
 import androidx.compose.runtime.remember
+import app.absentmotion.model.mediaUris
 import androidx.compose.ui.res.stringResource
 import app.absentmotion.R
 import app.absentmotion.ui.tutorial.tutorialGuard
@@ -93,6 +97,8 @@ fun EditorScreen(state: EditorState, onExit: () -> Unit) {
             val color = remember { arrayOfNulls<FullColor>(1) }.also { if (state.fullColor != null) it[0] = state.fullColor }[0]
             Presence(state.fullColor != null) { color?.let { PhoneScreen(onDismiss = { state.endGesture(); state.fullColor = null }, title = stringResource(R.string.color), onConfirm = { state.endGesture(); state.fullColor = null }) { Box(Modifier.fillMaxSize().presence(rise = 16.dp)) { FullColorPicker(state, it) } } } }
             if (state.cameraOpen) EditorCamera(state, scope)
+            if (state.captionsOpen) CaptionsSheet(state) { state.captionsOpen = false }
+            if (deskLayout) SourcePickBar(state, Modifier.align(Alignment.BottomCenter).padding(16.dp).widthIn(max = 560.dp).fillMaxWidth().clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp)))
         }
     }
 }
@@ -147,6 +153,7 @@ private fun EditorBody(state: EditorState, onExit: () -> Unit) {
             containerColor = Am.Field,
         )
     }
+    MissingMediaCheck(state)
     if (deskLayout) {
         if (app.absentmotion.platform.PlatformFeatures.desktop) DeskWorkspace(state, onExit, addLibrary)
         else Column(Modifier.fillMaxSize().background(Am.TopBar).windowInsetsPadding(androidx.compose.foundation.layout.WindowInsets.safeDrawing)) {
@@ -211,8 +218,10 @@ private fun SlideOver(open: Boolean, content: @Composable () -> Unit) {
 private fun PhoneEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: AddLibrary) {
         androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxSize().background(Am.TopBar).systemBarsPadding().displayCutoutPadding().imePadding()) {
             val available = maxHeight
+            val shown = remember { state.bodyShown }
+            SideEffect { state.bodyShown = true }
             Column(Modifier.fillMaxSize()) {
-                EditorTopBar(state, onExit, Modifier.fillMaxWidth().height(42.dp).enterFade().tutorialGuard(any = true))
+                EditorTopBar(state, onExit, Modifier.fillMaxWidth().height(42.dp).enterFade(skip = shown).tutorialGuard(any = true))
                 Box(Modifier.fillMaxWidth().weight(1f).tutorialTarget("preview")) {
                     Preview(state, Modifier.fillMaxSize())
                     (state.drawing as? app.absentmotion.editor.PointMode)?.let { PointOverlay(state, it, Modifier.fillMaxSize()) }
@@ -221,7 +230,7 @@ private fun PhoneEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: 
                     if (state.settings.transitionInPreview) TransitionButton(state, Modifier.align(Alignment.BottomStart).padding(12.dp).tutorialTarget("transition"))
                     HistoryNotes(state, Modifier.align(Alignment.BottomCenter))
                 }
-                Box(Modifier.fillMaxWidth().height(46.dp).enterFade().tutorialTarget("playbar")) {
+                Box(Modifier.fillMaxWidth().height(46.dp).enterFade(skip = shown).tutorialTarget("playbar")) {
                     PlayBar(state, Modifier.fillMaxSize().tutorialGuard(any = true))
                     LevelMeter(state, Modifier.align(Alignment.BottomStart).fillMaxWidth().height(2.1.dp))
                 }
@@ -230,7 +239,7 @@ private fun PhoneEditorBody(state: EditorState, onExit: () -> Unit, addLibrary: 
                 val lower = lowerPanelHeight(available, wanted)
                 val scroll = androidx.compose.foundation.rememberScrollState()
                 LaunchedEffect(scroll) { androidx.compose.runtime.snapshotFlow { scroll.maxValue }.collect { scroll.scrollTo(it) } }
-                Box(Modifier.fillMaxWidth().height(lower).enterFade().background(Am.TimelineBg).tutorialTarget("timeline").verticalScroll(scroll, enabled = lower < wanted)) {
+                Box(Modifier.fillMaxWidth().height(lower).enterFade(skip = shown).background(Am.TimelineBg).tutorialTarget("timeline").verticalScroll(scroll, enabled = lower < wanted)) {
                     Box(Modifier.fillMaxWidth().height(wanted)) {
                         Timeline(state, Modifier.fillMaxSize())
                         LowerPanels(state, addLibrary)
@@ -250,6 +259,7 @@ private val MinLower = 140.dp
 internal fun LowerPanels(state: EditorState, addLibrary: AddLibrary, top: Boolean = false, transitionHere: Boolean = true) {
     Swap(
         when {
+            state.sourcePick != null -> "pick"
             state.drawing is app.absentmotion.editor.PointMode -> "points"
             state.addOpen -> "add"
             MultiSelect.active -> "multi"
@@ -262,6 +272,7 @@ internal fun LowerPanels(state: EditorState, addLibrary: AddLibrary, top: Boolea
         val lower = Modifier.align(if (top) Alignment.TopCenter else Alignment.BottomCenter).fillMaxWidth().pointerInput(Unit) {}.tutorialGuard(any = true)
         val tall = top && !state.easingOpen && (state.panel == EditorPanel.Blending || state.panel == EditorPanel.Effects || state.panel == EditorPanel.MoveTransform)
         when {
+            state.sourcePick != null -> SourcePickBar(state, lower)
             state.drawing is app.absentmotion.editor.PointMode -> Box(lower.height(PanelHeight).background(Am.Panel).tutorialTarget("panel")) { (state.drawing as? app.absentmotion.editor.PointMode)?.let { PointPanel(state, it) } }
             state.addOpen -> AddPopup(state, lower.height(AddPopupHeight).tutorialTarget("add_panel"), addLibrary)
             MultiSelect.active -> MultiBar(state, lower.height(48.dp))
@@ -344,3 +355,26 @@ private fun Playback(state: EditorState) {
 
 internal fun previewFrameOffset(elapsedNanos: Long, fps: Int, speed: Int): Int =
     ((elapsedNanos.toDouble() * fps * speed / 4.0 + 250_000_000.0) / 1_000_000_000.0).toInt()
+
+@Composable
+private fun MissingMediaCheck(state: EditorState) {
+    val context = LocalContext.current
+    var names by remember { mutableStateOf<List<String>>(emptyList()) }
+    LaunchedEffect(state) {
+        val scene = state.scene
+        val gone = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+            scene.node.mediaUris().filterTo(HashSet()) { uri ->
+                runCatching { context.contentResolver.openAssetFileDescriptor(app.absentmotion.platform.Uri.parse(uri), "r")?.close() == null }.getOrDefault(true)
+            }
+        }
+        state.missingMedia = gone
+        names = gone.map { scene.media(it)?.filename?.ifEmpty { null } ?: it.substringAfterLast('/') }.sorted()
+    }
+    if (names.isNotEmpty()) androidx.compose.material3.AlertDialog(
+        onDismissRequest = { names = emptyList() },
+        title = { Text(stringResource(R.string.export_missing_title), color = Am.OnDark) },
+        text = { Text(stringResource(R.string.editor_missing_media, names.joinToString("\n")), color = Am.OnDark) },
+        confirmButton = { DialogPill(stringResource(R.string.ok)) { names = emptyList() } },
+        containerColor = Am.Field,
+    )
+}

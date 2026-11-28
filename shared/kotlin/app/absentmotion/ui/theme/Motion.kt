@@ -86,7 +86,8 @@ fun Modifier.fadeBackground(on: Boolean, color: Color): Modifier {
 }
 
 @Composable
-fun Modifier.enterFade(rise: Dp = 0.dp, delayMs: Int = 0): Modifier {
+fun Modifier.enterFade(rise: Dp = 0.dp, delayMs: Int = 0, skip: Boolean = false): Modifier {
+    if (skip) return this
     val p = remember { Animatable(0f) }
     LaunchedEffect(Unit) { p.animateTo(1f, tween(Motion.EnterMs, delayMs, Motion.EaseOut)) }
     val risePx = with(LocalDensity.current) { rise.toPx() }

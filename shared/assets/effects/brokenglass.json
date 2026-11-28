@@ -1,0 +1,19 @@
+{
+ "id": "brokenglass",
+ "name": "Broken Glass",
+ "category": "distort",
+ "since": "5.4.0",
+ "description": "Shatters the picture like a pane of glass hit near the middle: cracks run out from the impact point and each shard is shifted and turned a little. Debris sets how many pieces it breaks into and how far they move.",
+ "params": [
+  {
+   "id": "debris",
+   "label": "Debris",
+   "type": "float",
+   "default": 15,
+   "min": 1,
+   "max": 30,
+   "step": 1
+  }
+ ],
+ "sksl": "uniform shader image;\nuniform float2 size;\nuniform float time;\nuniform float debris;\nfloat2 hash22(float2 p) {\n    float3 q = fract(float3(p.xyx) * float3(0.1031, 0.1030, 0.0973));\n    q += dot(q, q.yzx + 33.33);\n    return fract((q.xx + q.yz) * q.zy);\n}\nhalf4 main(float2 coord) {\n    if (coord.x < 0.0 || coord.y < 0.0 || coord.x > size.x || coord.y > size.y) return image.eval(coord);\n    float s = max(min(size.x, size.y), 1.0);\n    float k = clamp(debris, 1.0, 30.0);\n    float n = floor(4.0 + k * 0.75);\n    float scale = n / 6.2831853;\n    float2 c = float2(0.47, 0.44) * size;\n    float2 d = coord - c;\n    float r = length(d);\n    float r0 = 0.03 * s;\n    float2 w = float2(log(r + r0) * scale, (atan(d.y, d.x) / 6.2831853 + 0.5) * n);\n    float2 cell = floor(w);\n    float2 f = w - cell;\n    float best = 8.0;\n    float2 nearest = float2(0.0);\n    float2 piece = float2(0.0);\n    float2 seat = float2(0.0);\n    for (int j = -1; j <= 1; j++) {\n        for (int i = -1; i <= 1; i++) {\n            float2 g = float2(float(i), float(j));\n            float2 id = float2(cell.x + g.x, mod(cell.y + g.y, n));\n            float2 o = 0.15 + 0.7 * hash22(id + 3.17);\n            float2 v = g + o - f;\n            float dd = dot(v, v);\n            if (dd < best) { best = dd; nearest = v; piece = id; seat = cell + g + o; }\n        }\n    }\n    float edge = 8.0;\n    for (int j = -2; j <= 2; j++) {\n        for (int i = -2; i <= 2; i++) {\n            float2 g = float2(float(i), float(j));\n            float2 id = float2(cell.x + g.x, mod(cell.y + g.y, n));\n            float2 v = g + 0.15 + 0.7 * hash22(id + 3.17) - f;\n            float2 diff = v - nearest;\n            if (dot(diff, diff) > 0.00001) edge = min(edge, dot(0.5 * (nearest + v), normalize(diff)));\n        }\n    }\n    float rs = max(exp(seat.x / scale) - r0, 0.0);\n    float ang = (seat.y / n - 0.5) * 6.2831853;\n    float2 way = float2(cos(ang), sin(ang));\n    float2 centre = c + rs * way;\n    float2 h = hash22(piece + 17.31);\n    float2 h2 = hash22(piece + 41.73);\n    float amp = s * (0.004 + 0.0012 * k);\n    float2 shift = way * amp * (0.4 + 0.8 * h.x) + float2(-way.y, way.x) * amp * (h.y - 0.5);\n    float turn = (h2.x - 0.5) * 2.0 * radians(0.8 + 0.15 * k);\n    float2 q = coord - centre - shift;\n    float cs = cos(turn), sn = sin(turn);\n    float2 from = centre + float2(cs * q.x + sn * q.y, -sn * q.x + cs * q.y);\n    half4 col = image.eval(clamp(from, float2(0.5), size - 0.5));\n    float3 rgb = float3(col.rgb) * (1.0 + (h2.y - 0.5) * 0.16);\n    float px = edge * (r + r0) / scale;\n    float lw = max(1.2, s / 600.0);\n    float core = 1.0 - smoothstep(lw * 0.35, lw, px);\n    float rim = (1.0 - smoothstep(lw, lw * 3.0, px)) * (1.0 - core);\n    rgb = mix(rgb * (1.0 - 0.3 * rim), float3(0.93) * float(col.a), 0.8 * core);\n    return half4(half3(min(rgb, float3(col.a))), col.a);\n}\n"
+}

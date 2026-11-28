@@ -70,6 +70,37 @@ class NativeFxTest {
         assertEquals(440.0, crossings(AudioFx.of(FxKind.Voice)).toDouble(), 3.0)
     }
 
+    @Test fun vibratoSwingsThePitchAroundTheNote() {
+        val r = 48_000
+        fun ups(fx: AudioFx): List<Int> {
+            val buf = sine(440.0, r, 2.0, 0.2)
+            chain(r, fx).use { it.process(buf, 2 * r) }
+            return (r / 2 until 2 * r).filter { buf[2 * it - 2] < 0f && buf[2 * it] >= 0f }
+        }
+        fun periods(at: List<Int>) = at.zipWithNext { a, b -> r.toDouble() / (b - a) }
+        assertTrue(periods(ups(AudioFx.of(FxKind.Vibrato, "depth" to 0f))).all { abs(it - 440) < 12 })
+        val swung = ups(AudioFx.of(FxKind.Vibrato, "rate" to 4f, "depth" to 1f))
+        assertEquals(440.0, (swung.size - 1) * r.toDouble() / (swung.last() - swung.first()), 2.0)
+        assertTrue("${periods(swung).max()} ${periods(swung).min()}", periods(swung).max() > 470 && periods(swung).min() < 412)
+    }
+
+    @Test fun ringModulatorMovesATone() {
+        val r = 48_000
+        fun level(buf: FloatArray, hz: Double): Double {
+            var re = 0.0
+            var im = 0.0
+            for (i in r / 2 until r) { re += buf[2 * i] * kotlin.math.cos(2 * PI * hz * i / r); im += buf[2 * i] * sin(2 * PI * hz * i / r) }
+            return 2 * kotlin.math.hypot(re, im) / (r / 2)
+        }
+        val ringing = sine(1000.0, r, 1.0, 0.4).also { chain(r, AudioFx.of(FxKind.RingModulator, "freq" to 200f)).use { fx -> fx.process(it, r) } }
+        assertEquals(0.2, level(ringing, 800.0), 0.01)
+        assertEquals(0.2, level(ringing, 1200.0), 0.01)
+        assertTrue(level(ringing, 1000.0) < 0.005)
+        val half = sine(1000.0, r, 1.0, 0.4).also { chain(r, AudioFx.of(FxKind.RingModulator, "freq" to 200f).withMix(0.5f)).use { fx -> fx.process(it, r) } }
+        assertEquals(0.2, level(half, 1000.0), 0.01)
+        assertEquals(0.1, level(half, 800.0), 0.01)
+    }
+
     @Test fun mixAndBypassLeaveTheSoundDry() {
         val r = 44_100
         for (fx in listOf(AudioFx.of(FxKind.Eq, "lowGain" to 12f).withMix(0f), AudioFx.of(FxKind.Eq, "lowGain" to 12f).withBypass(true))) {

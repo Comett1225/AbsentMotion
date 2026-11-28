@@ -12,6 +12,7 @@ import app.absentmotion.model.copyLayers
 import app.absentmotion.model.withEffect
 import app.absentmotion.model.mapMediaUris
 import app.absentmotion.model.effects
+import app.absentmotion.editor.withStabPathsFollowing
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -245,6 +246,13 @@ class VideoBackgroundTest {
         val catalog = EffectCatalog.parse { File("../shared/assets/effects", it).inputStream() }
         val expected = catalog.definitions.filter { it.category in setOf("move", "distort", "repeat", "3d") }.map { it.id }.toSet() - setOf("absent.timequant", "absent.pulseopacity")
         assertEquals(expected, MatteFollowedEffects)
+    }
+
+    @Test fun theCutOutKeepsTheStabilizerPathOfItsVideo() {
+        val scene = Scene.parse("""<scene width="100" height="100" fps="30"><shape id="2" startTime="0" endTime="1000" s=".rect" fillType="media" fillVideo="matte.mp4" matteFrame="100,100">
+            <effect id="absent.stabilizer"><stabpath uri="clip.mp4" key="k" path="0 1 2 0.1" zoom="1.1"/></effect></shape></scene>""")
+        val kept = scene.withStabPathsFollowing().layers.single().effects.single().child("stabpath")
+        assertEquals("0 1 2 0.1", kept?.get("path"))
     }
 
     @Test fun copiesKeepTheMaskNoiseLinkedAndMovedMediaRewritesAiMarks() {

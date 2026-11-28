@@ -1,0 +1,9 @@
+New effects: Stabilizer, Warm Glow, Broken Glass, Vibrato and Ring Modulator.
+Toji Motion pack: 143 effects to download in More Effects and the Community.
+Speed for text, null and group layers.
+Installed fonts show up in the font list.
+Missing clips show a warning and a Ø on the timeline.
+New Settings page, Create theme and selection colors.
+Pick caption sources in the editor.
+Box and Flip look the same as in Alight Motion.
+Fixes for SVG, Remove Background, Tile and the eyedropper.

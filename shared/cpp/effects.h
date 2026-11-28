@@ -36,7 +36,7 @@ public:
     bool turnCorners(const Layer& layer, double timeMs, SkPoint corners[4]) const;
     bool draw(SkCanvas* canvas, const Scene& scene, const Layer& layer, double timeMs, const SkRect& area, const SkMatrix& placed,
               const std::function<void(SkCanvas*)>& source, const std::function<void(SkCanvas*)>& below, const Grab& grab = nullptr,
-              const Upload& upload = nullptr) const;
+              const Upload& upload = nullptr, float sourceInset = 0) const;
     void forgetHeld();
 
 private:
@@ -72,7 +72,7 @@ private:
     bool mayDiffuse(const LayerEffect& e, const Definition* d) const;
     sk_sp<SkImageFilter> chain(const Scene& scene, const Layer& layer, double timeMs, const SkRect& area, const SkRect& seen,
                                const SkRect& drawn, const SkMatrix& placed, sk_sp<SkImageFilter> content, sk_sp<SkImageFilter> below,
-                               int before = -1, int from = -1, const SkRect* window = nullptr) const;
+                               int before = -1, int from = -1, const SkRect* window = nullptr, float sourceInset = 0) const;
     bool reaches(const Layer& layer) const;
     sk_sp<SkImage> held(SkCanvas* canvas, const Scene& scene, const Layer& layer, double timeMs, const SkRect& bounds, SkIRect* taken,
                         SkIRect* subset, SkMatrix* fromDevice) const;

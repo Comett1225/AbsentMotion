@@ -1,0 +1,22 @@
+{
+ "id": "stabilizer",
+ "name": "Stabilizer",
+ "category": "move",
+ "since": "5.4.0",
+ "native": true,
+ "description": "Steadies a shaky video layer. Pick Low, Medium or High and the clip's camera movement is measured once and kept with the project; the picture is then moved and turned against the shake, with just enough zoom to hide the edges. Higher levels keep the picture steadier.",
+ "params": [
+  {
+   "id": "stabilization",
+   "label": "Stabilization",
+   "type": "choice",
+   "default": 0,
+   "options": [
+    "Off",
+    "Low",
+    "Medium",
+    "High"
+   ]
+  }
+ ]
+}

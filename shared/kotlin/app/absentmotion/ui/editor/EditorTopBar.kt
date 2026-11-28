@@ -78,7 +78,7 @@ fun EditorTopBar(state: EditorState, onExit: () -> Unit, modifier: Modifier = Mo
             PointTopBar(state, it, modifier)
             return
         }
-        if (MultiSelect.active) {
+        if (MultiSelect.active && state.sourcePick == null) {
             MultiTopBar(state, modifier)
             return
         }

@@ -8,6 +8,7 @@ import app.absentmotion.model.Scene
 import app.absentmotion.model.SvgImport
 import app.absentmotion.model.contours
 import app.absentmotion.model.importSvg
+import app.absentmotion.model.nestedTime
 import app.absentmotion.model.parseColor
 import app.absentmotion.model.parseSvgColor
 import app.absentmotion.model.parseSvgPath
@@ -111,6 +112,26 @@ class SvgImportTest {
         assertEquals(1f, g["end"]!!.split(',')[0].toFloat(), 1e-3f)
         assertTrue(result.skipped.contains(txt(R.string.model_svg_skipped_text)))
         assertTrue(result.skipped.contains(txt(R.string.model_svg_skipped_gradient_colours)))
+    }
+
+    @Test fun aLengthenedSvgGroupKeepsShowingEveryShape() {
+        val top = import("""
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+              <rect width="10" height="10" fill="#f00"/>
+              <g><rect x="50" width="10" height="10" fill="#0f0"/><rect x="70" width="10" height="10" fill="#00f"/></g>
+            </svg>
+        """).layer!!
+        val long = Layer(top.node.with("endTime", "5000"))
+        for (at in listOf(500.0, 1990.0, 2500.0, 4900.0)) {
+            val inner = long.nestedTime(at, host.fps).ms
+            for (child in long.nested!!.layers) {
+                assertTrue("${child.label} hidden at $at", child.activeAt(inner.toInt()))
+                if (child.kind == "embedScene") {
+                    val deeper = child.nestedTime(inner, host.fps).ms.toInt()
+                    assertTrue("nested shapes hidden at $at", child.nested!!.layers.all { it.activeAt(deeper) })
+                }
+            }
+        }
     }
 
     @Test fun groupTransformsAreAppliedToTheShapes() {

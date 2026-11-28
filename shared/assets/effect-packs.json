@@ -1,0 +1,1031 @@
+{
+ "format": "absentmotion-community",
+ "version": 2,
+ "items": [
+  {
+   "kind": "effect",
+   "name": "toji-motion",
+   "title": "Toji Motion",
+   "creator": "Toji Motion",
+   "description": "143 effects by the modders Toji Motion and Tanryu: glows, glitches, 3D looks, particles, distortions, colour looks and more.",
+   "tags": [
+    "Glow",
+    "Glitch",
+    "3D",
+    "Particles",
+    "Distort",
+    "Color"
+   ],
+   "added": "2026-11-28T12:22:06Z",
+   "file": "effects/toji-motion/toji-motion.abmfx",
+   "bytes": 183854,
+   "sha256": "95157354dabd172d6ba6dccbfef83e269e3be46810ef3f704039a6ad3f964deb",
+   "minVersion": 61,
+   "credit": "Effects by Toji Motion and Tanryu, collected by anxyis (anxy-patches), GPL-3.0",
+   "contents": [
+    {
+     "id": "toji-motion.3-color-gradient",
+     "name": "3 Color Gradient+",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/3-color-gradient.webp",
+     "hero": "effects/toji-motion/thumbs/3-color-gradient.hero.webp"
+    },
+    {
+     "id": "toji-motion.360-floor-grid",
+     "name": "360° Floor Grid",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/360-floor-grid.webp",
+     "hero": "effects/toji-motion/thumbs/360-floor-grid.hero.webp"
+    },
+    {
+     "id": "toji-motion.3d-ball",
+     "name": "3D Ball",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/3d-ball.webp",
+     "hero": "effects/toji-motion/thumbs/3d-ball.hero.webp"
+    },
+    {
+     "id": "toji-motion.3d-bevel",
+     "name": "3D Bevel",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/3d-bevel.webp",
+     "hero": "effects/toji-motion/thumbs/3d-bevel.hero.webp"
+    },
+    {
+     "id": "toji-motion.3d-chrome",
+     "name": "3D Chrome",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/3d-chrome.webp",
+     "hero": "effects/toji-motion/thumbs/3d-chrome.hero.webp"
+    },
+    {
+     "id": "toji-motion.3d-cube",
+     "name": "3D Cube",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/3d-cube.webp",
+     "hero": "effects/toji-motion/thumbs/3d-cube.hero.webp"
+    },
+    {
+     "id": "toji-motion.3d-cylinder",
+     "name": "3D Cylinder",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/3d-cylinder.webp",
+     "hero": "effects/toji-motion/thumbs/3d-cylinder.hero.webp"
+    },
+    {
+     "id": "toji-motion.3d-displace",
+     "name": "3D Displace",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/3d-displace.webp",
+     "hero": "effects/toji-motion/thumbs/3d-displace.hero.webp"
+    },
+    {
+     "id": "toji-motion.3d-dome",
+     "name": "3D Dome",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/3d-dome.webp",
+     "hero": "effects/toji-motion/thumbs/3d-dome.hero.webp"
+    },
+    {
+     "id": "toji-motion.3d-donut",
+     "name": "3D Donut",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/3d-donut.webp",
+     "hero": "effects/toji-motion/thumbs/3d-donut.hero.webp"
+    },
+    {
+     "id": "toji-motion.3d-flip",
+     "name": "3D Flip",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/3d-flip.webp",
+     "hero": "effects/toji-motion/thumbs/3d-flip.hero.webp"
+    },
+    {
+     "id": "toji-motion.3d-fold",
+     "name": "3D Fold",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/3d-fold.webp",
+     "hero": "effects/toji-motion/thumbs/3d-fold.hero.webp"
+    },
+    {
+     "id": "toji-motion.3d-glass",
+     "name": "3D Glass",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/3d-glass.webp",
+     "hero": "effects/toji-motion/thumbs/3d-glass.hero.webp"
+    },
+    {
+     "id": "toji-motion.3d-normal-light",
+     "name": "3D Normal Light",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/3d-normal-light.webp",
+     "hero": "effects/toji-motion/thumbs/3d-normal-light.hero.webp"
+    },
+    {
+     "id": "toji-motion.3d-particles",
+     "name": "3D Particles",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/3d-particles.webp",
+     "hero": "effects/toji-motion/thumbs/3d-particles.hero.webp"
+    },
+    {
+     "id": "toji-motion.3d-pop-out",
+     "name": "3D Pop Out",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/3d-pop-out.webp",
+     "hero": "effects/toji-motion/thumbs/3d-pop-out.hero.webp"
+    },
+    {
+     "id": "toji-motion.3d-relief",
+     "name": "3D Relief",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/3d-relief.webp",
+     "hero": "effects/toji-motion/thumbs/3d-relief.hero.webp"
+    },
+    {
+     "id": "toji-motion.3d-rotate",
+     "name": "3D Rotate",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/3d-rotate.webp",
+     "hero": "effects/toji-motion/thumbs/3d-rotate.hero.webp"
+    },
+    {
+     "id": "toji-motion.3d-shatter",
+     "name": "3D Shatter",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/3d-shatter.webp",
+     "hero": "effects/toji-motion/thumbs/3d-shatter.hero.webp"
+    },
+    {
+     "id": "toji-motion.3d-sphere",
+     "name": "3D Sphere",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/3d-sphere.webp",
+     "hero": "effects/toji-motion/thumbs/3d-sphere.hero.webp"
+    },
+    {
+     "id": "toji-motion.3d-spiral",
+     "name": "3D Spiral",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/3d-spiral.webp",
+     "hero": "effects/toji-motion/thumbs/3d-spiral.hero.webp"
+    },
+    {
+     "id": "toji-motion.3d-tilt",
+     "name": "3D Tilt",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/3d-tilt.webp",
+     "hero": "effects/toji-motion/thumbs/3d-tilt.hero.webp"
+    },
+    {
+     "id": "toji-motion.3d-tunnel",
+     "name": "3D Tunnel",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/3d-tunnel.webp",
+     "hero": "effects/toji-motion/thumbs/3d-tunnel.hero.webp"
+    },
+    {
+     "id": "toji-motion.3d-water",
+     "name": "3D Water",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/3d-water.webp",
+     "hero": "effects/toji-motion/thumbs/3d-water.hero.webp"
+    },
+    {
+     "id": "toji-motion.3d-wave-sheet",
+     "name": "3D Wave Sheet",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/3d-wave-sheet.webp",
+     "hero": "effects/toji-motion/thumbs/3d-wave-sheet.hero.webp"
+    },
+    {
+     "id": "toji-motion.anaglyph-3d",
+     "name": "Anaglyph 3D",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/anaglyph-3d.webp",
+     "hero": "effects/toji-motion/thumbs/anaglyph-3d.hero.webp"
+    },
+    {
+     "id": "toji-motion.audio-visualisation",
+     "name": "Audio Visualisation+",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/audio-visualisation.webp",
+     "hero": "effects/toji-motion/thumbs/audio-visualisation.hero.webp"
+    },
+    {
+     "id": "toji-motion.bcc-lensblur",
+     "name": "BCC Lensblur",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/bcc-lensblur.webp",
+     "hero": "effects/toji-motion/thumbs/bcc-lensblur.hero.webp"
+    },
+    {
+     "id": "toji-motion.black-hole",
+     "name": "Black Hole",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/black-hole.webp",
+     "hero": "effects/toji-motion/thumbs/black-hole.hero.webp"
+    },
+    {
+     "id": "toji-motion.blackbar-maker",
+     "name": "BlackBar Maker+",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/blackbar-maker.webp",
+     "hero": "effects/toji-motion/thumbs/blackbar-maker.hero.webp"
+    },
+    {
+     "id": "toji-motion.bloom",
+     "name": "Bloom",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/bloom.webp",
+     "hero": "effects/toji-motion/thumbs/bloom.hero.webp"
+    },
+    {
+     "id": "toji-motion.bokeh-parallax",
+     "name": "Bokeh Parallax",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/bokeh-parallax.webp",
+     "hero": "effects/toji-motion/thumbs/bokeh-parallax.hero.webp"
+    },
+    {
+     "id": "toji-motion.chromatic-aberration",
+     "name": "Chromatic Aberration",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/chromatic-aberration.webp",
+     "hero": "effects/toji-motion/thumbs/chromatic-aberration.hero.webp"
+    },
+    {
+     "id": "toji-motion.color-grid",
+     "name": "Color Grid",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/color-grid.webp",
+     "hero": "effects/toji-motion/thumbs/color-grid.hero.webp"
+    },
+    {
+     "id": "toji-motion.color-splash",
+     "name": "Color Splash",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/color-splash.webp",
+     "hero": "effects/toji-motion/thumbs/color-splash.hero.webp"
+    },
+    {
+     "id": "toji-motion.comet",
+     "name": "Comet",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/comet.webp",
+     "hero": "effects/toji-motion/thumbs/comet.hero.webp"
+    },
+    {
+     "id": "toji-motion.cross-hatch",
+     "name": "Cross Hatch",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/cross-hatch.webp",
+     "hero": "effects/toji-motion/thumbs/cross-hatch.hero.webp"
+    },
+    {
+     "id": "toji-motion.cross-process",
+     "name": "Cross Process",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/cross-process.webp",
+     "hero": "effects/toji-motion/thumbs/cross-process.hero.webp"
+    },
+    {
+     "id": "toji-motion.crt-monitor",
+     "name": "CRT Monitor",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/crt-monitor.webp",
+     "hero": "effects/toji-motion/thumbs/crt-monitor.hero.webp"
+    },
+    {
+     "id": "toji-motion.crystallize",
+     "name": "Crystallize",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/crystallize.webp",
+     "hero": "effects/toji-motion/thumbs/crystallize.hero.webp"
+    },
+    {
+     "id": "toji-motion.depth-fog",
+     "name": "Depth Fog",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/depth-fog.webp",
+     "hero": "effects/toji-motion/thumbs/depth-fog.hero.webp"
+    },
+    {
+     "id": "toji-motion.dolly-zoom",
+     "name": "Dolly Zoom",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/dolly-zoom.webp",
+     "hero": "effects/toji-motion/thumbs/dolly-zoom.hero.webp"
+    },
+    {
+     "id": "toji-motion.dreamy-glow",
+     "name": "Dreamy Glow",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/dreamy-glow.webp",
+     "hero": "effects/toji-motion/thumbs/dreamy-glow.hero.webp"
+    },
+    {
+     "id": "toji-motion.duotone",
+     "name": "Duotone",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/duotone.webp",
+     "hero": "effects/toji-motion/thumbs/duotone.hero.webp"
+    },
+    {
+     "id": "toji-motion.edge-line",
+     "name": "Edge Line",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/edge-line.webp",
+     "hero": "effects/toji-motion/thumbs/edge-line.hero.webp"
+    },
+    {
+     "id": "toji-motion.edge-outline",
+     "name": "Edge Outline",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/edge-outline.webp",
+     "hero": "effects/toji-motion/thumbs/edge-outline.hero.webp"
+    },
+    {
+     "id": "toji-motion.emboss",
+     "name": "Emboss",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/emboss.webp",
+     "hero": "effects/toji-motion/thumbs/emboss.hero.webp"
+    },
+    {
+     "id": "toji-motion.fake-3d",
+     "name": "Fake 3D",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/fake-3d.webp",
+     "hero": "effects/toji-motion/thumbs/fake-3d.hero.webp"
+    },
+    {
+     "id": "toji-motion.film-grain",
+     "name": "Film Grain",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/film-grain.webp",
+     "hero": "effects/toji-motion/thumbs/film-grain.hero.webp"
+    },
+    {
+     "id": "toji-motion.fisheye",
+     "name": "Fisheye",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/fisheye.webp",
+     "hero": "effects/toji-motion/thumbs/fisheye.hero.webp"
+    },
+    {
+     "id": "toji-motion.flame",
+     "name": "Flame",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/flame.webp",
+     "hero": "effects/toji-motion/thumbs/flame.hero.webp"
+    },
+    {
+     "id": "toji-motion.fractal-texture",
+     "name": "Fractal Texture",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/fractal-texture.webp",
+     "hero": "effects/toji-motion/thumbs/fractal-texture.hero.webp"
+    },
+    {
+     "id": "toji-motion.frosted-glass",
+     "name": "Frosted Glass",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/frosted-glass.webp",
+     "hero": "effects/toji-motion/thumbs/frosted-glass.hero.webp"
+    },
+    {
+     "id": "toji-motion.frosted",
+     "name": "Frosted",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/frosted.webp",
+     "hero": "effects/toji-motion/thumbs/frosted.hero.webp"
+    },
+    {
+     "id": "toji-motion.glitch-blocks",
+     "name": "Glitch Blocks",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/glitch-blocks.webp",
+     "hero": "effects/toji-motion/thumbs/glitch-blocks.hero.webp"
+    },
+    {
+     "id": "toji-motion.glitch-pixel",
+     "name": "Glitch Pixel",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/glitch-pixel.webp",
+     "hero": "effects/toji-motion/thumbs/glitch-pixel.hero.webp"
+    },
+    {
+     "id": "toji-motion.glitch-slice",
+     "name": "Glitch Slice",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/glitch-slice.webp",
+     "hero": "effects/toji-motion/thumbs/glitch-slice.hero.webp"
+    },
+    {
+     "id": "toji-motion.glitch-vhs",
+     "name": "Glitch VHS",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/glitch-vhs.webp",
+     "hero": "effects/toji-motion/thumbs/glitch-vhs.hero.webp"
+    },
+    {
+     "id": "toji-motion.glow-border",
+     "name": "Glow Border",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/glow-border.webp",
+     "hero": "effects/toji-motion/thumbs/glow-border.hero.webp"
+    },
+    {
+     "id": "toji-motion.gradient-map-2",
+     "name": "[X] Gradient Map+",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/gradient-map-2.webp",
+     "hero": "effects/toji-motion/thumbs/gradient-map-2.hero.webp"
+    },
+    {
+     "id": "toji-motion.gradient-map",
+     "name": "Gradient Map",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/gradient-map.webp",
+     "hero": "effects/toji-motion/thumbs/gradient-map.hero.webp"
+    },
+    {
+     "id": "toji-motion.gradient-overlay",
+     "name": "[X] Gradient Overlay+",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/gradient-overlay.webp",
+     "hero": "effects/toji-motion/thumbs/gradient-overlay.hero.webp"
+    },
+    {
+     "id": "toji-motion.gradient-shadow",
+     "name": "Gradient Shadow+",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/gradient-shadow.webp",
+     "hero": "effects/toji-motion/thumbs/gradient-shadow.hero.webp"
+    },
+    {
+     "id": "toji-motion.halftone",
+     "name": "Halftone",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/halftone.webp",
+     "hero": "effects/toji-motion/thumbs/halftone.hero.webp"
+    },
+    {
+     "id": "toji-motion.hologram",
+     "name": "Hologram",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/hologram.webp",
+     "hero": "effects/toji-motion/thumbs/hologram.hero.webp"
+    },
+    {
+     "id": "toji-motion.hyperspace-3d",
+     "name": "Hyperspace 3D",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/hyperspace-3d.webp",
+     "hero": "effects/toji-motion/thumbs/hyperspace-3d.hero.webp"
+    },
+    {
+     "id": "toji-motion.invert",
+     "name": "Invert",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/invert.webp",
+     "hero": "effects/toji-motion/thumbs/invert.hero.webp"
+    },
+    {
+     "id": "toji-motion.isoline",
+     "name": "Isoline",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/isoline.webp",
+     "hero": "effects/toji-motion/thumbs/isoline.hero.webp"
+    },
+    {
+     "id": "toji-motion.kaleidoscope",
+     "name": "Kaleidoscope",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/kaleidoscope.webp",
+     "hero": "effects/toji-motion/thumbs/kaleidoscope.hero.webp"
+    },
+    {
+     "id": "toji-motion.lens-flare",
+     "name": "Lens Flare",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/lens-flare.webp",
+     "hero": "effects/toji-motion/thumbs/lens-flare.hero.webp"
+    },
+    {
+     "id": "toji-motion.light-particle",
+     "name": "Light Particle",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/light-particle.webp",
+     "hero": "effects/toji-motion/thumbs/light-particle.hero.webp"
+    },
+    {
+     "id": "toji-motion.light-rays",
+     "name": "Light Rays",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/light-rays.webp",
+     "hero": "effects/toji-motion/thumbs/light-rays.hero.webp"
+    },
+    {
+     "id": "toji-motion.lightning-sky",
+     "name": "Lightning Sky",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/lightning-sky.webp",
+     "hero": "effects/toji-motion/thumbs/lightning-sky.hero.webp"
+    },
+    {
+     "id": "toji-motion.linescape",
+     "name": "Linescape",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/linescape.webp",
+     "hero": "effects/toji-motion/thumbs/linescape.hero.webp"
+    },
+    {
+     "id": "toji-motion.liquid-wave",
+     "name": "Liquid Wave",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/liquid-wave.webp",
+     "hero": "effects/toji-motion/thumbs/liquid-wave.hero.webp"
+    },
+    {
+     "id": "toji-motion.long-shadow",
+     "name": "[X] Long Shadow+",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/long-shadow.webp",
+     "hero": "effects/toji-motion/thumbs/long-shadow.hero.webp"
+    },
+    {
+     "id": "toji-motion.luma-stamper",
+     "name": "[X] Luma Stamper+",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/luma-stamper.webp",
+     "hero": "effects/toji-motion/thumbs/luma-stamper.hero.webp"
+    },
+    {
+     "id": "toji-motion.magic-colortint",
+     "name": "Magic Colortint",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/magic-colortint.webp",
+     "hero": "effects/toji-motion/thumbs/magic-colortint.hero.webp"
+    },
+    {
+     "id": "toji-motion.meteor",
+     "name": "Meteor",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/meteor.webp",
+     "hero": "effects/toji-motion/thumbs/meteor.hero.webp"
+    },
+    {
+     "id": "toji-motion.mirror",
+     "name": "Mirror",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/mirror.webp",
+     "hero": "effects/toji-motion/thumbs/mirror.hero.webp"
+    },
+    {
+     "id": "toji-motion.money-filter",
+     "name": "Money Filter",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/money-filter.webp",
+     "hero": "effects/toji-motion/thumbs/money-filter.hero.webp"
+    },
+    {
+     "id": "toji-motion.mosaic",
+     "name": "Mosaic",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/mosaic.webp",
+     "hero": "effects/toji-motion/thumbs/mosaic.hero.webp"
+    },
+    {
+     "id": "toji-motion.multigradient-map",
+     "name": "MultiGradient Map+",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/multigradient-map.webp",
+     "hero": "effects/toji-motion/thumbs/multigradient-map.hero.webp"
+    },
+    {
+     "id": "toji-motion.neon-edge-glow",
+     "name": "Neon Edge Glow",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/neon-edge-glow.webp",
+     "hero": "effects/toji-motion/thumbs/neon-edge-glow.hero.webp"
+    },
+    {
+     "id": "toji-motion.neon-grid",
+     "name": "Neon Grid",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/neon-grid.webp",
+     "hero": "effects/toji-motion/thumbs/neon-grid.hero.webp"
+    },
+    {
+     "id": "toji-motion.new-colorize",
+     "name": "New Colorize",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/new-colorize.webp",
+     "hero": "effects/toji-motion/thumbs/new-colorize.hero.webp"
+    },
+    {
+     "id": "toji-motion.new-colortemp",
+     "name": "New ColorTemp",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/new-colortemp.webp",
+     "hero": "effects/toji-motion/thumbs/new-colortemp.hero.webp"
+    },
+    {
+     "id": "toji-motion.new-lensflare",
+     "name": "New Lensflare",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/new-lensflare.webp",
+     "hero": "effects/toji-motion/thumbs/new-lensflare.hero.webp"
+    },
+    {
+     "id": "toji-motion.night-vision",
+     "name": "Night Vision",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/night-vision.webp",
+     "hero": "effects/toji-motion/thumbs/night-vision.hero.webp"
+    },
+    {
+     "id": "toji-motion.oil-painting",
+     "name": "Oil Painting",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/oil-painting.webp",
+     "hero": "effects/toji-motion/thumbs/oil-painting.hero.webp"
+    },
+    {
+     "id": "toji-motion.old-colorbalance",
+     "name": "Old ColorBalance",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/old-colorbalance.webp",
+     "hero": "effects/toji-motion/thumbs/old-colorbalance.hero.webp"
+    },
+    {
+     "id": "toji-motion.old-film",
+     "name": "Old Film",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/old-film.webp",
+     "hero": "effects/toji-motion/thumbs/old-film.hero.webp"
+    },
+    {
+     "id": "toji-motion.ordered-dither",
+     "name": "Ordered Dither",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/ordered-dither.webp",
+     "hero": "effects/toji-motion/thumbs/ordered-dither.hero.webp"
+    },
+    {
+     "id": "toji-motion.page-curl",
+     "name": "Page Curl",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/page-curl.webp",
+     "hero": "effects/toji-motion/thumbs/page-curl.hero.webp"
+    },
+    {
+     "id": "toji-motion.parallax-3d",
+     "name": "Parallax 3D",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/parallax-3d.webp",
+     "hero": "effects/toji-motion/thumbs/parallax-3d.hero.webp"
+    },
+    {
+     "id": "toji-motion.pencil-sketch",
+     "name": "Pencil Sketch",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/pencil-sketch.webp",
+     "hero": "effects/toji-motion/thumbs/pencil-sketch.hero.webp"
+    },
+    {
+     "id": "toji-motion.pinch",
+     "name": "Pinch",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/pinch.webp",
+     "hero": "effects/toji-motion/thumbs/pinch.hero.webp"
+    },
+    {
+     "id": "toji-motion.pixel-sorter",
+     "name": "Pixel Sorter",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/pixel-sorter.webp",
+     "hero": "effects/toji-motion/thumbs/pixel-sorter.hero.webp"
+    },
+    {
+     "id": "toji-motion.plasma-wave",
+     "name": "Plasma Wave",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/plasma-wave.webp",
+     "hero": "effects/toji-motion/thumbs/plasma-wave.hero.webp"
+    },
+    {
+     "id": "toji-motion.plasma",
+     "name": "Plasma",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/plasma.webp",
+     "hero": "effects/toji-motion/thumbs/plasma.hero.webp"
+    },
+    {
+     "id": "toji-motion.polar-coordinates",
+     "name": "Polar Coordinates",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/polar-coordinates.webp",
+     "hero": "effects/toji-motion/thumbs/polar-coordinates.hero.webp"
+    },
+    {
+     "id": "toji-motion.posterize",
+     "name": "Posterize",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/posterize.webp",
+     "hero": "effects/toji-motion/thumbs/posterize.hero.webp"
+    },
+    {
+     "id": "toji-motion.puddle",
+     "name": "Puddle",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/puddle.webp",
+     "hero": "effects/toji-motion/thumbs/puddle.hero.webp"
+    },
+    {
+     "id": "toji-motion.rain",
+     "name": "Rain",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/rain.webp",
+     "hero": "effects/toji-motion/thumbs/rain.hero.webp"
+    },
+    {
+     "id": "toji-motion.rainbow-shift",
+     "name": "Rainbow Shift",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/rainbow-shift.webp",
+     "hero": "effects/toji-motion/thumbs/rainbow-shift.hero.webp"
+    },
+    {
+     "id": "toji-motion.raindrops",
+     "name": "Raindrops",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/raindrops.webp",
+     "hero": "effects/toji-motion/thumbs/raindrops.hero.webp"
+    },
+    {
+     "id": "toji-motion.retro-grid-3d",
+     "name": "Retro Grid 3D",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/retro-grid-3d.webp",
+     "hero": "effects/toji-motion/thumbs/retro-grid-3d.hero.webp"
+    },
+    {
+     "id": "toji-motion.ripple-water",
+     "name": "Ripple Water",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/ripple-water.webp",
+     "hero": "effects/toji-motion/thumbs/ripple-water.hero.webp"
+    },
+    {
+     "id": "toji-motion.scan-wave",
+     "name": "Scan Wave",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/scan-wave.webp",
+     "hero": "effects/toji-motion/thumbs/scan-wave.hero.webp"
+    },
+    {
+     "id": "toji-motion.sepia",
+     "name": "Sepia",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/sepia.webp",
+     "hero": "effects/toji-motion/thumbs/sepia.hero.webp"
+    },
+    {
+     "id": "toji-motion.shatter",
+     "name": "Shatter",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/shatter.webp",
+     "hero": "effects/toji-motion/thumbs/shatter.hero.webp"
+    },
+    {
+     "id": "toji-motion.shockwave",
+     "name": "Shockwave",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/shockwave.webp",
+     "hero": "effects/toji-motion/thumbs/shockwave.hero.webp"
+    },
+    {
+     "id": "toji-motion.smear",
+     "name": "Smear",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/smear.webp",
+     "hero": "effects/toji-motion/thumbs/smear.hero.webp"
+    },
+    {
+     "id": "toji-motion.smoke-particle",
+     "name": "Smoke Particle",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/smoke-particle.webp",
+     "hero": "effects/toji-motion/thumbs/smoke-particle.hero.webp"
+    },
+    {
+     "id": "toji-motion.snow-falling",
+     "name": "Snow Falling",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/snow-falling.webp",
+     "hero": "effects/toji-motion/thumbs/snow-falling.hero.webp"
+    },
+    {
+     "id": "toji-motion.snow",
+     "name": "Snow",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/snow.webp",
+     "hero": "effects/toji-motion/thumbs/snow.hero.webp"
+    },
+    {
+     "id": "toji-motion.snowflake",
+     "name": "Snowflake",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/snowflake.webp",
+     "hero": "effects/toji-motion/thumbs/snowflake.hero.webp"
+    },
+    {
+     "id": "toji-motion.solarize",
+     "name": "Solarize",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/solarize.webp",
+     "hero": "effects/toji-motion/thumbs/solarize.hero.webp"
+    },
+    {
+     "id": "toji-motion.solid-color",
+     "name": "[X] Solid Color+",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/solid-color.webp",
+     "hero": "effects/toji-motion/thumbs/solid-color.hero.webp"
+    },
+    {
+     "id": "toji-motion.sparkle",
+     "name": "Sparkle",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/sparkle.webp",
+     "hero": "effects/toji-motion/thumbs/sparkle.hero.webp"
+    },
+    {
+     "id": "toji-motion.split-tone",
+     "name": "Split Tone",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/split-tone.webp",
+     "hero": "effects/toji-motion/thumbs/split-tone.hero.webp"
+    },
+    {
+     "id": "toji-motion.spotlight",
+     "name": "Spotlight",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/spotlight.webp",
+     "hero": "effects/toji-motion/thumbs/spotlight.hero.webp"
+    },
+    {
+     "id": "toji-motion.starfield",
+     "name": "Starfield",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/starfield.webp",
+     "hero": "effects/toji-motion/thumbs/starfield.hero.webp"
+    },
+    {
+     "id": "toji-motion.swirl",
+     "name": "Swirl+",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/swirl.webp",
+     "hero": "effects/toji-motion/thumbs/swirl.hero.webp"
+    },
+    {
+     "id": "toji-motion.tanryu-beast-3d-camera",
+     "name": "TanRyu Beast 3D Camera",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/tanryu-beast-3d-camera.webp",
+     "hero": "effects/toji-motion/thumbs/tanryu-beast-3d-camera.hero.webp"
+    },
+    {
+     "id": "toji-motion.tanryu-beast-particles-v2",
+     "name": "TanRyu Beast Particles V2",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/tanryu-beast-particles-v2.webp",
+     "hero": "effects/toji-motion/thumbs/tanryu-beast-particles-v2.hero.webp"
+    },
+    {
+     "id": "toji-motion.tanryu-card-dance-ae-style",
+     "name": "TanRyu Card Dance (AE Style)",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/tanryu-card-dance-ae-style.webp",
+     "hero": "effects/toji-motion/thumbs/tanryu-card-dance-ae-style.hero.webp"
+    },
+    {
+     "id": "toji-motion.tanryu-magic-bullet-looks",
+     "name": "TanRyu Magic Bullet Looks",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/tanryu-magic-bullet-looks.webp",
+     "hero": "effects/toji-motion/thumbs/tanryu-magic-bullet-looks.hero.webp"
+    },
+    {
+     "id": "toji-motion.tanryu-ultimate-3d-particles",
+     "name": "TanRyu Ultimate 3D Particles",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/tanryu-ultimate-3d-particles.webp",
+     "hero": "effects/toji-motion/thumbs/tanryu-ultimate-3d-particles.hero.webp"
+    },
+    {
+     "id": "toji-motion.tanryu-ultimate-starfield-3d",
+     "name": "TanRyu Ultimate Starfield 3D",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/tanryu-ultimate-starfield-3d.webp",
+     "hero": "effects/toji-motion/thumbs/tanryu-ultimate-starfield-3d.hero.webp"
+    },
+    {
+     "id": "toji-motion.thermal-vision",
+     "name": "Thermal Vision",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/thermal-vision.webp",
+     "hero": "effects/toji-motion/thumbs/thermal-vision.hero.webp"
+    },
+    {
+     "id": "toji-motion.tone-curve",
+     "name": "Tone Curve",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/tone-curve.webp",
+     "hero": "effects/toji-motion/thumbs/tone-curve.hero.webp"
+    },
+    {
+     "id": "toji-motion.toon-shade",
+     "name": "Toon Shade",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/toon-shade.webp",
+     "hero": "effects/toji-motion/thumbs/toon-shade.hero.webp"
+    },
+    {
+     "id": "toji-motion.tv-analogue",
+     "name": "TV Analogue",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/tv-analogue.webp",
+     "hero": "effects/toji-motion/thumbs/tv-analogue.hero.webp"
+    },
+    {
+     "id": "toji-motion.tv-damage-scanlines",
+     "name": "TV Damage + Scanlines",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/tv-damage-scanlines.webp",
+     "hero": "effects/toji-motion/thumbs/tv-damage-scanlines.hero.webp"
+    },
+    {
+     "id": "toji-motion.twist",
+     "name": "Twist",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/twist.webp",
+     "hero": "effects/toji-motion/thumbs/twist.hero.webp"
+    },
+    {
+     "id": "toji-motion.vhs-retro",
+     "name": "VHS Retro",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/vhs-retro.webp",
+     "hero": "effects/toji-motion/thumbs/vhs-retro.hero.webp"
+    },
+    {
+     "id": "toji-motion.vignette-pro",
+     "name": "Vignette Pro",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/vignette-pro.webp",
+     "hero": "effects/toji-motion/thumbs/vignette-pro.hero.webp"
+    },
+    {
+     "id": "toji-motion.vr-combined",
+     "name": "VR Combined",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/vr-combined.webp",
+     "hero": "effects/toji-motion/thumbs/vr-combined.hero.webp"
+    },
+    {
+     "id": "toji-motion.warp-texture",
+     "name": "Warp Texture+",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/warp-texture.webp",
+     "hero": "effects/toji-motion/thumbs/warp-texture.hero.webp"
+    },
+    {
+     "id": "toji-motion.wipe",
+     "name": "[X] Wipe+",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/wipe.webp",
+     "hero": "effects/toji-motion/thumbs/wipe.hero.webp"
+    },
+    {
+     "id": "toji-motion.wobble",
+     "name": "Wobble",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/wobble.webp",
+     "hero": "effects/toji-motion/thumbs/wobble.hero.webp"
+    },
+    {
+     "id": "toji-motion.zig-zag",
+     "name": "Zig Zag",
+     "version": 1,
+     "thumbnail": "effects/toji-motion/thumbs/zig-zag.webp",
+     "hero": "effects/toji-motion/thumbs/zig-zag.hero.webp"
+    }
+   ],
+   "official": true
+  }
+ ]
+}

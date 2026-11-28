@@ -10027,6 +10027,63 @@
      "label": "Uitsnijden"
     }
    }
+  },
+  "warmglow": {
+   "description": "Vervaagt de laag en houdt per kleur het donkerste van de vervaging en het beeld, zodat schaduwen zacht in de heldere delen uitlopen. Masker beperkt het effect tot een rechthoek, een ellips of een veelhoek.",
+   "name": "Warme gloed",
+   "params": {
+    "blur": {
+     "label": "Niveau"
+    },
+    "mask": {
+     "label": "Masker",
+     "options": [
+      "Geen",
+      "Rechthoek",
+      "Ellips",
+      "Veelhoek"
+     ]
+    },
+    "maskCenter": {
+     "label": "Maskerpositie"
+    },
+    "maskWidth": {
+     "label": "Maskerbreedte"
+    },
+    "maskHeight": {
+     "label": "Maskerhoogte"
+    },
+    "sides": {
+     "label": "Zijden"
+    },
+    "feather": {
+     "label": "Zachte rand"
+    }
+   }
+  },
+  "brokenglass": {
+   "description": "Laat het beeld versplinteren als een ruit die bij het midden is geraakt: scheuren lopen uit vanaf het inslagpunt en elke scherf schuift en draait een beetje. Scherven bepaalt in hoeveel stukken het breekt en hoe ver ze bewegen.",
+   "name": "Gebroken glas",
+   "params": {
+    "debris": {
+     "label": "Scherven"
+    }
+   }
+  },
+  "stabilizer": {
+   "description": "Maakt een bibberige videolaag rustiger. Kies Laag, Gemiddeld of Hoog; de camerabeweging van de clip wordt één keer gemeten en bij het project bewaard, daarna wordt het beeld tegen het trillen in verschoven en gedraaid, met net genoeg zoom om de randen te verbergen. Hogere niveaus houden het beeld rustiger.",
+   "name": "Stabilisator",
+   "params": {
+    "stabilization": {
+     "label": "Stabilisatie",
+     "options": [
+      "Uit",
+      "Laag",
+      "Gemiddeld",
+      "Hoog"
+     ]
+    }
+   }
   }
  }
 }

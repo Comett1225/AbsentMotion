@@ -21,7 +21,7 @@ constexpr double kTau = 6.283185307179586;
 const char* const kMotionIds[] = {"absent.autoshake", "absent.randomdisplace", "absent.randomjitter", "absent.oscillate",
                                   "absent.swing", "absent.spin", "absent.pulsesize", "absent.pulseopacity",
                                   "absent.echo", "absent.videofeedback", "absent.timequant", "absent.shutterblur", "absent.motionblur", "absent.movealongpath",
-                                  "absent.scaleassist", "absent.parenthelper", "absent.facetrack"};
+                                  "absent.scaleassist", "absent.parenthelper", "absent.facetrack", "absent.stabilizer"};
 
 thread_local bool gFastShutter = false;
 thread_local bool gShutterAnyTime = false;

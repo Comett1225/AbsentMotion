@@ -137,7 +137,7 @@ class EngineThread(private val background: Int, private val context: Context? = 
 
     internal suspend fun awaitEffects() { effectJob?.join() }
 
-    internal suspend fun previewAddedEffects(context: Context, added: List<AddedEffect>): List<AddedEffectPreview> {
+    internal suspend fun previewAddedEffects(context: Context, added: List<AddedEffect>, pictured: Set<String> = emptySet()): List<AddedEffectPreview> {
         if (added.isEmpty()) return emptyList()
         val sample = withContext(Dispatchers.IO) { runCatching { addedEffectSample(context) }.getOrNull() }
         return try {
@@ -146,7 +146,7 @@ class EngineThread(private val background: Int, private val context: Context? = 
                 NativeEngine().use { preview ->
                     added.map {
                         coroutineContext.ensureActive()
-                        previewAddedEffect(preview, it, sample)
+                        previewAddedEffect(preview, it, sample.takeIf { _ -> it.definition.key !in pictured })
                     }
                 }
             }

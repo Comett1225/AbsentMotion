@@ -463,3 +463,5 @@ fun rememberFolderPicker(start: String?, title: String, onPicked: (String) -> Un
 
 fun mediaTrouble(context: Context, uri: android.net.Uri): String? =
     uri.toFile()?.let { file -> runCatching { app.absentmotion.media.MediaEngine.current.trouble(file) }.getOrNull() }?.let { context.getString(it) }
+
+internal fun systemFontFamily(file: java.io.File): String? = android.graphics.fonts.SystemFonts.familyOf(file)

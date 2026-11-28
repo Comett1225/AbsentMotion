@@ -643,7 +643,7 @@ private class LayerWriter(private val host: Scene, private val duration: Int) {
                     transformNode(host.width / 2f, host.height / 2f, item.opacity),
                     XmlNode("scene", linkedMapOf(
                         "title" to "", "width" to "${host.width}", "height" to "${host.height}", "exportWidth" to "${host.width}",
-                        "exportHeight" to "${host.height}", "bgcolor" to "#00000000", "totalTime" to "$duration", "fps" to "${host.fps}", "retime" to "off",
+                        "exportHeight" to "${host.height}", "bgcolor" to "#00000000", "totalTime" to "${(duration - 1).coerceAtLeast(0)}", "fps" to "${host.fps}", "retime" to "freeze",
                     ), item.children.map { node(it, 0, duration) }),
                 ))
             }

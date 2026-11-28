@@ -80,3 +80,5 @@ internal fun sampledBitmap(maxSide: Int, open: () -> InputStream?): Bitmap? {
     val options = BitmapFactory.Options().apply { inSampleSize = maxOf(1, maxOf(bounds.outWidth, bounds.outHeight) / maxSide) }
     return open()?.use { BitmapFactory.decodeStream(it, null, options) }
 }
+
+internal fun systemFontFamily(file: java.io.File): String? = null

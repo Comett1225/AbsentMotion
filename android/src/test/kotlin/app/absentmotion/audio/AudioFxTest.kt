@@ -83,11 +83,11 @@ class AudioFxTest {
         assertTrue(reset.bypass)
     }
 
-    private val nativeCounts = mapOf(0 to 13, 1 to 4, 2 to 4, 3 to 6, 4 to 5, 5 to 6, 6 to 5, NativeFx.PITCH to 1)
+    private val nativeCounts = mapOf(0 to 13, 1 to 4, 2 to 4, 3 to 6, 4 to 5, 5 to 6, 6 to 5, NativeFx.PITCH to 1, 9 to 2, 10 to 1)
 
     @Test fun parameterLayoutMatchesTheNativeBridge() {
         val counts = mapOf(FxKind.Eq to 13, FxKind.LowPass to 3, FxKind.HighPass to 3, FxKind.Reverb to 6, FxKind.Echo to 5, FxKind.Compressor to 6, FxKind.Gate to 5,
-            FxKind.HighPitch to 1, FxKind.LowPitch to 1, FxKind.Voice to 9)
+            FxKind.HighPitch to 1, FxKind.LowPitch to 1, FxKind.Voice to 9, FxKind.Vibrato to 2, FxKind.RingModulator to 1)
         assertEquals(FxKind.entries.toSet(), counts.keys)
         for ((kind, count) in counts) {
             assertEquals(kind.xml, count, kind.params.size)
@@ -95,9 +95,11 @@ class AudioFxTest {
         }
         for (kind in FxKind.entries.filter { it.units == 1 && it != FxKind.HighPitch && it != FxKind.LowPitch })
             assertEquals(kind, FxKind.entries.single { it.id == kind.id })
-        val spec = FxKind.entries.map { AudioFx.of(it) }.spec()!!
-        assertEquals(spec.kinds.sumOf { 2 + nativeCounts.getValue(it) }, spec.values.size)
-        assertEquals(FxKind.entries.sumOf { it.units }, spec.kinds.size)
+        for (kinds in FxKind.entries.partition { it != FxKind.Voice }.toList()) {
+            val spec = kinds.map { AudioFx.of(it) }.spec()!!
+            assertEquals(spec.kinds.sumOf { 2 + nativeCounts.getValue(it) }, spec.values.size)
+            assertEquals(kinds.sumOf { it.units }, spec.kinds.size)
+        }
         assertTrue((List(MAX_AUDIO_FX + 3) { AudioFx.of(FxKind.Eq) }).spec()!!.kinds.size == MAX_AUDIO_FX)
     }
 

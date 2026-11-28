@@ -63,6 +63,76 @@ internal fun exitsToRecord(exits: List<Exit>, seen: Long, logged: List<Long>): L
         if (handled) null else exit to reason
     }
 
+private class ProtoField(val num: Int, val value: Long, val bytes: ByteArray?) {
+    val text: String get() = bytes?.decodeToString().orEmpty()
+}
+
+private fun protoFields(b: ByteArray): List<ProtoField> {
+    val out = ArrayList<ProtoField>()
+    var i = 0
+    fun varint(): Long {
+        var r = 0L
+        var shift = 0
+        while (true) {
+            val x = b[i++].toInt() and 255
+            r = r or ((x and 127).toLong() shl shift)
+            if (x < 128) return r
+            shift += 7
+            require(shift < 64)
+        }
+    }
+    while (i < b.size) {
+        val key = varint()
+        val num = (key ushr 3).toInt()
+        when ((key and 7).toInt()) {
+            0 -> out += ProtoField(num, varint(), null)
+            1 -> i += 8
+            2 -> {
+                val n = varint().toInt()
+                if (n < 0 || i + n > b.size) break
+                out += ProtoField(num, 0, b.copyOfRange(i, i + n))
+                i += n
+            }
+            5 -> i += 4
+            else -> error("not protobuf")
+        }
+    }
+    return out
+}
+
+internal fun tombstoneText(bytes: ByteArray, maxChars: Int): String? = runCatching {
+    val top = protoFields(bytes)
+    val crashed = top.lastOrNull { it.num == 6 && it.bytes == null }?.value?.toInt()
+    val threads = top.filter { it.num == 16 && it.bytes != null }.mapNotNull { entry -> protoFields(entry.bytes!!).firstOrNull { it.num == 2 }?.bytes?.let(::protoFields) }
+    if (crashed == null || threads.isEmpty()) return null
+    fun id(t: List<ProtoField>) = t.firstOrNull { it.num == 1 && it.bytes == null }?.value?.toInt()
+    fun frames(t: List<ProtoField>, limit: Int, withBuild: Boolean) = buildString {
+        t.filter { it.num == 4 && it.bytes != null }.take(limit).forEachIndexed { n, frame ->
+            val f = protoFields(frame.bytes!!)
+            fun str(k: Int) = f.firstOrNull { it.num == k && it.bytes != null }?.text.orEmpty()
+            val pc = f.firstOrNull { it.num == 1 && it.bytes == null }?.value ?: 0L
+            append("  #").append(n.toString().padStart(2, '0')).append(" pc 0x").append(pc.toString(16)).append(' ').append(str(6).substringAfterLast('/').ifEmpty { "<unknown>" })
+            if (str(4).isNotEmpty()) append(" (").append(str(4)).append('+').append(f.firstOrNull { it.num == 5 && it.bytes == null }?.value ?: 0).append(')')
+            if (withBuild && str(8).isNotEmpty()) append(" (BuildId: ").append(str(8)).append(')')
+            append('\n')
+        }
+    }
+    fun name(t: List<ProtoField>) = t.firstOrNull { it.num == 2 && it.bytes != null }?.text.orEmpty()
+    buildString {
+        top.firstOrNull { it.num == 10 && it.bytes != null }?.let { protoFields(it.bytes!!) }?.let { s ->
+            fun str(k: Int) = s.firstOrNull { it.num == k && it.bytes != null }?.text.orEmpty()
+            append(str(2)).append(" (").append(str(4)).append(')')
+            if (s.any { it.num == 8 && it.value != 0L }) append(", fault address 0x").append((s.firstOrNull { it.num == 9 && it.bytes == null }?.value ?: 0L).toULong().toString(16))
+            append('\n')
+        }
+        top.filter { it.num == 15 && it.bytes != null }.forEach { c -> protoFields(c.bytes!!).firstOrNull { it.num == 1 && it.bytes != null }?.let { append("Cause: ").append(it.text).append('\n') } }
+        top.firstOrNull { it.num == 14 && it.bytes != null }?.text?.takeIf { it.isNotBlank() }?.let { append("Abort message: ").append(it).append('\n') }
+        val first = threads.firstOrNull { id(it) == crashed }
+        if (first != null) append("\nCrashed thread ").append(crashed).append(' ').append(name(first)).append(":\n").append(frames(first, 64, true))
+        for (t in threads) if (t !== first) append("\nThread ").append(id(t)).append(' ').append(name(t)).append(":\n").append(frames(t, 12, false))
+    }.take(maxChars)
+}.getOrNull()
+
 internal fun readableStrings(bytes: ByteArray, maxChars: Int, shortest: Int = 5): String {
     val out = StringBuilder()
     val run = StringBuilder()
@@ -215,7 +285,11 @@ object CrashLogs {
         val trace = runCatching { info.traceInputStream?.use { it.readAtMost(4 * MaxDetail) } }.getOrNull()
         if (trace != null && trace.isNotEmpty()) {
             append('\n')
-            append(if (info.reason == ApplicationExitInfo.REASON_ANR) trace.decodeToString().take(MaxDetail) else readableStrings(trace, MaxDetail))
+            append(when (info.reason) {
+                ApplicationExitInfo.REASON_ANR -> trace.decodeToString().take(MaxDetail)
+                ApplicationExitInfo.REASON_CRASH_NATIVE -> tombstoneText(trace, MaxDetail) ?: readableStrings(trace, MaxDetail)
+                else -> readableStrings(trace, MaxDetail)
+            })
         }
     }
 }

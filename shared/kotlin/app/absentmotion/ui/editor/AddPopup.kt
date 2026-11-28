@@ -304,15 +304,13 @@ private fun TemplateCell(template: SavedTemplate, modifier: Modifier, onClick: (
 
 @Composable
 private fun QuickBar(state: EditorState, modifier: Modifier, close: Boolean = true) {
-    var captions by remember { mutableStateOf(false) }
     Column(modifier) {
         QuickItem(R.string.add_quick_freehand_brush, ChromeIcons.Freehand, height = 61.dp, iconTop = 7.dp, labelTop = 35.dp, onClick = { state.startFreehand() })
         QuickItem(R.string.add_quick_pen_tool, ChromeIcons.VectorDrawing, height = 61.dp, iconTop = 6.5.dp, labelTop = 35.dp, onClick = { state.startVectorDrawing() })
         QuickItem(R.string.add_quick_text, ChromeIcons.TextTool, height = 48.dp, iconTop = 4.dp, labelTop = 31.dp, target = "add_text", onClick = { state.addText() })
-        QuickItem(R.string.add_quick_captions, ChromeIcons.Captions, height = 48.dp, iconTop = 4.dp, labelTop = 31.dp, onClick = { captions = true })
+        QuickItem(R.string.add_quick_captions, ChromeIcons.Captions, height = 48.dp, iconTop = 4.dp, labelTop = 31.dp, onClick = { state.addOpen = false; state.captionsOpen = true })
         if (close) BarButton(ChromeIcons.CloseThick, stringResource(R.string.action_close), Modifier.fillMaxWidth().weight(1f)) { state.addOpen = false }
     }
-    if (captions) CaptionsSheet(state) { captions = false }
 }
 
 @Composable

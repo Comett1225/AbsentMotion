@@ -10027,6 +10027,63 @@
      "label": "Pangkas"
     }
    }
+  },
+  "warmglow": {
+   "description": "Mengaburkan lapisan dan mengekalkan yang lebih gelap antara kabur dan gambar bagi setiap warna, supaya bayang merebak dengan lembut ke bahagian yang cerah. Topeng menghadkan kesan kepada segi empat tepat, elips atau poligon.",
+   "name": "Cahaya Hangat",
+   "params": {
+    "blur": {
+     "label": "Tahap"
+    },
+    "mask": {
+     "label": "Topeng",
+     "options": [
+      "Tiada",
+      "Segi Empat Tepat",
+      "Elips",
+      "Poligon"
+     ]
+    },
+    "maskCenter": {
+     "label": "Kedudukan Topeng"
+    },
+    "maskWidth": {
+     "label": "Lebar Topeng"
+    },
+    "maskHeight": {
+     "label": "Tinggi Topeng"
+    },
+    "sides": {
+     "label": "Sisi"
+    },
+    "feather": {
+     "label": "Lembut tepi"
+    }
+   }
+  },
+  "brokenglass": {
+   "description": "Memecahkan gambar seperti kaca yang dihentam berhampiran tengah: retakan merebak dari titik hentaman dan setiap serpihan teranjak serta berputar sedikit. Serpihan menetapkan bilangan serpihan dan sejauh mana ia bergerak.",
+   "name": "Kaca Pecah",
+   "params": {
+    "debris": {
+     "label": "Serpihan"
+    }
+   }
+  },
+  "stabilizer": {
+   "description": "Menstabilkan lapisan video yang bergoyang. Pilih Rendah, Sederhana atau Tinggi dan pergerakan kamera klip diukur sekali lalu disimpan bersama projek; kemudian gambar digerakkan dan diputar melawan goncangan dengan zum secukupnya untuk menyembunyikan tepi. Tahap yang lebih tinggi mengekalkan gambar lebih stabil.",
+   "name": "Penstabil",
+   "params": {
+    "stabilization": {
+     "label": "Penstabilan",
+     "options": [
+      "Mati",
+      "Rendah",
+      "Sederhana",
+      "Tinggi"
+     ]
+    }
+   }
   }
  }
 }

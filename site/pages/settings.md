@@ -20,7 +20,7 @@ On a computer, Settings is a window with its pages listed on the left. There the
 
 ## Editor
 
-- **Theme.** **System default** (the default on a new install: Light or Dark, following the dark mode of your phone or computer), **Light** (a dark editor and a warm light home screen), **Dark** (dark everywhere, Home included), **Daylight** (light everywhere), **Light Green** (a deep navy editor with mint green highlights and a light grey home screen) or **Custom**. The first start shows **Select your theme**, and so does the first start after updating to 5.1 if you never picked a theme. **Import theme file...** loads a theme from a small file (see below). Under it, **Theme color** sets the accent color of buttons, switches and other highlights: **Default** (the theme's own color), **Blue**, **Green**, **Purple**, **Pink** or **Custom...**, which opens a color picker. **App font** sets the font of the app's menus and labels, not the text in your projects: **Default** or one of the fonts that come with the app or that you imported.
+- **Theme.** **System default** (the default on a new install: Light or Dark, following the dark mode of your phone or computer), **Light** (a dark editor and a warm light home screen), **Dark** (dark everywhere, Home included), **Daylight** (light everywhere), **Light Green** (a deep navy editor with mint green highlights and a light grey home screen) or **Custom**. The first start shows **Select your theme**, and so does the first start after updating to 5.1 if you never picked a theme. **Import theme file...** loads a theme from a small file, and **Create theme...** opens a page where you make your own theme color by color (see [Themes](@themes)). Under it, **Theme color** sets the accent color of buttons, switches and other highlights: **Default** (the theme's own color), **Blue**, **Green**, **Purple**, **Pink** or **Custom...**, which opens a color picker. **App font** sets the font of the app's menus and labels, not the text in your projects: **Default** or one of the fonts that come with the app or that you imported.
 - **New Layer Length.** How long new layers last: 1 to 10, 15, 20, 25, 30, 45 or 60 seconds. The default is 2.
 - **Vibration.** Small vibrations on the timeline for snaps, long presses and reordering. On by default.
 - **Transition button in preview.** Off by default. The round button that adds a transition normally sits at the bottom right of the timeline area. Turn this on to have it at the bottom left of the preview instead. See [Transitions and animations](@animations).
@@ -30,13 +30,7 @@ On a computer, Settings is a window with its pages listed on the left. There the
 
 ### Custom themes
 
-A theme file is a small text file in JSON format of up to 64 KB with an optional `name` and any of the colors you want to change, written as `#RRGGBB` or `#AARRGGBB`. Colors you leave out keep the AbsentMotion look. For example:
-
-```
-{"name": "Mint", "Accent": "#5BD6A4", "HomeAccent": "#1B7A4A"}
-```
-
-The color names are the editor and home screen colors: TopBar, PreviewBg, TimelineBg, Panel, PanelInset, Button, Field, FieldHi, Chosen, Well, Deepest, Line, MenuLine, KeyDigit, KeySymbol, Scrim, PressEditor, OnDark, OnDarkDim, Caption, Faint, Inactive, OnScrim, Accent, AccentLit, AccentGlow, AccentDeep, OnAccent, Cool, CoolDeep, Gold, Favorite, Warning, Bookmark, LayerBar, LayerBarStripe, TextBar, TextBarStripe, AudioBar, AudioWave, OnBar, OnAudioBar, HomeBg, Card, SheetBg, Navy, HomeAccent, OnNavy, OnNavyAccent, NavyHi, NavyLine, HomeInk, HomeMid, HomeDim, HomeFaint, HomeLine, HomePanel, HomeDrawer, SwitchOff, Thumb, MenuScrim and PressHome. One custom theme is kept at a time; importing a new file replaces it and applies it at once.
+You can make your own theme in the app with **Create theme...**, or load a theme file someone shared with **Import theme file...**. One custom theme is kept at a time; saving or importing a new one replaces it and applies it at once. [Themes](@themes) explains both, with every color name and where it shows.
 
 ## Playback and preview
 
